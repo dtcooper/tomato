@@ -30,7 +30,7 @@ jobs:
           echo "::set-output name=tag::${{ matrix.debug && 'dev' || 'latest' }}"
           echo "::set-output name=cache-tag::ghcr.io/${USERNAME}/tomato-cache:server-${{ matrix.debug && 'dev' || 'latest' }}"
           echo "::set-output name=repo::ghcr.io/${USERNAME}/tomato-server"
-          echo "::set-output name=sha-tag::$(echo ${GITHUB_SHA} | cut -c 1-8)${{ matrix.debug && '-dev' || '' }}""
+          echo "::set-output name=sha-tag::$(echo ${GITHUB_SHA} | cut -c 1-8)${{ matrix.debug && '-dev' || '' }}"
           echo "::set-output name=username::${USERNAME}"
       -
         name: Set up Docker Buildx
