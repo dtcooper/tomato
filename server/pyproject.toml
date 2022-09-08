@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "tomato"
+version = "0.0.1-dev0"
+description = "Tomato Radio Automation Server"
+authors = ["David Cooper <david.cooper@burningman.org>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

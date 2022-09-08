@@ -10,3 +10,10 @@ The server backend is written in [Python](https://www.python.org/)'s
 
 The client is a native, cross-platform [Electron](https://www.electronjs.org/)
 app.
+
+
+## License
+
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT)
+&mdash; see the [LICENSE](https://github.com/dtcooper/tomato/blob/main/LICENSE)
+file for details.
