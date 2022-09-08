@@ -1,5 +1,4 @@
 services:
   app:
     restart: always
-    image: ghcr.io/dtcooper/tomato-backend:latest
     build: .

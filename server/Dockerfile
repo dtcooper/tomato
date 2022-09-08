@@ -1,6 +1,33 @@
 FROM python:3.10-bullseye AS base
 
 
+FROM base AS audiowaveform-builder
+
+ARG AUDIOWAVEFORM_VERSION=1.6.0
+
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install --no-install-recommends -y \
+        cmake \
+        g++ \
+        gcc \
+        libboost-filesystem-dev \
+        libboost-program-options-dev \
+        libboost-regex-dev \
+        libgd-dev \
+        libid3tag0-dev \
+        libmad0-dev \
+        libsndfile1-dev \
+        make \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /usr/src/audiowaveform && cd /usr/src/audiowaveform \
+    && wget -qO - "https://github.com/bbc/audiowaveform/archive/refs/tags/${AUDIOWAVEFORM_VERSION}.tar.gz" | tar xz --strip-components 1 \
+    && mkdir build && cd build \
+    && cmake -D ENABLE_TESTS=0 .. \
+    && make && make install && strip "$(which audiowaveform)"
+
+
 FROM base AS final
 
 ARG DEBUG=0 \
@@ -19,12 +46,22 @@ RUN curl -sSL https://install.python-poetry.org | python -
 ENV PATH="/root/.local/bin:${PATH}"
 
 RUN apt-get update \
+    && apt-get upgrade -y \
     && apt-get install --no-install-recommends -y \
         ffmpeg \
+        # For audiowaveform
+        libboost-filesystem1.74.0 \
+        libboost-program-options1.74.0 \
+        libboost-regex1.74.0 \
+        libgd3 \
+        libid3tag0 \
+        libmad0 \
+        libsndfile1 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY pyproject.toml poetry.lock /app/
 WORKDIR /app
 RUN poetry install $([ -z "$DEBUG" -o "$DEBUG" = '0' ] && echo '--no-dev')
 
+COPY --from=audiowaveform-builder /usr/local/bin/audiowaveform /usr/local/bin/
 COPY . /app
