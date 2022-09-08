@@ -11,6 +11,39 @@ The server backend is written in [Python](https://www.python.org/)'s
 The client is a native, cross-platform [Electron](https://www.electronjs.org/)
 app.
 
+## Server Setup
+
+Install [Docker](https://www.docker.com/) (which now includes
+[Compose](https://docs.docker.com/compose/)),
+
+```bash
+# For Linux only. On macOS skip this step and install Docker Desktop.
+curl -fsSL https://get.docker.com | sh
+```
+
+Then, clone the repository and enter the `server/` directory,
+
+```bash
+git clone https://github.com/dtcooper/tomato.git
+cd tomato/server
+```
+
+Create and edit an `.env` environment variables file and optionally symlink
+the development config for Compose,
+
+```bash
+cp .env.sample .env
+
+# Only symlink this file when DEBUG=1
+ln -s docker-compose.dev.yml docker-compose.override.yml
+```
+
+Now bring the server up using,
+
+```bash
+docker compose up
+```
+
 
 ## License
 
