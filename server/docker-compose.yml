@@ -4,12 +4,15 @@ services:
     image: ghcr.io/dtcooper/tomato-server:latest
     depends_on:
       - db
+      - redis
     build:
       context: .
       args:
         - "DEBUG=${DEBUG:-0}"
     volumes:
       - ./.env:/.env:ro
+      - ../constants.json:/constants.json:ro
+      - ./serve:/serve
 
   db:
     restart: always
@@ -19,5 +22,12 @@ services:
     environment:
       - POSTGRES_PASSWORD=postgres
 
+  redis:
+    restart: always
+    image: library/redis:6.2-alpine
+    volumes:
+      - redis_data:/data
+
 volumes:
   postgres_data:
+  redis_data:

@@ -13,3 +13,7 @@ shell:
 .PHONY: up
 up:
 	$(COMPOSE) up
+
+.PHONY: down
+down:
+	$(COMPOSE) down

@@ -38,9 +38,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     POETRY_VIRTUALENVS_CREATE=false
 
-RUN wget -qO /usr/local/bin/wait-for-it.sh \
+RUN wget -qO /usr/local/bin/wait-for-it \
         "https://raw.githubusercontent.com/vishnubob/wait-for-it/${WAIT_FOR_IT_VERSION}/wait-for-it.sh" \
-    && chmod +x /usr/local/bin/wait-for-it.sh
+    && chmod +x /usr/local/bin/wait-for-it
 
 RUN curl -sSL https://install.python-poetry.org | python -
 ENV PATH="/root/.local/bin:${PATH}"
