@@ -15,6 +15,7 @@ fi
 
 wait-for-it -t 0 db:5432
 ./manage.py migrate
+./manage.py create_groups
 
 if [ "$DEBUG" ]; then
     # When DEBUG=True, if no user exists, create one
