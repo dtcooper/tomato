@@ -16,7 +16,7 @@ inputs:
     required: false
     default: 'false'
   build-args:
-    description: "List of build-time variables"
+    description: List of build-time variables
     required: false
 
 runs:
@@ -53,7 +53,6 @@ runs:
         platforms: linux/amd64,linux/arm64
         context: ./${{ inputs.container }}/
         tags: ${{ steps.vars.outputs.repo }}:${{ inputs.tag }}
-        no-cache: ${{ inputs.no-cache }}
         build-args: ${{ inputs.build-args }}
-        cache-from: type=registry,ref=${{ steps.vars.outputs.cache-tag }}
-        cache-to: type=registry,ref=${{ steps.vars.outputs.cache-tag }},mode=max
+        cache-from: ${{ inputs.no-cache == 'false' && format('type=registry,ref={0}', steps.vars.outputs.cache-tag) || '' }}
+        cache-to: ${{ inputs.no-cache == 'false' && format('type=registry,ref={0},mode=max', steps.vars.outputs.cache-tag) || '' }}
