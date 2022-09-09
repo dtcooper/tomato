@@ -20,3 +20,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           container: server
           tag: ${{ github.ref_name }}
+          no-cache: true

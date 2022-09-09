@@ -50,8 +50,7 @@ runs:
       with:
         push: true
         pull: true
-        #platforms: linux/amd64,linux/arm64
-        platforms: linux/amd64
+        platforms: linux/amd64,linux/arm64
         context: ./${{ inputs.container }}/
         tags: ${{ steps.vars.outputs.repo }}:${{ inputs.tag }}
         no-cache: ${{ inputs.no-cache }}
