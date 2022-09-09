@@ -1,0 +1,54 @@
+name: Build and push
+description: Build and push docker containers
+
+inputs:
+  container:
+    description: Container name
+    required: true
+  tag:
+    description: Container tag name
+    required: true
+  token:
+    description: GitHub token
+    required: true
+  no-cache:
+    description: Do not use cache when building
+    required: false
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    -
+      name: Set variables
+      id: vars
+      shell: bash
+      run: |
+        USERNAME="$(echo "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
+        echo "::set-output name=cache-tag::ghcr.io/${USERNAME}/tomato-build-cache:${{ inputs.container }}-${{ inputs.tag }}"
+        echo "::set-output name=repo::ghcr.io/${USERNAME}/tomato-${{ inputs.container }}"
+        echo "::set-output name=username::${USERNAME}"
+    -
+      name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    -
+      name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+    -
+      name: Login to Github Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ steps.vars.outputs.username }}
+        password: ${{ inputs.token }}
+    -
+      name: Build and push
+      uses: docker/build-push-action@v3
+      with:
+        push: true
+        platforms: linux/amd64,linux/arm64
+        context: ./${{ inputs.container }}/
+        tags: ${{ steps.vars.outputs.repo }}:${{ inputs.tag }}
+        no-cache: ${{ inputs.no-cache }}
+        cache-from: type=registry,ref=${{ steps.vars.outputs.cache-tag }}
+        cache-to: type=registry,ref=${{ steps.vars.outputs.cache-tag }},mode=max
