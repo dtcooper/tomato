@@ -1,4 +1,10 @@
 services:
   app:
     restart: always
-    build: .
+    image: ghcr.io/dtcooper/tomato-server:latest
+    build:
+      context: .
+      args:
+        - "DEBUG=${DEBUG:-0}"
+    volumes:
+      - ./.env:/.env:ro

@@ -8,6 +8,12 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+Django = "^4.1.1"
+
+[tool.poetry.group.dev.dependencies]
+django-extensions = "^3.2.0"
+ipdb = "^0.13.9"
+ipython = "^8.5.0"
 
 [build-system]
 requires = ["poetry-core"]

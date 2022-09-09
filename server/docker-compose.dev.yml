@@ -1,4 +1,6 @@
 services:
   app:
+    restart: 'no'
+    image: ghcr.io/dtcooper/tomato-server:dev
     volumes:
       - .:/app
