@@ -2,9 +2,22 @@ services:
   app:
     restart: always
     image: ghcr.io/dtcooper/tomato-server:latest
+    depends_on:
+      - db
     build:
       context: .
       args:
         - "DEBUG=${DEBUG:-0}"
     volumes:
       - ./.env:/.env:ro
+
+  db:
+    restart: always
+    image: library/postgres:14.5-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_PASSWORD=postgres
+
+volumes:
+  postgres_data:

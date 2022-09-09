@@ -4,3 +4,10 @@ services:
     image: ghcr.io/dtcooper/tomato-server:dev
     volumes:
       - .:/app
+    ports:
+      - 8000:8000
+
+  db:
+    restart: 'no'
+    ports:
+      - 127.0.0.1:5432:5432
