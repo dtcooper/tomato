@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 concurrency:
@@ -16,7 +18,7 @@ jobs:
     name: Build container
     strategy:
       matrix:
-        debug: [0, 1]
+        tag: [dev, latest]
     steps:
       -
         name: Checkout
@@ -27,10 +29,8 @@ jobs:
         shell: bash
         run: |
           USERNAME="$(echo "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
-          echo "::set-output name=tag::${{ matrix.debug && 'dev' || 'latest' }}"
-          echo "::set-output name=cache-tag::ghcr.io/${USERNAME}/tomato-cache:server-${{ matrix.debug && 'dev' || 'latest' }}"
+          echo "::set-output name=cache-tag::ghcr.io/${USERNAME}/tomato-build-cache:server-${{ matrix.tag }}"
           echo "::set-output name=repo::ghcr.io/${USERNAME}/tomato-server"
-          echo "::set-output name=sha-tag::$(echo ${GITHUB_SHA} | cut -c 1-8)${{ matrix.debug && '-dev' || '' }}"
           echo "::set-output name=username::${USERNAME}"
       -
         name: Set up Docker Buildx
@@ -53,9 +53,9 @@ jobs:
           platforms: linux/amd64
           context: ./server/
           tags: |
-            ${{ steps.vars.outputs.repo }}:${{ steps.vars.outputs.tag }}
-            ${{ steps.vars.outputs.repo }}:${{ steps.vars.outputs.sha-tag }}
+            ${{ steps.vars.outputs.repo }}:${{ matrix.tag }} |
+            ${{ github.ref_type == 'tag' && matrix.tag == 'latest' && format('{0}/{1}', steps.var.outputs.repo, github.ref_name) || '' }}
           build-args: |
-            DEBUG=${{ matrix.debug }}
+            DEBUG=${{ matrix.tag == 'dev' && '1' || '0' }}
           cache-from: type=registry,ref=${{ steps.vars.outputs.cache-tag }}
           cache-to: type=registry,ref=${{ steps.vars.outputs.cache-tag }},mode=max
