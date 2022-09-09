@@ -53,7 +53,7 @@ jobs:
           platforms: linux/amd64
           context: ./server/
           tags: |
-            ${{ steps.vars.outputs.repo }}:${{ matrix.tag }} |
+            ${{ steps.vars.outputs.repo }}:${{ matrix.tag }}
             ${{ github.ref_type == 'tag' && matrix.tag == 'latest' && format('{0}/{1}', steps.var.outputs.repo, github.ref_name) || '' }}
           build-args: |
             DEBUG=${{ matrix.tag == 'dev' && '1' || '0' }}
