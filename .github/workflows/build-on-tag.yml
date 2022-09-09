@@ -1,0 +1,22 @@
+name: Release server container
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    name: Build container
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Build container
+        uses: ./.github/actions/docker-build-push
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          container: server
+          tag: ${{ github.ref_name }}
