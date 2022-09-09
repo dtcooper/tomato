@@ -15,6 +15,9 @@ inputs:
     description: Do not use cache when building
     required: false
     default: 'false'
+  build-args:
+    description: "List of build-time variables"
+    required: false
 
 runs:
   using: composite
@@ -50,5 +53,6 @@ runs:
         context: ./${{ inputs.container }}/
         tags: ${{ steps.vars.outputs.repo }}:${{ inputs.tag }}
         no-cache: ${{ inputs.no-cache }}
+        build-args: ${{ inputs.build-args }}
         cache-from: type=registry,ref=${{ steps.vars.outputs.cache-tag }}
         cache-to: type=registry,ref=${{ steps.vars.outputs.cache-tag }},mode=max

@@ -28,3 +28,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           container: server
           tag: ${{ matrix.tag }}
+          build-args: DEBUG=${{ matrix.tag == 'dev' && '1' || '0' }}
