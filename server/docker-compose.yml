@@ -16,7 +16,7 @@ services:
 
   db:
     restart: always
-    image: library/postgres:14.5-alpine
+    image: postgres:14.5-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
@@ -24,10 +24,26 @@ services:
 
   redis:
     restart: always
-    image: library/redis:6.2-alpine
+    image: redis:6.2-alpine
     volumes:
       - redis_data:/data
 
+  nginx:
+    restart: always
+    image: jonasal/nginx-certbot:3.2
+    depends_on:
+      - app
+    volumes:
+      - ./nginx.conf:/etc/nginx/templates/app.conf.template:ro
+      - nginx_secrets:/etc/letsencrypt
+    environment:
+      - "CERTBOT_EMAIL=${CERTBOT_EMAIL:?CERTBOT_EMAIL needs to be set. See .env file.}"
+      - "DOMAIN_NAME=${DOMAIN_NAME:?DOMAIN_NAME needs to be set. See .env file.}"
+    ports:
+      - 80:80
+      - 443:443
+
 volumes:
+  nginx_secrets:
   postgres_data:
   redis_data:

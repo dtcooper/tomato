@@ -16,3 +16,10 @@ services:
     restart: 'no'
     ports:
       - 127.0.0.1:6379:6379
+
+  nginx:
+    restart: 'no'
+    environment:
+      - "USE_LOCAL_CA=${NGINX_USE_LOCAL_CA:-0}"
+    volumes:
+      - ./local-certificate-authority:/etc/local_ca

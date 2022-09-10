@@ -1,5 +1,0 @@
-.env*
-/serve/
-docker-compose*.yml
-Dockerfile
-Makefile

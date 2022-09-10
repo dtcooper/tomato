@@ -12,9 +12,11 @@ env.read_env("/.env")
 BASE_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = BASE_DIR.parent
 
-SECRET_KEY = env("SECRET_KEY")
 DEBUG = env.bool("DEBUG", default=False)
 DOMAIN_NAME = env("DOMAIN_NAME", default=None)
+REQUIRE_STRONG_PASSWORDS = env("REQUIRE_STRONG_PASSWORDS", default=False)
+SECRET_KEY = env("SECRET_KEY")
+TIME_ZONE = env("TIMEZONE", default="US/Pacific")
 
 ALLOWED_HOSTS = {"app"}
 if DEBUG:
@@ -79,12 +81,7 @@ DATABASES = {
     }
 }
 
-AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-]
-
 LANGUAGE_CODE = "en-us"
-TIME_ZONE = env("TIMEZONE", default="US/Pacific")
 USE_I18N = True
 USE_TZ = True
 
@@ -94,6 +91,14 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = "/serve/media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+if REQUIRE_STRONG_PASSWORDS:
+    AUTH_PASSWORD_VALIDATORS = [
+        {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+        {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 12}},
+        {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+        {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+    ]
 
 CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
 CONSTANCE_SUPERUSER_ONLY = False

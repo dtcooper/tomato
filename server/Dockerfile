@@ -64,7 +64,7 @@ WORKDIR /app
 RUN poetry install $([ -z "$DEBUG" -o "$DEBUG" = '0' ] && echo '--no-dev')
 
 COPY --from=audiowaveform-builder /usr/local/bin/audiowaveform /usr/local/bin/
-COPY . /app
+COPY *.py *.sh tomato /app/
 WORKDIR /app
 
 ENTRYPOINT ["/app/entrypoint.sh"]

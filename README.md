@@ -13,6 +13,8 @@ app.
 
 ## Server Setup
 
+### Development Instructions
+
 Install [Docker](https://www.docker.com/) (which now includes
 [Compose](https://docs.docker.com/compose/)),
 
@@ -32,17 +34,27 @@ Create and edit an `.env` environment variables file and optionally symlink
 the development config for Compose,
 
 ```bash
+# Use DEBUG=1 for local development
 cp .env.sample .env
 
 # Only symlink this file when DEBUG=1
 ln -s docker-compose.dev.yml docker-compose.override.yml
 ```
 
-Now bring the server up using,
+Now create a superuser to login as,
+
+```bash
+# Not needed if DEBUG=1. Skip this step, use username/password tomato/tomato
+docker compose run app ./manage.py createsuperuser
+```
+
+And finally, bring the server up using,
 
 ```bash
 docker compose up
 ```
+
+Now navigate to <http://localhost:8000/>.
 
 
 ## License
