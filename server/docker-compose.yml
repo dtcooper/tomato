@@ -35,6 +35,7 @@ services:
       - app
     volumes:
       - ./nginx.conf:/etc/nginx/templates/app.conf.template:ro
+      - ./serve:/serve
       - nginx_secrets:/etc/letsencrypt
     environment:
       - "CERTBOT_EMAIL=${CERTBOT_EMAIL:?CERTBOT_EMAIL needs to be set. See .env file.}"
