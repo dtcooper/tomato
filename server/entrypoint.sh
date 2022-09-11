@@ -33,7 +33,7 @@ if [ $# = 0 ]; then
             -w $GUNICORN_WORKERS \
             --capture-output \
             --access-logfile - \
-        wsgi
+        tomato.wsgi
     fi
 else
     echo "Executing: $@"
