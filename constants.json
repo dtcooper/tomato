@@ -1,4 +1,5 @@
 {
+    "schema_version": 0,
     "colors": [
         {"name": "red", "normal": "#f44336", "light": "#e57373", "dark": "#c62828"},
         {"name": "pink", "normal": "#e91e63", "light": "#f06292", "dark": "#ad1457"},

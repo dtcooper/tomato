@@ -4,6 +4,7 @@ import random
 import secrets
 import string
 from urllib.parse import urlparse
+import uuid
 
 import base58
 
@@ -69,42 +70,47 @@ class User(AbstractUser):
         return None
 
 
-class Rotator(models.Model):
+class BaseModel(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
+    created_at = models.DateTimeField("created at", auto_now_add=True)
+    created_by = models.ForeignKey(
+        User, verbose_name="created by", on_delete=models.SET_NULL, null=True, editable=False
+    )
     name = models.CharField(
-        "rotator name",
+        "name",
         max_length=NAME_MAX_LENGTH,
         db_index=True,
-        help_text="The name of this asset rotator, eg 'ADs', 'Station IDs, 'Short Interviews', etc.",
     )
-
-    class Meta:
-        db_table = "rotators"
-        ordering = (Lower("name"),)
 
     def __str__(self):
         return self.name
 
+    class Meta:
+        abstract = True
+        ordering = (Lower("name"),)
 
-class Asset(models.Model):
+
+class Rotator(BaseModel):
+    class Meta:
+        db_table = "rotators"
+
+
+rotator_name = Rotator._meta.get_field("name")
+rotator_name.verbose_name = "rotator name"
+rotator_name.help_text = "The name of this asset rotator, eg 'ADs', 'Station IDs, 'Short Interviews', etc."
+del rotator_name
+
+
+class Asset(BaseModel):
     class Status(models.IntegerChoices):
         PENDING = 0, "Pending processing"
         PROCESSING = 1, "Processing"
         FAILED = 2, "Processing Failed"
         READY = 3, "Ready"
 
-    created = models.DateTimeField("created at", auto_now_add=True)
-    name = models.CharField(
-        "name",
-        max_length=NAME_MAX_LENGTH,
-        blank=True,
-        db_index=True,
-        help_text=(
-            "Optional name, if left unspecified, base it off the audio file's metadata and failing that its filename."
-        ),
-    )
     file = models.FileField("audio file", null=True, blank=False)
     status = models.SmallIntegerField(choices=Status.choices, default=Status.PENDING)
-    is_active = models.BooleanField(
+    enabled = models.BooleanField(
         "enabled",
         default=True,
         help_text=(
@@ -120,11 +126,22 @@ class Asset(models.Model):
         help_text="Rotators that this asset will be included in.",
     )
 
+    class Meta:
+        db_table = "assets"
+        verbose_name = "audio asset"
+        ordering = (Lower("name"),)
+
+    def serialize(self):
+        return {
+            "id": str(self.uuid),
+            "url": self.file.url,
+            "name": self.name,
+            "duration": round(self.duration.total_seconds()),
+            "rotators": list(self.rotators.values_list("uuid", flat=True)),
+        }
+
     def get_stripped_asset_url(self):
         return urlparse(self.file.url)._replace(query="", fragment="").geturl()
-
-    def __str__(self):
-        return self.name
 
     def clean(self):
         if self.file:
@@ -140,7 +157,10 @@ class Asset(models.Model):
             if not self.name:
                 self.name = ffprobe_data.title[:NAME_MAX_LENGTH].strip()
 
-    class Meta:
-        db_table = "assets"
-        verbose_name = "audio asset"
-        ordering = (Lower("name"),)
+
+asset_name = Asset._meta.get_field("name")
+asset_name.blank = True
+asset_name.help_text = (
+    "Optional name, if left unspecified, base it off the audio file's metadata and failing that its filename."
+)
+del asset_name

@@ -70,9 +70,13 @@ class AssetUploadForm(forms.Form):
             )
 
 
+class RotatorAdmin(admin.ModelAdmin):
+    exclude = ("uuid",)  # XXX
+
+
 class AssetAdmin(admin.ModelAdmin):
-    fields = ("name", "file", "status", "rotators", "created", "duration")
-    readonly_fields = ("duration", "created", "status")
+    exclude = ("uuid",)  # XXX
+    readonly_fields = ("duration", "created_at", "status")
     filter_horizontal = ("rotators",)
 
     def upload_view(self, request):
@@ -135,5 +139,5 @@ admin.site.unregister(Group)
 admin.site.unregister([Constance])
 admin.site.register([Constance], ConstanceAdmin)
 admin.site.register(User, UserAdmin)
-admin.site.register(Rotator)
+admin.site.register(Rotator, RotatorAdmin)
 admin.site.register(Asset, AssetAdmin)

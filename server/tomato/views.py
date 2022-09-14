@@ -6,7 +6,8 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbid
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
-from .models import User
+from .constants import SCHEMA_VERSION
+from .models import Asset, User
 
 
 def json_post_view(view_func):
@@ -20,23 +21,6 @@ def json_post_view(view_func):
             return HttpResponseBadRequest()
 
         response = view_func(request, json_data, *args, **kwargs)
-        if isinstance(response, HttpResponse):
-            return response
-
-        response["status"] = "error" if "error" in response else "ok"
-        return JsonResponse(response)
-
-    return view
-
-
-def json_get_view(view_func):
-    @wraps(view_func)
-    @require_GET
-    def view(request, *args, **kwargs):
-        response = view_func(request, *args, **kwargs)
-        if isinstance(response, HttpResponse):
-            return response
-
         response["status"] = "error" if "error" in response else "ok"
         return JsonResponse(response)
 
@@ -50,7 +34,7 @@ def require_auth_token(view_func):
         if auth_token:
             user = User.get_user_for_auth_token(auth_token)
             if user is not None:
-                return view_func(request, user, *args, **kwargs)
+                return view_func(request, *args, **kwargs)
         return HttpResponseForbidden()
 
     return view
@@ -69,7 +53,7 @@ def auth_token(request, json_data):
         return {"error": "Please provide a username and password."}
 
 
-@json_get_view
 @require_auth_token
-def sync(request, user):
-    return {"sync": "test"}
+def sync(request):
+    assets = Asset.objects.filter(enabled=True, status=Asset.Status.READY)
+    return JsonResponse({"schema_version": SCHEMA_VERSION, "assets": [asset.serialize() for asset in assets]})
