@@ -57,7 +57,19 @@ RUN apt-get update \
         libid3tag0 \
         libmad0 \
         libsndfile1 \
-    && rm -rf /var/lib/apt/lists/*
+        $([ "$DEBUG" -a "$DEBUG" != '0' ] && echo \
+            less \
+            iputils-ping \
+            nano \
+            netcat \
+            postgresql-client \
+            redis-tools \
+        ) \
+    && rm -rf /var/lib/apt/lists/* \
+    && if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
+        echo "alias redis-cli='redis-cli -h redis'" >> /root/.bashrc \
+        && echo "alias ls='ls --color=auto'" >> /root/.bashrc \
+    ; fi
 
 COPY pyproject.toml poetry.lock /app/
 WORKDIR /app

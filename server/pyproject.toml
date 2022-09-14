@@ -4,13 +4,18 @@ version = "0.0.1-dev0"
 description = "Tomato Radio Automation Server"
 authors = ["David Cooper <david.cooper@burningman.org>"]
 license = "MIT"
-readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+base58 = "^2.1.1"
+boto3 = "^1.24.72"
 Django = "^4.1.1"
+django-cleanup = "^6.0.0"
 django-constance = {extras = ["redis"], version = "^2.9.1"}
 django-environ = "^0.9.0"
+django-extensions = "^3.2.1"
+django-s3file = "^5.5.2"
+django-storages = "^1.13.1"
 gunicorn = "^20.1.0"
 huey = "^2.4.3"
 psycopg2 = "^2.9.3"
@@ -18,7 +23,6 @@ watchdog = {extras = ["watchmedo"], version = "^2.1.9"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.8.0"
-django-extensions = "^3.2.0"
 flake8 = "^5.0.4"
 ipdb = "^0.13.9"
 ipython = "^8.5.0"

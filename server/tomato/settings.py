@@ -18,6 +18,11 @@ REQUIRE_STRONG_PASSWORDS = env("REQUIRE_STRONG_PASSWORDS", default=False)
 SECRET_KEY = env("SECRET_KEY")
 TIME_ZONE = env("TIMEZONE", default="US/Pacific")
 
+AWS_S3_REGION_NAME = env("DIGITALOCEAN_SPACES_REGION_NAME")
+AWS_ACCESS_KEY_ID = env("DIGITALOCEAN_SPACES_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = env("DIGITALOCEAN_SPACES_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = env("DIGITALOCEAN_SPACES_STORAGE_BUCKET_NAME")
+
 ALLOWED_HOSTS = {"app"}
 if DEBUG:
     ALLOWED_HOSTS.add("localhost")
@@ -26,19 +31,24 @@ if DOMAIN_NAME:
 ALLOWED_HOSTS = list(ALLOWED_HOSTS)
 
 INSTALLED_APPS = [
+    # Django
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Third-party
     "constance",
+    "django_extensions",
+    "s3file",
+    # Local
+    "tomato",
+    # cleanup should be last
+    "django_cleanup",
 ]
-if DEBUG:
-    INSTALLED_APPS.append("django_extensions")
-INSTALLED_APPS.append("tomato")
 
-AUTH_USER_MODEL = "tomato.TomatoUser"
+AUTH_USER_MODEL = "tomato.User"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -48,6 +58,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "s3file.middleware.S3FileMiddleware",
 ]
 
 ROOT_URLCONF = "tomato.urls"
@@ -92,6 +103,12 @@ MEDIA_ROOT = "/serve/media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+AWS_S3_FILE_OVERWRITE = False
+AWS_S3_ENDPOINT_URL = f"https://{AWS_S3_REGION_NAME}.digitaloceanspaces.com"
+AWS_DEFAULT_ACL = "public-read"
+AWS_QUERYSTRING_AUTH = False
+DEFAULT_FILE_STORAGE = "s3file.storages_optimized.S3OptimizedUploadStorage"
+
 if REQUIRE_STRONG_PASSWORDS:
     AUTH_PASSWORD_VALIDATORS = [
         {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -130,3 +147,7 @@ CONSTANCE_CONFIG = OrderedDict(
         ),
     }
 )
+
+SHELL_PLUS_IMPORTS = [
+    "from tomato.ffmpeg import ffprobe",
+]

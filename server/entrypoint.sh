@@ -9,21 +9,28 @@ fi
 wait-for-it -t 0 db:5432
 ./manage.py migrate
 
-if [ $# = 0 ]; then
-    ./manage.py collectstatic --noinput
-    ./manage.py create_groups
+if [ "$DEBUG" -a "$DEBUG" != '0' ]; then
+    # When DEBUG=True, if no user exists, create one with tomato:tomato
+    if [ "$(./manage.py shell -c 'from tomato.models import User; print("" if User.objects.exists() else "1")')" = 1 ]; then
+        DJANGO_SUPERUSER_PASSWORD=tomato ./manage.py createsuperuser --noinput --username tomato --email tomato@example.com
+    fi
 
+    # Make psql/redis work easily
+    export PGHOST=db
+    export PGUSER=postgres
+    export PGPASSWORD=postgres
+fi
+
+if [ $# = 0 ]; then
     if [ "$DEBUG" -a "$DEBUG" != '0' ]; then
-        # When DEBUG=True, if no user exists, create one
-        if [ "$(./manage.py shell -c 'from tomato.models import TomatoUser; print("" if TomatoUser.objects.exists() else "1")')" = 1 ]; then
-            DJANGO_SUPERUSER_PASSWORD=tomato ./manage.py createsuperuser --noinput --username tomato --email tomato@example.com
-        fi
+
         exec ./manage.py runserver
     else
+        ./manage.py collectstatic --noinput
 
         if [ -z "$GUNICORN_WORKERS" ]; then
-            # max of round(num_cpus * 1.5 + 1) and 4
-            GUNICORN_WORKERS="$(python -c 'import multiprocessing as m; print(max(round(m.cpu_count() * 1.5 + 1), 4))')"
+            # num_cpus * 2 + 1 workers
+            GUNICORN_WORKERS="$(python -c 'import multiprocessing as m; print(m.cpu_count() * 2 + 1)')"
         fi
 
         exec gunicorn \
