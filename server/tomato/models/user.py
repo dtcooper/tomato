@@ -7,7 +7,6 @@ import base58
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-from django.db import models
 
 
 class User(AbstractUser):
@@ -16,18 +15,16 @@ class User(AbstractUser):
     is_staff = True
     first_name = None
     last_name = None
-    is_active = models.BooleanField(
-        "account enabled",
-        default=True,
-        help_text="Designates whether this account is enabled. Unselect this instead of deleting an account.",
-    )
+    email = EMAIL_FIELD = None
+    REQUIRED_FIELDS = []
+    REMOVED_FIELDS = ("is_staff", "first_name", "last_name", "email")
 
     class Meta:
         db_table = "users"
 
     def __init__(self, *args, **kwargs):
-        if "is_staff" in kwargs:
-            del kwargs["is_staff"]
+        for field in self.REMOVED_FIELDS:
+            kwargs.pop(field, None)
         super().__init__(*args, **kwargs)
 
     def get_full_name(self):
@@ -59,3 +56,24 @@ class User(AbstractUser):
                     if secrets.compare_digest(pw_hash, user._get_pw_hash(salt)):
                         return user
         return None
+
+
+is_active_field = User._meta.get_field("is_active")
+is_active_field.verbose_name = "account enabled"
+is_active_field.help_text = "Designates whether this account is enabled. Unselect this instead of deleting an account."
+del is_active_field
+
+is_superuser_field = User._meta.get_field("is_superuser")
+is_superuser_field.verbose_name = "administrator account"
+is_superuser_field.help_text = (
+    "Designates that this user is an administrator and has all permissions. Only administrators can create and edit"
+    " user accounts. "
+)
+del is_superuser_field
+
+groups_field = User._meta.get_field("groups")
+groups_field.help_text = (
+    "The groups this user belongs to. If groups with overlapping permissions are selected, user will get the most"
+    " possible permissions."
+)
+del groups_field

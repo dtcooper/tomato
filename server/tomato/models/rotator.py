@@ -13,7 +13,7 @@ class Rotator(BaseModel):
         verbose_name="Stop Set",
     )
 
-    class Meta:
+    class Meta(BaseModel.Meta):
         db_table = "rotators"
 
 

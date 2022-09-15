@@ -14,7 +14,7 @@ if [ -z "$__RUN_HUEY" ]; then
     ./manage.py migrate
     if [ "$DEBUG" -a "$DEBUG" != '0' ]; then
         if [ "$(./manage.py shell -c 'from tomato.models import User; print("" if User.objects.exists() else "1")')" = 1 ]; then
-            DJANGO_SUPERUSER_PASSWORD=tomato ./manage.py createsuperuser --noinput --username tomato --email tomato@example.com
+            DJANGO_SUPERUSER_PASSWORD=tomato ./manage.py createsuperuser --noinput --username tomato
         fi
     fi
 fi

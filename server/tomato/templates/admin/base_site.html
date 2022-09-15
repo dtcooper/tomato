@@ -27,9 +27,21 @@
     display: block;
     height: inherit;
   }
+  #nav-sidebar .module td .bulk-upload-addlink {
+    margin-left: 5px;
+  }
 </style>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
+    Array.from(document.querySelectorAll('.app-tomato.module .model-asset .addlink')).forEach((addLink) => {
+      const cell = addLink.closest('td')
+      const link = document.createElement('a')
+      link.classList.add('addlink', 'bulk-upload-addlink')
+      link.text = 'Bulk upload'
+      link.href = "{% filter escapejs %}{% url 'admin:tomato_asset_upload' %}{% endfilter %}"
+      cell.append(link)
+    })
+
     let showProgressBar = false
     const progressBar = document.getElementById('s3file-progress-bar')
 

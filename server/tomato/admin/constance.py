@@ -11,3 +11,4 @@ class ConstanceAdmin(BaseConstanceAdmin):
 
 
 Constance._meta.verbose_name = Constance._meta.verbose_name_plural = "configuration"
+Constance._meta.app_label = "tomato"

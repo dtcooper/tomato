@@ -1,10 +1,11 @@
 from django.db import models
 
-from .base import BaseModel
+from .base import BaseModel, EnabledBeginEndWeightMixin
 
 
-class StopSet(BaseModel):
-    pass
+class StopSet(EnabledBeginEndWeightMixin, BaseModel):
+    class Meta(BaseModel.Meta):
+        db_table = "stopsets"
 
 
 class StopSetRotator(models.Model):

@@ -5,17 +5,16 @@ from urllib.parse import unquote, urlparse
 from django.core.exceptions import ValidationError
 from django.core.files.storage import get_storage_class
 from django.db import models
-from django.db.models.functions import Lower
 
 from ..ffmpeg import ffprobe
-from .base import NAME_MAX_LENGTH, BaseModel
+from .base import NAME_MAX_LENGTH, BaseModel, EnabledBeginEndWeightMixin
 from .rotator import Rotator
 
 
 querystring_auth_storage = get_storage_class()(querystring_auth=True)
 
 
-class Asset(BaseModel):
+class Asset(EnabledBeginEndWeightMixin, BaseModel):
     class Status(models.IntegerChoices):
         PENDING = 0, "Pending processing"
         PROCESSING = 1, "Processing"
@@ -24,7 +23,7 @@ class Asset(BaseModel):
 
     file = models.FileField("audio file", null=True, blank=False)
     status = models.SmallIntegerField(
-        choices=Status.choices, default=Status.PENDING, help_text="All audio assets will be processed"
+        choices=Status.choices, default=Status.PENDING, help_text="All audio assets will be processed after uploading."
     )
     enabled = models.BooleanField(
         "enabled",
@@ -42,10 +41,9 @@ class Asset(BaseModel):
         help_text="Rotators that this asset will be included in.",
     )
 
-    class Meta:
+    class Meta(BaseModel.Meta):
         db_table = "assets"
         verbose_name = "audio asset"
-        ordering = (Lower("name"),)
 
     def serialize(self):
         return {
@@ -83,6 +81,7 @@ Asset.rotators.through._meta.verbose_name_plural = "Asset in Rotator relationshi
 name_field = Asset._meta.get_field("name")
 name_field.blank = True
 name_field.help_text = (
-    "Optional name, if left unspecified, base it off the audio file's metadata and failing that its filename."
+    "Optional name, if left unspecified, we'll automatically base it off the audio file's metadata and failing that its"
+    " filename."
 )
 del name_field
