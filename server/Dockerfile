@@ -21,11 +21,14 @@ RUN apt-get update \
         make \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /usr/src/audiowaveform && cd /usr/src/audiowaveform \
+RUN mkdir -p /usr/src/audiowaveform \
+    && cd /usr/src/audiowaveform \
     && wget -qO - "https://github.com/bbc/audiowaveform/archive/refs/tags/${AUDIOWAVEFORM_VERSION}.tar.gz" | tar xz --strip-components 1 \
     && mkdir build && cd build \
     && cmake -D ENABLE_TESTS=0 .. \
-    && make && make install && strip "$(which audiowaveform)"
+    && make -j "$(nproc)" \
+    && make install \
+    && strip "$(which audiowaveform)"
 
 
 FROM base AS final
@@ -76,7 +79,8 @@ WORKDIR /app
 RUN poetry install $([ -z "$DEBUG" -o "$DEBUG" = '0' ] && echo '--no-dev')
 
 COPY --from=audiowaveform-builder /usr/local/bin/audiowaveform /usr/local/bin/
-COPY *.py *.sh tomato /app/
+COPY *.py *.sh /app/
+COPY tomato/ /app/tomato/
 WORKDIR /app
 
 ENTRYPOINT ["/app/entrypoint.sh"]
