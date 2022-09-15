@@ -10,9 +10,29 @@
     font-size: 12px !important;
     font-style: italic;
   }
+  #s3file-progress-container {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 9999;
+    width: 100%;
+    background-color: transparent;
+    height: 8px;
+    display: block;
+  }
+  #s3file-progress-bar {
+    background-color: #ff295e;
+    width: 0%;
+    display: block;
+    height: inherit;
+  }
 </style>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', () => {
+    let showProgressBar = false
+    const progressBar = document.getElementById('s3file-progress-bar')
+
     let forms = Array.from(document.querySelectorAll('.s3file')).map((input) => {
       return input.closest('form')
     })
@@ -32,20 +52,22 @@
             button.disabled = true
           })
 
-          if (!form.querySelector('progress')) {
-            const elem = document.createElement('progress')
-            elem.setAttribute('min', '0')
-            elem.setAttribute('max', '1')
-            elem.style.width = '100%'
-            elem.style.height = '25px'
-            form.insertBefore(elem, form.firstChild)
+          if (!showProgressBar) {
             form.addEventListener('progress', (event) => {
-              elem.setAttribute('value', event.detail.progress)
+              progressBar.style.width = `${event.detail.progress * 100}%`
             })
+            showProgressBar = true
           }
         }
       })
     })
   })
 </script>
+{% endblock %}
+
+{% block header %}
+  <div id="s3file-progress-container">
+    <span id="s3file-progress-bar"></span>
+  </div>
+  {{ block.super }}
 {% endblock %}

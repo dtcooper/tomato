@@ -13,8 +13,9 @@ BASE_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = BASE_DIR.parent
 
 DEBUG = env.bool("DEBUG", default=False)
+
 DOMAIN_NAME = env("DOMAIN_NAME", default=None)
-REQUIRE_STRONG_PASSWORDS = env("REQUIRE_STRONG_PASSWORDS", default=False)
+REQUIRE_STRONG_PASSWORDS = env("REQUIRE_STRONG_PASSWORDS", default=not DEBUG)
 SECRET_KEY = env("SECRET_KEY")
 TIME_ZONE = env("TIMEZONE", default="US/Pacific")
 
@@ -23,12 +24,26 @@ AWS_ACCESS_KEY_ID = env("DIGITALOCEAN_SPACES_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = env("DIGITALOCEAN_SPACES_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = env("DIGITALOCEAN_SPACES_STORAGE_BUCKET_NAME")
 
+EMAIL_ADMIN_ADDRESS = env("EMAIL_ADMIN_ADDRESS")
+EMAIL_HOST = env("EMAIL_HOST")
+EMAIL_HOST_USER = env("EMAIL_USERNAME")
+EMAIL_HOST_PASSWORD = env("EMAIL_PASSWORD")
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=(EMAIL_PORT == 587))
+DEFAULT_FROM_EMAIL = SERVER_EMAIL = env("EMAIL_FROM_ADDRESS")
+
 ALLOWED_HOSTS = {"app"}
 if DEBUG:
     ALLOWED_HOSTS.add("localhost")
 if DOMAIN_NAME:
     ALLOWED_HOSTS.add(DOMAIN_NAME)
 ALLOWED_HOSTS = list(ALLOWED_HOSTS)
+
+if DEBUG:
+    import socket  # only if you haven't already imported this
+
+    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+    INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
 
 INSTALLED_APPS = [
     # Django
@@ -40,26 +55,42 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Third-party
     "constance",
-    "django_extensions",
+    "huey.contrib.djhuey",
     "s3file",
-    # Local
-    "tomato",
-    # cleanup should be last
-    "django_cleanup",
 ]
+if DEBUG:
+    INSTALLED_APPS.extend(
+        [
+            "debug_toolbar",
+            "django_extensions",
+        ]
+    )
+INSTALLED_APPS.extend(
+    [
+        # Local
+        "tomato",
+        # cleanup should be last
+        "django_cleanup",
+    ]
+)
 
 AUTH_USER_MODEL = "tomato.User"
 
-MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "s3file.middleware.S3FileMiddleware",
-]
+MIDDLEWARE = []
+if DEBUG:
+    MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
+MIDDLEWARE.extend(
+    [
+        "django.middleware.security.SecurityMiddleware",
+        "django.contrib.sessions.middleware.SessionMiddleware",
+        "django.middleware.common.CommonMiddleware",
+        "django.middleware.csrf.CsrfViewMiddleware",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "django.contrib.messages.middleware.MessageMiddleware",
+        "django.middleware.clickjacking.XFrameOptionsMiddleware",
+        "s3file.middleware.S3FileMiddleware",
+    ]
+)
 
 ROOT_URLCONF = "tomato.urls"
 
@@ -92,16 +123,67 @@ DATABASES = {
     }
 }
 
+HUEY = {
+    "connection": {"host": "redis"},
+    "expire_time": 60 * 60,
+    "huey_class": "huey.PriorityRedisExpireHuey",
+    "immediate": False,
+    "name": "tomato",
+}
+
 LANGUAGE_CODE = "en-us"
 USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
-STATIC_ROOT = "/serve/static"
-MEDIA_URL = "/media/"
-MEDIA_ROOT = "/serve/media"
+STATIC_ROOT = "/static"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+ADMINS = [(f"{DOMAIN_NAME} Admin", EMAIL_ADMIN_ADDRESS)]
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
+        }
+    },
+    "formatters": {
+        "console": {
+            "format": "[%(asctime)s] %(levelname)s:%(name)s:%(lineno)s:%(funcName)s: %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "console", "level": "INFO"},
+        "mail_admins": {
+            "level": "ERROR",
+            "filters": ["require_debug_false"],
+            "class": "django.utils.log.AdminEmailHandler",
+            "include_html": True,
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+        },
+        "django.request": {
+            "handlers": ["mail_admins", "console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "huey": {
+            "handlers": ["mail_admins", "console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "tomato": {
+            "handlers": ["console"],
+            "level": "INFO",
+        },
+    },
+}
 
 AWS_S3_FILE_OVERWRITE = False
 AWS_S3_ENDPOINT_URL = f"https://{AWS_S3_REGION_NAME}.digitaloceanspaces.com"
@@ -150,4 +232,5 @@ CONSTANCE_CONFIG = OrderedDict(
 
 SHELL_PLUS_IMPORTS = [
     "from tomato.ffmpeg import ffprobe",
+    "from tomato.tasks import generate_peaks",
 ]

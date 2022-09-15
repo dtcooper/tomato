@@ -1,52 +1,11 @@
 from django import forms
 from django.contrib import admin, messages
-from django.contrib.admin.helpers import AdminForm
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import Group
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.urls import path
-from django.utils.html import format_html_join
-from django.utils.safestring import mark_safe
 
-from constance.admin import Config as Constance
-from constance.admin import ConstanceAdmin as BaseConstanceAdmin
-
-from .models import Asset, Rotator, User
-
-
-STRFTIME_FMT = "%a %b %-d %Y %-I:%M %p"
-
-
-class ConstanceAdmin(BaseConstanceAdmin):
-    def has_module_permission(self, request):
-        return True
-
-    def has_view_permission(self, request, obj=None):
-        return True
-
-
-Constance._meta.verbose_name = Constance._meta.verbose_name_plural = "configuration"
-
-
-class UserAdmin(UserAdmin):
-    fieldsets = (
-        (None, {"fields": ("username", "email", "password")}),
-        ("Permissions", {"fields": ("is_active", "is_superuser", "groups")}),
-        ("Important dates", {"fields": ("last_login", "date_joined")}),
-    )
-    readonly_fields = ("last_login", "date_joined")
-    list_display = ("username", "email", "is_active", "groups_display")
-    list_filter = ("is_superuser", "is_active", "groups")
-
-    @admin.display(description="Groups")
-    def groups_display(self, instance):
-        if instance.is_superuser:
-            return mark_safe("<strong><em>All groups!</em></strong> (Superuser)")
-        else:
-            groups_html = format_html_join("\n", mark_safe("<li>{}</li>"), instance.groups.values_list("name"))
-            return mark_safe(f"<ul>\n{groups_html}</ul>") if groups_html else None
+from ..models import Asset, Rotator
 
 
 class AssetUploadForm(forms.Form):
@@ -70,12 +29,7 @@ class AssetUploadForm(forms.Form):
             )
 
 
-class RotatorAdmin(admin.ModelAdmin):
-    exclude = ("uuid",)  # XXX
-
-
 class AssetAdmin(admin.ModelAdmin):
-    exclude = ("uuid",)  # XXX
     readonly_fields = ("duration", "created_at", "status")
     filter_horizontal = ("rotators",)
 
@@ -133,11 +87,3 @@ class AssetAdmin(admin.ModelAdmin):
         return [
             path(r"upload/", self.admin_site.admin_view(self.upload_view), name="tomato_asset_upload")
         ] + super().get_urls()
-
-
-admin.site.unregister(Group)
-admin.site.unregister([Constance])
-admin.site.register([Constance], ConstanceAdmin)
-admin.site.register(User, UserAdmin)
-admin.site.register(Rotator, RotatorAdmin)
-admin.site.register(Asset, AssetAdmin)

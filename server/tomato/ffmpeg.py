@@ -3,7 +3,6 @@ import datetime
 import json
 import logging
 import math
-import os
 import subprocess
 
 
@@ -52,8 +51,5 @@ def ffprobe(url):
 
     tags = data["format"].get("tags", {})
     tags = [tags.get(field, "").strip() for field in ("artist", "title")]
-    title = " - ".join(tag for tag in tags if tag) or None
-    if not title:
-        title, _ = os.path.splitext(os.path.basename(url))
-
-    return FFProbe(title=title.strip(), **kwargs)
+    title = (" - ".join(tag for tag in tags if tag)).strip() or None
+    return FFProbe(title=title, **kwargs)

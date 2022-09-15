@@ -4,7 +4,7 @@ import boto3
 from botocore.exceptions import ClientError
 
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):

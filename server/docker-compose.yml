@@ -1,18 +1,26 @@
+x-app-template: &app-template
+  restart: always
+  image: ghcr.io/dtcooper/tomato-server:latest
+  depends_on:
+    - db
+    - redis
+  build:
+    context: .
+    args:
+      - "DEBUG=${DEBUG:-0}"
+  volumes:
+    - ./.env:/.env:ro
+    - ../constants.json:/constants.json:ro
+    - ./serve:/serve
+
 services:
   app:
-    restart: always
-    image: ghcr.io/dtcooper/tomato-server:latest
-    depends_on:
-      - db
-      - redis
-    build:
-      context: .
-      args:
-        - "DEBUG=${DEBUG:-0}"
-    volumes:
-      - ./.env:/.env:ro
-      - ../constants.json:/constants.json:ro
-      - ./serve:/serve
+    <<: *app-template
+
+  tasks:
+    <<: *app-template
+    environment:
+      - __RUN_HUEY=1
 
   db:
     restart: always
@@ -35,7 +43,7 @@ services:
       - app
     volumes:
       - ./nginx.conf:/etc/nginx/templates/app.conf.template:ro
-      - ./serve:/serve
+      - ./static:/static
       - nginx_secrets:/etc/letsencrypt
     environment:
       - "CERTBOT_EMAIL=${CERTBOT_EMAIL:?CERTBOT_EMAIL needs to be set. See .env file.}"

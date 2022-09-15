@@ -1,5 +1,6 @@
+from django.conf import settings
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 from django.utils.safestring import mark_safe
 
 from constance.apps import ConstanceConfig
@@ -16,5 +17,10 @@ ConstanceConfig.verbose_name = "Settings"
 urlpatterns = [
     path("auth/", views.auth_token),
     path("sync/", views.sync),
-    path("", admin.site.urls),
 ]
+
+if settings.DEBUG:
+    urlpatterns.append(path("__debug__/", include("debug_toolbar.urls")))
+
+# Catch-all in admin, so it should be last
+urlpatterns.append(path("", admin.site.urls))

@@ -1,11 +1,17 @@
+x-dev-app-template: &dev-app-template
+  restart: 'no'
+  image: ghcr.io/dtcooper/tomato-server:dev
+  volumes:
+    - .:/app
+
 services:
   app:
-    restart: 'no'
-    image: ghcr.io/dtcooper/tomato-server:dev
-    volumes:
-      - .:/app
+    <<: *dev-app-template
     ports:
       - 8000:8000
+
+  tasks:
+    <<: *dev-app-template
 
   db:
     restart: 'no'

@@ -2,12 +2,12 @@ from functools import wraps
 import json
 
 from django.contrib.auth import authenticate
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
+from django.http import HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_POST
 
 from .constants import SCHEMA_VERSION
-from .models import Asset, User
+from .models import Asset, Rotator, User
 
 
 def json_post_view(view_func):
@@ -55,5 +55,11 @@ def auth_token(request, json_data):
 
 @require_auth_token
 def sync(request):
-    assets = Asset.objects.filter(enabled=True, status=Asset.Status.READY)
-    return JsonResponse({"schema_version": SCHEMA_VERSION, "assets": [asset.serialize() for asset in assets]})
+    response = {"schema_version": SCHEMA_VERSION}
+    models = {
+        "assets": Asset.objects.filter(enabled=True, status=Asset.Status.READY),
+        "rotators": Rotator.objects.all(),
+    }
+    response = {key: [obj.serialize() for obj in objs] for key, objs in models.items()}
+    response["schema_version"] = SCHEMA_VERSION
+    return JsonResponse(response)

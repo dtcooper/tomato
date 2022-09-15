@@ -76,7 +76,7 @@ RUN apt-get update \
 
 COPY pyproject.toml poetry.lock /app/
 WORKDIR /app
-RUN poetry install $([ -z "$DEBUG" -o "$DEBUG" = '0' ] && echo '--no-dev')
+RUN poetry install $([ -z "$DEBUG" -o "$DEBUG" = '0' ] && echo '--without=dev')
 
 COPY --from=audiowaveform-builder /usr/local/bin/audiowaveform /usr/local/bin/
 COPY *.py *.sh /app/
