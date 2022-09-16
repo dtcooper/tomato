@@ -1,11 +1,13 @@
 from django import forms
-from django.contrib import admin, messages
+from django.contrib import messages
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.urls import path
 
 from ..models import Asset, Rotator
+from .base import TomatoModelAdminBase
 
 
 class AssetUploadForm(forms.Form):
@@ -13,7 +15,7 @@ class AssetUploadForm(forms.Form):
         widget=forms.ClearableFileInput(attrs={"multiple": True}),
         required=True,
         label="Audio file(s)",
-        help_text=f"Select multiple files to be uploaded as {Asset._meta.verbose_name_plural }.",
+        help_text=f"Select multiple files to be uploaded as {Asset._meta.verbose_name_plural}.",
     )
 
     def __init__(self, *args, **kwargs):
@@ -26,10 +28,11 @@ class AssetUploadForm(forms.Form):
                     'Optionally select rotator(s) to add the newly uploaded audio assets to. Hold down "Control", or'
                     ' "Command" on a Mac, to select more than one.'
                 ),
+                widget=FilteredSelectMultiple("test", False),
             )
 
 
-class AssetAdmin(admin.ModelAdmin):
+class AssetAdmin(TomatoModelAdminBase):
     readonly_fields = ("duration", "created_at", "status")
     filter_horizontal = ("rotators",)
 
@@ -47,7 +50,7 @@ class AssetAdmin(admin.ModelAdmin):
                 assets = []
 
                 for audio_file in files:
-                    asset = Asset(file=audio_file)
+                    asset = Asset(file=audio_file, created_by=request.user)
                     assets.append(asset)
 
                     try:
@@ -55,7 +58,7 @@ class AssetAdmin(admin.ModelAdmin):
                     except forms.ValidationError as validation_error:
                         for field, error_list in validation_error:
                             for error in error_list:
-                                form.add_error("files" if field == "file" else "__all__", error)
+                                form.add_error("files" if field == "file" else "__all__", f"{audio_file}: {error}")
 
             # If no errors where added
             if form.is_valid():

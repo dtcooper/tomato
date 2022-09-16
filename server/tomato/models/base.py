@@ -58,16 +58,10 @@ class EnabledBeginEndWeightMixin(models.Model):
         abstract = True
 
 
-class BaseModel(models.Model):
+class TomatoModelBase(models.Model):
     created_at = models.DateTimeField("created at", auto_now_add=True)
-    created_by = models.ForeignKey(
-        User, verbose_name="created by", on_delete=models.SET_NULL, null=True, editable=False
-    )
-    name = models.CharField(
-        "name",
-        max_length=NAME_MAX_LENGTH,
-        db_index=True,
-    )
+    created_by = models.ForeignKey(User, verbose_name="created by", on_delete=models.SET_NULL, null=True)
+    name = models.CharField("name", max_length=NAME_MAX_LENGTH, db_index=True)
 
     class Meta:
         abstract = True

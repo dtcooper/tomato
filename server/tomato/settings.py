@@ -40,6 +40,7 @@ if DOMAIN_NAME:
 ALLOWED_HOSTS = list(ALLOWED_HOSTS)
 
 if DEBUG:
+    # For django debug framework
     import socket  # only if you haven't already imported this
 
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
@@ -111,6 +112,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "tomato.wsgi.application"
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 DATABASES = {
     "default": {

@@ -34,7 +34,7 @@ RUN mkdir -p /usr/src/audiowaveform \
 FROM base AS final
 
 ARG DEBUG=0 \
-    POETRY_VERSION=1.2.0 \
+    POETRY_VERSION=1.2.1 \
     WAIT_FOR_IT_VERSION=81b1373f
 
 ENV PYTHONDONTWRITEBYTECODE=1 \

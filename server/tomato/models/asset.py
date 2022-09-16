@@ -7,29 +7,29 @@ from django.core.files.storage import get_storage_class
 from django.db import models
 
 from ..ffmpeg import ffprobe
-from .base import NAME_MAX_LENGTH, BaseModel, EnabledBeginEndWeightMixin
+from .base import NAME_MAX_LENGTH, EnabledBeginEndWeightMixin, TomatoModelBase
 from .rotator import Rotator
 
 
 querystring_auth_storage = get_storage_class()(querystring_auth=True)
 
 
-class Asset(EnabledBeginEndWeightMixin, BaseModel):
+class Asset(EnabledBeginEndWeightMixin, TomatoModelBase):
     class Status(models.IntegerChoices):
         PENDING = 0, "Pending processing"
         PROCESSING = 1, "Processing"
-        FAILED = 2, "Processing Failed"
+        FAILED = 2, "Processing failed"
         READY = 3, "Ready"
 
     file = models.FileField("audio file", null=True, blank=False)
     status = models.SmallIntegerField(
-        choices=Status.choices, default=Status.PENDING, help_text="All audio assets will be processed after uploading."
+        choices=Status.choices, default=Status.PENDING, help_text="All assets will be processed after uploading."
     )
     enabled = models.BooleanField(
         "enabled",
         default=True,
         help_text=(
-            "Designates whether this audio asset is enabled. Unselect this to completely disable playing of this asset."
+            "Designates whether this asset is enabled. Unselect this to completely disable playing of this asset."
         ),
     )
     duration = models.DurationField(default=datetime.timedelta(0))
@@ -41,7 +41,7 @@ class Asset(EnabledBeginEndWeightMixin, BaseModel):
         help_text="Rotators that this asset will be included in.",
     )
 
-    class Meta(BaseModel.Meta):
+    class Meta(TomatoModelBase.Meta):
         db_table = "assets"
         verbose_name = "audio asset"
 

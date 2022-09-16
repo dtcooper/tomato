@@ -1,5 +1,5 @@
-from django.contrib import admin
+from .base import TomatoModelAdminBase
 
 
-class RotatorAdmin(admin.ModelAdmin):
+class RotatorAdmin(TomatoModelAdminBase):
     pass

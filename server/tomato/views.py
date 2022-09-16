@@ -55,6 +55,7 @@ def auth_token(request, json_data):
 
 @require_auth_token
 def sync(request):
+    # TODO: gaurantee referential integrity... possibly with prefetch_related limiting an ID of rotators
     response = {"schema_version": SCHEMA_VERSION}
     models = {
         "assets": Asset.objects.filter(enabled=True, status=Asset.Status.READY),

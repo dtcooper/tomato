@@ -1,7 +1,6 @@
 import hashlib
 import random
 import secrets
-import string
 
 import base58
 
@@ -9,14 +8,17 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 
 
+# Salt can't contain ':' as it would break auth token splitting
+ALL_BYTES_BUT_COLON = bytes(range(256)).replace(b":", b"")
+ALL_BYTES_BUT_COLON = tuple(ALL_BYTES_BUT_COLON[i : i + 1] for i in range(len(ALL_BYTES_BUT_COLON)))
+
+
 class User(AbstractUser):
-    # Salt can't contain ':' as it would break auth token splitting
-    POSSIBLE_SALT_CHARS = (string.ascii_letters + string.digits + string.punctuation).replace(":", "")
     is_staff = True
     first_name = None
     last_name = None
     email = EMAIL_FIELD = None
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ()
     REMOVED_FIELDS = ("is_staff", "first_name", "last_name", "email")
 
     class Meta:
@@ -35,7 +37,7 @@ class User(AbstractUser):
         return hashlib.sha256(to_hash).digest()
 
     def generate_auth_token(self):
-        salt = ("".join(random.choice(self.POSSIBLE_SALT_CHARS) for _ in range(8))).encode("utf-8")
+        salt = b"".join(random.choice(ALL_BYTES_BUT_COLON) for _ in range(8))
         raw_token = b"%b:%d:%b" % (salt, self.id, self._get_pw_hash(salt))
         return base58.b58encode(raw_token).decode("utf-8")
 
@@ -49,7 +51,7 @@ class User(AbstractUser):
             if len(salt_user_id_pw_hash_split) == 3:
                 salt, user_id, pw_hash = salt_user_id_pw_hash_split
                 try:
-                    user = cls.objects.get(id=user_id, is_active=True)
+                    user = cls.objects.get(id=user_id.decode("utf-8"), is_active=True)
                 except cls.DoesNotExist:
                     pass
                 else:
@@ -66,12 +68,13 @@ del is_active_field
 is_superuser_field = User._meta.get_field("is_superuser")
 is_superuser_field.verbose_name = "administrator account"
 is_superuser_field.help_text = (
-    "Designates that this user is an administrator and has all permissions. Only administrators can create and edit"
-    " user accounts. "
+    "Designates that this user is an administrator and is implicitly in all groups. NOTE: Only administrators can"
+    " create and edit user accounts. "
 )
 del is_superuser_field
 
 groups_field = User._meta.get_field("groups")
+groups_field.verbose_name = "permission groups"
 groups_field.help_text = (
     "The groups this user belongs to. If groups with overlapping permissions are selected, user will get the most"
     " possible permissions."

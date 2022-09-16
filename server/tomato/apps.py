@@ -12,44 +12,33 @@ class TomatoConfig(AppConfig):
 
     def create_groups(self, using=None, *args, **kwargs):
         all_groups = []
+        Asset = apps.get_model("tomato.Asset")
+        ClientLogEntry = apps.get_model("tomato.ClientLogEntry")
+        ContentType = apps.get_model("contenttypes.ContentType")
         Group = apps.get_model("auth.Group")
         Permission = apps.get_model("auth.Permission")
-        ContentType = apps.get_model("contenttypes.ContentType")
-        Asset = apps.get_model("tomato.Asset")
-        StopSet = apps.get_model("tomato.StopSet")
-        StopSetRotator = apps.get_model("tomato.StopSetRotator")
         Rotator = apps.get_model("tomato.Rotator")
+        Stopset = apps.get_model("tomato.Stopset")
+        StopsetRotator = apps.get_model("tomato.StopsetRotator")
         assets_name = Asset._meta.verbose_name_plural
         rotator_name = Rotator._meta.verbose_name_plural
-        stopset_name = StopSet._meta.verbose_name_plural
+        stopset_name = Stopset._meta.verbose_name_plural
+        client_log_entry_name = ClientLogEntry._meta.verbose_name_plural
 
-        asset_content_type = ContentType.objects.get_for_model(Asset)
-        all_content_types = (
-            asset_content_type,
-            ContentType.objects.get_for_model(Rotator),
-            ContentType.objects.get_for_model(StopSet),
-            ContentType.objects.get_for_model(StopSetRotator),
-        )
+        asset = ContentType.objects.get_for_model(Asset)
+        rotator = ContentType.objects.get_for_model(Rotator)
+        stopset = ContentType.objects.get_for_model(Stopset)
+        stopset_rotator = ContentType.objects.get_for_model(StopsetRotator)
+        client_log_entry = ContentType.objects.get_for_model(ClientLogEntry)
 
-        group, _ = Group.objects.get_or_create(name=f"Edit {assets_name}, {rotator_name} & {stopset_name}")
-        group.permissions.add(*Permission.objects.filter(content_type__in=all_content_types))
-        all_groups.append(group)
-
-        group, _ = Group.objects.get_or_create(name=f"Edit {assets_name} ONLY, view {rotator_name} & {stopset_name}")
-        group.permissions.add(
-            *Permission.objects.filter(content_type__in=all_content_types, codename__startswith="view_")
-        )
-        group.permissions.add(*Permission.objects.filter(content_type=asset_content_type))
-        all_groups.append(group)
-
-        # group, _ = Group.objects.get_or_create(name='View and export Client Log Entries')
-        # group.permissions.add(*Permission.objects.filter(content_type=log_entry))
-
-        group, _ = Group.objects.get_or_create(name=f"View {assets_name}, {rotator_name} & {stopset_name}")
-        group.permissions.add(
-            *Permission.objects.filter(content_type__in=all_content_types, codename__startswith="view_")
-        )
-        all_groups.append(group)
+        for name, content_types in (
+            (f"Edit {assets_name}, {rotator_name} & {stopset_name}", (asset, rotator, stopset, stopset_rotator)),
+            (f"Edit {assets_name}, but NOT {rotator_name} & {stopset_name}", (asset,)),
+            (f"View and export {client_log_entry_name}", (client_log_entry,)),
+        ):
+            group, _ = Group.objects.get_or_create(name=name)
+            group.permissions.add(*Permission.objects.filter(content_type__in=content_types))
+            all_groups.append(group)
 
         group, _ = Group.objects.get_or_create(name="Modify configuration")
         # tomato comes after constance in INSTALLED_APPS, so this should always exist

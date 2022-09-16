@@ -1,5 +1,13 @@
 {
     "schema_version": 0,
+    "client_log_entry_types": [
+        "played_asset",
+        "played_part_stopset",
+        "played_stopset",
+        "skipped_asset",
+        "skipped_stopset",
+        "waited"
+    ],
     "colors": [
         {"name": "red", "normal": "#f44336", "light": "#e57373", "dark": "#c62828"},
         {"name": "pink", "normal": "#e91e63", "light": "#f06292", "dark": "#ad1457"},

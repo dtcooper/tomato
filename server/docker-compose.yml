@@ -11,7 +11,7 @@ x-app-template: &app-template
   volumes:
     - ./.env:/.env:ro
     - ../constants.json:/constants.json:ro
-    - ./serve:/serve
+    - ./static:/static
 
 services:
   app:

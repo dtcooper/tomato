@@ -1,19 +1,19 @@
 from django.db import models
 
-from .base import BaseModel
-from .stopset import StopSet
+from .base import TomatoModelBase
+from .stopset import Stopset
 
 
-class Rotator(BaseModel):
+class Rotator(TomatoModelBase):
     stopsets = models.ManyToManyField(
-        StopSet,
-        through="StopSetRotator",
+        Stopset,
+        through="StopsetRotator",
         related_name="rotators",
         through_fields=("rotator", "stopset"),
         verbose_name="Stop Set",
     )
 
-    class Meta(BaseModel.Meta):
+    class Meta(TomatoModelBase.Meta):
         db_table = "rotators"
 
 
