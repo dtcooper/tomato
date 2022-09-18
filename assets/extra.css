@@ -1,0 +1,6 @@
+/* Minor tweaks to mkdocs-material CSS */
+
+* {
+  /* Make sure "fl" and "fi" don't get warped in code examples */
+  font-feature-settings: "liga" 0;
+}
