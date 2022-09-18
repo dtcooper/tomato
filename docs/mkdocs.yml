@@ -1,0 +1,83 @@
+copyright: Copyright &copy; 2022 David Cooper &amp; Burning Man Information Radio
+docs_dir: .
+edit_uri: ""
+repo_name: dtcooper/tomato
+repo_url: https://github.com/dtcooper/tomato
+site_name: Tomato Radio Automation
+site_url: https://dtcooper.github.io/tomato/
+strict: true
+
+nav:
+  - index.md
+  - client.md
+  - server.md
+  - license.md
+
+extra_css:
+  - assets/extra.css
+
+plugins:
+  - search
+  - same-dir
+
+theme:
+  name: material
+  favicon: assets/favicon.svg
+  font:
+    text: Space Grotesk
+    code: Space Mono  # ligatures disabled in extra.css
+  icon:
+    logo: material/radio
+    repo: fontawesome/brands/github
+  features:
+    - navigation.expand
+    - navigation.instant
+    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - search.highlight
+    - search.suggest
+    - toc.integrate
+  palette:
+    - scheme: default
+      media: "(prefers-color-scheme: light)"
+      primary: pink
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      media: "(prefers-color-scheme: dark)"
+      primary: pink
+      accent: light blue
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+
+markdown_extensions:
+  - attr_list
+  - admonition
+  - def_list
+  - footnotes
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.snippets:
+      base_path: [ "../LICENSE" ]
+      check_paths: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - toc:
+      permalink: "\u2190"
+
+extra:
+  generator: false

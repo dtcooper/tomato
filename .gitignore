@@ -1,4 +1,5 @@
 .DS_Store
+/docs/site/
 /server/.env
 /server/docker-compose.override.yml
 /server/local-certificate-authority/
