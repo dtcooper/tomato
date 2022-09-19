@@ -3,6 +3,7 @@ from django.contrib.auth.models import Group
 from django.utils.safestring import mark_safe
 
 from constance.admin import Config
+from user_messages.models import Message
 
 from ..models import Asset, ClientLogEntry, Rotator, Stopset, User
 from .asset import AssetAdmin
@@ -14,13 +15,12 @@ from .user import UserAdmin
 
 
 admin.site.site_url = None
-admin.site.site_title = admin.site.site_header = "Tomato Administration"
+admin.site.site_title = admin.site.site_header = "Tomato Radio Automation"
 admin.site.index_title = None
 admin.site.empty_value_display = mark_safe("<em>None</em>")
 
 
-admin.site.unregister(Group)
-admin.site.unregister([Config])
+admin.site.unregister([Config, Group, Message])
 admin.site.register(Asset, AssetAdmin)
 admin.site.register(ClientLogEntry, ClientLogEntryAdmin)
 admin.site.register([Config], ConfigAdmin)

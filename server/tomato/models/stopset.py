@@ -5,8 +5,8 @@ from .base import EnabledBeginEndWeightMixin, TomatoModelBase
 
 class Stopset(EnabledBeginEndWeightMixin, TomatoModelBase):
     class Meta(TomatoModelBase.Meta):
-        verbose_name = "stop set"
         db_table = "stopsets"
+        verbose_name = "stop set"
 
 
 class StopsetRotator(models.Model):
@@ -16,6 +16,7 @@ class StopsetRotator(models.Model):
     def __str__(self):
         s = f"{self.rotator.name} in {self.stopset.name}"
         if self.id:
+            # TODO this is causing n lookups in stop set change view
             num = StopsetRotator.objects.filter(stopset=self.stopset, id__lte=self.id).count()
             s = f"{num}. {s}"
         return s

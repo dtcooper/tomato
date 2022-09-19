@@ -9,9 +9,11 @@ Welcome to Tomato Radio Automation!
 Tomato is easy to use, and hard to screw up playout software written for the
 specific use case of [Burning Man Information Radio](https://bmir.org).
 
+## Use Case
+
 ## Features
 
-## Why Named Tomato?
+## Why The Name?
 
 Simply said, this software was named after my cat, Tomato... or more
 affectionately nicknamed Kitty, Tomatillo, The "Shink", Catly, Catniss Evercat,

@@ -1,7 +1,5 @@
-from collections import OrderedDict
+from decimal import Decimal
 from pathlib import Path
-
-from django.core import validators
 
 import environ
 
@@ -51,13 +49,13 @@ INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
-    "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Third-party
     "constance",
     "huey.contrib.djhuey",
     "s3file",
+    "user_messages",
 ]
 if DEBUG:
     INSTALLED_APPS.extend(
@@ -105,11 +103,15 @@ TEMPLATES = [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
+                # django-user-messages: Swap out django.contrib.messages.context_processors.messages
+                "user_messages.context_processors.messages",
+                "tomato.utils.json_data_context_processor",
             ],
         },
     },
 ]
+
+SILENCED_SYSTEM_CHECKS = ("admin.E404",)  # Needed for django-user-messages
 
 WSGI_APPLICATION = "tomato.wsgi.application"
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -125,12 +127,28 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "CONNECTION_POOL_KWARGS": {"max_connections": 50},
+            "PARSER_CLASS": "redis.connection.HiredisParser",
+        },
+        "KEY_PREFIX": "cache",
+    }
+}
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+
 HUEY = {
-    "connection": {"host": "redis"},
     "expire_time": 60 * 60,
-    "huey_class": "huey.PriorityRedisExpireHuey",
+    "huey_class": "tomato.utils.DjangoPriorityRedisExpiryHuey",
     "immediate": False,
     "name": "tomato",
+    "store_none": True,
 }
 
 LANGUAGE_CODE = "en-us"
@@ -206,33 +224,35 @@ CONSTANCE_SUPERUSER_ONLY = False
 CONSTANCE_REDIS_CONNECTION = "redis://redis"
 CONSTANCE_ADDITIONAL_FIELDS = {
     "wait_interval_minutes": (
-        "django.forms.fields.IntegerField",
+        "django.forms.fields.DecimalField",
         {
+            "decimal_places": 2,
+            "max_value": 600,
+            "min_value": 0,
             "widget": "django.forms.TextInput",
-            "widget_kwargs": {"attrs": {"size": 5}},
-            "validators": [validators.MinValueValidator(0), validators.MaxValueValidator(600)],
+            "widget_kwargs": {"attrs": {"size": 8}},
         },
     ),
 }
-CONSTANCE_CONFIG = OrderedDict(
-    {
-        "WAIT_INTERVAL_MINUTES": (
-            20,
-            "Time to wait between stop sets (in minutes). Set to 0 to disable the wait interval.",
-            "wait_interval_minutes",
+CONSTANCE_CONFIG = {
+    "BROADCAST_COMPRESSION": (False, "Enable broadcast compression, smoothing out dynamic range in audio output"),
+    "WAIT_INTERVAL_MINUTES": (
+        Decimal(20),
+        "Time to wait between stop sets (in minutes). Set to 0 to disable the wait interval entirely.",
+        "wait_interval_minutes",
+    ),
+    "WAIT_INTERVAL_SUBTRACTS_STOPSET_PLAYTIME": (
+        False,
+        (
+            "Wait time subtracts the playtime of a stop set in minutes. This will provide more "
+            "even results, ie the number of stop sets played per hour will be more consistent at "
+            "the expense of a DJs air time."
         ),
-        "WAIT_INTERVAL_SUBTRACTS_STOPSET_PLAYTIME": (
-            False,
-            (
-                "Wait time subtracts the playtime of a stop set in minutes. This will provide more "
-                "even results, ie the number of stop sets played per hour will be more consistent at "
-                "the expense of a DJs air time."
-            ),
-        ),
-    }
-)
+    ),
+}
 
 SHELL_PLUS_IMPORTS = [
+    "from user_messages import api as user_messages_api",
     "from tomato.ffmpeg import ffprobe",
-    "from tomato.tasks import generate_peaks",
+    "from tomato.tasks import process_asset",
 ]

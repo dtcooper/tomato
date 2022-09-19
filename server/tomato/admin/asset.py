@@ -1,40 +1,105 @@
 from django import forms
-from django.contrib import messages
-from django.contrib.admin.widgets import FilteredSelectMultiple
+from django.contrib import admin, messages
+from django.contrib.admin.helpers import ActionForm
+from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.urls import path
+from django.utils.html import format_html, format_html_join
+from django.utils.safestring import mark_safe
 
 from ..models import Asset, Rotator
-from .base import TomatoModelAdminBase
+from ..tasks import process_asset
+from .base import NoNullRelatedOnlyFieldListFilter, TomatoModelAdminBase
+
+
+class AssetActionForm(ActionForm):
+    rotator = forms.ModelChoiceField(Rotator.objects.all(), required=False, label=" ", empty_label="--- Rotator ---")
 
 
 class AssetUploadForm(forms.Form):
     files = forms.FileField(
         widget=forms.ClearableFileInput(attrs={"multiple": True}),
         required=True,
-        label="Audio file(s)",
-        help_text=f"Select multiple files to be uploaded as {Asset._meta.verbose_name_plural}.",
+        label="Audio files",
+        help_text="Select one or more files to be uploaded as audio assets.",
+    )
+    rotators = forms.ModelMultipleChoiceField(
+        Rotator.objects.all(), required=False, help_text="Rotators that the newly uploaded asset will be included in."
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, request, admin_site, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if Rotator.objects.exists():
-            self.fields["rotators"] = forms.ModelMultipleChoiceField(
-                Rotator.objects.all(),
-                required=False,
-                help_text=(
-                    'Optionally select rotator(s) to add the newly uploaded audio assets to. Hold down "Control", or'
-                    ' "Command" on a Mac, to select more than one.'
-                ),
-                widget=FilteredSelectMultiple("test", False),
-            )
+
+        self.fields["rotators"].widget = RelatedFieldWidgetWrapper(
+            FilteredSelectMultiple("rotators", False),
+            Asset._meta.get_field("rotators").remote_field,
+            admin_site,
+            can_add_related=request.user.has_perm("tomato.add_rotator"),
+        )
 
 
 class AssetAdmin(TomatoModelAdminBase):
-    readonly_fields = ("duration", "created_at", "status")
+    action_form = AssetActionForm
+    search_fields = ("name",)
+    actions = ("enable", "disable", "add_rotator", "remove_rotator")
+    exclude = ()
+    readonly_fields = ("duration", "created_at", "status", "created_by")
+    list_filter = ("enabled", "rotators", "status", ("created_by", NoNullRelatedOnlyFieldListFilter))
     filter_horizontal = ("rotators",)
+    list_display = ("name", "status", "file_display", "weight", "rotators_display", "created_by", "created_at")
+    date_hierarchy = "created_at"
+    list_prefetch_related = "rotators"
+
+    @admin.display(description="Audio", empty_value="")
+    def file_display(self, obj):
+        if obj.file:
+            return format_html(
+                '<audio src="{}" style="height: 30px; max-width: 200px;" controlslist="nodownload noplaybackrate"'
+                ' preload="auto" controls />',
+                obj.file.url,
+            )
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        process_asset(asset=obj, user=request.user)
+        self.message_user(
+            request,
+            f'Audio asset "{obj.name}" is being processed. A message will appear when it is ready.',
+            messages.WARNING,
+        )
+
+    @admin.display(description="Rotators")
+    def rotators_display(self, obj):
+        rotators = [(r.name,) for r in obj.rotators.all()]
+        return format_html_join(mark_safe("<br>\n"), "&#x25cf; {}", rotators) or None
+
+    @admin.action(description="Add selected audio assets to rotator", permissions=("add", "change", "delete"))
+    def add_rotator(self, request, queryset):
+        rotator_id = request.POST.get("rotator")
+        if rotator_id:
+            rotator = Rotator.objects.get(id=rotator_id)
+            for asset in queryset:
+                asset.rotators.add(rotator)
+            self.message_user(
+                request, f"Added {len(queryset)} audio assets to rotator {rotator.name}.", messages.SUCCESS
+            )
+        else:
+            self.message_user(request, "You must select a rotator to add audio assets to.", messages.WARNING)
+
+    @admin.action(description="Remove selected audio assets from rotator", permissions=("add", "change", "delete"))
+    def remove_rotator(self, request, queryset):
+        rotator_id = request.POST.get("rotator")
+        if rotator_id:
+            rotator = Rotator.objects.get(id=rotator_id)
+            for asset in queryset:
+                asset.rotators.remove(rotator)
+            self.message_user(
+                request, f"Removed {len(queryset)} audio assets from rotator {rotator.name}.", messages.SUCCESS
+            )
+        else:
+            self.message_user(request, "You must select a rotator to remove audio assets from.", messages.WARNING)
 
     def upload_view(self, request):
         if not self.has_add_permission(request):
@@ -43,7 +108,7 @@ class AssetAdmin(TomatoModelAdminBase):
         opts = self.model._meta
 
         if request.method == "POST":
-            form = AssetUploadForm(request.POST, request.FILES)
+            form = AssetUploadForm(request, self.admin_site, request.POST, request.FILES)
             if form.is_valid():
                 files = request.FILES.getlist("files")
                 rotators = form.cleaned_data.get("rotators")
@@ -68,11 +133,11 @@ class AssetAdmin(TomatoModelAdminBase):
                     if rotators:
                         asset.rotators.add(*rotators)
 
-                self.message_user(request, f"Uploaded {len(assets)} {opts.verbose_name_plural}.", messages.SUCCESS)
+                self.message_user(request, f"Uploaded {len(assets)} audio assets.", messages.SUCCESS)
 
                 return redirect("admin:tomato_asset_changelist")
         else:
-            form = AssetUploadForm()
+            form = AssetUploadForm(request, self.admin_site)
 
         return TemplateResponse(
             request,
@@ -81,7 +146,8 @@ class AssetAdmin(TomatoModelAdminBase):
                 "app_label": opts.app_label,
                 "form": form,
                 "opts": opts,
-                "title": f"Bulk upload {opts.verbose_name_plural}",
+                "title": "Bulk upload audio assets",
+                "media": self.media,
                 **self.admin_site.each_context(request),
             },
         )

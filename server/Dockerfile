@@ -34,10 +34,12 @@ RUN mkdir -p /usr/src/audiowaveform \
 FROM base AS final
 
 ARG DEBUG=0 \
+    DJANGO_BASH_COMPLETION_VERSION=4.1 \
     POETRY_VERSION=1.2.1 \
     WAIT_FOR_IT_VERSION=81b1373f
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
+ENV DJANGO_SETTINGS_MODULE=tomato.settings \
+    PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     POETRY_VIRTUALENVS_CREATE=false
 
@@ -61,6 +63,7 @@ RUN apt-get update \
         libmad0 \
         libsndfile1 \
         $([ "$DEBUG" -a "$DEBUG" != '0' ] && echo \
+            bash-completion \
             less \
             iputils-ping \
             nano \
@@ -72,6 +75,9 @@ RUN apt-get update \
     && if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
         echo "alias redis-cli='redis-cli -h redis'" >> /root/.bashrc \
         && echo "alias ls='ls --color=auto'" >> /root/.bashrc \
+        && echo '. /etc/bash_completion' >> /root/.bashrc \
+        && wget -qO /etc/bash_completion.d/django_bash_completion \
+            "https://raw.githubusercontent.com/django/django/${DJANGO_BASH_COMPLETION_VERSION}/extras/django_bash_completion" \
     ; fi
 
 COPY pyproject.toml poetry.lock /app/

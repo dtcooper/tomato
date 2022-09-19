@@ -10,3 +10,6 @@ SCHEMA_VERSION = _data["schema_version"]
 CLIENT_LOG_ENTRY_TYPES = _data["client_log_entry_types"]
 COLORS = _data["colors"]
 COLORS_DICT = {c["name"]: {k: c[k] for k in c.keys() if k != "name"} for c in COLORS}
+
+EDIT_ONLY_ASSETS_GROUP_NAME = "Edit audio assets, but NOT rotators & stop sets"
+EDIT_ALL_GROUP_NAME = "Edit audio assets, rotators & stop sets"

@@ -1,6 +1,8 @@
 from django.apps import AppConfig, apps
 from django.db.models import signals
 
+from .constants import EDIT_ALL_GROUP_NAME, EDIT_ONLY_ASSETS_GROUP_NAME
+
 
 class TomatoConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
@@ -20,10 +22,6 @@ class TomatoConfig(AppConfig):
         Rotator = apps.get_model("tomato.Rotator")
         Stopset = apps.get_model("tomato.Stopset")
         StopsetRotator = apps.get_model("tomato.StopsetRotator")
-        assets_name = Asset._meta.verbose_name_plural
-        rotator_name = Rotator._meta.verbose_name_plural
-        stopset_name = Stopset._meta.verbose_name_plural
-        client_log_entry_name = ClientLogEntry._meta.verbose_name_plural
 
         asset = ContentType.objects.get_for_model(Asset)
         rotator = ContentType.objects.get_for_model(Rotator)
@@ -32,9 +30,9 @@ class TomatoConfig(AppConfig):
         client_log_entry = ContentType.objects.get_for_model(ClientLogEntry)
 
         for name, content_types in (
-            (f"Edit {assets_name}, {rotator_name} & {stopset_name}", (asset, rotator, stopset, stopset_rotator)),
-            (f"Edit {assets_name}, but NOT {rotator_name} & {stopset_name}", (asset,)),
-            (f"View and export {client_log_entry_name}", (client_log_entry,)),
+            (EDIT_ALL_GROUP_NAME, (asset, rotator, stopset, stopset_rotator)),
+            (EDIT_ONLY_ASSETS_GROUP_NAME, (asset,)),
+            (f"View and export {ClientLogEntry._meta.verbose_name_plural}", (client_log_entry,)),
         ):
             group, _ = Group.objects.get_or_create(name=name)
             group.permissions.add(*Permission.objects.filter(content_type__in=content_types))

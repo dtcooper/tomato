@@ -1,11 +1,6 @@
-{% extends 'admin/base_site.html' %}
+{% extends 'admin/change_form.html' %}
 
 {% load static admin_urls %}
-
-{% block extrastyle %}
-  {{ block.super }}
-  <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
-{% endblock %}
 
 {% block extrahead %}
   {{ block.super }}
@@ -39,16 +34,19 @@
   <div id="content-main">
     <form id="upload-form" action="{% url opts|admin_urlname:'upload' %}" method="post" enctype="multipart/form-data">
       {% csrf_token %}
+      <p>Using the form below, you can bulk upload {{ opts.verbose_name_plural }}.</p>
+
+      <div class="submit-row">
+        <input type="submit" value="Bulk Upload" class="default">
+      </div>
 
       <fieldset class="module aligned">
         {% for field in form %}
           <div class="form-row" id="form_row_{{ field.name }}">
             {{ field.errors }}
             {{ field.label_tag }}
-            {{ field }}
-            {% if field.help_text %}
-              <div class="help">{{ field.help_text }}</div>
-            {% endif %}
+            <div>{{ field }}</div>
+            <div class="help">{{ field.help_text }}</div>
           </div>
         {% endfor %}
       </fieldset>

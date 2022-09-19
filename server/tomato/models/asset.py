@@ -12,6 +12,7 @@ from .rotator import Rotator
 
 
 querystring_auth_storage = get_storage_class()(querystring_auth=True)
+ERROR_DETAIL_LENGTH = 1024
 
 
 class Asset(EnabledBeginEndWeightMixin, TomatoModelBase):
@@ -19,8 +20,18 @@ class Asset(EnabledBeginEndWeightMixin, TomatoModelBase):
         PENDING = 0, "Pending processing"
         PROCESSING = 1, "Processing"
         FAILED = 2, "Processing failed"
-        READY = 3, "Ready"
+        PROCESSED = 3, "Ready (processed)"
 
+    name = models.CharField(
+        "name",
+        max_length=NAME_MAX_LENGTH,
+        db_index=True,
+        blank=True,
+        help_text=(
+            "Optional name, if left unspecified, we'll automatically base it off the audio file's metadata and failing"
+            " that its filename."
+        ),
+    )
     file = models.FileField("audio file", null=True, blank=False)
     status = models.SmallIntegerField(
         choices=Status.choices, default=Status.PENDING, help_text="All assets will be processed after uploading."
@@ -40,6 +51,7 @@ class Asset(EnabledBeginEndWeightMixin, TomatoModelBase):
         verbose_name="rotators",
         help_text="Rotators that this asset will be included in.",
     )
+    error_detail = models.TextField(max_length=ERROR_DETAIL_LENGTH, blank=True)
 
     class Meta(TomatoModelBase.Meta):
         db_table = "assets"
@@ -75,13 +87,13 @@ class Asset(EnabledBeginEndWeightMixin, TomatoModelBase):
 
 
 Asset.rotators.through.__str__ = lambda self: f"{self.asset.name} in {self.rotator.name}"
-Asset.rotators.through._meta.verbose_name = "Asset in Rotator relationship"
-Asset.rotators.through._meta.verbose_name_plural = "Asset in Rotator relationships"
+Asset.rotators.through._meta.verbose_name = "Asset in rotator relationship"
+Asset.rotators.through._meta.verbose_name_plural = "Asset in rotator relationships"
 
-name_field = Asset._meta.get_field("name")
-name_field.blank = True
-name_field.help_text = (
-    "Optional name, if left unspecified, we'll automatically base it off the audio file's metadata and failing that its"
-    " filename."
-)
-del name_field
+created_by_field = Asset._meta.get_field("created_by")
+created_by_field.verbose_name = "uploading user"
+del created_by_field
+
+created_at_field = Asset._meta.get_field("created_at")
+created_at_field.verbose_name = "date uploaded"
+del created_at_field

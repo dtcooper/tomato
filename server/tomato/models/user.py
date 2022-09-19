@@ -1,19 +1,20 @@
-import hashlib
-import random
+import hmac
 import secrets
+import struct
 
 import base58
 
-from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-
-
-# Salt can't contain ':' as it would break auth token splitting
-ALL_BYTES_BUT_COLON = bytes(range(256)).replace(b":", b"")
-ALL_BYTES_BUT_COLON = tuple(ALL_BYTES_BUT_COLON[i : i + 1] for i in range(len(ALL_BYTES_BUT_COLON)))
+from django.utils.crypto import constant_time_compare, salted_hmac
 
 
 class User(AbstractUser):
+    ACCESS_TOKEN_ALGORITHM = "sha256"
+    ACCESS_TOKEN_SALT_LENGTH = 8
+    ACCESS_TOKEN_STRUCT = struct.Struct(
+        f"!{ACCESS_TOKEN_SALT_LENGTH}sq{hmac.new(b'key', digestmod=ACCESS_TOKEN_ALGORITHM).digest_size}s"
+    )
+
     is_staff = True
     first_name = None
     last_name = None
@@ -32,30 +33,29 @@ class User(AbstractUser):
     def get_full_name(self):
         return ""  # avoids wonky display in templates/admin/object_history.html
 
-    def _get_pw_hash(self, salt):
-        to_hash = b"%d:%b:%b:%b" % (self.id, settings.SECRET_KEY.encode("utf-8"), salt, self.password.encode("utf-8"))
-        return hashlib.sha256(to_hash).digest()
+    def _get_access_token_hash(self, salt):
+        return salted_hmac(salt, f"{self.id}:{self.password}", algorithm=self.ACCESS_TOKEN_ALGORITHM).digest()
 
-    def generate_auth_token(self):
-        salt = b"".join(random.choice(ALL_BYTES_BUT_COLON) for _ in range(8))
-        raw_token = b"%b:%d:%b" % (salt, self.id, self._get_pw_hash(salt))
+    def generate_access_token(self):
+        salt = secrets.token_bytes(self.ACCESS_TOKEN_SALT_LENGTH)
+        raw_token = self.ACCESS_TOKEN_STRUCT.pack(salt, self.id, self._get_access_token_hash(salt))
         return base58.b58encode(raw_token).decode("utf-8")
 
     @classmethod
-    def get_user_for_auth_token(cls, auth_token):
+    def validate_access_token(cls, auth_token):
         try:
-            salt_user_id_pw_hash_split = base58.b58decode(auth_token).split(b":", 2)
+            packed = base58.b58decode(auth_token)
         except ValueError:
             pass
         else:
-            if len(salt_user_id_pw_hash_split) == 3:
-                salt, user_id, pw_hash = salt_user_id_pw_hash_split
+            if len(packed) == cls.ACCESS_TOKEN_STRUCT.size:
+                salt, user_id, hash = cls.ACCESS_TOKEN_STRUCT.unpack(packed)
                 try:
-                    user = cls.objects.get(id=user_id.decode("utf-8"), is_active=True)
+                    user = cls.objects.get(id=user_id, is_active=True)
                 except cls.DoesNotExist:
                     pass
                 else:
-                    if secrets.compare_digest(pw_hash, user._get_pw_hash(salt)):
+                    if user.has_usable_password() and constant_time_compare(hash, user._get_access_token_hash(salt)):
                         return user
         return None
 
@@ -75,8 +75,5 @@ del is_superuser_field
 
 groups_field = User._meta.get_field("groups")
 groups_field.verbose_name = "permission groups"
-groups_field.help_text = (
-    "The groups this user belongs to. If groups with overlapping permissions are selected, user will get the most"
-    " possible permissions."
-)
+groups_field.help_text = "The permission groups this user belongs to."
 del groups_field

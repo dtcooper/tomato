@@ -41,12 +41,12 @@ def require_auth_token(view_func):
 
 
 @json_post_view
-def auth_token(request, json_data):
+def access_token(request, json_data):
     username, password = json_data.get("username"), json_data.get("password")
     if username is not None and password is not None:
         user = authenticate(username=username, password=password)
         if user is not None:
-            return {"auth_token": user.generate_auth_token()}
+            return {"access_token": user.generate_access_token()}
         else:
             return {"error": "Invalid username and password combination."}
     else:

@@ -1,4 +1,5 @@
 copyright: Copyright &copy; 2022 David Cooper &amp; Burning Man Information Radio
+dev_addr: 127.0.0.1:8888
 docs_dir: .
 edit_uri: ""
 repo_name: dtcooper/tomato

@@ -4,18 +4,16 @@ from django.db import models
 from django.utils import timezone
 
 from ..constants import CLIENT_LOG_ENTRY_TYPES
-from .asset import Asset
-from .stopset import Stopset
 from .user import User
 
 
 class ClientLogEntry(models.Model):
     class Type(models.TextChoices):
-        PLAYED_ASSET = "played_asset", f"Played an {Asset._meta.verbose_name}"
-        PLAYED_PARTIAL_STOPSET = "played_part_stopset", f"Played a partial {Stopset._meta.verbose_name}"
-        PLAYED_STOPSET = "played_stopset", f"Played an entire {Stopset._meta.verbose_name}"
-        SKIPPED_ASSET = "skipped_asset", f"Skipped playing an {Asset._meta.verbose_name}"
-        SKIPPED_STOPSET = "skipped_stopset", f"Skipped playing an entire {Stopset._meta.verbose_name}"
+        PLAYED_ASSET = "played_asset", "Played an audio asset"
+        PLAYED_PARTIAL_STOPSET = "played_part_stopset", "Played a partial stop set"
+        PLAYED_STOPSET = "played_stopset", "Played an entire stop set"
+        SKIPPED_ASSET = "skipped_asset", "Skipped playing an audio asset"
+        SKIPPED_STOPSET = "skipped_stopset", "Skipped playing an entire stop set"
         WAITED = "waited", "Waited"
 
     if set(Type.values) != set(CLIENT_LOG_ENTRY_TYPES):

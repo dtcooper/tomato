@@ -48,8 +48,13 @@ class Command(BaseCommand):
                 LifecycleConfiguration={
                     "Rules": [
                         {
+                            "Prefix": "tmp/s3file/",
                             "Expiration": {"Days": 1},
-                            "Filter": {"Prefix": "tmp/s3file/"},
+                            "Status": "Enabled",
+                        },
+                        {
+                            "Prefix": "",
+                            "AbortIncompleteMultipartUpload": {"DaysAfterInitiation": 1},
                             "Status": "Enabled",
                         },
                     ],

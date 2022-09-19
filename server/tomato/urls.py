@@ -6,7 +6,7 @@ from tomato import views
 
 
 urlpatterns = [
-    path("auth/", views.auth_token),
+    path("auth/", views.access_token, name="access_token"),
     path("sync/", views.sync),
 ]
 

@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models.functions import Lower
 
 from .user import User
 
@@ -26,9 +25,9 @@ class EnabledBeginEndWeightMixin(models.Model):
         blank=True,
         default=None,
         help_text=(
-            "<strong>Date when eligibility for random selection <u>begins</u>.</strong>  If specified, random"
-            " selection is only eligible after this date. If left blank, its always eligible for random selection up"
-            f" to end air date. [Timezone: {settings.TIME_ZONE}]"
+            "Date when eligibility for random selection <strong>begins</strong>. If specified, random selection is only"
+            " eligible after this date. If left blank, its always eligible for random selection up to end air date."
+            f" (Timezone: {settings.TIME_ZONE})"
         ),
     )
     end = models.DateTimeField(
@@ -37,13 +36,13 @@ class EnabledBeginEndWeightMixin(models.Model):
         blank=True,
         default=None,
         help_text=(
-            "<strong>Date when eligibility for random selection <u>ends</u>.</strong> If specified, random selection"
-            " is only eligible before this date. If left blank, its always eligible for random selection starting with"
-            f" begin air date. [Timezone: {settings.TIME_ZONE}]"
+            "Date when eligibility for random selection <strong>ends</strong>. If specified, random selection is only"
+            " eligible before this date. If left blank, its always eligible for random selection starting with begin"
+            f" air date. (Timezone: {settings.TIME_ZONE})"
         ),
     )
     weight = models.DecimalField(
-        "random weight",
+        "weight",
         max_digits=5,
         decimal_places=2,
         default=1,
@@ -61,11 +60,11 @@ class EnabledBeginEndWeightMixin(models.Model):
 class TomatoModelBase(models.Model):
     created_at = models.DateTimeField("created at", auto_now_add=True)
     created_by = models.ForeignKey(User, verbose_name="created by", on_delete=models.SET_NULL, null=True)
-    name = models.CharField("name", max_length=NAME_MAX_LENGTH, db_index=True)
+    name = models.CharField("name", max_length=NAME_MAX_LENGTH, unique=True)
 
     class Meta:
         abstract = True
-        ordering = (Lower("name"),)
+        ordering = ("name",)
 
     def __str__(self):
         return self.name

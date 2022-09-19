@@ -62,7 +62,7 @@ Now navigate to <http://localhost:8000/>.
 - [ ] Optionally use HTML5's web audio API's
       [`DynamicsCompressorNode`](https://developer.mozilla.org/en-US/docs/Web/API/DynamicsCompressorNode)
       to simulate broadcast compression (add in configuration)
-- [ ] Use [django-user-messages](https://github.com/matthiask/django-user-messages)
+- [x] Use [django-user-messages](https://github.com/matthiask/django-user-messages)
       to message users when processing is done.
 
 
