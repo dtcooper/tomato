@@ -32,7 +32,7 @@
   {% endif %}
 
   <div id="content-main">
-    <form id="upload-form" action="{% url opts|admin_urlname:'upload' %}" method="post" enctype="multipart/form-data">
+    <form id="upload-form" action="{% url opts|admin_urlname:'upload' %}" method="post">
       {% csrf_token %}
       <p>Using the form below, you can bulk upload {{ opts.verbose_name_plural }}.</p>
 

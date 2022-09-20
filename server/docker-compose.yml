@@ -4,6 +4,7 @@ x-app-template: &app-template
   depends_on:
     - db
     - redis
+    - minio
   build:
     context: .
     args:
@@ -41,6 +42,7 @@ services:
     image: jonasal/nginx-certbot:3.2
     depends_on:
       - app
+      - minio
     volumes:
       - ./nginx.conf:/etc/nginx/templates/app.conf.template:ro
       - ./static:/static
@@ -52,7 +54,19 @@ services:
       - 80:80
       - 443:443
 
+  minio:
+    restart: always
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    environment:
+      - MINIO_ROOT_USER=AKIAIOSFODNN7EXAMPLE
+      - "MINIO_ROOT_PASSWORD=${SECRET_KEY}"
+      - "MINIO_SERVER_URL=http://${DOMAIN_NAME}:9000/"
+    image: quay.io/minio/minio:RELEASE.2022-09-17T00-09-45Z
+
 volumes:
+  minio_data:
   nginx_secrets:
   postgres_data:
   redis_data:

@@ -41,6 +41,10 @@
     #nav-sidebar .module td .bulk-upload-addlink {
       margin-left: 5px;
     }
+
+    #footer h5 {
+      text-align: center;
+    }
   </style>
   {{ COLORS|json_script:"json-tomato-colors" }}
   <script>
@@ -93,7 +97,7 @@
 {% endblock %}
 
 {% block userlinks %}
-  <a href="https://dtcooper.github.io/tomato/">Help Docs</a> /
+  <a href="https://dtcooper.github.io/tomato/" target="_blank">Help Docs</a> /
   {{ block.super }}
 {% endblock %}
 
@@ -102,4 +106,19 @@
     <span id="s3file-progress-bar"></span>
   </div>
   {{ block.super }}
+{% endblock %}
+
+{% block footer %}
+  {% now 'Y' as copyright_year %}
+  <div id="footer">
+    <hr/>
+    <div class="container pull-left">
+      <h5>
+          &copy; Copyright 2019{% if copyright_year|add:"0" > 2019 %}-{{ copyright_year }}{% endif %}
+          <a href="mailto:david.cooper@burningman.org" target="_blank">David Cooper</a>
+          &amp; <a href="https://bmir.org/" target="_blank">BMIR</a>.
+          All rights reserved.
+      </h5>
+    </div>
+  </div>
 {% endblock %}

@@ -21,7 +21,7 @@ def process_asset(asset: Asset, user=None):
     time.sleep(2.65)
 
     asset.refresh_from_db()
-    asset.status = Asset.Status.PROCESSED
+    asset.status = Asset.Status.READY
     asset.save()
 
     if user is not None:

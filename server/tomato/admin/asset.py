@@ -132,6 +132,7 @@ class AssetAdmin(TomatoModelAdminBase):
 
                     if rotators:
                         asset.rotators.add(*rotators)
+                    process_asset(asset)
 
                 self.message_user(request, f"Uploaded {len(assets)} audio assets.", messages.SUCCESS)
 

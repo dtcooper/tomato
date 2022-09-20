@@ -1,3 +1,5 @@
+import zoneinfo
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -6,6 +8,8 @@ from .user import User
 
 
 NAME_MAX_LENGTH = 75
+UTC = zoneinfo.ZoneInfo("UTC")
+ZULU_STRFTIME = "%Y-%m-%dT%H:%M:%SZ"
 
 
 def greater_than_zero(value):
@@ -52,6 +56,15 @@ class EnabledBeginEndWeightMixin(models.Model):
             " others, '2' is 2x as likely, '3' is 3x as likely, '0.5' half as likely, and so on."
         ),
     )
+
+    def serialize(self):
+        return {
+            "enabled": self.enabled,
+            "weight": round(float(self.weight), 2),
+            "begin": self.begin and self.begin.astimezone(UTC).strftime(ZULU_STRFTIME),
+            "end": self.end and self.end.astimezone(UTC).strftime(ZULU_STRFTIME),
+            **super().serialize(),
+        }
 
     class Meta:
         abstract = True

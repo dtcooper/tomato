@@ -8,6 +8,12 @@ class Stopset(EnabledBeginEndWeightMixin, TomatoModelBase):
         db_table = "stopsets"
         verbose_name = "stop set"
 
+    def serialize(self):
+        return {
+            "rotators": [r.id for r in self.rotators.all()],
+            **super().serialize(),
+        }
+
 
 class StopsetRotator(models.Model):
     stopset = models.ForeignKey(Stopset, on_delete=models.CASCADE)

@@ -3,7 +3,7 @@ import os
 from urllib.parse import unquote, urlparse
 
 from django.core.exceptions import ValidationError
-from django.core.files.storage import get_storage_class
+from django.core.files.storage import default_storage
 from django.db import models
 
 from ..ffmpeg import ffprobe
@@ -11,7 +11,6 @@ from .base import NAME_MAX_LENGTH, EnabledBeginEndWeightMixin, TomatoModelBase
 from .rotator import Rotator
 
 
-querystring_auth_storage = get_storage_class()(querystring_auth=True)
 ERROR_DETAIL_LENGTH = 1024
 
 
@@ -20,7 +19,7 @@ class Asset(EnabledBeginEndWeightMixin, TomatoModelBase):
         PENDING = 0, "Pending processing"
         PROCESSING = 1, "Processing"
         FAILED = 2, "Processing failed"
-        PROCESSED = 3, "Ready (processed)"
+        READY = 3, "Ready"
 
     name = models.CharField(
         "name",
@@ -59,7 +58,7 @@ class Asset(EnabledBeginEndWeightMixin, TomatoModelBase):
 
     def serialize(self):
         return {
-            "url": self.file.url,
+            "file": {"filename": self.file.name, "url": self.file.url},
             "duration": round(self.duration.total_seconds()),
             "rotators": [rotator.id for rotator in self.rotators.all()],
             **super().serialize(),
@@ -70,7 +69,7 @@ class Asset(EnabledBeginEndWeightMixin, TomatoModelBase):
 
     def clean(self):
         if self.file:
-            url = querystring_auth_storage.url(self.file.file.obj.key)  # Get temporary upload url
+            url = default_storage.minio_url(self.file.file.obj.key)  # Get temporary upload url
             ffprobe_data = ffprobe(url)
             if not ffprobe_data:
                 raise ValidationError({"file": "Invalid audio file"})
