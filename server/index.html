@@ -341,9 +341,60 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Server
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         Server
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#installing-docker" class="md-nav__link">
+    Installing Docker
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-build" class="md-nav__link">
+    Run &amp; Build
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -380,6 +431,29 @@
 
 
 <h1 id="the-tomato-backend-server">The Tomato Backend Server<a class="headerlink" href="#the-tomato-backend-server" title="Permanent link">←</a></h1>
+<p>The backend server is written in <a href="https://www.python.org/">Python</a>'s <a href="https://www.djangoproject.com/">Django web framework</a>,
+heavily leveraging its <a href="https://docs.djangoproject.com/en/4.1/ref/contrib/admin/">automatic admin interface</a>.</p>
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">←</a></h2>
+<p>Follow these steps to get started.</p>
+<h3 id="installing-docker">Installing Docker<a class="headerlink" href="#installing-docker" title="Permanent link">←</a></h3>
+<p>You'll need to install <a href="https://www.docker.com/">Docker</a> to get started (which now comes preloaded
+with <a href="https://docs.docker.com/compose/">Compose</a>).</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Linux</label><label for="__tabbed_1_2">macOS</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>At the command line, execute the following to install Docker,</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl -fsSL https://get.docker.com <span class="p">|</span> sh
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<p>Install Docker Desktop by
+<a href="https://www.docker.com/products/docker-desktop">following the instructions here</a>.</p>
+</div>
+</div>
+</div>
+<h3 id="run-build">Run &amp; Build<a class="headerlink" href="#run-build" title="Permanent link">←</a></h3>
+<p>Here are the instructions to install Tomato in both development mode and
+production mode.</p>
 
 
 
@@ -390,6 +464,8 @@
             </div>
           
           
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
         </div>
         
       </main>
@@ -452,7 +528,7 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.expand", "navigation.instant", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "search.highlight", "search.suggest", "toc.integrate"], "search": "../assets/javascripts/workers/search.ecf98df9.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "navigation.expand", "navigation.instant", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "search.highlight", "search.suggest", "toc.integrate"], "search": "../assets/javascripts/workers/search.ecf98df9.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
     
       <script src="../assets/javascripts/bundle.39f04ddb.min.js"></script>
