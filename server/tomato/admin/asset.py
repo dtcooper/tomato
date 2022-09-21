@@ -9,6 +9,9 @@ from django.urls import path
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 
+from django_file_form.forms import FileFormMixin, MultipleUploadedFileField
+from django_file_form.model_admin import FileFormAdminMixin
+
 from ..models import Asset, Rotator
 from ..tasks import process_asset
 from .base import NoNullRelatedOnlyFieldListFilter, TomatoModelAdminBase
@@ -18,10 +21,8 @@ class AssetActionForm(ActionForm):
     rotator = forms.ModelChoiceField(Rotator.objects.all(), required=False, label=" ", empty_label="--- Rotator ---")
 
 
-class AssetUploadForm(forms.Form):
-    files = forms.FileField(
-        widget=forms.ClearableFileInput(attrs={"multiple": True}),
-        required=True,
+class AssetUploadForm(FileFormMixin, forms.Form):
+    files = MultipleUploadedFileField(
         label="Audio files",
         help_text="Select one or more files to be uploaded as audio assets.",
     )
@@ -40,12 +41,12 @@ class AssetUploadForm(forms.Form):
         )
 
 
-class AssetAdmin(TomatoModelAdminBase):
+class AssetAdmin(FileFormAdminMixin, TomatoModelAdminBase):
     action_form = AssetActionForm
     search_fields = ("name",)
     actions = ("enable", "disable", "add_rotator", "remove_rotator")
     exclude = ()
-    readonly_fields = ("duration", "created_at", "status", "created_by")
+    readonly_fields = ("duration", "created_at", "status", "created_by", "file_display")
     list_filter = ("enabled", "rotators", "status", ("created_by", NoNullRelatedOnlyFieldListFilter))
     filter_horizontal = ("rotators",)
     list_display = ("name", "status", "file_display", "weight", "rotators_display", "created_by", "created_at")
@@ -61,14 +62,26 @@ class AssetAdmin(TomatoModelAdminBase):
                 obj.file.url,
             )
 
+    def has_change_permission(self, request, obj=None):
+        if obj is not None and obj.status != Asset.Status.READY:
+            return False
+        return super().has_change_permission(request, obj)
+
     def save_model(self, request, obj, form, change):
+        should_process = "file" in obj.get_dirty_fields()
+        if should_process:
+            obj.status = Asset.Status.PENDING
+
         super().save_model(request, obj, form, change)
-        process_asset(asset=obj, user=request.user)
-        self.message_user(
-            request,
-            f'Audio asset "{obj.name}" is being processed. A message will appear when it is ready.',
-            messages.WARNING,
-        )
+
+        if should_process:
+            process_asset(obj)
+            self.message_user(
+                request,
+                f'Audio asset "{obj.name}" is being processed. A message will appear when it is ready. Refresh this'
+                " page and you can edit it at that time.",
+                messages.WARNING,
+            )
 
     @admin.display(description="Rotators")
     def rotators_display(self, obj):
@@ -129,14 +142,14 @@ class AssetAdmin(TomatoModelAdminBase):
             if form.is_valid():
                 for asset in assets:
                     asset.save()
-
                     if rotators:
                         asset.rotators.add(*rotators)
                     process_asset(asset)
 
+                form.delete_temporary_files()
                 self.message_user(request, f"Uploaded {len(assets)} audio assets.", messages.SUCCESS)
-
                 return redirect("admin:tomato_asset_changelist")
+
         else:
             form = AssetUploadForm(request, self.admin_site)
 

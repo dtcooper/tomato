@@ -29,12 +29,3 @@ services:
       - "USE_LOCAL_CA=${NGINX_USE_LOCAL_CA:-0}"
     volumes:
       - ./local-certificate-authority:/etc/local_ca
-
-  minio:
-    restart: 'no'
-    ports:
-      - 127.0.0.1:9000:9000
-      - 127.0.0.1:9001:9001
-
-volumes:
-  minio_data:

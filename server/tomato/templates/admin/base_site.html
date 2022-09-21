@@ -19,31 +19,17 @@
       line-height: 1.2;
     }
 
-    #s3file-progress-container {
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      left: 0;
-      z-index: 9999;
-      width: 100%;
-      background-color: transparent;
-      height: 10px;
-      display: block;
-    }
-
-    #s3file-progress-bar {
-      background-color: var(--primary);
-      width: 0%;
-      display: block;
-      height: inherit;
-    }
-
     #nav-sidebar .module td .bulk-upload-addlink {
       margin-left: 5px;
     }
 
     #footer h5 {
       text-align: center;
+    }
+
+    .dff-uploader .dff-files {
+      margin-left: 10px !important;
+      max-width: 65em !important;
     }
   </style>
   {{ COLORS|json_script:"json-tomato-colors" }}
@@ -59,52 +45,12 @@
         link.href = "{% filter escapejs %}{% url 'admin:tomato_asset_upload' %}{% endfilter %}"
         cell.append(link)
       })
-
-      let showProgressBar = false
-      const progressBar = document.getElementById('s3file-progress-bar')
-
-      let forms = Array.from(document.querySelectorAll('.s3file')).map((input) => {
-        return input.closest('form')
-      })
-
-      forms = new Set(forms)
-      forms.forEach((form) => {
-        form.addEventListener('submit', (event) => {
-          event.preventDefault()
-
-          let showProgress = false
-          Array.from(form.querySelectorAll('.s3file')).map((input) => {
-            showProgress = showProgress || input.files.length > 0
-          })
-
-          if (showProgress) {
-            Array.from(form.querySelectorAll('input[type=submit], button[type=submit]')).forEach((button) => {
-              button.disabled = true
-            })
-
-            if (!showProgressBar) {
-              form.addEventListener('progress', (event) => {
-                progressBar.style.width = `${event.detail.progress * 100}%`
-              })
-              showProgressBar = true
-            }
-          }
-        })
-      })
     })
-
   </script>
 {% endblock %}
 
 {% block userlinks %}
   <a href="https://dtcooper.github.io/tomato/" target="_blank">Help Docs</a> /
-  {{ block.super }}
-{% endblock %}
-
-{% block header %}
-  <div id="s3file-progress-container">
-    <span id="s3file-progress-bar"></span>
-  </div>
   {{ block.super }}
 {% endblock %}
 
@@ -116,7 +62,7 @@
       <h5>
           &copy; Copyright 2019{% if copyright_year|add:"0" > 2019 %}-{{ copyright_year }}{% endif %}
           <a href="mailto:david.cooper@burningman.org" target="_blank">David Cooper</a>
-          &amp; <a href="https://bmir.org/" target="_blank">BMIR</a>.
+          &amp; <a href="https://bmir.org/" target="_blank">BMIR</a>.<br>
           All rights reserved.
       </h5>
     </div>

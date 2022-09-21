@@ -42,12 +42,16 @@
 
       <fieldset class="module aligned">
         {% for field in form %}
-          <div class="form-row" id="form_row_{{ field.name }}">
-            {{ field.errors }}
-            {{ field.label_tag }}
-            <div>{{ field }}</div>
-            <div class="help">{{ field.help_text }}</div>
-          </div>
+          {% if field.is_hidden %}
+            {{ field }}
+          {% else %}
+            <div class="form-row" id="form_row_{{ field.name }}">
+              {{ field.errors }}
+              {{ field.label_tag }}
+              <div>{{ field }}</div>
+              <div class="help">{{ field.help_text }}</div>
+            </div>
+          {% endif %}
         {% endfor %}
       </fieldset>
 

@@ -31,6 +31,7 @@ theme:
     logo: material/radio
     repo: fontawesome/brands/github
   features:
+    - content.tabs.link
     - navigation.expand
     - navigation.instant
     - navigation.sections

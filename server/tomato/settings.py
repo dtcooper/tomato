@@ -17,17 +17,6 @@ REQUIRE_STRONG_PASSWORDS = env("REQUIRE_STRONG_PASSWORDS", default=not DEBUG)
 SECRET_KEY = env("SECRET_KEY")
 TIME_ZONE = env("TIMEZONE", default="US/Pacific")
 
-USE_MINIO = DEBUG and env.bool("USE_MINIO", default=True)
-
-AWS_STORAGE_BUCKET_NAME = "tomato"
-AWS_ACCESS_KEY_ID = "AKIAIOSFODNN7EXAMPLE"
-AWS_S3_ENDPOINT_URL = "http://minio:9000"
-AWS_S3_REGION_NAME = "us-east-1"
-AWS_SECRET_ACCESS_KEY = SECRET_KEY
-
-AWS_S3_FILE_OVERWRITE = False
-AWS_QUERYSTRING_EXPIRE = 48 * 60 * 60  # 48 hours
-
 EMAIL_ADMIN_ADDRESS = env("EMAIL_ADMIN_ADDRESS")
 EMAIL_HOST = env("EMAIL_HOST")
 EMAIL_HOST_USER = env("EMAIL_USERNAME")
@@ -61,7 +50,7 @@ INSTALLED_APPS = [
     # Third-party
     "constance",
     "huey.contrib.djhuey",
-    "s3file",
+    "django_file_form",
     "user_messages",
 ]
 if DEBUG:
@@ -94,7 +83,6 @@ MIDDLEWARE.extend(
         "django.contrib.auth.middleware.AuthenticationMiddleware",
         "django.contrib.messages.middleware.MessageMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
-        "s3file.middleware.S3FileMiddleware",
     ]
 )
 
@@ -122,7 +110,6 @@ SILENCED_SYSTEM_CHECKS = ("admin.E404",)  # Needed for django-user-messages
 
 WSGI_APPLICATION = "tomato.wsgi.application"
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-DEFAULT_FILE_STORAGE = "tomato.utils.PrivateMediaS3OptimizedUploadStorage"
 
 DATABASES = {
     "default": {
@@ -149,7 +136,6 @@ CACHES = {
 }
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-SESSION_CACHE_ALIAS = "default"
 
 HUEY = {
     "expire_time": 60 * 60,
@@ -164,7 +150,11 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
-STATIC_ROOT = "/static"
+STATIC_ROOT = "/serve/static"
+MEDIA_URL = "/assets/"
+MEDIA_ROOT = "/serve/assets"
+FILE_FORM_MUST_LOGIN = True
+FILE_FORM_UPLOAD_DIR = "_temp_uploads"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

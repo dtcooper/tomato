@@ -3,6 +3,7 @@ from django.contrib.auth.models import Group
 from django.utils.safestring import mark_safe
 
 from constance.admin import Config
+from django_file_form.models import TemporaryUploadedFile
 from user_messages.models import Message
 
 from ..models import Asset, ClientLogEntry, Rotator, Stopset, User
@@ -20,7 +21,7 @@ admin.site.index_title = None
 admin.site.empty_value_display = mark_safe("<em>None</em>")
 
 
-admin.site.unregister([Config, Group, Message])
+admin.site.unregister([Config, Group, Message, TemporaryUploadedFile])
 admin.site.register(Asset, AssetAdmin)
 admin.site.register(ClientLogEntry, ClientLogEntryAdmin)
 admin.site.register([Config], ConfigAdmin)

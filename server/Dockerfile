@@ -85,7 +85,6 @@ WORKDIR /app
 RUN poetry install $([ -z "$DEBUG" -o "$DEBUG" = '0' ] && echo '--without=dev')
 
 COPY --from=audiowaveform-builder /usr/local/bin/audiowaveform /usr/local/bin/
-COPY --from=quay.io/minio/mc:RELEASE.2022-09-16T09-16-47Z /usr/bin/mc /usr/local/bin/
 COPY *.py *.sh /app/
 COPY tomato/ /app/tomato/
 WORKDIR /app

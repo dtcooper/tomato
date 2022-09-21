@@ -1,10 +1,11 @@
 import datetime
 import os
-from urllib.parse import unquote, urlparse
 
 from django.core.exceptions import ValidationError
-from django.core.files.storage import default_storage
 from django.db import models
+
+from dirtyfields import DirtyFieldsMixin
+from django_file_form.uploaded_file import UploadedTusFile
 
 from ..ffmpeg import ffprobe
 from .base import NAME_MAX_LENGTH, EnabledBeginEndWeightMixin, TomatoModelBase
@@ -14,7 +15,7 @@ from .rotator import Rotator
 ERROR_DETAIL_LENGTH = 1024
 
 
-class Asset(EnabledBeginEndWeightMixin, TomatoModelBase):
+class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
     class Status(models.IntegerChoices):
         PENDING = 0, "Pending processing"
         PROCESSING = 1, "Processing"
@@ -64,13 +65,14 @@ class Asset(EnabledBeginEndWeightMixin, TomatoModelBase):
             **super().serialize(),
         }
 
-    def get_stripped_asset_url(self):
-        return urlparse(self.file.url)._replace(query="", fragment="").geturl()
-
     def clean(self):
         if self.file:
-            url = default_storage.minio_url(self.file.file.obj.key)  # Get temporary upload url
-            ffprobe_data = ffprobe(url)
+            if isinstance(self.file.file, UploadedTusFile):
+                file_path = self.file.file.file.path
+            else:
+                file_path = self.file.path
+
+            ffprobe_data = ffprobe(file_path)
             if not ffprobe_data:
                 raise ValidationError({"file": "Invalid audio file"})
 
@@ -81,8 +83,8 @@ class Asset(EnabledBeginEndWeightMixin, TomatoModelBase):
                 if ffprobe_data.title:
                     self.name = ffprobe_data.title
                 else:
-                    title_from_filename, _ = os.path.splitext(os.path.basename(urlparse(url).path))
-                    self.name = unquote(title_from_filename)[:NAME_MAX_LENGTH].strip()
+                    self.name, _ = os.path.splitext(os.path.basename(self.file.name))
+            self.name = self.name[: NAME_MAX_LENGTH - 1].strip() or "Untitled"
 
 
 Asset.rotators.through.__str__ = lambda self: f"{self.asset.name} in {self.rotator.name}"

@@ -1,25 +1,10 @@
-from urllib.parse import urlparse, urlunparse
+from pathlib import Path
 
 from django.apps import AppConfig, apps
 from django.conf import settings
 from django.db.models import signals
 
-from s3file.forms import S3FileInputMixin
-
 from .constants import EDIT_ALL_GROUP_NAME, EDIT_ONLY_ASSETS_GROUP_NAME
-
-
-if settings.USE_MINIO:
-    _build_attrs_original = S3FileInputMixin.build_attrs
-
-    def _build_attrs_monkey_patched_minio_to_localhost(self, *args, **kwargs):
-        attrs = _build_attrs_original(self, *args, **kwargs)
-        url = urlparse(attrs["data-url"])
-        url = url._replace(netloc=settings.DOMAIN_NAME, scheme="https", path=f"s3/{url.path}")
-        attrs["data-url"] = urlunparse(url)
-        return attrs
-
-    _build_attrs_monkey_patched_minio_to_localhost.__name__ = "build_attrs"
 
 
 class TomatoConfig(AppConfig):
@@ -28,9 +13,9 @@ class TomatoConfig(AppConfig):
     verbose_name = "Radio automation"
 
     def ready(self):
+        temp_upload_path = Path(settings.MEDIA_ROOT) / settings.FILE_FORM_UPLOAD_DIR
+        temp_upload_path.mkdir(parents=True, exist_ok=True)
         signals.post_migrate.connect(self.create_groups, sender=self)
-        if settings.USE_MINIO:
-            S3FileInputMixin.build_attrs = _build_attrs_monkey_patched_minio_to_localhost
 
     def create_groups(self, using=None, *args, **kwargs):
         all_groups = []
