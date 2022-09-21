@@ -6,17 +6,33 @@ if [ ! -f /.env ]; then
 fi
 . /.env
 
+NO_SECRET_KEY=
+if [ -z "$SECRET_KEY" ]; then
+    NO_SECRET_KEY=1
+fi
+
 wait-for-it -t 0 db:5432
 wait-for-it -t 0 redis:6379
 
 # If we're not running huey, migration and create tomato:tomato when DEBUG=1
 if [ -z "$__RUN_HUEY" ]; then
+    if [ "$NO_SECRET_KEY" ]; then
+        echo 'Generating SECRET_KEY...'
+        python -c 'import base62 as b, dotenv as d, secrets as s; d.set_key("/.env", "SECRET_KEY", b.encodebytes(s.token_bytes(40)))'
+        . /.env
+    fi
+
     ./manage.py migrate
     if [ "$DEBUG" -a "$DEBUG" != '0' ]; then
         if [ "$(./manage.py shell -c 'from tomato.models import User; print("" if User.objects.exists() else "1")')" = 1 ]; then
             DJANGO_SUPERUSER_PASSWORD=tomato ./manage.py createsuperuser --noinput --username tomato
         fi
     fi
+
+elif [ "$NO_SECRET_KEY" ]; then
+    echo 'Delaying huey while SECRET_KEY is being generated...'
+    sleep 10
+    . /.env
 fi
 
 if [ "$DEBUG" -a "$DEBUG" != '0' ]; then

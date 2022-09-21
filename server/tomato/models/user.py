@@ -2,7 +2,7 @@ import hmac
 import secrets
 import struct
 
-import base58
+import base62
 
 from django.contrib.auth.models import AbstractUser
 from django.utils.crypto import constant_time_compare, salted_hmac
@@ -39,12 +39,12 @@ class User(AbstractUser):
     def generate_access_token(self):
         salt = secrets.token_bytes(self.ACCESS_TOKEN_SALT_LENGTH)
         raw_token = self.ACCESS_TOKEN_STRUCT.pack(salt, self.id, self._get_access_token_hash(salt))
-        return base58.b58encode(raw_token).decode("utf-8")
+        return base62.encodebytes(raw_token)
 
     @classmethod
     def validate_access_token(cls, auth_token):
         try:
-            packed = base58.b58decode(auth_token)
+            packed = base62.decodebytes(auth_token)
         except ValueError:
             pass
         else:

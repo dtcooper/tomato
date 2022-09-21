@@ -9,7 +9,7 @@ x-app-template: &app-template
     args:
       - "DEBUG=${DEBUG:-0}"
   volumes:
-    - ./.env:/.env:ro
+    - ./.env:/.env
     - ../constants.json:/constants.json:ro
     - ./serve:/serve
 

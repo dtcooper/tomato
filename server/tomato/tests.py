@@ -1,7 +1,7 @@
 import json
 import random
 
-import base58
+import base62
 
 from django.test import TestCase
 from django.urls import reverse
@@ -25,7 +25,7 @@ class ViewTests(TestCase):
         self.assertIn("access_token", data)
 
         access_token = data["access_token"]
-        raw_access_token = base58.b58decode(access_token)
+        raw_access_token = base62.decodebytes(access_token)
         self.assertEqual(len(raw_access_token), User.ACCESS_TOKEN_STRUCT.size)
         _, access_token_user_id, _ = User.ACCESS_TOKEN_STRUCT.unpack(raw_access_token)
         self.assertEqual(user.id, access_token_user_id)
@@ -50,11 +50,11 @@ class ViewTests(TestCase):
                     # Flip sign so user_id is always negative, so no possible way it can be a good token
                     raw_bad_token[User.ACCESS_TOKEN_SALT_LENGTH] |= 1 << 7
 
-                bad_token = base58.b58encode(raw_bad_token)
+                bad_token = base62.encodebytes(bytes(raw_bad_token))
                 self.assertIsNone(User.validate_access_token(bad_token))
 
         access_token = user.generate_access_token()
-        raw_access_token = base58.b58decode(access_token)
+        raw_access_token = base62.decodebytes(access_token)
         self.assertEqual(len(raw_access_token), User.ACCESS_TOKEN_STRUCT.size)
         _, access_token_user_id, _ = User.ACCESS_TOKEN_STRUCT.unpack(raw_access_token)
         self.assertEqual(user.id, access_token_user_id)
