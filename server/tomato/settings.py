@@ -17,13 +17,15 @@ REQUIRE_STRONG_PASSWORDS = env("REQUIRE_STRONG_PASSWORDS", default=not DEBUG)
 SECRET_KEY = env("SECRET_KEY")
 TIME_ZONE = env("TIMEZONE", default="US/Pacific")
 
-EMAIL_ADMIN_ADDRESS = env("EMAIL_ADMIN_ADDRESS")
-EMAIL_HOST = env("EMAIL_HOST")
-EMAIL_HOST_USER = env("EMAIL_USERNAME")
-EMAIL_HOST_PASSWORD = env("EMAIL_PASSWORD")
-EMAIL_PORT = env.int("EMAIL_PORT", default=587)
-EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=(EMAIL_PORT == 587))
-DEFAULT_FROM_EMAIL = SERVER_EMAIL = env("EMAIL_FROM_ADDRESS")
+EMAIL_EXCEPTIONS_ENABLED = env.bool("EMAIL_EXCEPTIONS_ENABLED", default=True)
+if EMAIL_EXCEPTIONS_ENABLED:
+    EMAIL_ADMIN_ADDRESS = env("EMAIL_ADMIN_ADDRESS")
+    EMAIL_HOST = env("EMAIL_HOST")
+    EMAIL_HOST_USER = env("EMAIL_USERNAME")
+    EMAIL_HOST_PASSWORD = env("EMAIL_PASSWORD")
+    EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+    EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=(EMAIL_PORT == 587))
+    DEFAULT_FROM_EMAIL = SERVER_EMAIL = env("EMAIL_FROM_ADDRESS")
 
 
 ALLOWED_HOSTS = {"app"}
@@ -35,7 +37,7 @@ ALLOWED_HOSTS = list(ALLOWED_HOSTS)
 
 if DEBUG:
     # For django debug framework
-    import socket  # only if you haven't already imported this
+    import socket
 
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
     INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
@@ -158,7 +160,6 @@ FILE_FORM_UPLOAD_DIR = "_temp_uploads"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-ADMINS = [(f"{DOMAIN_NAME} Admin", EMAIL_ADMIN_ADDRESS)]
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -174,12 +175,6 @@ LOGGING = {
     },
     "handlers": {
         "console": {"class": "logging.StreamHandler", "formatter": "console", "level": "INFO"},
-        "mail_admins": {
-            "level": "ERROR",
-            "filters": ["require_debug_false"],
-            "class": "django.utils.log.AdminEmailHandler",
-            "include_html": True,
-        },
     },
     "loggers": {
         "django": {
@@ -187,12 +182,12 @@ LOGGING = {
             "level": "INFO",
         },
         "django.request": {
-            "handlers": ["mail_admins", "console"],
+            "handlers": ["console"],
             "level": "INFO",
             "propagate": False,
         },
         "huey": {
-            "handlers": ["mail_admins", "console"],
+            "handlers": ["console"],
             "level": "INFO",
             "propagate": False,
         },
@@ -202,6 +197,16 @@ LOGGING = {
         },
     },
 }
+if EMAIL_EXCEPTIONS_ENABLED:
+    ADMINS = [(f"{DOMAIN_NAME} Admin", EMAIL_ADMIN_ADDRESS)]
+    LOGGING["handlers"]["mail_admins"] = {
+        "level": "ERROR",
+        "filters": ["require_debug_false"],
+        "class": "django.utils.log.AdminEmailHandler",
+        "include_html": True,
+    }
+    LOGGING["loggers"]["django.request"]["handlers"].append("mail_admins")
+    LOGGING["loggers"]["huey"]["handlers"].append("mail_admins")
 
 if REQUIRE_STRONG_PASSWORDS:
     AUTH_PASSWORD_VALIDATORS = [
