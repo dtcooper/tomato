@@ -207,20 +207,6 @@
         
   
   
-    
-  
-
-
-  <li class="md-tabs__item">
-    <a href="./" class="md-tabs__link md-tabs__link--active">
-      Concepts
-    </a>
-  </li>
-
-      
-        
-  
-  
 
 
   <li class="md-tabs__item">
@@ -238,6 +224,20 @@
   <li class="md-tabs__item">
     <a href="../server/" class="md-tabs__link">
       Server
+    </a>
+  </li>
+
+      
+        
+  
+  
+    
+  
+
+
+  <li class="md-tabs__item">
+    <a href="./" class="md-tabs__link md-tabs__link--active">
+      Concepts
     </a>
   </li>
 
@@ -327,6 +327,36 @@
 
   
   
+  
+    <li class="md-nav__item">
+      <a href="../client/" class="md-nav__link">
+        Client
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../server/" class="md-nav__link">
+        Server
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
     
   
   
@@ -367,42 +397,46 @@
     Glossary of Terms
   </a>
   
+    <nav class="md-nav" aria-label="Glossary of Terms">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#audio-asset" class="md-nav__link">
+    Audio Asset
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rotator" class="md-nav__link">
+    Rotator
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stop-set" class="md-nav__link">
+    Stop Set
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#random-weight" class="md-nav__link">
+    Random Weight
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
   
 </nav>
       
-    </li>
-  
-
-    
-      
-      
-      
-
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../client/" class="md-nav__link">
-        Client
-      </a>
-    </li>
-  
-
-    
-      
-      
-      
-
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../server/" class="md-nav__link">
-        Server
-      </a>
     </li>
   
 
@@ -439,9 +473,7 @@
 
 <h1 id="core-concepts-explained">Core Concepts, Explained<a class="headerlink" href="#core-concepts-explained" title="Permanent link">←</a></h1>
 <h2 id="glossary-of-terms">Glossary of Terms<a class="headerlink" href="#glossary-of-terms" title="Permanent link">←</a></h2>
-<dl>
-<dt>Audio Asset</dt>
-<dd>
+<h3 id="audio-asset">Audio Asset<a class="headerlink" href="#audio-asset" title="Permanent link">←</a></h3>
 <p>A short, individual audio track. Think individual advertisements, individual
 public service announcements, or individual station IDs.</p>
 <p>Audio assets always have a name and underlying audio file, like an mp3 but
@@ -452,9 +484,7 @@ their enabled at all.</p>
 <p>And example would be a short advertisement audio clip named <em>"David's
 Steel Guitar Ad."</em></p>
 </div>
-</dd>
-<dt>Rotator</dt>
-<dd>
+<h3 id="rotator">Rotator<a class="headerlink" href="#rotator" title="Permanent link">←</a></h3>
 <p>A collection of audio assets. A rotator represents a way to <em>categorize</em>
 audio assets into the same group.</p>
 <p>An audio asset <strong>can</strong> belong to more than one rotator, but in practice,
@@ -465,9 +495,7 @@ they won't.</p>
 Guitar Ad"</em> along with other short ads for musical instruments in the
 <em>"Musical Instrument Ads"</em> rotator.</p>
 </div>
-</dd>
-<dt>Stop Set</dt>
-<dd>
+<h3 id="stop-set">Stop Set<a class="headerlink" href="#stop-set" title="Permanent link">←</a></h3>
 <p>A stop set is an ordered list of rotators. A stop set can be thought of as
 an entire commercial break, like in traditional radio. One audio asset is
 selected at random<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> for each rotator in a stop set.</p>
@@ -565,15 +593,31 @@ randomly selected audio assets.</p>
 </tbody>
 </table>
 </div>
-</dd>
-<dt>Random Weight</dt>
-<dd>Random weight is also known as selection bias.</dd>
-</dl>
+<h3 id="random-weight">Random Weight<a class="headerlink" href="#random-weight" title="Permanent link">←</a></h3>
+<p>The weight of how likely random selection occurs of an item occurs, when
+compared to all other items in a set. The default random weight with Tomato is
+always <code>1</code>.</p>
+<p>Random weight is used when Tomato selects both audio assets and stop sets.</p>
+<p>The likeliness of an item <code>x</code> being selected is calculated as follows,</p>
+<div class="arithmatex">
+<div class="MathJax_Preview">
+\text{chance of selection of item} = \frac{\text{random weight of item}}{\text{sum all of item random weights}}
+</div>
+<script type="math/tex; mode=display">
+\text{chance of selection of item} = \frac{\text{random weight of item}}{\text{sum all of item random weights}}
+</script>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Random Weight Example</p>
+<p>If an audio asset <em>"A"</em> has a weight of <code>2</code> and all other audio assets
+have a weight of <code>1</code>, then asset <em>"A"</em> is <strong>twice as likely</strong> to be selected
+when compares to all other assets.</p>
+</div>
 <div class="footnote">
 <hr />
 <ol>
 <li id="fn:1">
-<p>The random selection process can be biased by weight.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p>The random selection process can be biased by random weight.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
@@ -599,7 +643,7 @@ randomly selected audio assets.</p>
     <nav class="md-footer__inner md-grid" aria-label="Footer" >
       
         
-        <a href=".." class="md-footer__link md-footer__link--prev" aria-label="Previous: Intro" rel="prev">
+        <a href="../server/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Server" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
           </div>
@@ -608,20 +652,20 @@ randomly selected audio assets.</p>
               <span class="md-footer__direction">
                 Previous
               </span>
-              Intro
+              Server
             </div>
           </div>
         </a>
       
       
         
-        <a href="../client/" class="md-footer__link md-footer__link--next" aria-label="Next: Client" rel="next">
+        <a href="../license/" class="md-footer__link md-footer__link--next" aria-label="Next: Author &amp; License" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Client
+              Author & License
             </div>
           </div>
           <div class="md-footer__button md-icon">
@@ -655,6 +699,12 @@ randomly selected audio assets.</p>
     
     
       <script src="../assets/javascripts/bundle.37e9125f.min.js"></script>
+      
+        <script src="../assets/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js?config=AM_CHTML"></script>
       
     
   </body>
