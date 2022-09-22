@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 import shutil
 import tempfile
+import time
 from urllib.parse import urlparse
 import zipfile
 
@@ -32,6 +33,8 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        before_time = time.time()
+
         if options["delete_all"]:
             if (
                 options["interactive"]
@@ -43,12 +46,13 @@ class Command(BaseCommand):
             for model_cls in (Asset, Rotator, Stopset):
                 model_cls.objects.all().delete()
 
-            self.stdout.write(f"Deleted {ALL_MODELS_TEXT}!")
+            self.stdout.write(self.style.WARNING(f"Deleted {ALL_MODELS_TEXT}!"))
 
-        self.stdout.write(f"Downloading {SAMPLE_DATA_URL}...")
         for model_cls in (Asset, Rotator, Stopset):
             if model_cls.objects.exists():
                 raise CommandError(f"One or more {model_cls._meta.verbose_name_plural} already exists! Exiting.")
+
+        self.stdout.write(f"Downloading {SAMPLE_DATA_URL}...")
 
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_dir = Path(temp_dir)
@@ -58,24 +62,26 @@ class Command(BaseCommand):
                 with open(zip_filename, "wb") as zip_file:
                     shutil.copyfileobj(response.raw, zip_file)
 
-            print("Extract archive...")
+            self.stdout.write("Extract archive...")
             with zipfile.ZipFile(zip_filename, "r") as archive:
                 archive.extractall(temp_dir)
 
             temp_dir = temp_dir / zip_filename.with_suffix("").name
 
-            print("Loading metadata...")
+            self.stdout.write("Loading metadata...")
             with open(temp_dir / "metadata.json", "r") as metadata_file:
                 metadata = json.load(metadata_file)
 
             rotator_names = [d.name for d in temp_dir.iterdir() if d.is_dir()]
 
             mp3_dir = Path(settings.MEDIA_ROOT) / "prefill"
+            shutil.rmtree(mp3_dir, ignore_errors=True)
             mp3_dir.mkdir(parents=True, exist_ok=True)
             rotators = {}
 
             for rotator_name in rotator_names:
                 rotator_dir = temp_dir / rotator_name
+                self.stdout.write(f"Creating rotator {rotator_name}...")
                 rotator = rotators[rotator_name] = Rotator.objects.create(
                     name=rotator_name,
                     color=metadata["rotator_colors"][rotator_name],
@@ -83,7 +89,7 @@ class Command(BaseCommand):
 
                 for mp3_tmp_filename in rotator_dir.iterdir():
                     mp3_filename = mp3_dir / mp3_tmp_filename.name
-                    print(f"Importing {mp3_filename.name}...")
+                    self.stdout.write(f"Importing audio asset {mp3_filename.name}...")
 
                     shutil.move(mp3_tmp_filename, mp3_filename)
 
@@ -93,12 +99,15 @@ class Command(BaseCommand):
                     asset.rotators.add(rotator)
                     process_asset(asset)
 
-            for stopset_name, rotator_names in metadata["stopsets"].items():
-                stopset = Stopset.objects.create(
-                    name=stopset_name,
+        for stopset_name, rotator_names in metadata["stopsets"].items():
+            self.stdout.write(f"Creating stop set {stopset_name}...")
+            stopset = Stopset.objects.create(
+                name=stopset_name,
+            )
+            for rotator_name in rotator_names:
+                StopsetRotator.objects.create(
+                    stopset=stopset,
+                    rotator=rotators[rotator_name],
                 )
-                for rotator_name in rotator_names:
-                    StopsetRotator.objects.create(
-                        stopset=stopset,
-                        rotator=rotators[rotator_name],
-                    )
+
+        self.stdout.write(self.style.SUCCESS(f"Done! Took {time.time() - before_time:.3f} seconds."))
