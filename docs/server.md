@@ -50,6 +50,20 @@ cp .env.sample .env
     ln -s docker-compose.dev.yml docker-compose.overrides.yml
     ```
 
+    Build the containers (or pull them by instead executing `#!bash docker compose pull`),
+
+    ```bash
+    docker compose build
+    ```
+
+    !!! tip "Generating Sample Data"
+        If you just want to demo Tomato with loads of prefilled sample data, run
+        this command,
+
+        ```bash
+        docker compose run --rm app ./manage.py prefill_sample_data --created-by tomato
+        ```
+
     Now bring up the server,
 
     ```bash
@@ -71,24 +85,85 @@ cp .env.sample .env
 
     1. Set `DEBUG` flag to `0` &mdash; which tells Tomato to run in production
        mode.
-    2. `DOMAIN_NAME` is set to a domain name that resolves to a publicly
-       accessible IP address of the server.
-    3. `CERTBOT_EMAIL` is set to a valid email.
-    4. Either set `EMAIL_EXCEPTIONS_ENABLED` to `0` to disable emails, or set it
+    2. Either set `EMAIL_EXCEPTIONS_ENABLED` to `0` to disable emails, or set it
        to `1` and edit all `EMAIL_*` values point to a properly configured SMTP
        server
 
-    !!! danger "`DOMAIN_NAME` and `CERTBOT_EMAIL` **must** be properly set!"
+    === "Setting Up an Nginx Container"
 
-        If you don't set `DOMAIN_NAME` and `CERTBOT_EMAIL` properly as described
-        above, the production [Nginx] container will not  start correctly. This
-        is a requirement of [Certbot], the underlying component that automatically
-        generates an SSL certificate for you.
+        It's **highly recommended** that you use the production [Nginx]
+        container, which automatically generates an SSL certificate for you and
+        takes care of reverse proxying into Tomato for you.
 
-    Now, create a symbolic link for the production [Compose] overrides,
+        To do so, first make sure of the following in your `.env` file,
+
+        1. `DOMAIN_NAME` is set to a domain name that resolves to a publicly
+        accessible IP address of the server.
+        2. `CERTBOT_EMAIL` is set to a valid email.
+
+        !!! danger "`DOMAIN_NAME` and `CERTBOT_EMAIL` **must** be properly set!"
+            If you don't set `DOMAIN_NAME` and `CERTBOT_EMAIL` properly as described
+            above, the production [Nginx] container will not  start correctly. This
+            is a requirement of [Certbot], the underlying component that automatically
+            generates an SSL certificate for you.
+
+        Now, create a symbolic link for the [Nginx] [Compose] overrides,
+
+        ```bash
+        ln -s docker-compose.nginx.yml docker-compose.overrides.yml
+        ```
+
+    === "Reverse Proxying Yourself"
+
+        !!! danger "Reverse proxying yourself is **NOT** recommended."
+            This is method of setting up Tomato on your server is unsupported,
+            and not recommended. However, here is a guide for non-standard
+            setups, or if you don't have port `80` and `443` available on your
+            server.
+
+        Create and edit a file named `docker-compose.overrides.yml`,
+
+        ```yaml title="server/docker-compose.overrides.yml"
+        services:
+          app:
+            ports:
+              # Replace 1234 with any port you like
+              - 127.0.0.1:1234:8000
+        ```
+
+        Then in your web server, reverse proxy into port you chose.
+
+        If you're using [Nginx], you can use configuration like this,
+
+        ```nginx title="sample.conf"
+        server {
+          # ... other Nginx config here
+
+          location /assets/ {
+            # Replace /home/user/tomato with the path you cloned the repository
+            alias /home/user/tomato/server/serve/assets/;
+          }
+
+          location /static/ {
+            # Replace /home/user/tomato here too
+            alias /home/user/tomato/server/serve/static/;
+          }
+
+          location / {
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            # Replace 1234 with the port you chose above
+            proxy_pass http://127.0.0.1:1234;
+          }
+        }
+        ```
+
+    Pull the containers (or build them by instead executing `#!bash docker compose build`),
 
     ```bash
-    ln -s docker-compose.prod.yml docker-compose.overrides.yml
+    docker compose pull
     ```
 
     Create an admin user by following the instructions after typing this at the
@@ -112,6 +187,8 @@ cp .env.sample .env
     docker compose down
     ```
 
+    Tomato will be configured to auto-restart on crashes, and and system
+    start-up.
 
 [certbot]: https://certbot.eff.org/
 [compose]: https://docs.docker.com/compose/

@@ -37,6 +37,5 @@ services:
       - redis_data:/data
 
 volumes:
-  nginx_secrets:
   postgres_data:
   redis_data:

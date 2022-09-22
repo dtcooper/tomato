@@ -31,7 +31,6 @@ class EnabledBeginEndWeightMixin(models.Model):
         help_text=(
             "Date when eligibility for random selection <strong>begins</strong>. If specified, random selection is only"
             " eligible after this date. If left blank, its always eligible for random selection up to end air date."
-            f" (Timezone: {settings.TIME_ZONE})"
         ),
     )
     end = models.DateTimeField(
@@ -40,9 +39,9 @@ class EnabledBeginEndWeightMixin(models.Model):
         blank=True,
         default=None,
         help_text=(
-            "Date when eligibility for random selection <strong>ends</strong>. If specified, random selection is only"
-            " eligible before this date. If left blank, its always eligible for random selection starting with begin"
-            f" air date. (Timezone: {settings.TIME_ZONE})"
+            f"Date when eligibility for random selection <strong>ends</strong>. If specified, random selection is only"
+            f" eligible before this date. If left blank, its always eligible for random selection starting with begin"
+            f" air date."
         ),
     )
     weight = models.DecimalField(
