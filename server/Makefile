@@ -12,11 +12,11 @@ shell:
 
 .PHONY: up
 up:
-	$(COMPOSE) up
+	$(COMPOSE) up --remove-orphans $(shell source .env; if [ -z "$$DEBUG" -o "$$DEBUG" = 0 ]; then echo "-d"; fi)
 
 .PHONY: down
 down:
-	$(COMPOSE) down
+	$(COMPOSE) down --remove-orphans
 
 .PHONY: check-env
 check-env:
