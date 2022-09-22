@@ -10,13 +10,18 @@ strict: true
 
 nav:
   - index.md
-  - concepts.md
   - client.md
   - server.md
+  - concepts.md
   - license.md
 
 extra_css:
   - assets/extra.css
+
+extra_javascript:
+  - assets/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js?config=AM_CHTML
 
 plugins:
   - search
@@ -63,6 +68,7 @@ markdown_extensions:
   - def_list
   - footnotes
   - md_in_html
+  - pymdownx.arithmatex
   - pymdownx.details
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
