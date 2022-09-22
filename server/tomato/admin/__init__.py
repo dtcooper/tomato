@@ -15,18 +15,18 @@ from .stopset import StopsetAdmin
 from .user import UserAdmin
 
 
+HELP_DOCS_URL = "https://dtcooper.github.io/tomato/"
 MODELS_HELP_DOCS_TEXT = {
     Asset: mark_safe(
-        "For information about what an audio asset is, <a"
-        ' href="https://dtcooper.github.io/tomato/concepts/#audio-asset" target="_blank">see the docs</a>.'
+        f'For information about audio assets, <a href="{HELP_DOCS_URL}concepts/#audio-asset" target="_blank">see the'
+        " docs</a>."
     ),
     Rotator: mark_safe(
-        'For information about what a rotators are, <a href="https://dtcooper.github.io/tomato/concepts/#rotator"'
-        ' target="_blank">see the docs</a>.'
+        f'For information about rotators, <a href="{HELP_DOCS_URL}concepts/#rotator" target="_blank">see the docs</a>.'
     ),
     Stopset: mark_safe(
-        'For information about what an stop sets are, <a href="https://dtcooper.github.io/tomato/concepts/#stop-set"'
-        ' target="_blank">see the docs</a>.'
+        f'For information about stop sets, <a href="{HELP_DOCS_URL}concepts/#stop-set" target="_blank">see the'
+        " docs</a>."
     ),
 }
 
@@ -47,6 +47,7 @@ class TomatoAdminSite(admin.AdminSite):
                 break
 
         return {
+            "help_docs_url": HELP_DOCS_URL,
             "help_docs_text": help_docs_text,
             "tomato_json_data": {"colors": COLORS_DICT},
             **context,
