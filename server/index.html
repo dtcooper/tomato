@@ -477,6 +477,8 @@ Take action on the following,</p>
 <li>Either set <code>EMAIL_EXCEPTIONS_ENABLED</code> to <code>0</code> to disable emails, or set it
    to <code>1</code> and edit all <code>EMAIL_*</code> values point to a properly configured SMTP
    server</li>
+<li><code>DOMAIN_NAME</code> is set to a domain name that resolves to a publicly
+accessible IP address of the server.</li>
 </ol>
 <div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Setting Up an Nginx Container</label><label for="__tabbed_3_2">Reverse Proxying Yourself</label></div>
 <div class="tabbed-content">
@@ -485,11 +487,9 @@ Take action on the following,</p>
 container, which automatically generates an SSL certificate for you and
 takes care of reverse proxying into Tomato for you.</p>
 <p>To do so, first make sure of the following in your <code>.env</code> file,</p>
-<ol>
-<li><code>DOMAIN_NAME</code> is set to a domain name that resolves to a publicly
-accessible IP address of the server.</li>
+<ul>
 <li><code>CERTBOT_EMAIL</code> is set to a valid email.</li>
-</ol>
+</ul>
 <div class="admonition danger">
 <p class="admonition-title"><code>DOMAIN_NAME</code> and <code>CERTBOT_EMAIL</code> <strong>must</strong> be properly set!</p>
 <p>If you don't set <code>DOMAIN_NAME</code> and <code>CERTBOT_EMAIL</code> properly as described
