@@ -10,7 +10,6 @@ from .base import TomatoModelAdminBase
 class RotatorAdmin(TomatoModelAdminBase):
     list_display = ("name", "color", "stopsets_display")
     list_prefetch_related = Prefetch("stopsets", queryset=Stopset.objects.distinct())
-    search_fields = ("name",)
     fields = ("name", "color", "stopsets_display")
     readonly_fields = ("stopsets_display",)
 

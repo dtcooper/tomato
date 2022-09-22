@@ -43,11 +43,11 @@ class AssetUploadForm(FileFormMixin, forms.Form):
 
 class AssetAdmin(FileFormAdminMixin, TomatoModelAdminBase):
     action_form = AssetActionForm
-    search_fields = ("name",)
     actions = ("enable", "disable", "add_rotator", "remove_rotator")
     exclude = ()
     readonly_fields = ("duration", "created_at", "status", "created_by", "file_display")
     list_filter = ("enabled", "rotators", "status", ("created_by", NoNullRelatedOnlyFieldListFilter))
+    list_per_page = 250
     filter_horizontal = ("rotators",)
     list_display = ("name", "status", "file_display", "weight", "rotators_display", "created_by", "created_at")
     date_hierarchy = "created_at"

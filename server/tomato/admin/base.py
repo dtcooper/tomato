@@ -18,6 +18,7 @@ class ListPrefetchRelatedMixin:
 
 class TomatoModelAdminBase(ListPrefetchRelatedMixin, admin.ModelAdmin):
     save_on_top = True
+    search_fields = ("name",)
     exclude = ("created_by",)  # XXX should be excluded by modeladmin directly
 
     @admin.action(description="Enable selected %(verbose_name_plural)s", permissions=("add", "change", "delete"))
