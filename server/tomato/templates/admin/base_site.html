@@ -1,10 +1,13 @@
 {% extends 'admin/base_site.html' %}
 
+{% load static %}
+
 {# Disable dark mode #}
 {% block dark-mode-vars %}{% endblock %}
 
 {% block extrahead %}
   {{ block.super }}
+  <link rel="icon" type="image/svg+xml" href="{% static 'tomato/favicon.svg' %}">
   <style>
     :root {
       --primary: #0aa0e1;
@@ -32,9 +35,9 @@
       max-width: 65em !important;
     }
   </style>
-  {{ COLORS|json_script:"json-tomato-colors" }}
+  {{ tomato_json_data|json_script:"tomato-json-data" }}
   <script>
-    const COLORS = JSON.parse(document.getElementById('json-tomato-colors').textContent)
+    const TOMATO_DATA = JSON.parse(document.getElementById('tomato-json-data').textContent)
 
     document.addEventListener('DOMContentLoaded', () => {
       Array.from(document.querySelectorAll('.app-tomato.module .model-asset .addlink')).forEach((addLink) => {
@@ -52,6 +55,13 @@
 {% block userlinks %}
   <a href="https://dtcooper.github.io/tomato/" target="_blank">Help Docs</a> /
   {{ block.super }}
+{% endblock %}
+
+{% block content_subtitle %}
+  {{ block.super }}
+  {% if help_docs_text %}
+    <p>{{ help_docs_text }}</p>
+  {% endif %}
 {% endblock %}
 
 {% block footer %}

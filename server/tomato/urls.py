@@ -1,9 +1,9 @@
 from django.conf import settings
 from django.conf.urls.static import static
-from django.contrib import admin
 from django.urls import include, path
 
 from tomato import views
+from tomato.admin import admin_site
 
 
 urlpatterns = [
@@ -17,4 +17,4 @@ if settings.DEBUG:
     urlpatterns.extend(static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT))
 
 # Catch-all in admin, so it should be last
-urlpatterns.append(path("", admin.site.urls))
+urlpatterns.append(path("", admin_site.urls))

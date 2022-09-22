@@ -4,8 +4,6 @@ from huey import PriorityRedisExpireHuey
 
 from django_redis import get_redis_connection
 
-from .constants import COLORS_DICT
-
 
 def pretty_delta(td):
     if isinstance(td, (float, int)):
@@ -25,10 +23,6 @@ def pretty_delta(td):
         fmt = "{days} day(s) {hrs} hr(s) {min} min {sec} sec"
 
     return fmt.format(**d)
-
-
-def json_data_context_processor(request):
-    return {"COLORS": COLORS_DICT}
 
 
 def once_at_startup(crontab):

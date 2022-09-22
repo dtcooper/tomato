@@ -44,7 +44,7 @@ if DEBUG:
 
 INSTALLED_APPS = [
     # Django
-    "django.contrib.admin",
+    "django.contrib.admin.apps.SimpleAdminConfig",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.messages",
@@ -102,7 +102,6 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 # django-user-messages: Swap out django.contrib.messages.context_processors.messages
                 "user_messages.context_processors.messages",
-                "tomato.utils.json_data_context_processor",
             ],
         },
     },

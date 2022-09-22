@@ -90,7 +90,7 @@ class Command(BaseCommand):
 
             metadata_path = temp_dir / "metadata.json"
             if not metadata_path.exists():
-                raise CommandError(f"No metadata JSON file found in archive!")
+                raise CommandError("No metadata JSON file found in archive!")
 
             with open(metadata_path, "r") as metadata_file:
                 metadata = json.load(metadata_file)

@@ -1,6 +1,5 @@
 import zoneinfo
 
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
@@ -39,9 +38,9 @@ class EnabledBeginEndWeightMixin(models.Model):
         blank=True,
         default=None,
         help_text=(
-            f"Date when eligibility for random selection <strong>ends</strong>. If specified, random selection is only"
-            f" eligible before this date. If left blank, its always eligible for random selection starting with begin"
-            f" air date."
+            "Date when eligibility for random selection <strong>ends</strong>. If specified, random selection is only"
+            " eligible before this date. If left blank, its always eligible for random selection starting with begin"
+            " air date."
         ),
     )
     weight = models.DecimalField(
