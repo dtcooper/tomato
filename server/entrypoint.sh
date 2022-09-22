@@ -79,7 +79,9 @@ if [ $# = 0 ]; then
         fi
     fi
 else
-    echo "Executing: $@"
-    echo
+    if [ -z "$__SILENT" ]; then
+        echo "Executing: $@"
+        echo
+    fi
     exec "$@"
 fi
