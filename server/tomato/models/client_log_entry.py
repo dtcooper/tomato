@@ -34,7 +34,7 @@ class ClientLogEntry(models.Model):
         )
 
     class Meta:
-        verbose_name = "log entry"
-        verbose_name_plural = "log entries"
+        verbose_name = "client log entry"
+        verbose_name_plural = "client log entries"
         db_table = "logs"
         ordering = ("-created_at",)

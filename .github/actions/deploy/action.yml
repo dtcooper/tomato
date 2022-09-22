@@ -1,0 +1,68 @@
+name: Deploy
+description: Deploy Tomato containers via SSH
+
+inputs:
+  host:
+    description: SSH host
+    required: true
+  port:
+    description: SSH port
+    required: false
+    default: '22'
+  username:
+    description: SSH username
+    required: true
+  key:
+    description: SSH key
+    required: true
+  fingerprint:
+    description: SSH fingerprint
+    required: true
+  directory:
+    description: SSH directory to deploy in
+    required: true
+  tomato_username:
+    description: Tomato superuser username
+    required: true
+  tomato_password:
+    description: Tomato superuser password
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    -
+        name: Deploy containers
+        uses: appleboy/ssh-action@master
+        env:
+          DIRECTORY: ${{ inputs.directory }}
+          TOMATO_USERNAME: ${{ inputs.tomato_username }}
+          TOMATO_PASSWORD: ${{ inputs.tomato_password }}
+        with:
+          host: ${{ inputs.host }}
+          port: ${{ inputs.port }}
+          username: ${{ inputs.username }}
+          key: ${{ inputs.key }}
+          fingerprint: ${{ inputs.fingerprint }}
+          envs: DIRECTORY,TOMATO_USERNAME,TOMATO_PASSWORD
+          script_stop: true
+          # Steps:
+          #  1. git pull, fast-forward only
+          #  2. pull containers
+          #  3. bring down all containers if RESTART set
+          #  4. bring up containers in detatched mode
+          #  5. Set redis keys describing deployment (date, URL of workflow)
+          #  6. remove all extraneous docker container data (prune)
+          script: |
+            cd "$DIRECTORY/server"
+            git pull --ff-only
+            docker compose pull --quiet
+            docker compose down --remove-orphans --volumes
+            sudo rm -rf serve
+            docker compose up --quiet-pull --remove-orphans --no-build --detach
+            docker system prune --force --all
+            sleep 10
+            docker compose run --rm --env "DJANGO_SUPERUSER_PASSWORD=$TOMATO_PASSWORD" app \
+              ./manage.py createsuperuser --noinput --username "$TOMATO_USERNAME"
+            docker compose run --rm app \
+              ./manage.py prefill_sample_data --noinput --delete-all --created-by "$TOMATO_USERNAME"

@@ -51,6 +51,8 @@ if [ $# = 0 ]; then
         if [ "$DEBUG" -a "$DEBUG" != '0' ]; then
             exec watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- $CMD
         else
+            echo 'Delaying huey startup for 10 seconds...'
+            sleep 10
             exec $CMD
         fi
 

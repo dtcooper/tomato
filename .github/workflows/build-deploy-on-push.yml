@@ -1,0 +1,53 @@
+name: Build & deploy server container
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: docker-build
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    name: Build container
+    strategy:
+      matrix:
+        tag: [dev, latest]
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Build container
+        uses: ./.github/actions/docker-build-push
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          container: server
+          tag: ${{ matrix.tag }}
+          build-args: DEBUG=${{ matrix.tag == 'dev' && '1' || '0' }}
+
+  deploy:
+    runs-on: ubuntu-20.04
+    name: Deploy
+    env:
+      SSH_DIRECTORY: tomato
+    needs: [build]
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Deploy containers
+        uses: ./.github/actions/deploy
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          fingerprint: ${{ secrets.SSH_FINGERPRINT }}
+          directory: ${{ env.SSH_DIRECTORY }}
+          tomato_username: ${{ secrets.TOMATO_USERNAME }}
+          tomato_password: ${{ secrets.TOMATO_PASSWORD }}
