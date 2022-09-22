@@ -33,21 +33,17 @@ jobs:
   deploy:
     runs-on: ubuntu-20.04
     name: Deploy
-    env:
-      SSH_DIRECTORY: tomato
     needs: [build]
     steps:
       -
         name: Checkout
         uses: actions/checkout@v3
-      -
         name: Deploy containers
-        uses: ./.github/actions/deploy
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           fingerprint: ${{ secrets.SSH_FINGERPRINT }}
-          directory: ${{ env.SSH_DIRECTORY }}
-          tomato_username: ${{ secrets.TOMATO_USERNAME }}
-          tomato_password: ${{ secrets.TOMATO_PASSWORD }}
+          script: ./deploy-tomato-server.sh
