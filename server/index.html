@@ -210,6 +210,18 @@
 
 
   <li class="md-tabs__item">
+    <a href="../concepts/" class="md-tabs__link">
+      Concepts
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
     <a href="../client/" class="md-tabs__link">
       Client
     </a>
@@ -304,6 +316,21 @@
     <li class="md-nav__item">
       <a href=".." class="md-nav__link">
         Intro
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/" class="md-nav__link">
+        Concepts
       </a>
     </li>
   
@@ -465,20 +492,34 @@ this command,</p>
 </code></pre></div>
 <p>In your web browser, navigate to <a href="http://localhost:8000">http://localhost:8000</a>.</p>
 <p>The default username and password, which you can <em>(and should)</em> change will
-be <code>tomato</code> and <code>tomato</code>.</p>
+be,</p>
+<table>
+<thead>
+<tr>
+<th align="center">Username</th>
+<th align="center">Password</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>tomato</code></td>
+<td align="center"><code>tomato</code></td>
+</tr>
+</tbody>
+</table>
 <p>To stop the server, press <span class="keys"><kbd class="key-control">Ctrl</kbd><span>+</span><kbd class="key-c">C</kbd></span>.</p>
 </div>
 <div class="tabbed-block">
-<p>Open up the <code>.env</code> file you just created using your favourite text editor.
+<p>Open up the <code>.env</code> file you just created using your favorite text editor.
 Take action on the following,</p>
 <ol>
 <li>Set <code>DEBUG</code> flag to <code>0</code> &mdash; which tells Tomato to run in production
    mode.</li>
 <li>Either set <code>EMAIL_EXCEPTIONS_ENABLED</code> to <code>0</code> to disable emails, or set it
-   to <code>1</code> and edit all <code>EMAIL_*</code> values point to a properly configured SMTP
-   server</li>
+   to <code>1</code> and edit all <code>EMAIL_*</code> values to point to a properly configured
+   SMTP server</li>
 <li><code>DOMAIN_NAME</code> is set to a domain name that resolves to a publicly
-accessible IP address of the server.</li>
+   accessible IP address of the server.</li>
 </ol>
 <div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Setting Up an Nginx Container</label><label for="__tabbed_3_2">Reverse Proxying Yourself</label></div>
 <div class="tabbed-content">

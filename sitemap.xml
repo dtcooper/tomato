@@ -11,6 +11,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://dtcooper.github.io/tomato/concepts/</loc>
+         <lastmod>2022-09-22</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://dtcooper.github.io/tomato/license/</loc>
          <lastmod>2022-09-22</lastmod>
          <changefreq>daily</changefreq>
