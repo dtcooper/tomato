@@ -73,23 +73,27 @@ cp .env.sample .env
     In your web browser, navigate to <http://localhost:8000>.
 
     The default username and password, which you can _(and should)_ change will
-    be `tomato` and `tomato`.
+    be,
+
+    | Username | Password |
+    | :------: | :------: |
+    | `tomato` | `tomato` |
 
     To stop the server, press ++ctrl+c++.
 
 
 === "Production Deployment"
 
-    Open up the `.env` file you just created using your favourite text editor.
+    Open up the `.env` file you just created using your favorite text editor.
     Take action on the following,
 
     1. Set `DEBUG` flag to `0` &mdash; which tells Tomato to run in production
        mode.
     2. Either set `EMAIL_EXCEPTIONS_ENABLED` to `0` to disable emails, or set it
-       to `1` and edit all `EMAIL_*` values point to a properly configured SMTP
-       server
+       to `1` and edit all `EMAIL_*` values to point to a properly configured
+       SMTP server
     3. `DOMAIN_NAME` is set to a domain name that resolves to a publicly
-    accessible IP address of the server.
+       accessible IP address of the server.
 
     === "Setting Up an Nginx Container"
 
