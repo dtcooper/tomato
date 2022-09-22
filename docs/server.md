@@ -88,6 +88,8 @@ cp .env.sample .env
     2. Either set `EMAIL_EXCEPTIONS_ENABLED` to `0` to disable emails, or set it
        to `1` and edit all `EMAIL_*` values point to a properly configured SMTP
        server
+    3. `DOMAIN_NAME` is set to a domain name that resolves to a publicly
+    accessible IP address of the server.
 
     === "Setting Up an Nginx Container"
 
@@ -97,9 +99,7 @@ cp .env.sample .env
 
         To do so, first make sure of the following in your `.env` file,
 
-        1. `DOMAIN_NAME` is set to a domain name that resolves to a publicly
-        accessible IP address of the server.
-        2. `CERTBOT_EMAIL` is set to a valid email.
+        * `CERTBOT_EMAIL` is set to a valid email.
 
         !!! danger "`DOMAIN_NAME` and `CERTBOT_EMAIL` **must** be properly set!"
             If you don't set `DOMAIN_NAME` and `CERTBOT_EMAIL` properly as described
