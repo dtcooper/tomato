@@ -463,15 +463,31 @@
 <p>Tomato is easy to use, and hard to screw up playout software written for the
 specific use case of <a href="https://bmir.org">Burning Man Information Radio</a>.</p>
 <h2 id="use-case">Use Case<a class="headerlink" href="#use-case" title="Permanent link">←</a></h2>
+<p>The use case of Tomato is extremely simple by design.</p>
+<pre class="mermaid"><code>flowchart LR
+    subgraph CLIENT_SERVER [Client-Server Relationship]
+        direction BT
+            client(Desktop Client)
+            server(Backend Server)
+            server -- admins uploads audio using web UI --&gt; client
+    end
+    subgraph STOPSET [Desktop Client]
+        direction TB
+            stopset("Client Plays Stop Set (ie, commercials)")
+            wait("Client Waits (countdown timer)")
+            stopset --&gt; wait
+            wait -- client prompted to play stopset --&gt; stopset
+    end
+    CLIENT_SERVER --&gt; STOPSET</code></pre>
 <h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">←</a></h2>
 <h2 id="why-the-name">Why The Name?<a class="headerlink" href="#why-the-name" title="Permanent link">←</a></h2>
 <p>Simply said, this software was named after my cat, Tomato... or more
 affectionately nicknamed Kitty, Tomatillo, The "Shink", Catly, Catniss Evercat,
 Mr. Annoying, and Kitty Poopoo. His breed: <em>domestic street urchin.</em></p>
 <figure>
-<p><img alt="Tomato the cat" loading="lazy" src="assets/cat.jpg" style="max-width: 600px; width: 100%" />
-  </p>
-<figcaption>Tomato with his favorite mug.</figcaption>
+<div class="highlight"><pre><span></span><code>![Tomato the cat](assets/cat.jpg){ style=&quot;max-width: 600px; width: 100%&quot; loading=lazy }
+&lt;figcaption&gt;Tomato with his favorite mug.&lt;/figcaption&gt;
+</code></pre></div>
 </figure>
 <h2 id="whats-next">What's Next?<a class="headerlink" href="#whats-next" title="Permanent link">←</a></h2>
 
@@ -518,7 +534,7 @@ Mr. Annoying, and Kitty Poopoo. His breed: <em>domestic street urchin.</em></p>
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2022 David Cooper &amp; Burning Man Information Radio
+      Copyright &copy; 2022 <a href="https://jew.pizza" target="_blank">David Cooper</a> &amp; <a href="https://bmir.org" target="_blank">Burning Man Information Radio</a>
     </div>
   
   
