@@ -4,9 +4,23 @@ title: Concepts
 
 # Core Concepts, Explained
 
-## Glossary of Terms
+Below is a list of concepts and an explanation of how they're used in Tomato.
 
-Below is a list of terms and an explanation of how they're used in Tomato.
+## Audio Entities
+
+### Flow Diagram
+
+While the definitions of what an [audio asset](#audio-asset), [rotator](#rotator),
+and [stop set](#stop-set) are below, here's a simple flow diagram for them.
+
+```mermaid
+flowchart RL
+    stopset{Stop Sets}
+    rotator{Rotators}
+    asset{Audio Assets}
+    rotator -- "many-to-many relationship (ordered list)" --> stopset
+    asset -- "many-to-many relationship (set)" --> rotator
+```
 
 ### Audio Asset
 **An <u>audio asset</u> is a short individual audio track** (also referred to as just
@@ -45,35 +59,78 @@ station ID jingles at the start and end of a stop set, as in the example below.
     Let's say we have the following rotators created, and we've put assets in
     each of them them,
 
-    | Rotator                      | Audio Assets in Rotator                      |
-    | ---------------------------: | :------------------------------------------- |
-    | Station IDs                  | `S_ID_1.mp3`, `S_ID_2.mp3`, and `S_ID_3.mp3` |
-    | Public Service Announcements | `PSA_1.mp3` and `PSA_2.mp3`                  |
-    | Advertisements               | `AD_1.mp3`, `AD_2.mp3`, and `AD_3.mp3`       |
+    ```mermaid
+    flowchart TD
+        sids(Station IDs\n<em>Rotator</em>)
+        psas(Public Service Announcements\n<em>Rotator</em>)
+        ads(Advertisements\n<em>Rotator</em>)
+        sid1(S_ID_1.mp3\n<em>Asset</em>)
+        sid2(S_ID_2.mp3\n<em>Asset</em>)
+        sid3(S_ID_3.mp3\n<em>Asset</em>)
+        sid1 --> sids
+        sid2 --> sids
+        sid3 --> sids
+        psa1(PSA_1.mp3\n<em>Asset</em>)
+        psa2(PSA_2.mp3\n<em>Asset</em>)
+        psa1 --> psas
+        psa2 --> psas
+        ad1(AD_1.mp3\n<em>Asset</em>)
+        ad2(AD_2.mp3\n<em>Asset</em>)
+        ad3(AD_3.mp3\n<em>Asset</em>)
+        ad1 --> ads
+        ad2 --> ads
+        ad3 --> ads
+    ```
 
-    Then we have an  _"Evening Stop Set",_ which contains this an ordered
-    list of five rotators, shown here,
+    Then we have an  _"Evening Stop Set",_ which contains this an ordered list
+    of five rotators, shown here,
 
-    | Order in Stop Set  | Rotator                               |
-    | -----: | :------------------------------------ |
-    | 1      | Station IDs                           |
-    | 2      | Advertisements                        |
-    | 3      | Advertisements _(repetition allowed)_ |
-    | 4      | Public Service Announcements          |
-    | 5      | Station IDs                           |
+    ```mermaid
+    flowchart RL
+        stopset(Evening Stop Set)
+        rotator1(1. Station IDs\n<em>Rotator</em>)
+        rotator2(2. Advertisements\n<em>Rotator</em>)
+        rotator3(3. Advertisements\n<em>Rotator</em>\n<strong><small>Repetition Allowed!</small></strong>)
+        rotator4(4. Public Service Announcements\n<em>Rotator</em>)
+        rotator5(5. Station IDs\n<em>Rotator</em>)
+        rotator1 --- stopset
+        rotator2 --- stopset
+        rotator3 --- stopset
+        rotator4 --- stopset
+        rotator5 --- stopset
+    ```
 
     Then, when an _"Evening Stop Set"_ is played by Tomato during a commercial
     break, here's what's played,
 
-    | Order in Stop Set | Audio Asset (Randomly Selected)                              |
-    | ----------------: | :----------------------------------------------------------- |
-    | 1                 | `S_ID_2` &mdash; _selected from Station IDs_                 |
-    | 2                 | `AD_3` &mdash; _selected from Advertisements_                |
-    | 3                 | `AD_1` &mdash; _selected from Advertisements_                |
-    | 4                 | `PSA_2` &mdash; _selected from Public Service Announcements_ |
-    | 5                 | `S_ID_1` &mdash; _selected from Station IDs_                 |
+    ```mermaid
+    flowchart LR
+        stopset(Evening Stop Set)
+        rotator1(1. Station IDs\n<em>Rotator</em>)
+        rotator2(2. Advertisements\n<em>Rotator</em>)
+        rotator3(3. Advertisements\n<em>Rotator</em>)
+        rotator4(4. Public Service Announcements\n<em>Rotator</em>)
+        rotator5(5. Station IDs\n<em>Rotator</em>)
+        asset1(S_ID_2.mp3\n<em>Asset</em>)
+        asset2(AD_3.mp3\n<em>Asset</em>)
+        asset3(AD_1.mp3\n<em>Asset</em>)
+        asset4(PSA_2.mp3\n<em>Asset</em>)
+        asset5(S_ID_1.mp3\n<em>Asset</em>)
+        rotator1 --- stopset
+        rotator2 --- stopset
+        rotator3 --- stopset
+        rotator4 --- stopset
+        rotator5 --- stopset
+        asset1 -- randomly selected --- rotator1
+        asset2 -- randomly selected --- rotator2
+        asset3 -- randomly selected --- rotator3
+        asset4 -- randomly selected --- rotator4
+        asset5 -- randomly selected --- rotator5
+    ```
 
-### Random Weight
+## Wait Interval
+
+## Random Weight
 **A <u>random weight</u> is how likely random selection of an item occurs**,
 when compared to all other items of the same type. The default weight of an item
 with always $1$ unless modified.
@@ -86,7 +143,10 @@ $$
 x_{\text{chance}} = \frac{x_{\text{weight}}}{[\text{sum all of item weights}]}
 $$
 
-!!! example "Random Weight Example"
+Expand the "Random Weight Example" below for an in-depth example and technical
+explanation.
+
+??? example "Random Weight Example"
     Let's dig a little deeper. For the purposes of this example, all assets are
     in a rotator called _"Commercials."_
 

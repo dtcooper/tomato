@@ -2,7 +2,8 @@
 
 ## Author
 
-Hi, I'm David Cooper, the author of Tomato., reachable at <david.cooper@burningman.org>.
+Hi, I'm David Cooper, the author of Tomato. You can reach more at
+<david.cooper@burningman.org>.
 
 ## License
 
