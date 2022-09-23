@@ -131,8 +131,12 @@ cp .env.sample .env
         services:
           app:
             ports:
-              # Replace 1234 with any port you like
+              # Replace 1234 with any port you like (app server)
               - 127.0.0.1:1234:8000
+          logs:
+            ports:
+              # Replace 4321 with any port you like (logs server)
+              - 127.0.0.1:4321:8000
         ```
 
         Then in your web server, reverse proxy into port you chose.
@@ -153,12 +157,24 @@ cp .env.sample .env
             alias /home/user/tomato/server/serve/static/;
           }
 
+          location /_internal/server-logs {
+            internal;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_buffering off;
+            proxy_cache off;
+            # Replace 1234 with the port you chose above (logs server)
+            proxy_pass http://127.0.0.1:4321/server-logs;
+          }
+
           location / {
             proxy_set_header Host $http_host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
-            # Replace 1234 with the port you chose above
+            # Replace 1234 with the port you chose above (app server)
             proxy_pass http://127.0.0.1:1234;
           }
         }

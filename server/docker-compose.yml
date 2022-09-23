@@ -9,8 +9,8 @@ x-app-template: &app-template
     args:
       - "DEBUG=${DEBUG:-0}"
   volumes:
-    - ./.env:/.env
     - ../constants.json:/constants.json:ro
+    - ./.env:/.env
     - ./serve:/serve
 
 services:
@@ -42,6 +42,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
+      - DOZZLE_ADDR=:8000
       - DOZZLE_BASE=/server-logs
 
 volumes:
