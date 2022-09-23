@@ -11,6 +11,27 @@ specific use case of [Burning Man Information Radio](https://bmir.org).
 
 ## Use Case
 
+The use case of Tomato is extremely simple by design.
+
+```mermaid
+flowchart LR
+    subgraph CLIENT_SERVER [Client-Server Relationship]
+        direction BT
+            client(Desktop Client)
+            server(Backend Server)
+            server -- admins uploads audio using web UI --> client
+    end
+    subgraph STOPSET [Desktop Client]
+        direction TB
+            stopset("Client Plays Stop Set (ie, commercials)")
+            wait("Client Waits (countdown timer)")
+            stopset --> wait
+            wait -- client prompted to play stopset --> stopset
+    end
+    CLIENT_SERVER --> STOPSET
+```
+
+
 ## Features
 
 ## Why The Name?
@@ -20,8 +41,8 @@ affectionately nicknamed Kitty, Tomatillo, The "Shink", Catly, Catniss Evercat,
 Mr. Annoying, and Kitty Poopoo. His breed: _domestic street urchin._
 
 <figure markdown>
-  ![Tomato the cat](assets/cat.jpg){ style="max-width: 600px; width: 100%" loading=lazy }
-  <figcaption>Tomato with his favorite mug.</figcaption>
+    ![Tomato the cat](assets/cat.jpg){ style="max-width: 600px; width: 100%" loading=lazy }
+    <figcaption>Tomato with his favorite mug.</figcaption>
 </figure>
 
 ## What's Next?
