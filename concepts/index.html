@@ -401,8 +401,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#flow-diagram" class="md-nav__link">
-    Flow Diagram
+  <a href="#relationship-diagram" class="md-nav__link">
+    Relationship Diagram
   </a>
   
 </li>
@@ -488,9 +488,11 @@
 <h1 id="core-concepts-explained">Core Concepts, Explained<a class="headerlink" href="#core-concepts-explained" title="Permanent link">←</a></h1>
 <p>Below is a list of concepts and an explanation of how they're used in Tomato.</p>
 <h2 id="audio-entities">Audio Entities<a class="headerlink" href="#audio-entities" title="Permanent link">←</a></h2>
-<h3 id="flow-diagram">Flow Diagram<a class="headerlink" href="#flow-diagram" title="Permanent link">←</a></h3>
+<p>Tomato's audio entities are a core concept, and they're defined below.</p>
+<h3 id="relationship-diagram">Relationship Diagram<a class="headerlink" href="#relationship-diagram" title="Permanent link">←</a></h3>
 <p>While the definitions of what an <a href="#audio-asset">audio asset</a>, <a href="#rotator">rotator</a>,
-and <a href="#stop-set">stop set</a> are below, here's a simple flow diagram for them.</p>
+and <a href="#stop-set">stop set</a> are below, here's a simple relationship diagram for
+them.</p>
 <pre class="mermaid"><code>flowchart RL
     stopset{Stop Sets}
     rotator{Rotators}
@@ -589,6 +591,8 @@ break, here's what's played,</p>
     asset5 -- randomly selected --- rotator5</code></pre>
 </div>
 <h2 id="wait-interval">Wait Interval<a class="headerlink" href="#wait-interval" title="Permanent link">←</a></h2>
+<p>Tomato's <strong>wait interval</strong> is how long the client should wait before notifying
+that a stop set is due to be played.</p>
 <h2 id="random-weight">Random Weight<a class="headerlink" href="#random-weight" title="Permanent link">←</a></h2>
 <p><strong>A <u>random weight</u> is how likely random selection of an item occurs</strong>,
 when compared to all other items of the same type. The default weight of an item
@@ -598,10 +602,8 @@ with always <span class="arithmatex">\(1\)</span> unless modified.</p>
 <div class="arithmatex">\[
 x_{\text{chance}} = \frac{x_{\text{weight}}}{[\text{sum all of item weights}]}
 \]</div>
-<p>Expand the "Random Weight Example" below for an in-depth example and technical
-explanation.</p>
-<details class="example">
-<summary>Random Weight Example</summary>
+<div class="admonition example">
+<p class="admonition-title">Random Weight Example</p>
 <p>Let's dig a little deeper. For the purposes of this example, all assets are
 in a rotator called <em>"Commercials."</em></p>
 <p>If an asset named <em>"Commercial A"</em> has a weight of <span class="arithmatex">\(2\)</span> and all other assets
@@ -644,7 +646,7 @@ or <span class="arithmatex">\(\text{B}_\text{weight}=1,\ \text{C}_\text{weight}=
 <p>So as you can see, since <span class="arithmatex">\(7.4\%\)</span> is twice <span class="arithmatex">\(3.7\%\)</span>, <em>"Commercial A"</em> with
 weight <span class="arithmatex">\(2\)</span> is <strong>twice as likely</strong> to be played as <em>"Commercial B"</em> with
 weight <span class="arithmatex">\(1\)</span>.</p>
-</details>
+</div>
 <div class="footnote">
 <hr />
 <ol>
