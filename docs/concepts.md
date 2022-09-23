@@ -6,12 +6,17 @@ title: Concepts
 
 Below is a list of concepts and an explanation of how they're used in Tomato.
 
+
 ## Audio Entities
 
-### Flow Diagram
+Tomato's audio entities are a core concept, and they're defined below.
+
+
+### Relationship Diagram
 
 While the definitions of what an [audio asset](#audio-asset), [rotator](#rotator),
-and [stop set](#stop-set) are below, here's a simple flow diagram for them.
+and [stop set](#stop-set) are below, here's a simple relationship diagram for
+them.
 
 ```mermaid
 flowchart RL
@@ -21,6 +26,7 @@ flowchart RL
     rotator -- "many-to-many relationship (ordered list)" --> stopset
     asset -- "many-to-many relationship (set)" --> rotator
 ```
+
 
 ### Audio Asset
 **An <u>audio asset</u> is a short individual audio track** (also referred to as just
@@ -128,7 +134,12 @@ station ID jingles at the start and end of a stop set, as in the example below.
         asset5 -- randomly selected --- rotator5
     ```
 
+
 ## Wait Interval
+
+Tomato's **wait interval** is how long the client should wait before notifying
+that a stop set is due to be played.
+
 
 ## Random Weight
 **A <u>random weight</u> is how likely random selection of an item occurs**,
@@ -143,10 +154,8 @@ $$
 x_{\text{chance}} = \frac{x_{\text{weight}}}{[\text{sum all of item weights}]}
 $$
 
-Expand the "Random Weight Example" below for an in-depth example and technical
-explanation.
 
-??? example "Random Weight Example"
+!!! example "Random Weight Example"
     Let's dig a little deeper. For the purposes of this example, all assets are
     in a rotator called _"Commercials."_
 
@@ -200,7 +209,6 @@ explanation.
     So as you can see, since $7.4\%$ is twice $3.7\%$, _"Commercial A"_ with
     weight $2$ is **twice as likely** to be played as _"Commercial B"_ with
     weight $1$.
-
 
 
 [^1]: The random selection process can be biased by [random weight](#random-weight).
