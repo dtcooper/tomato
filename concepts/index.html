@@ -393,12 +393,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#glossary-of-terms" class="md-nav__link">
-    Glossary of Terms
+  <a href="#audio-entities" class="md-nav__link">
+    Audio Entities
   </a>
   
-    <nav class="md-nav" aria-label="Glossary of Terms">
+    <nav class="md-nav" aria-label="Audio Entities">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#flow-diagram" class="md-nav__link">
+    Flow Diagram
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#audio-asset" class="md-nav__link">
@@ -421,15 +428,22 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#random-weight" class="md-nav__link">
-    Random Weight
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wait-interval" class="md-nav__link">
+    Wait Interval
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#random-weight" class="md-nav__link">
+    Random Weight
+  </a>
   
 </li>
       
@@ -472,8 +486,17 @@
 
 
 <h1 id="core-concepts-explained">Core Concepts, Explained<a class="headerlink" href="#core-concepts-explained" title="Permanent link">←</a></h1>
-<h2 id="glossary-of-terms">Glossary of Terms<a class="headerlink" href="#glossary-of-terms" title="Permanent link">←</a></h2>
-<p>Below is a list of terms and an explanation of how they're used in Tomato.</p>
+<p>Below is a list of concepts and an explanation of how they're used in Tomato.</p>
+<h2 id="audio-entities">Audio Entities<a class="headerlink" href="#audio-entities" title="Permanent link">←</a></h2>
+<h3 id="flow-diagram">Flow Diagram<a class="headerlink" href="#flow-diagram" title="Permanent link">←</a></h3>
+<p>While the definitions of what an <a href="#audio-asset">audio asset</a>, <a href="#rotator">rotator</a>,
+and <a href="#stop-set">stop set</a> are below, here's a simple flow diagram for them.</p>
+<pre class="mermaid"><code>flowchart RL
+    stopset{Stop Sets}
+    rotator{Rotators}
+    asset{Audio Assets}
+    rotator -- "many-to-many relationship (ordered list)" --&gt; stopset
+    asset -- "many-to-many relationship (set)" --&gt; rotator</code></pre>
 <h3 id="audio-asset">Audio Asset<a class="headerlink" href="#audio-asset" title="Permanent link">←</a></h3>
 <p><strong>An <u>audio asset</u> is a short individual audio track</strong> (also referred to as just
 an asset). Think individual advertisements, individual public service
@@ -506,94 +529,67 @@ station ID jingles at the start and end of a stop set, as in the example below.<
 <p>If stop sets are a bit confusing to you, don't worry. Follow along.</p>
 <p>Let's say we have the following rotators created, and we've put assets in
 each of them them,</p>
-<table>
-<thead>
-<tr>
-<th align="right">Rotator</th>
-<th align="left">Audio Assets in Rotator</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">Station IDs</td>
-<td align="left"><code>S_ID_1.mp3</code>, <code>S_ID_2.mp3</code>, and <code>S_ID_3.mp3</code></td>
-</tr>
-<tr>
-<td align="right">Public Service Announcements</td>
-<td align="left"><code>PSA_1.mp3</code> and <code>PSA_2.mp3</code></td>
-</tr>
-<tr>
-<td align="right">Advertisements</td>
-<td align="left"><code>AD_1.mp3</code>, <code>AD_2.mp3</code>, and <code>AD_3.mp3</code></td>
-</tr>
-</tbody>
-</table>
-<p>Then we have an  <em>"Evening Stop Set",</em> which contains this an ordered
-list of five rotators, shown here,</p>
-<table>
-<thead>
-<tr>
-<th align="right">Order in Stop Set</th>
-<th align="left">Rotator</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">1</td>
-<td align="left">Station IDs</td>
-</tr>
-<tr>
-<td align="right">2</td>
-<td align="left">Advertisements</td>
-</tr>
-<tr>
-<td align="right">3</td>
-<td align="left">Advertisements <em>(repetition allowed)</em></td>
-</tr>
-<tr>
-<td align="right">4</td>
-<td align="left">Public Service Announcements</td>
-</tr>
-<tr>
-<td align="right">5</td>
-<td align="left">Station IDs</td>
-</tr>
-</tbody>
-</table>
+<pre class="mermaid"><code>flowchart TD
+    sids(Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
+    psas(Public Service Announcements\n&lt;em&gt;Rotator&lt;/em&gt;)
+    ads(Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;)
+    sid1(S_ID_1.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+    sid2(S_ID_2.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+    sid3(S_ID_3.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+    sid1 --&gt; sids
+    sid2 --&gt; sids
+    sid3 --&gt; sids
+    psa1(PSA_1.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+    psa2(PSA_2.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+    psa1 --&gt; psas
+    psa2 --&gt; psas
+    ad1(AD_1.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+    ad2(AD_2.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+    ad3(AD_3.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+    ad1 --&gt; ads
+    ad2 --&gt; ads
+    ad3 --&gt; ads</code></pre>
+<p>Then we have an  <em>"Evening Stop Set",</em> which contains this an ordered list
+of five rotators, shown here,</p>
+<pre class="mermaid"><code>flowchart RL
+    stopset(Evening Stop Set)
+    rotator1(1. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
+    rotator2(2. Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;)
+    rotator3(3. Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;\n&lt;strong&gt;&lt;small&gt;Repetition Allowed!&lt;/small&gt;&lt;/strong&gt;)
+    rotator4(4. Public Service Announcements\n&lt;em&gt;Rotator&lt;/em&gt;)
+    rotator5(5. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
+    rotator1 --- stopset
+    rotator2 --- stopset
+    rotator3 --- stopset
+    rotator4 --- stopset
+    rotator5 --- stopset</code></pre>
 <p>Then, when an <em>"Evening Stop Set"</em> is played by Tomato during a commercial
 break, here's what's played,</p>
-<table>
-<thead>
-<tr>
-<th align="right">Order in Stop Set</th>
-<th align="left">Audio Asset (Randomly Selected)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="right">1</td>
-<td align="left"><code>S_ID_2</code> &mdash; <em>selected from Station IDs</em></td>
-</tr>
-<tr>
-<td align="right">2</td>
-<td align="left"><code>AD_3</code> &mdash; <em>selected from Advertisements</em></td>
-</tr>
-<tr>
-<td align="right">3</td>
-<td align="left"><code>AD_1</code> &mdash; <em>selected from Advertisements</em></td>
-</tr>
-<tr>
-<td align="right">4</td>
-<td align="left"><code>PSA_2</code> &mdash; <em>selected from Public Service Announcements</em></td>
-</tr>
-<tr>
-<td align="right">5</td>
-<td align="left"><code>S_ID_1</code> &mdash; <em>selected from Station IDs</em></td>
-</tr>
-</tbody>
-</table>
+<pre class="mermaid"><code>flowchart LR
+    stopset(Evening Stop Set)
+    rotator1(1. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
+    rotator2(2. Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;)
+    rotator3(3. Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;)
+    rotator4(4. Public Service Announcements\n&lt;em&gt;Rotator&lt;/em&gt;)
+    rotator5(5. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
+    asset1(S_ID_2.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+    asset2(AD_3.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+    asset3(AD_1.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+    asset4(PSA_2.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+    asset5(S_ID_1.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+    rotator1 --- stopset
+    rotator2 --- stopset
+    rotator3 --- stopset
+    rotator4 --- stopset
+    rotator5 --- stopset
+    asset1 -- randomly selected --- rotator1
+    asset2 -- randomly selected --- rotator2
+    asset3 -- randomly selected --- rotator3
+    asset4 -- randomly selected --- rotator4
+    asset5 -- randomly selected --- rotator5</code></pre>
 </div>
-<h3 id="random-weight">Random Weight<a class="headerlink" href="#random-weight" title="Permanent link">←</a></h3>
+<h2 id="wait-interval">Wait Interval<a class="headerlink" href="#wait-interval" title="Permanent link">←</a></h2>
+<h2 id="random-weight">Random Weight<a class="headerlink" href="#random-weight" title="Permanent link">←</a></h2>
 <p><strong>A <u>random weight</u> is how likely random selection of an item occurs</strong>,
 when compared to all other items of the same type. The default weight of an item
 with always <span class="arithmatex">\(1\)</span> unless modified.</p>
@@ -602,8 +598,10 @@ with always <span class="arithmatex">\(1\)</span> unless modified.</p>
 <div class="arithmatex">\[
 x_{\text{chance}} = \frac{x_{\text{weight}}}{[\text{sum all of item weights}]}
 \]</div>
-<div class="admonition example">
-<p class="admonition-title">Random Weight Example</p>
+<p>Expand the "Random Weight Example" below for an in-depth example and technical
+explanation.</p>
+<details class="example">
+<summary>Random Weight Example</summary>
 <p>Let's dig a little deeper. For the purposes of this example, all assets are
 in a rotator called <em>"Commercials."</em></p>
 <p>If an asset named <em>"Commercial A"</em> has a weight of <span class="arithmatex">\(2\)</span> and all other assets
@@ -646,7 +644,7 @@ or <span class="arithmatex">\(\text{B}_\text{weight}=1,\ \text{C}_\text{weight}=
 <p>So as you can see, since <span class="arithmatex">\(7.4\%\)</span> is twice <span class="arithmatex">\(3.7\%\)</span>, <em>"Commercial A"</em> with
 weight <span class="arithmatex">\(2\)</span> is <strong>twice as likely</strong> to be played as <em>"Commercial B"</em> with
 weight <span class="arithmatex">\(1\)</span>.</p>
-</div>
+</details>
 <div class="footnote">
 <hr />
 <ol>
