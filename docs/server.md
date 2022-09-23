@@ -5,7 +5,7 @@ title: Server
 # The Tomato Backend Server
 
 The backend server is written in [Python]'s [Django web framework][django],
-heavily leveraging its [automatic admin interface][django-admin].
+heavily leveraging its automatic admin interface.
 
 ## Installation
 
@@ -107,11 +107,11 @@ cp .env.sample .env
 
         !!! danger "`DOMAIN_NAME` and `CERTBOT_EMAIL` **must** be properly set!"
             If you don't set `DOMAIN_NAME` and `CERTBOT_EMAIL` properly as described
-            above, the production [Nginx] container will not  start correctly. This
+            above, the production Nginx container will not  start correctly. This
             is a requirement of [Certbot], the underlying component that automatically
             generates an SSL certificate for you.
 
-        Now, create a symbolic link for the [Nginx] [Compose] overrides,
+        Now, create a symbolic link for the Nginx Compose overrides,
 
         ```bash
         ln -s docker-compose.nginx.yml docker-compose.overrides.yml
@@ -137,7 +137,7 @@ cp .env.sample .env
 
         Then in your web server, reverse proxy into port you chose.
 
-        If you're using [Nginx], you can use configuration like this,
+        If you're using Nginx, you can use configuration like this,
 
         ```nginx title="sample.conf"
         server {
@@ -196,7 +196,6 @@ cp .env.sample .env
 
 [certbot]: https://certbot.eff.org/
 [compose]: https://docs.docker.com/compose/
-[django-admin]: https://docs.djangoproject.com/en/4.1/ref/contrib/admin/
 [django]: https://www.djangoproject.com/
 [docker-desktop]: https://www.docker.com/products/docker-desktop
 [docker]: https://www.docker.com/
