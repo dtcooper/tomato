@@ -439,7 +439,7 @@
 
 <h1 id="the-tomato-backend-server">The Tomato Backend Server<a class="headerlink" href="#the-tomato-backend-server" title="Permanent link">←</a></h1>
 <p>The backend server is written in <a href="https://www.python.org/">Python</a>'s <a href="https://www.djangoproject.com/">Django web framework</a>,
-heavily leveraging its <a href="https://docs.djangoproject.com/en/4.1/ref/contrib/admin/">automatic admin interface</a>.</p>
+heavily leveraging its automatic admin interface.</p>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">←</a></h2>
 <p>Follow these steps to get started.</p>
 <div class="admonition note">
@@ -534,11 +534,11 @@ takes care of reverse proxying into Tomato for you.</p>
 <div class="admonition danger">
 <p class="admonition-title"><code>DOMAIN_NAME</code> and <code>CERTBOT_EMAIL</code> <strong>must</strong> be properly set!</p>
 <p>If you don't set <code>DOMAIN_NAME</code> and <code>CERTBOT_EMAIL</code> properly as described
-above, the production <a href="https://www.nginx.com/">Nginx</a> container will not  start correctly. This
+above, the production Nginx container will not  start correctly. This
 is a requirement of <a href="https://certbot.eff.org/">Certbot</a>, the underlying component that automatically
 generates an SSL certificate for you.</p>
 </div>
-<p>Now, create a symbolic link for the <a href="https://docs.docker.com/compose/">Nginx</a> overrides,</p>
+<p>Now, create a symbolic link for the Nginx Compose overrides,</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ln -s docker-compose.nginx.yml docker-compose.overrides.yml
 </code></pre></div>
 </div>
@@ -558,7 +558,7 @@ server.</p>
 <a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">127.0.0.1:1234:8000</span><span class="w"></span>
 </code></pre></div>
 <p>Then in your web server, reverse proxy into port you chose.</p>
-<p>If you're using <a href="https://www.nginx.com/">Nginx</a>, you can use configuration like this,</p>
+<p>If you're using Nginx, you can use configuration like this,</p>
 <div class="highlight"><span class="filename">sample.conf</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">server</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="c1"># ... other Nginx config here</span>
 <a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>

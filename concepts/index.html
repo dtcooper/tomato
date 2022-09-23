@@ -479,16 +479,14 @@
 an asset). Think individual advertisements, individual public service
 announcements, or individual station IDs.</p>
 <p>Assets always have a name and underlying audio file (like an mp3) but they can
-have additional data like when they begin and end airing, or whether their
-enabled at all.</p>
+have additional data for example when they begin and end airing.</p>
 <div class="admonition example">
 <p class="admonition-title">Audio Asset Example</p>
-<p>And example would be a short advertisement audio clip named <em>"David's
-Steel Guitar Ad."</em></p>
+<p>A short advertisement audio clip named <em>"David's Steel Guitar Ad."</em></p>
 </div>
 <h3 id="rotator">Rotator<a class="headerlink" href="#rotator" title="Permanent link">←</a></h3>
-<p><strong>A <u>rotator</u> is a collection of audio assets.</strong> A rotator represents a way
-to <em>categorize</em> assets into the same group.</p>
+<p><strong>A <u>rotator</u> is a collection of audio assets.</strong> A rotator is how you to
+<em>categorize</em> similar assets into a group.</p>
 <p>While an asset <em>can</em> belong to more than one rotator, in practice they won't.</p>
 <div class="admonition example">
 <p class="admonition-title">Rotator Example</p>
@@ -498,12 +496,14 @@ Instrument Ads"</em> rotator.</p>
 </div>
 <h3 id="stop-set">Stop Set<a class="headerlink" href="#stop-set" title="Permanent link">←</a></h3>
 <p><strong>A <u>stop set</u> is an ordered list of rotators.</strong> A stop set can be thought
-of as an entire commercial break, like in traditional radio. To "play" a stop set,
-an asset is selected at random<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> from each rotator in a stop set.</p>
-<p>A rotator <strong>can</strong> be (and often is) in a stop set more than once.</p>
-<p>If that sounds a bit confusing to you, don't worry. Check out the example below,</p>
+of as an entire commercial break, like what you'd hear in traditional radio. In
+order to play a stop set, an asset is selected at random<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> from each rotator
+in it.</p>
+<p>A rotator <strong>can</strong> be (and often is) in a stop set more than once. Think having
+station ID jingles at the start and end of a stop set, as in the example below.</p>
 <div class="admonition example">
 <p class="admonition-title">Stop Set Example</p>
+<p>If stop sets are a bit confusing to you, don't worry. Follow along.</p>
 <p>Let's say we have the following rotators created, and we've put assets in
 each of them them,</p>
 <table>
@@ -561,7 +561,7 @@ list of five rotators, shown here,</p>
 </tbody>
 </table>
 <p>Then, when an <em>"Evening Stop Set"</em> is played by Tomato during a commercial
-break, Tomato plays through the following five randomly selected assets.</p>
+break, here's what's played,</p>
 <table>
 <thead>
 <tr>
@@ -594,57 +594,64 @@ break, Tomato plays through the following five randomly selected assets.</p>
 </table>
 </div>
 <h3 id="random-weight">Random Weight<a class="headerlink" href="#random-weight" title="Permanent link">←</a></h3>
-<p>The weight of how likely random selection occurs of an item occurs, when
-compared to all other items in a set. The default random weight with Tomato is
-always <span class="arithmatex">\(1\)</span>.</p>
+<p><strong>A <u>random weight</u> is how likely random selection of an item occurs</strong>,
+when compared to all other items of the same type. The default weight of an item
+with always <span class="arithmatex">\(1\)</span> unless modified.</p>
 <p>Random weight is used when Tomato selects both assets and stop sets.</p>
-<p>The likeliness of an item <code>x</code> being selected is calculated as follows,</p>
+<p>The likeliness (or "chance") of an item <span class="arithmatex">\(x\)</span> being selected is calculated as follows,</p>
 <div class="arithmatex">\[
-\text{chance of selection of item} = \frac{\text{random weight of item}}{\text{sum all of item random weights}}
+x_{\text{chance}} = \frac{x_{\text{weight}}}{[\text{sum all of item weights}]}
 \]</div>
 <div class="admonition example">
 <p class="admonition-title">Random Weight Example</p>
-<p>If an asset <em>"Commercial A"</em> has a weight of <span class="arithmatex">\(2\)</span> and all other assets have a
-weight of <span class="arithmatex">\(1\)</span>, then asset <em>"Commercial A"</em> is <strong>twice as likely</strong> to be
+<p>Let's dig a little deeper. For the purposes of this example, all assets are
+in a rotator called <em>"Commercials."</em></p>
+<p>If an asset named <em>"Commercial A"</em> has a weight of <span class="arithmatex">\(2\)</span> and all other assets
+have a weight of <span class="arithmatex">\(1\)</span>, then asset <em>"Commercial A"</em> is <strong>twice as likely</strong> to be
 selected when compared to all other assets.</p>
-<p>Suppose there are 26 commercials, named <em>"Commercial A"</em> through
-<em>"Commercial Z",</em> with <em>"A"</em> having a weight of <span class="arithmatex">\(2\)</span> and the rest having a
-weight of <span class="arithmatex">\(1\)</span>. We get a sum of all random weights as <span class="arithmatex">\(27\)</span>.</p>
+<p>Suppose there are 26 commercials &mdash; one for each letter of the alphabet
+&mdash; and they're named <em>"Commercial A"</em> through <em>"Commercial Z"</em>.</p>
+<p>We assign a weight of <span class="arithmatex">\(2\)</span> to <em>"Commercial A,"</em> or <span class="arithmatex">\(\text{A}_\text{weight}=2\)</span>
+and assign a weight of <span class="arithmatex">\(1\)</span> to <em>"Commercial B"</em> through <em>"Commercial Z,"</em>
+or <span class="arithmatex">\(\text{B}_\text{weight}=1,\ \text{C}_\text{weight}=1,\ \ldots,\ \text{X}_\text{weight}=1,\ \text{Z}_\text{weight}=1\)</span>.</p>
+<p>We get a sum of all random weights as <span class="arithmatex">\(27\)</span>, illustrated below,</p>
 <div class="arithmatex">\[
 \begin{align*}
-\text{sum all of item random weights}
-    &amp;= \text{Commercial A}_\text{weight} + \text{Commercial A}_\text{weight}
-    + \ldots + \text{Commercial Z}_\text{weight} \\
-&amp;= 2 + 1 + \ldots + 1 \\
+[\text{sum all of item weights}] &amp;= \sum_{x=A}^{Z} x_\text{weight} \\
+&amp;= \text{A}_\text{weight} + (\text{B}_\text{weight} + \text{C}_\text{weight}
+    + \ldots + \text{X}_\text{weight} +  \text{Z}_\text{weight}) \\
+&amp;= 2 + (1 + 1 + \ldots + 1 + 1) \\
+&amp;= 2 + 25 \\
 &amp;= 27
 \end{align*}
 \]</div>
-<p>Per the selection equation above, the change we'll pick <em>"Commercial A</em>"
-with a range weight of <span class="arithmatex">\(2\)</span> is,</p>
+<p>Then, per the selection equation above,</p>
 <div class="arithmatex">\[
 \begin{align*}
-\text{Commercial A}_\text{selection chance} &amp;= \frac{\text{Commercial A}_\text{weight}}{\text{sum all of item random weights}} \\
+\text{A}_\text{chance} &amp;= \frac{\text{A}_\text{weight}}{\text{[sum all of item weights]}} \\
 &amp;= \frac{2}{27} \\
 &amp;\simeq 7.4\%
 \end{align*}
 \]</div>
-<p>Per the selection equation above, the change we'll pick <em>"Commercial B</em>"
-with a range weight of <span class="arithmatex">\(1\)</span> is,</p>
+<p>So the chance we'll pick <em>"Commercial A</em>" with a random weight of <span class="arithmatex">\(2\)</span> is
+<span class="arithmatex">\(\text{A}_\text{chance}=7.4\%\)</span>. Similarly,</p>
 <div class="arithmatex">\[
 \begin{align*}
-\text{Commercial B}_\text{selection chance} &amp;= \frac{\text{Commercial B}_\text{weight}}{\text{sum all of item random weights}} \\
+\text{B}_\text{chance} &amp;= \frac{\text{B}_\text{weight}}{\text{[sum all of item weights]}} \\
 &amp;= \frac{1}{27} \\
 &amp;\simeq 3.7\%
 \end{align*}
 \]</div>
-<p>So you can see, since <span class="arithmatex">\(7.4\%\)</span> is twice <span class="arithmatex">\(3.7\%\)</span>, <em>"Commercial A"</em> is <strong>twice
-as likely</strong> to be played as <em>"Commercial B"</em> because of its weight of <span class="arithmatex">\(2\)</span>.</p>
+<p>The chance we'll pick <em>"Commercial B</em>" with a weight of <span class="arithmatex">\(1\)</span> is <span class="arithmatex">\(\text{B}_\text{chance}=3.7\%\)</span></p>
+<p>So as you can see, since <span class="arithmatex">\(7.4\%\)</span> is twice <span class="arithmatex">\(3.7\%\)</span>, <em>"Commercial A"</em> with
+weight <span class="arithmatex">\(2\)</span> is <strong>twice as likely</strong> to be played as <em>"Commercial B"</em> with
+weight <span class="arithmatex">\(1\)</span>.</p>
 </div>
 <div class="footnote">
 <hr />
 <ol>
 <li id="fn:1">
-<p>The random selection process can be biased by random weight.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p>The random selection process can be biased by <a href="#random-weight">random weight</a>.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
