@@ -4,7 +4,7 @@ import json
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.db.models import Prefetch
-from django.http import HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
@@ -70,3 +70,10 @@ def sync(request):
     }
     response.update({key: [obj.serialize() for obj in qs] for key, qs in models.items()})
     return JsonResponse(response)
+
+
+def server_logs(request):
+    if request.user.is_superuser:
+        return HttpResponse(headers={"X-Accel-Redirect": f"/_internal{request.get_full_path()}"})
+    else:
+        return HttpResponseForbidden()

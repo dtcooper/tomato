@@ -1,9 +1,10 @@
 services:
   nginx:
     restart: always
-    image: jonasal/nginx-certbot:3.2
+    image: jonasal/nginx-certbot:3.2-alpine
     depends_on:
       - app
+      - logs
     volumes:
       - ./nginx.conf:/etc/nginx/templates/app.conf.template:ro
       - ./serve:/serve:ro

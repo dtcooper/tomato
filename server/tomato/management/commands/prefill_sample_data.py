@@ -123,7 +123,7 @@ class Command(BaseCommand):
                     asset.clean()
                     asset.save()
                     asset.rotators.add(rotator)
-                    process_asset(asset)
+                    process_asset(asset, user=created_by, message_on_error_only=True)
 
                     num += 1
 

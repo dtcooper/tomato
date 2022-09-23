@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import include, path
+from django.urls import include, path, re_path
 
 from tomato import views
 from tomato.admin import admin_site
@@ -9,6 +9,7 @@ from tomato.admin import admin_site
 urlpatterns = [
     path("auth/", views.access_token, name="access_token"),
     path("sync/", views.sync),
+    re_path("^server-logs", views.server_logs, name="server_logs"),
     path("upload/", include("django_file_form.urls")),
 ]
 

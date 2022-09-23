@@ -13,7 +13,7 @@ from django_file_form.forms import FileFormMixin, MultipleUploadedFileField
 from django_file_form.model_admin import FileFormAdminMixin
 
 from ..models import Asset, Rotator
-from ..tasks import process_asset
+from ..tasks import bulk_process_assets, process_asset
 from .base import NoNullRelatedOnlyFieldListFilter, TomatoModelAdminBase
 
 
@@ -41,15 +41,30 @@ class AssetUploadForm(FileFormMixin, forms.Form):
         )
 
 
+class StatusFilter(admin.SimpleListFilter):
+    title = "status"
+    parameter_name = "status"
+
+    def lookups(self, request, model_admin):
+        return (("ready", "Ready to play"), ("processing", "Processing"))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "ready":
+            return queryset.filter(status=Asset.Status.READY)
+        elif value == "processing":
+            return queryset.exclude(status=Asset.Status.READY)
+
+
 class AssetAdmin(FileFormAdminMixin, TomatoModelAdminBase):
     action_form = AssetActionForm
     actions = ("enable", "disable", "add_rotator", "remove_rotator")
     exclude = ()
     readonly_fields = ("duration", "created_at", "status", "created_by", "file_display")
-    list_filter = ("enabled", "rotators", "status", ("created_by", NoNullRelatedOnlyFieldListFilter))
+    list_filter = ("enabled", "rotators", StatusFilter, ("created_by", NoNullRelatedOnlyFieldListFilter))
     list_per_page = 250
     filter_horizontal = ("rotators",)
-    list_display = ("name", "status", "file_display", "weight", "rotators_display", "created_by", "created_at")
+    list_display = ("name", "status", "weight", "rotators_display", "created_by", "created_at")
     date_hierarchy = "created_at"
     list_prefetch_related = "rotators"
 
@@ -57,15 +72,16 @@ class AssetAdmin(FileFormAdminMixin, TomatoModelAdminBase):
     def file_display(self, obj):
         if obj.file:
             return format_html(
-                '<audio src="{}" style="height: 30px; max-width: 200px;" controlslist="nodownload noplaybackrate"'
+                '<audio src="{}" style="height: 45px; width: 100%;" controlslist="nodownload noplaybackrate"'
                 ' preload="auto" controls />',
                 obj.file.url,
             )
 
-    def has_change_permission(self, request, obj=None):
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = list(self.readonly_fields)
         if obj is not None and obj.status != Asset.Status.READY:
-            return False
-        return super().has_change_permission(request, obj)
+            readonly_fields.append("file")
+        return readonly_fields
 
     def save_model(self, request, obj, form, change):
         should_process = "file" in obj.get_dirty_fields()
@@ -75,7 +91,7 @@ class AssetAdmin(FileFormAdminMixin, TomatoModelAdminBase):
         super().save_model(request, obj, form, change)
 
         if should_process:
-            process_asset(obj)
+            process_asset(obj, user=request.user)
             self.message_user(
                 request,
                 f'Audio asset "{obj.name}" is being processed. A message will appear when it is ready. Refresh this'
@@ -144,7 +160,7 @@ class AssetAdmin(FileFormAdminMixin, TomatoModelAdminBase):
                     asset.save()
                     if rotators:
                         asset.rotators.add(*rotators)
-                    process_asset(asset)
+                bulk_process_assets(assets, user=request.user)
 
                 form.delete_temporary_files()
                 self.message_user(request, f"Uploaded {len(assets)} audio assets.", messages.SUCCESS)

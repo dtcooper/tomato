@@ -6,7 +6,7 @@ from django.db import models
 from .user import User
 
 
-NAME_MAX_LENGTH = 75
+NAME_MAX_LENGTH = 70
 UTC = zoneinfo.ZoneInfo("UTC")
 ZULU_STRFTIME = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -69,7 +69,7 @@ class EnabledBeginEndWeightMixin(models.Model):
 
 
 class TomatoModelBase(models.Model):
-    created_at = models.DateTimeField("created at", auto_now_add=True)
+    created_at = models.DateTimeField("created at", auto_now_add=True, db_index=True)
     created_by = models.ForeignKey(User, verbose_name="created by", on_delete=models.SET_NULL, null=True)
     name = models.CharField("name", max_length=NAME_MAX_LENGTH, unique=True)
 

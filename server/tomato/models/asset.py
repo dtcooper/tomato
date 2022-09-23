@@ -19,8 +19,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
     class Status(models.IntegerChoices):
         PENDING = 0, "Pending processing"
         PROCESSING = 1, "Processing"
-        FAILED = 2, "Processing failed"
-        READY = 3, "Ready"
+        READY = 2, "Ready to play"
 
     name = models.CharField(
         "name",
@@ -51,11 +50,15 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         verbose_name="rotators",
         help_text="Rotators that this asset will be included in.",
     )
-    error_detail = models.TextField(max_length=ERROR_DETAIL_LENGTH, blank=True)
 
     class Meta(TomatoModelBase.Meta):
         db_table = "assets"
         verbose_name = "audio asset"
+        ordering = ("-created_at",)
+
+    def generate_peaks(self):
+        if not self.file:
+            return
 
     def serialize(self):
         return {

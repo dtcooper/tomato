@@ -54,6 +54,9 @@
 
 {% block userlinks %}
   <a href="{{ help_docs_url }}" target="_blank">Help Docs</a> /
+  {% if user.is_superuser %}
+    <a href="{% url 'server_logs' %}" target="_blank">Server Logs</a> /
+  {% endif %}
   {{ block.super }}
 {% endblock %}
 
@@ -70,10 +73,14 @@
     <hr/>
     <div class="container pull-left">
       <h5>
-          &copy; Copyright 2019{% if copyright_year|add:"0" > 2019 %}-{{ copyright_year }}{% endif %}
-          <a href="mailto:david.cooper@burningman.org" target="_blank">David Cooper</a>
-          &amp; <a href="https://bmir.org/" target="_blank">BMIR</a>.<br>
-          All rights reserved.
+          <div>
+            &copy; Copyright 2019{% if copyright_year|add:"0" > 2019 %}-{{ copyright_year }}{% endif %}
+            <a href="mailto:david.cooper@burningman.org" target="_blank">David Cooper</a>
+            &amp; <a href="https://bmir.org/" target="_blank">BMIR</a>.
+          </div>
+          <div>
+            All rights reserved.
+          </div>
       </h5>
     </div>
   </div>

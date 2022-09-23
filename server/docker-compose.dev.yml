@@ -22,3 +22,8 @@ services:
     restart: 'no'
     ports:
       - 127.0.0.1:6379:6379
+
+  logs:
+    restart: 'no'
+    ports:
+      - 127.0.0.1:9999:8080
