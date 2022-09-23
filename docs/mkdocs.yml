@@ -68,7 +68,8 @@ markdown_extensions:
   - def_list
   - footnotes
   - md_in_html
-  - pymdownx.arithmatex
+  - pymdownx.arithmatex:
+      generic: true
   - pymdownx.details
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
