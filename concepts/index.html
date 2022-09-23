@@ -473,38 +473,39 @@
 
 <h1 id="core-concepts-explained">Core Concepts, Explained<a class="headerlink" href="#core-concepts-explained" title="Permanent link">←</a></h1>
 <h2 id="glossary-of-terms">Glossary of Terms<a class="headerlink" href="#glossary-of-terms" title="Permanent link">←</a></h2>
+<p>Below is a list of terms and an explanation of how they're used in Tomato.</p>
 <h3 id="audio-asset">Audio Asset<a class="headerlink" href="#audio-asset" title="Permanent link">←</a></h3>
-<p>A short, individual audio track. Think individual advertisements, individual
-public service announcements, or individual station IDs.</p>
-<p>Audio assets always have a name and underlying audio file, like an mp3 but
-can contain additional data like when they begin and end airing, or whether
-their enabled at all.</p>
+<p><strong>An <u>audio asset</u> is a short individual audio track</strong> (also referred to as just
+an asset). Think individual advertisements, individual public service
+announcements, or individual station IDs.</p>
+<p>Assets always have a name and underlying audio file (like an mp3) but they can
+have additional data like when they begin and end airing, or whether their
+enabled at all.</p>
 <div class="admonition example">
 <p class="admonition-title">Audio Asset Example</p>
 <p>And example would be a short advertisement audio clip named <em>"David's
 Steel Guitar Ad."</em></p>
 </div>
 <h3 id="rotator">Rotator<a class="headerlink" href="#rotator" title="Permanent link">←</a></h3>
-<p>A collection of audio assets. A rotator represents a way to <em>categorize</em>
-audio assets into the same group.</p>
-<p>An audio asset <strong>can</strong> belong to more than one rotator, but in practice,
-they won't.</p>
+<p><strong>A <u>rotator</u> is a collection of audio assets.</strong> A rotator represents a way
+to <em>categorize</em> assets into the same group.</p>
+<p>While an asset <em>can</em> belong to more than one rotator, in practice they won't.</p>
 <div class="admonition example">
 <p class="admonition-title">Rotator Example</p>
-<p>From the audio asset example above, you might put <em>"David's Steel
-Guitar Ad"</em> along with other short ads for musical instruments in the
-<em>"Musical Instrument Ads"</em> rotator.</p>
+<p>From the asset example above, you might put <em>"David's Steel Guitar Ad"</em>
+along with other short ads for musical instruments in the <em>"Musical
+Instrument Ads"</em> rotator.</p>
 </div>
 <h3 id="stop-set">Stop Set<a class="headerlink" href="#stop-set" title="Permanent link">←</a></h3>
-<p>A stop set is an ordered list of rotators. A stop set can be thought of as
-an entire commercial break, like in traditional radio. One audio asset is
-selected at random<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> for each rotator in a stop set.</p>
-<p>A rotator <strong>can</strong> can be in a stop set more than once.</p>
-<p>If that sounds a bit confusing to you, see the example below.</p>
+<p><strong>A <u>stop set</u> is an ordered list of rotators.</strong> A stop set can be thought
+of as an entire commercial break, like in traditional radio. To "play" a stop set,
+an asset is selected at random<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> from each rotator in a stop set.</p>
+<p>A rotator <strong>can</strong> be (and often is) in a stop set more than once.</p>
+<p>If that sounds a bit confusing to you, don't worry. Check out the example below,</p>
 <div class="admonition example">
 <p class="admonition-title">Stop Set Example</p>
-<p>Let's say we have the following rotators, each several audio assets in
-them,</p>
+<p>Let's say we have the following rotators created, and we've put assets in
+each of them them,</p>
 <table>
 <thead>
 <tr>
@@ -515,15 +516,15 @@ them,</p>
 <tbody>
 <tr>
 <td align="right">Station IDs</td>
-<td align="left"><code>S_ID_1</code>, <code>S_ID_2</code>, and <code>S_ID_3</code></td>
+<td align="left"><code>S_ID_1.mp3</code>, <code>S_ID_2.mp3</code>, and <code>S_ID_3.mp3</code></td>
 </tr>
 <tr>
 <td align="right">Public Service Announcements</td>
-<td align="left"><code>PSA_1</code>, <code>PSA_2</code>, and <code>PSA_3</code></td>
+<td align="left"><code>PSA_1.mp3</code> and <code>PSA_2.mp3</code></td>
 </tr>
 <tr>
 <td align="right">Advertisements</td>
-<td align="left"><code>AD_1</code>, <code>AD_2</code>, and <code>AD_3</code></td>
+<td align="left"><code>AD_1.mp3</code>, <code>AD_2.mp3</code>, and <code>AD_3.mp3</code></td>
 </tr>
 </tbody>
 </table>
@@ -532,7 +533,7 @@ list of five rotators, shown here,</p>
 <table>
 <thead>
 <tr>
-<th align="right">Index</th>
+<th align="right">Order in Stop Set</th>
 <th align="left">Rotator</th>
 </tr>
 </thead>
@@ -559,36 +560,35 @@ list of five rotators, shown here,</p>
 </tr>
 </tbody>
 </table>
-<p>Then, when an <em>"Evening Stop Set"</em> is generated to be played by Tomato
-during a commercial break, Tomato plays through the following five
-randomly selected audio assets.</p>
+<p>Then, when an <em>"Evening Stop Set"</em> is played by Tomato during a commercial
+break, Tomato plays through the following five randomly selected assets.</p>
 <table>
 <thead>
 <tr>
-<th align="right">Index</th>
+<th align="right">Order in Stop Set</th>
 <th align="left">Audio Asset (Randomly Selected)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td align="right">1</td>
-<td align="left"><code>S_ID_2</code> &mdash; selected from Station IDs</td>
+<td align="left"><code>S_ID_2</code> &mdash; <em>selected from Station IDs</em></td>
 </tr>
 <tr>
 <td align="right">2</td>
-<td align="left"><code>AD_3</code> &mdash; selected from Advertisements</td>
+<td align="left"><code>AD_3</code> &mdash; <em>selected from Advertisements</em></td>
 </tr>
 <tr>
 <td align="right">3</td>
-<td align="left"><code>AD_1</code> &mdash; selected from Advertisements</td>
+<td align="left"><code>AD_1</code> &mdash; <em>selected from Advertisements</em></td>
 </tr>
 <tr>
 <td align="right">4</td>
-<td align="left"><code>PSA_2</code> &mdash; selected from Public Service Announcements</td>
+<td align="left"><code>PSA_2</code> &mdash; <em>selected from Public Service Announcements</em></td>
 </tr>
 <tr>
 <td align="right">5</td>
-<td align="left"><code>S_ID_1</code> &mdash; selected from Station IDs</td>
+<td align="left"><code>S_ID_1</code> &mdash; <em>selected from Station IDs</em></td>
 </tr>
 </tbody>
 </table>
@@ -596,22 +596,49 @@ randomly selected audio assets.</p>
 <h3 id="random-weight">Random Weight<a class="headerlink" href="#random-weight" title="Permanent link">←</a></h3>
 <p>The weight of how likely random selection occurs of an item occurs, when
 compared to all other items in a set. The default random weight with Tomato is
-always <code>1</code>.</p>
-<p>Random weight is used when Tomato selects both audio assets and stop sets.</p>
+always <span class="arithmatex">\(1\)</span>.</p>
+<p>Random weight is used when Tomato selects both assets and stop sets.</p>
 <p>The likeliness of an item <code>x</code> being selected is calculated as follows,</p>
-<div class="arithmatex">
-<div class="MathJax_Preview">
+<div class="arithmatex">\[
 \text{chance of selection of item} = \frac{\text{random weight of item}}{\text{sum all of item random weights}}
-</div>
-<script type="math/tex; mode=display">
-\text{chance of selection of item} = \frac{\text{random weight of item}}{\text{sum all of item random weights}}
-</script>
-</div>
+\]</div>
 <div class="admonition example">
 <p class="admonition-title">Random Weight Example</p>
-<p>If an audio asset <em>"A"</em> has a weight of <code>2</code> and all other audio assets
-have a weight of <code>1</code>, then asset <em>"A"</em> is <strong>twice as likely</strong> to be selected
-when compares to all other assets.</p>
+<p>If an asset <em>"Commercial A"</em> has a weight of <span class="arithmatex">\(2\)</span> and all other assets have a
+weight of <span class="arithmatex">\(1\)</span>, then asset <em>"Commercial A"</em> is <strong>twice as likely</strong> to be
+selected when compared to all other assets.</p>
+<p>Suppose there are 26 commercials, named <em>"Commercial A"</em> through
+<em>"Commercial Z",</em> with <em>"A"</em> having a weight of <span class="arithmatex">\(2\)</span> and the rest having a
+weight of <span class="arithmatex">\(1\)</span>. We get a sum of all random weights as <span class="arithmatex">\(27\)</span>.</p>
+<div class="arithmatex">\[
+\begin{align*}
+\text{sum all of item random weights}
+    &amp;= \text{Commercial A}_\text{weight} + \text{Commercial A}_\text{weight}
+    + \ldots + \text{Commercial Z}_\text{weight} \\
+&amp;= 2 + 1 + \ldots + 1 \\
+&amp;= 27
+\end{align*}
+\]</div>
+<p>Per the selection equation above, the change we'll pick <em>"Commercial A</em>"
+with a range weight of <span class="arithmatex">\(2\)</span> is,</p>
+<div class="arithmatex">\[
+\begin{align*}
+\text{Commercial A}_\text{selection chance} &amp;= \frac{\text{Commercial A}_\text{weight}}{\text{sum all of item random weights}} \\
+&amp;= \frac{2}{27} \\
+&amp;\simeq 7.4\%
+\end{align*}
+\]</div>
+<p>Per the selection equation above, the change we'll pick <em>"Commercial B</em>"
+with a range weight of <span class="arithmatex">\(1\)</span> is,</p>
+<div class="arithmatex">\[
+\begin{align*}
+\text{Commercial B}_\text{selection chance} &amp;= \frac{\text{Commercial B}_\text{weight}}{\text{sum all of item random weights}} \\
+&amp;= \frac{1}{27} \\
+&amp;\simeq 3.7\%
+\end{align*}
+\]</div>
+<p>So you can see, since <span class="arithmatex">\(7.4\%\)</span> is twice <span class="arithmatex">\(3.7\%\)</span>, <em>"Commercial A"</em> is <strong>twice
+as likely</strong> to be played as <em>"Commercial B"</em> because of its weight of <span class="arithmatex">\(2\)</span>.</p>
 </div>
 <div class="footnote">
 <hr />
