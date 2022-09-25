@@ -1,0 +1,22 @@
+{
+  "name": "tomato",
+  "version": "0.0.1-dev",
+  "description": "Tomato Radio Automation (Desktop App)",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dtcooper/tomato.git"
+  },
+  "author": "David Cooper <david.cooper@burningman.org>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dtcooper/tomato/issues"
+  },
+  "homepage": "https://github.com/dtcooper/tomato#readme",
+  "devDependencies": {
+    "electron": "^20.2.0"
+  }
+}
