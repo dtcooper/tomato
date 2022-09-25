@@ -11,23 +11,6 @@ Below is a list of concepts and an explanation of how they're used in Tomato.
 
 Tomato's audio entities are a core concept, and they're defined below.
 
-
-### Relationship Diagram
-
-While the definitions of what an [audio asset](#audio-asset), [rotator](#rotator),
-and [stop set](#stop-set) are below, here's a simple relationship diagram for
-them.
-
-```mermaid
-flowchart RL
-    stopset{Stop Sets}
-    rotator{Rotators}
-    asset{Audio Assets}
-    rotator -- "many-to-many relationship (ordered list)" --> stopset
-    asset -- "many-to-many relationship (set)" --> rotator
-```
-
-
 ### Audio Asset
 **An <u>audio asset</u> is a short individual audio track** (also referred to as just
 an asset). Think individual advertisements, individual public service
@@ -40,8 +23,8 @@ have additional data for example when they begin and end airing.
     A short advertisement audio clip named _"David's Steel Guitar Ad."_
 
 ### Rotator
-**A <u>rotator</u> is a collection of audio assets.** A rotator is how you to
-_categorize_ similar assets into a group.
+**A <u>rotator</u> is a collection of _similar_ audio assets.** A rotator is how
+you to _categorize_ assets into a group.
 
 While an asset _can_ belong to more than one rotator, in practice they won't.
 
@@ -94,11 +77,14 @@ station ID jingles at the start and end of a stop set, as in the example below.
     ```mermaid
     flowchart RL
         stopset(Evening Stop Set)
-        rotator1(1. Station IDs\n<em>Rotator</em>)
-        rotator2(2. Advertisements\n<em>Rotator</em>)
-        rotator3(3. Advertisements\n<em>Rotator</em>\n<strong><small>Repetition Allowed!</small></strong>)
-        rotator4(4. Public Service Announcements\n<em>Rotator</em>)
-        rotator5(5. Station IDs\n<em>Rotator</em>)
+        subgraph "Rotators in Stop Set"
+            direction TB
+            rotator1(1. Station IDs\n<em>Rotator</em>)
+            rotator2(2. Advertisements\n<em>Rotator</em>)
+            rotator3(3. Advertisements\n<em>Rotator</em>\n<strong><small>Repetition Allowed!</small></strong>)
+            rotator4(4. Public Service Announcements\n<em>Rotator</em>)
+            rotator5(5. Station IDs\n<em>Rotator</em>)
+        end
         rotator1 --- stopset
         rotator2 --- stopset
         rotator3 --- stopset
@@ -111,38 +97,56 @@ station ID jingles at the start and end of a stop set, as in the example below.
 
     ```mermaid
     flowchart LR
+        subgraph "Rotators in Stop Set"
+            direction TB
+            rotator1(1. Station IDs\n<em>Rotator</em>)
+            rotator2(2. Advertisements\n<em>Rotator</em>)
+            rotator3(3. Advertisements\n<em>Rotator</em>)
+            rotator4(4. Public Service Announcements\n<em>Rotator</em>)
+            rotator5(5. Station IDs\n<em>Rotator</em>)
+        end
         stopset(Evening Stop Set)
-        rotator1(1. Station IDs\n<em>Rotator</em>)
-        rotator2(2. Advertisements\n<em>Rotator</em>)
-        rotator3(3. Advertisements\n<em>Rotator</em>)
-        rotator4(4. Public Service Announcements\n<em>Rotator</em>)
-        rotator5(5. Station IDs\n<em>Rotator</em>)
-        asset1(S_ID_2.mp3\n<em>Asset</em>)
-        asset2(AD_3.mp3\n<em>Asset</em>)
-        asset3(AD_1.mp3\n<em>Asset</em>)
-        asset4(PSA_2.mp3\n<em>Asset</em>)
-        asset5(S_ID_1.mp3\n<em>Asset</em>)
+        subgraph "Assets Played"
+            direction TB
+            asset1(S_ID_2.mp3\n<em>Asset</em>)
+            asset2(AD_3.mp3\n<em>Asset</em>)
+            asset3(AD_1.mp3\n<em>Asset</em>)
+            asset4(PSA_2.mp3\n<em>Asset</em>)
+            asset5(S_ID_1.mp3\n<em>Asset</em>)
+        end
         rotator1 --- stopset
         rotator2 --- stopset
         rotator3 --- stopset
         rotator4 --- stopset
         rotator5 --- stopset
-        asset1 -- randomly selected --- rotator1
-        asset2 -- randomly selected --- rotator2
-        asset3 -- randomly selected --- rotator3
-        asset4 -- randomly selected --- rotator4
-        asset5 -- randomly selected --- rotator5
+        asset1 -- randomly\nselected --- rotator1
+        asset2 -- randomly\nselected --- rotator2
+        asset3 -- randomly\nselected --- rotator3
+        asset4 -- randomly\nselected --- rotator4
+        asset5 -- randomly\nselected --- rotator5
     ```
 
+### Relationship Diagram
+
+Hhere's a simple relationship diagram for the entities described above.
+
+```mermaid
+flowchart RL
+    stopset{Stop Sets}
+    rotator{Rotators}
+    asset{Audio Assets}
+    rotator -- "many-to-many\nrelationship (ordered list)" --> stopset
+    asset -- "many-to-many\nrelationship (set)" --> rotator
+```
 
 ## Wait Interval
 
-Tomato's **wait interval** is how long the client should wait before notifying
-that a stop set is due to be played.
+Tomato's **wait interval** is how long the desktop app should wait before
+notifying the user that a stop set is due to be played.
 
 
-## Random Weight
-**A <u>random weight</u> is how likely random selection of an item occurs**,
+## Weight
+**<u>Weight</u> (or random weight) is how likely random selection of an item occurs**,
 when compared to all other items of the same type. The default weight of an item
 with always $1$ unless modified.
 
@@ -155,7 +159,7 @@ x_{\text{chance}} = \frac{x_{\text{weight}}}{[\text{sum all of item weights}]}
 $$
 
 
-!!! example "Random Weight Example"
+???+ example "Weight Example"
     Let's dig a little deeper. For the purposes of this example, all assets are
     in a rotator called _"Commercials."_
 
@@ -211,4 +215,4 @@ $$
     weight $1$.
 
 
-[^1]: The random selection process can be biased by [random weight](#random-weight).
+[^1]: The random selection process can be biased by random [weight](#weight).
