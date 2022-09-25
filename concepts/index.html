@@ -211,7 +211,7 @@
 
   <li class="md-tabs__item">
     <a href="../client/" class="md-tabs__link">
-      Client
+      Desktop App
     </a>
   </li>
 
@@ -330,7 +330,7 @@
   
     <li class="md-nav__item">
       <a href="../client/" class="md-nav__link">
-        Client
+        Desktop App
       </a>
     </li>
   
@@ -401,13 +401,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#relationship-diagram" class="md-nav__link">
-    Relationship Diagram
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#audio-asset" class="md-nav__link">
     Audio Asset
   </a>
@@ -428,6 +421,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#relationship-diagram" class="md-nav__link">
+    Relationship Diagram
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -441,8 +441,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#random-weight" class="md-nav__link">
-    Random Weight
+  <a href="#weight" class="md-nav__link">
+    Weight
   </a>
   
 </li>
@@ -489,16 +489,6 @@
 <p>Below is a list of concepts and an explanation of how they're used in Tomato.</p>
 <h2 id="audio-entities">Audio Entities<a class="headerlink" href="#audio-entities" title="Permanent link">←</a></h2>
 <p>Tomato's audio entities are a core concept, and they're defined below.</p>
-<h3 id="relationship-diagram">Relationship Diagram<a class="headerlink" href="#relationship-diagram" title="Permanent link">←</a></h3>
-<p>While the definitions of what an <a href="#audio-asset">audio asset</a>, <a href="#rotator">rotator</a>,
-and <a href="#stop-set">stop set</a> are below, here's a simple relationship diagram for
-them.</p>
-<pre class="mermaid"><code>flowchart RL
-    stopset{Stop Sets}
-    rotator{Rotators}
-    asset{Audio Assets}
-    rotator -- "many-to-many relationship (ordered list)" --&gt; stopset
-    asset -- "many-to-many relationship (set)" --&gt; rotator</code></pre>
 <h3 id="audio-asset">Audio Asset<a class="headerlink" href="#audio-asset" title="Permanent link">←</a></h3>
 <p><strong>An <u>audio asset</u> is a short individual audio track</strong> (also referred to as just
 an asset). Think individual advertisements, individual public service
@@ -510,8 +500,8 @@ have additional data for example when they begin and end airing.</p>
 <p>A short advertisement audio clip named <em>"David's Steel Guitar Ad."</em></p>
 </div>
 <h3 id="rotator">Rotator<a class="headerlink" href="#rotator" title="Permanent link">←</a></h3>
-<p><strong>A <u>rotator</u> is a collection of audio assets.</strong> A rotator is how you to
-<em>categorize</em> similar assets into a group.</p>
+<p><strong>A <u>rotator</u> is a collection of <em>similar</em> audio assets.</strong> A rotator is how
+you to <em>categorize</em> assets into a group.</p>
 <p>While an asset <em>can</em> belong to more than one rotator, in practice they won't.</p>
 <div class="admonition example">
 <p class="admonition-title">Rotator Example</p>
@@ -555,11 +545,14 @@ each of them them,</p>
 of five rotators, shown here,</p>
 <pre class="mermaid"><code>flowchart RL
     stopset(Evening Stop Set)
-    rotator1(1. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
-    rotator2(2. Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;)
-    rotator3(3. Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;\n&lt;strong&gt;&lt;small&gt;Repetition Allowed!&lt;/small&gt;&lt;/strong&gt;)
-    rotator4(4. Public Service Announcements\n&lt;em&gt;Rotator&lt;/em&gt;)
-    rotator5(5. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
+    subgraph "Rotators in Stop Set"
+        direction TB
+        rotator1(1. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
+        rotator2(2. Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;)
+        rotator3(3. Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;\n&lt;strong&gt;&lt;small&gt;Repetition Allowed!&lt;/small&gt;&lt;/strong&gt;)
+        rotator4(4. Public Service Announcements\n&lt;em&gt;Rotator&lt;/em&gt;)
+        rotator5(5. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
+    end
     rotator1 --- stopset
     rotator2 --- stopset
     rotator3 --- stopset
@@ -568,33 +561,47 @@ of five rotators, shown here,</p>
 <p>Then, when an <em>"Evening Stop Set"</em> is played by Tomato during a commercial
 break, here's what's played,</p>
 <pre class="mermaid"><code>flowchart LR
+    subgraph "Rotators in Stop Set"
+        direction TB
+        rotator1(1. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
+        rotator2(2. Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;)
+        rotator3(3. Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;)
+        rotator4(4. Public Service Announcements\n&lt;em&gt;Rotator&lt;/em&gt;)
+        rotator5(5. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
+    end
     stopset(Evening Stop Set)
-    rotator1(1. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
-    rotator2(2. Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;)
-    rotator3(3. Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;)
-    rotator4(4. Public Service Announcements\n&lt;em&gt;Rotator&lt;/em&gt;)
-    rotator5(5. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
-    asset1(S_ID_2.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
-    asset2(AD_3.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
-    asset3(AD_1.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
-    asset4(PSA_2.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
-    asset5(S_ID_1.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+    subgraph "Assets Played"
+        direction TB
+        asset1(S_ID_2.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+        asset2(AD_3.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+        asset3(AD_1.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+        asset4(PSA_2.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+        asset5(S_ID_1.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+    end
     rotator1 --- stopset
     rotator2 --- stopset
     rotator3 --- stopset
     rotator4 --- stopset
     rotator5 --- stopset
-    asset1 -- randomly selected --- rotator1
-    asset2 -- randomly selected --- rotator2
-    asset3 -- randomly selected --- rotator3
-    asset4 -- randomly selected --- rotator4
-    asset5 -- randomly selected --- rotator5</code></pre>
+    asset1 -- randomly\nselected --- rotator1
+    asset2 -- randomly\nselected --- rotator2
+    asset3 -- randomly\nselected --- rotator3
+    asset4 -- randomly\nselected --- rotator4
+    asset5 -- randomly\nselected --- rotator5</code></pre>
 </div>
+<h3 id="relationship-diagram">Relationship Diagram<a class="headerlink" href="#relationship-diagram" title="Permanent link">←</a></h3>
+<p>Hhere's a simple relationship diagram for the entities described above.</p>
+<pre class="mermaid"><code>flowchart RL
+    stopset{Stop Sets}
+    rotator{Rotators}
+    asset{Audio Assets}
+    rotator -- "many-to-many\nrelationship (ordered list)" --&gt; stopset
+    asset -- "many-to-many\nrelationship (set)" --&gt; rotator</code></pre>
 <h2 id="wait-interval">Wait Interval<a class="headerlink" href="#wait-interval" title="Permanent link">←</a></h2>
-<p>Tomato's <strong>wait interval</strong> is how long the client should wait before notifying
-that a stop set is due to be played.</p>
-<h2 id="random-weight">Random Weight<a class="headerlink" href="#random-weight" title="Permanent link">←</a></h2>
-<p><strong>A <u>random weight</u> is how likely random selection of an item occurs</strong>,
+<p>Tomato's <strong>wait interval</strong> is how long the desktop app should wait before
+notifying the user that a stop set is due to be played.</p>
+<h2 id="weight">Weight<a class="headerlink" href="#weight" title="Permanent link">←</a></h2>
+<p><strong><u>Weight</u> (or random weight) is how likely random selection of an item occurs</strong>,
 when compared to all other items of the same type. The default weight of an item
 with always <span class="arithmatex">\(1\)</span> unless modified.</p>
 <p>Random weight is used when Tomato selects both assets and stop sets.</p>
@@ -602,8 +609,8 @@ with always <span class="arithmatex">\(1\)</span> unless modified.</p>
 <div class="arithmatex">\[
 x_{\text{chance}} = \frac{x_{\text{weight}}}{[\text{sum all of item weights}]}
 \]</div>
-<div class="admonition example">
-<p class="admonition-title">Random Weight Example</p>
+<details class="example" open="open">
+<summary>Weight Example</summary>
 <p>Let's dig a little deeper. For the purposes of this example, all assets are
 in a rotator called <em>"Commercials."</em></p>
 <p>If an asset named <em>"Commercial A"</em> has a weight of <span class="arithmatex">\(2\)</span> and all other assets
@@ -646,12 +653,12 @@ or <span class="arithmatex">\(\text{B}_\text{weight}=1,\ \text{C}_\text{weight}=
 <p>So as you can see, since <span class="arithmatex">\(7.4\%\)</span> is twice <span class="arithmatex">\(3.7\%\)</span>, <em>"Commercial A"</em> with
 weight <span class="arithmatex">\(2\)</span> is <strong>twice as likely</strong> to be played as <em>"Commercial B"</em> with
 weight <span class="arithmatex">\(1\)</span>.</p>
-</div>
+</details>
 <div class="footnote">
 <hr />
 <ol>
 <li id="fn:1">
-<p>The random selection process can be biased by <a href="#random-weight">random weight</a>.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p>The random selection process can be biased by random <a href="#weight">weight</a>.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
