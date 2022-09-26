@@ -5,20 +5,12 @@ const htmlmin = require('html-minifier')
 module.exports = (eleventyConfig) => {
   eleventyConfig.setBrowserSyncConfig({
     files: ['dist/**/*'],
-    port: 8080,
+    port: 8080
   })
+  eleventyConfig.addPassthroughCopy('assets')
 
   eleventyConfig.setNunjucksEnvironmentOptions({
     throwOnUndefined: true
-  })
-
-  eleventyConfig.addNunjucksGlobal('static', function (url) {
-    if (process.env.NODE_ENV === 'production') {
-      const urlNoExt = url.split('.').slice(0, -1).join('.')
-      const ext = url.split('.').at(-1)
-      url = `${urlNoExt}.min.${ext}`
-    }
-    return url
   })
 
   eleventyConfig.addTransform('htmlmin', function (content) {

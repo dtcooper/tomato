@@ -1,10 +1,12 @@
 from functools import wraps
 import json
+import time
+import random
 
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.db.models import Prefetch
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect, JsonResponse, HttpResponseNotAllowed
 from django.http.request import split_domain_port
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -13,40 +15,32 @@ from .constants import SCHEMA_VERSION
 from .models import Asset, Rotator, Stopset, User
 
 
-def json_post_view(view_func):
-    @wraps(view_func)
-    @csrf_exempt
-    @require_POST
-    def view(request, *args, **kwargs):
-        try:
-            json_data = json.loads(request.body)
-        except json.JSONDecodeError:
-            return HttpResponseBadRequest()
-
-        response = view_func(request, json_data, *args, **kwargs)
-        response["status"] = "error" if "error" in response else "ok"
-        return JsonResponse(response)
-
-    return view
-
-
 def user_from_request(request):
     auth_token = request.headers.get("X-access-Token") or request.GET.get("access_token")
     if auth_token:
         return User.validate_access_token(auth_token)
 
 
-@json_post_view
-def access_token(request, json_data):
+@csrf_exempt
+def access_token(request):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed()
+
+    try:
+        json_data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return HttpResponseBadRequest()
+
     username, password = json_data.get("username"), json_data.get("password")
     if username is not None and password is not None:
         user = authenticate(username=username, password=password)
         if user is not None:
-            return {"access_token": user.generate_access_token()}
+            response = {"success": True, "access_token": user.generate_access_token()}
         else:
-            return {"error": "Invalid username and password combination."}
+            response = {"success": False, "error": "Invalid username or password."}
     else:
-        return {"error": "Please provide a username and password."}
+        response = {"success": False, "error": "Invalid request."}
+    return JsonResponse(response)
 
 
 def sync(request):
@@ -68,7 +62,7 @@ def sync(request):
 
 def ping(request):
     user = user_from_request(request)
-    return JsonResponse({"pong": "tomato", "access_token_valid": user is not None})
+    return JsonResponse({"success": True, "access_token_valid": user is not None})
 
 
 def server_logs(request):

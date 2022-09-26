@@ -1,0 +1,78 @@
+<div x-data="conn" x-show="!globals.connected" class="hero min-h-screen bg-base-200" x-cloak>
+  <div class="hero-content p-0 flex-col lg:flex-row-reverse">
+    <div class="text-center lg:text-left">
+      <h1 class="text-3xl font-bold font-mono">Tomato Radio Automation</h1>
+      <p class="py-3 italic">Enter your username, password and server address.</p>
+    </div>
+    <div class="card flex-shrink-0 w-full max-w-xl shadow-2xl bg-base-100 relative">
+      <div class="absolute inset-0 flex justify-center items-center" x-show="connecting">
+        <h2 class="text-3xl italic align-middle text-success">Connecting...</h2>
+      </div>
+      <form class="card-body" @submit.prevent="login" :class="connecting && 'invisible'">
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Server Address</span>
+            <span class="label-text-alt font-bold text-error" x-show="error" x-text="error"></span>
+          </label>
+          <input
+            type="text"
+            x-model="address"
+            class="input input-bordered"
+            :class="error && 'input-error'"
+            @input="error = false"
+            placeholder="https://example.org"
+          >
+        </div>
+        <div class="flex gap-2">
+          <div class="form-control w-full">
+            <label class="label">
+              <span class="label-text">Username</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Enter username..."
+              x-model="username"
+              class="input input-bordered"
+              :class="authError && 'input-error'"
+              @input="authError = false"
+            >
+            <label class="label">
+              <span class="label-text-alt font-bold text-error" x-show="authError" x-text="authError"></span>
+            </label>
+          </div>
+          <div class="form-control w-full" x-title="password" x-data="{showPassword: false}">
+            <label class="label">
+              <span class="label-text">Password</span>
+            </label>
+            <input
+              class="input input-bordered"
+              :class="{'tracking-wider': !showPassword && password.length >= 1, 'input-error': authError}"
+              type="password"
+              :type="showPassword ? 'text' : 'password'"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="none"
+              x-model="password"
+              placeholder="Enter password..."
+              @input="authError = false"
+              autofocus
+            >
+            <div class="form-control items-end">
+              <label class="label cursor-pointer space-x-3 pr-0">
+                <span class="label-text" x-text="showPassword ? 'Hide password' : 'Reveal password'"></span>
+                <input type="checkbox" class="checkbox" x-model="showPassword">
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="form-control mt-6">
+          <button
+            class="btn btn-primary"
+            type="submit"
+            :disabled="connecting"
+          >Login</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
