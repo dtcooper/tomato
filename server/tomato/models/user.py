@@ -5,6 +5,7 @@ import struct
 import base62
 
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 from django.utils.crypto import constant_time_compare, salted_hmac
 
 
@@ -15,6 +16,14 @@ class User(AbstractUser):
         f"!{ACCESS_TOKEN_SALT_LENGTH}sq{hmac.new(b'key', digestmod=ACCESS_TOKEN_ALGORITHM).digest_size}s"
     )
 
+    enable_client_logs = models.BooleanField(
+        "client logs entries enabled",
+        default=True,
+        help_text=(
+            "Disable client logging for this account. In general you'll want to keep this enabled, but for test"
+            " accounts you may not want to pollute the client logs."
+        ),
+    )
     is_staff = True
     first_name = None
     last_name = None

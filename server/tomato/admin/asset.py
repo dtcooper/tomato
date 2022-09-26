@@ -46,7 +46,7 @@ class StatusFilter(admin.SimpleListFilter):
     parameter_name = "status"
 
     def lookups(self, request, model_admin):
-        return (("ready", "Ready to play"), ("processing", "Processing"))
+        return (("ready", "Ready"), ("processing", "Processing"))
 
     def queryset(self, request, queryset):
         value = self.value()
@@ -64,7 +64,7 @@ class AssetAdmin(FileFormAdminMixin, TomatoModelAdminBase):
     list_filter = ("enabled", "rotators", StatusFilter, ("created_by", NoNullRelatedOnlyFieldListFilter))
     list_per_page = 250
     filter_horizontal = ("rotators",)
-    list_display = ("name", "status", "weight", "rotators_display", "created_by", "created_at")
+    list_display = ("name", "enabled", "status", "weight", "rotators_display", "created_at")
     date_hierarchy = "created_at"
     list_prefetch_related = "rotators"
 

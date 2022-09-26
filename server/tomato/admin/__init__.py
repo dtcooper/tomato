@@ -34,7 +34,7 @@ MODELS_HELP_DOCS_TEXT = {
 class TomatoAdminSite(admin.AdminSite):
     site_url = None
     site_title = site_header = "Tomato Radio Automation"
-    index_title = None
+    index_title = "Tomato administration"
     empty_value_display = mark_safe("<em>None</em>")
 
     def each_context(self, request):

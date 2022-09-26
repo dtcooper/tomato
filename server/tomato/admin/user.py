@@ -11,12 +11,12 @@ from .base import ListPrefetchRelatedMixin
 class UserAdmin(ListPrefetchRelatedMixin, DjangoUserAdmin):
     add_fieldsets = (
         (None, {"fields": ("username", "password1", "password2")}),
-        ("Permissions", {"fields": ("is_superuser", "groups")}),
+        ("Permissions", {"fields": ("is_superuser", "enable_client_logs", "groups")}),
     )
     add_form_template = None  # Removed the top of page warning
     fieldsets = (
         (None, {"fields": ("username", "password")}),
-        ("Permissions", {"fields": ("is_active", "is_superuser", "groups")}),
+        ("Permissions", {"fields": ("is_active", "is_superuser", "enable_client_logs", "groups")}),
         ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
     filter_horizontal = ("groups",)

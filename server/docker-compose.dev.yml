@@ -8,7 +8,7 @@ services:
   app:
     <<: *dev-app-template
     ports:
-      - 8000:8000
+      - "${DEBUG_APP_PORT:-8000}:8000"
 
   tasks:
     <<: *dev-app-template
@@ -16,14 +16,14 @@ services:
   db:
     restart: 'no'
     ports:
-      - 127.0.0.1:5432:5432
+      - "127.0.0.1:${DEBUG_DB_PORT:-5432}:5432"
 
   redis:
     restart: 'no'
     ports:
-      - 127.0.0.1:6379:6379
+      - "127.0.0.1:${DEBUG_REDIS_PORT:-6379}:6379"
 
   logs:
     restart: 'no'
     ports:
-      - 127.0.0.1:9999:8000
+      - "127.0.0.1:${DEBUG_LOGS_PORT:-8001}:8000"

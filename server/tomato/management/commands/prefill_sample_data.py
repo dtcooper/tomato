@@ -12,7 +12,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 from tomato.models import Asset, Rotator, Stopset, StopsetRotator, User
-from tomato.tasks import process_asset
+from tomato.tasks import bulk_process_assets
 
 
 SAMPLE_DATA_URL = "https://tomato.nyc3.digitaloceanspaces.com/bmir-sample-assets.zip"
@@ -104,6 +104,8 @@ class Command(BaseCommand):
             rotators = {}
             num = 1
 
+            assets = []
+
             for rotator_name in rotator_names:
                 rotator_dir = temp_dir / rotator_name
 
@@ -123,9 +125,10 @@ class Command(BaseCommand):
                     asset.clean()
                     asset.save()
                     asset.rotators.add(rotator)
-                    process_asset(asset, user=created_by, message_on_error_only=True)
-
+                    assets.append(asset)
                     num += 1
+
+            bulk_process_assets(assets, user=created_by)
 
         for stopset_name, rotator_names in metadata["stopsets"].items():
             self.stdout.write(f"Creating stop set {stopset_name} with {len(rotator_names)} rotators...")

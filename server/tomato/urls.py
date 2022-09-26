@@ -8,7 +8,8 @@ from tomato.admin import admin_site
 
 urlpatterns = [
     path("auth/", views.access_token, name="access_token"),
-    path("sync/", views.sync),
+    path("sync/", views.sync, name="sync"),
+    path("ping/", views.ping, name="ping"),
     re_path("^server-logs", views.server_logs, name="server_logs"),
     path("upload/", include("django_file_form.urls")),
 ]

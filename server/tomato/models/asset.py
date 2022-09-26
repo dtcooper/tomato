@@ -19,7 +19,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
     class Status(models.IntegerChoices):
         PENDING = 0, "Pending processing"
         PROCESSING = 1, "Processing"
-        READY = 2, "Ready to play"
+        READY = 2, "Ready"
 
     name = models.CharField(
         "name",
@@ -95,7 +95,6 @@ Asset.rotators.through._meta.verbose_name = "Asset in rotator relationship"
 Asset.rotators.through._meta.verbose_name_plural = "Asset in rotator relationships"
 
 created_by_field = Asset._meta.get_field("created_by")
-created_by_field.verbose_name = "uploading user"
 del created_by_field
 
 created_at_field = Asset._meta.get_field("created_at")

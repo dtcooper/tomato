@@ -4,7 +4,8 @@ import json
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.db.models import Prefetch
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
+from django.http.request import split_domain_port
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
@@ -29,19 +30,10 @@ def json_post_view(view_func):
     return view
 
 
-def require_access_token(view_func):
-    @wraps(view_func)
-    def view(request, *args, **kwargs):
-        auth_token = request.headers.get("X-access-Token") or request.GET.get("access_token")
-        if auth_token:
-            user = User.get_user_for_auth_token(auth_token)
-            if user is not None:
-                return view_func(request, *args, **kwargs)
-        elif settings.DEBUG and request.user.is_authenticated:
-            return view_func(request, *args, **kwargs)
-        return HttpResponseForbidden()
-
-    return view
+def user_from_request(request):
+    auth_token = request.headers.get("X-access-Token") or request.GET.get("access_token")
+    if auth_token:
+        return User.validate_access_token(auth_token)
 
 
 @json_post_view
@@ -57,9 +49,11 @@ def access_token(request, json_data):
         return {"error": "Please provide a username and password."}
 
 
-@require_access_token
 def sync(request):
-    # TODO: gaurantee referential integrity... possibly with prefetch_related limiting an ID of rotators
+    user = user_from_request(request)
+    if not user and not settings.DEBUG:
+        return HttpResponseForbidden()
+
     response = {"schema_version": SCHEMA_VERSION}
     models = {
         "assets": Asset.objects.prefetch_related("rotators").filter(status=Asset.Status.READY),
@@ -72,8 +66,17 @@ def sync(request):
     return JsonResponse(response)
 
 
+def ping(request):
+    user = user_from_request(request)
+    return JsonResponse({"pong": "tomato", "access_token_valid": user is not None})
+
+
 def server_logs(request):
     if request.user.is_superuser:
-        return HttpResponse(headers={"X-Accel-Redirect": f"/_internal{request.get_full_path()}"})
+        if settings.DEBUG:
+            domain, _ = split_domain_port(request.get_host())
+            return HttpResponseRedirect(f"http://{domain}:{settings.DEBUG_LOGS_PORT}/server-logs")
+        else:
+            return HttpResponse(headers={"X-Accel-Redirect": f"/_internal{request.get_full_path()}"})
     else:
         return HttpResponseForbidden()

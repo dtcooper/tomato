@@ -40,12 +40,13 @@ def process_asset(asset, user=None):
 @djhuey.db_task()
 def bulk_process_assets(assets, user=None):
     begin = time.time()
-    process_calls = process_asset.map(assets)
+    process_calls = process_asset.map((asset, user) for asset in assets)
     print(process_calls.get(blocking=True))
     elapsed = time.time() - begin
-    user_messages_api.success(
-        user, f"Bulk processed {len(assets)} audio assets processed after {pretty_delta(elapsed)}!"
-    )
+    if user:
+        user_messages_api.success(
+            user, f"Bulk processed {len(assets)} audio assets processed after {pretty_delta(elapsed)}!"
+        )
 
 
 @djhuey.db_periodic_task(once_at_startup(crontab(hour="*/6", minute="5")))
