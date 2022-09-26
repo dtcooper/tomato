@@ -614,13 +614,14 @@ x_{\text{chance}} = \frac{x_{\text{weight}}}{[\text{sum all of item weights}]}
 <p>Let's dig a little deeper. For the purposes of this example, all assets are
 in a rotator called <em>"Commercials."</em></p>
 <p>If an asset named <em>"Commercial A"</em> has a weight of <span class="arithmatex">\(2\)</span> and all other assets
-have a weight of <span class="arithmatex">\(1\)</span>, then asset <em>"Commercial A"</em> is <strong>twice as likely</strong> to be
-selected when compared to all other assets.</p>
+have a weight of <span class="arithmatex">\(1\)</span>, then asset <em>"Commercial A"</em> is <strong>twice as likely</strong> to
+be selected when compared to all other assets.</p>
 <p>Suppose there are 26 commercials &mdash; one for each letter of the alphabet
 &mdash; and they're named <em>"Commercial A"</em> through <em>"Commercial Z"</em>.</p>
-<p>We assign a weight of <span class="arithmatex">\(2\)</span> to <em>"Commercial A,"</em> or <span class="arithmatex">\(\text{A}_\text{weight}=2\)</span>
+<p>We assign a weight of <span class="arithmatex">\(2\)</span> to <em>"Commercial A,"</em> or <span class="arithmatex">\(\text{A}_\text{weight} = 2\)</span>
 and assign a weight of <span class="arithmatex">\(1\)</span> to <em>"Commercial B"</em> through <em>"Commercial Z,"</em>
-or <span class="arithmatex">\(\text{B}_\text{weight}=1,\ \text{C}_\text{weight}=1,\ \ldots,\ \text{X}_\text{weight}=1,\ \text{Z}_\text{weight}=1\)</span>.</p>
+or <span class="arithmatex">\(\text{B}_\text{weight} = 1,\ \text{C}_\text{weight} = 1,\ \ldots,\
+\text{X}_\text{weight} = 1,\ \text{Z}_\text{weight} = 1\)</span>.</p>
 <p>We get a sum of all random weights as <span class="arithmatex">\(27\)</span>, illustrated below,</p>
 <div class="arithmatex">\[
 \begin{align*}
@@ -635,21 +636,23 @@ or <span class="arithmatex">\(\text{B}_\text{weight}=1,\ \text{C}_\text{weight}=
 <p>Then, per the selection equation above,</p>
 <div class="arithmatex">\[
 \begin{align*}
-\text{A}_\text{chance} &amp;= \frac{\text{A}_\text{weight}}{\text{[sum all of item weights]}} \\
+\text{A}_\text{chance} &amp;= \frac{\text{A}_\text{weight}}{\text{
+    [sum all of item weights]}} \\
 &amp;= \frac{2}{27} \\
-&amp;\simeq 7.4\%
+&amp;= 7.4\%
 \end{align*}
 \]</div>
 <p>So the chance we'll pick <em>"Commercial A</em>" with a random weight of <span class="arithmatex">\(2\)</span> is
-<span class="arithmatex">\(\text{A}_\text{chance}=7.4\%\)</span>. Similarly,</p>
+<span class="arithmatex">\(\text{A}_\text{chance} = 7.4\%\)</span>. Similarly,</p>
 <div class="arithmatex">\[
 \begin{align*}
 \text{B}_\text{chance} &amp;= \frac{\text{B}_\text{weight}}{\text{[sum all of item weights]}} \\
 &amp;= \frac{1}{27} \\
-&amp;\simeq 3.7\%
+&amp;= 3.7\%
 \end{align*}
 \]</div>
-<p>The chance we'll pick <em>"Commercial B</em>" with a weight of <span class="arithmatex">\(1\)</span> is <span class="arithmatex">\(\text{B}_\text{chance}=3.7\%\)</span></p>
+<p>The chance we'll pick <em>"Commercial B</em>" with a weight of <span class="arithmatex">\(1\)</span> is
+<span class="arithmatex">\(\text{B}_\text{chance} = 3.7\%\)</span></p>
 <p>So as you can see, since <span class="arithmatex">\(7.4\%\)</span> is twice <span class="arithmatex">\(3.7\%\)</span>, <em>"Commercial A"</em> with
 weight <span class="arithmatex">\(2\)</span> is <strong>twice as likely</strong> to be played as <em>"Commercial B"</em> with
 weight <span class="arithmatex">\(1\)</span>.</p>
