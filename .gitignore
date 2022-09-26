@@ -1,5 +1,15 @@
+# misc
 .DS_Store
+
+# docs
 /docs/site/
+
+# client
+/client/dist/
+/client/node_modules/
+/client/out/
+
+# server
 /server/.env
 /server/docker-compose.override.yml
 /server/serve/

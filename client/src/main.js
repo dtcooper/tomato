@@ -1,16 +1,21 @@
 const { app, BrowserWindow } = require('electron')
 const path = require('path')
+const process = require('process')
 
 function createWindow () {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, `preload${app.isPackaged ? '.min' : ''}.js`)
     }
   })
 
-  win.loadFile('index.html')
+  if (app.isPackaged) {
+    win.loadFile('dist/index.html')
+  } else {
+    win.loadURL('http://localhost:8080')
+  }
 }
 
 app.whenReady().then(() => {

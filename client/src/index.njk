@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval';" />
+    <link href="{{ static('styles.css') }}" rel="stylesheet">
+    <script src="{{ static('script.js') }}" defer></script>
+</head>
+<body class="p-2">
+    <h1>Hello World!</h1>
+    <p>
+        We are using Node.js <span id="node-version"></span>,
+        Chromium <span id="chrome-version"></span>,
+        Electron <span id="electron-version"></span>,
+        running in <span id="dev-mode"></span>.
+        <span x-data x-text="'Hello from alpinejs!'"></span>
+    </p>
+</body>
+</html>

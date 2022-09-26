@@ -2,11 +2,32 @@
   "name": "tomato",
   "version": "0.0.1-dev",
   "description": "Tomato Radio Automation (Desktop App)",
-  "main": "main.js",
+  "main": "dist/main.min.js",
   "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make"
+    "clean": "rm -rf dist out",
+    "dev": "NODE_ENV=development ELECTRON_NODE_VERSION=16.15.0 npm-run-all clean -p dev:*",
+    "dev:11ty": "eleventy --serve",
+    "dev:css": "tailwindcss --input src/styles.css --output dist/styles.css --watch",
+    "dev:electron": "npm-run-all dev:electron:wait dev:electron:forge",
+    "dev:electron:wait": "wait-on dist/styles.css dist/script.js dist/main.js dist/preload.js http://localhost:8080/",
+    "dev:electron:forge": "electron-forge start -p dist/main.js",
+    "dev:js-script": "esbuild --bundle src/script.js --outfile=dist/script.js --sourcemap --watch",
+    "dev:js-main": "esbuild --bundle --platform=node --target=node${ELECTRON_NODE_VERSION} --external:electron src/main.js --outfile=dist/main.js --sourcemap --watch",
+    "dev:js-preload": "esbuild --bundle --platform=node --target=node${ELECTRON_NODE_VERSION} src/preload.js --outfile=dist/preload.js --sourcemap --watch",
+    "build": "NODE_ENV=production ELECTRON_NODE_VERSION=16.15.0 npm-run-all clean -p build:*",
+    "build:11ty": "eleventy",
+    "build:css": "tailwindcss --input src/styles.css --output dist/styles.min.css --minify",
+    "build:js-script": "esbuild --bundle src/script.js --outfile=dist/script.min.js --sourcemap --minify",
+    "build:js-main": "esbuild --bundle --platform=node --target=node${ELECTRON_NODE_VERSION} --external:electron src/main.js --outfile=dist/main.min.js --sourcemap --minify",
+    "build:js-preload": "esbuild --bundle --platform=node --target=node${ELECTRON_NODE_VERSION} src/preload.js --outfile=dist/preload.min.js --sourcemap --minify",
+    "make": "npm-run-all build make:*",
+    "make:forge": "run-script-os",
+    "make:forge:darwin": "npx electron-forge make --arch universal",
+    "make:forge:default": "npx electron-forge make",
+    "package": "npm-run-all build package:*",
+    "package:forge": "run-script-os",
+    "package:forge:darwin": "npx electron-forge package --arch universal",
+    "package:forge:default": "npx electron-forge package"
   },
   "repository": {
     "type": "git",
@@ -19,19 +40,41 @@
   },
   "homepage": "https://github.com/dtcooper/tomato#readme",
   "devDependencies": {
+    "@11ty/eleventy": "^1.0.2",
     "@electron-forge/cli": "^6.0.0-beta.66",
     "@electron-forge/maker-deb": "^6.0.0-beta.66",
     "@electron-forge/maker-rpm": "^6.0.0-beta.66",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.66",
     "@electron-forge/maker-zip": "^6.0.0-beta.66",
-    "electron": "^20.2.0"
+    "alpinejs": "^3.10.3",
+    "daisyui": "^2.31.0",
+    "electron": "^20.2.0",
+    "esbuild": "^0.15.9",
+    "html-minifier": "^4.0.0",
+    "npm-run-all": "^4.1.5",
+    "run-script-os": "^1.1.6",
+    "standard": "^17.0.0",
+    "tailwindcss": "^3.1.8",
+    "wait-on": "^6.0.1"
+  },
+  "standard": {
+    "ignore": [
+      "dist/*.js",
+      "!.eleventy.js"
+    ]
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0"
   },
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "ignore": [
+          "^/src$",
+          "^/tailwind.config.js$",
+          "^/.eleventy.js$"
+        ]
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
