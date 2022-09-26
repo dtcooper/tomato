@@ -164,15 +164,16 @@ $$
     in a rotator called _"Commercials."_
 
     If an asset named _"Commercial A"_ has a weight of $2$ and all other assets
-    have a weight of $1$, then asset _"Commercial A"_ is **twice as likely** to be
-    selected when compared to all other assets.
+    have a weight of $1$, then asset _"Commercial A"_ is **twice as likely** to
+    be selected when compared to all other assets.
 
     Suppose there are 26 commercials &mdash; one for each letter of the alphabet
     &mdash; and they're named _"Commercial A"_ through _"Commercial Z"_.
 
-    We assign a weight of $2$ to _"Commercial A,"_ or $\text{A}_\text{weight}=2$
+    We assign a weight of $2$ to _"Commercial A,"_ or $\text{A}_\text{weight} = 2$
     and assign a weight of $1$ to _"Commercial B"_ through _"Commercial Z,"_
-    or $\text{B}_\text{weight}=1,\ \text{C}_\text{weight}=1,\ \ldots,\ \text{X}_\text{weight}=1,\ \text{Z}_\text{weight}=1$.
+    or $\text{B}_\text{weight} = 1,\ \text{C}_\text{weight} = 1,\ \ldots,\
+    \text{X}_\text{weight} = 1,\ \text{Z}_\text{weight} = 1$.
 
     We get a sum of all random weights as $27$, illustrated below,
 
@@ -191,24 +192,26 @@ $$
 
     $$
     \begin{align*}
-    \text{A}_\text{chance} &= \frac{\text{A}_\text{weight}}{\text{[sum all of item weights]}} \\
+    \text{A}_\text{chance} &= \frac{\text{A}_\text{weight}}{\text{
+        [sum all of item weights]}} \\
     &= \frac{2}{27} \\
-    &\simeq 7.4\%
+    &= 7.4\%
     \end{align*}
     $$
 
     So the chance we'll pick _"Commercial A_" with a random weight of $2$ is
-    $\text{A}_\text{chance}=7.4\%$. Similarly,
+    $\text{A}_\text{chance} = 7.4\%$. Similarly,
 
     $$
     \begin{align*}
     \text{B}_\text{chance} &= \frac{\text{B}_\text{weight}}{\text{[sum all of item weights]}} \\
     &= \frac{1}{27} \\
-    &\simeq 3.7\%
+    &= 3.7\%
     \end{align*}
     $$
 
-    The chance we'll pick _"Commercial B_" with a weight of $1$ is $\text{B}_\text{chance}=3.7\%$
+    The chance we'll pick _"Commercial B_" with a weight of $1$ is
+    $\text{B}_\text{chance} = 3.7\%$
 
     So as you can see, since $7.4\%$ is twice $3.7\%$, _"Commercial A"_ with
     weight $2$ is **twice as likely** to be played as _"Commercial B"_ with
