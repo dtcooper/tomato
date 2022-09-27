@@ -6,7 +6,7 @@ import random
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.db.models import Prefetch
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect, JsonResponse, HttpResponseNotAllowed
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.http.request import split_domain_port
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -23,6 +23,7 @@ def user_from_request(request):
 
 @csrf_exempt
 def access_token(request):
+    print(request.method)
     if request.method != 'POST':
         return HttpResponseNotAllowed()
 
