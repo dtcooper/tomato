@@ -22,7 +22,9 @@ jobs:
         name: test
         run: |
           touch tomato-client-preview-macos.zip tomato-client-preview-windows.zip
-          echo "${{ secrets.SSH_KEY }}" >> ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+          chown 0600 ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
       -
         name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
