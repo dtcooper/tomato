@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: docker-build
+  group: client-build
   cancel-in-progress: true
 
 jobs:
