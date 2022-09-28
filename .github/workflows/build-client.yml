@@ -26,7 +26,6 @@ jobs:
       -
         name: Build packages
         run: |
-          brew install wine-stable
           cd tomato/client
           npm install
           npm run build
