@@ -32,16 +32,19 @@ jobs:
           npm run build
           npx electron-forge make --arch universal --platform darwin
           npx electron-forge make --arch x64 --platform win32
+          mv -v out/make/zip/darwin/universal/*.zip ../tomato-client-preview-macos.zip
+          mv -v out/make/zip/win32/x64/*.zip ../tomato-client-preview-windows.zip
       -
         name: Upload packages
-        uses: appleboy/scp-action@master
+        uses: nicklasfrahm/scp-action@main
         with:
+          direction: upload
           host: ${{ secrets.SSH_HOST }}
           port: ${{ secrets.SSH_PORT }}
+          fingerprint: ${{ secrets.SSH_FINGERPRINT }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          fingerprint: ${{ secrets.SSH_FINGERPRINT }}
-          strip_components: 6
-          overwrite: true
-          source: "client/out/make/zip/darwin/universal/*.zip,client/out/make/zip/win32/x64/*.zip"
-          target: ${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}
+          source: |
+            tomato-client-preview-macos.zip
+            tomato-client-preview-windows.zip
+          target: www/priv.bmir.org
