@@ -68,7 +68,7 @@ const sync = async (address, accessToken, progressCallback = null) => {
     }
     asset.file.url = `${address}${url}`
     asset.file.filename = path.join(dataDir, asset.file.filename)
-    asset.localUrl = `file://${asset.file.filename}`
+    asset.file.localUrl = `file://${asset.file.filename}`
     const shortname = path.basename(asset.file.filename)
 
     if (progressCallback) {

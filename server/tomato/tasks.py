@@ -24,6 +24,8 @@ def process_asset(asset, user=None):
 
     asset.generate_md5sum()
 
+    # TODO trim silence from beginning and end of audio file
+
     asset.status = asset.Status.READY
     asset.save()
 

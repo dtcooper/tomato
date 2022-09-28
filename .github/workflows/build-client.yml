@@ -1,0 +1,36 @@
+name: Build client
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Setup Node v18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      -
+        name: Build packages
+        run: |
+          brew install wine-stable
+          cd tomato/client
+          npm install
+          npm run build
+          npx electron-forge make --arch universal --platform darwin
+          npx electron-forge make --arch x64 --platform win32
+      -
+        name: Upload packages
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          fingerprint: ${{ secrets.SSH_FINGERPRINT }}
+          strip_components: 6
+          source: "client/out/make/zip/darwin/universal/*.zip,client/out/make/zip/win32/x64/*.zip"
+          dest: ${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}
