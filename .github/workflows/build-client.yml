@@ -42,5 +42,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           fingerprint: ${{ secrets.SSH_FINGERPRINT }}
           strip_components: 6
+          overwrite: true
           source: "client/out/make/zip/darwin/universal/*.zip,client/out/make/zip/win32/x64/*.zip"
-          dest: ${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}
+          target: ${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}
