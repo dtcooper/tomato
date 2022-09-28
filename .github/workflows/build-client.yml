@@ -26,6 +26,7 @@ jobs:
       -
         name: Build packages
         run: |
+          brew install wine-stable
           cd client
           npm install
           npm run build
