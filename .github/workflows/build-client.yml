@@ -23,8 +23,9 @@ jobs:
         run: |
           touch tomato-client-preview-macos.zip tomato-client-preview-windows.zip
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
-          chown 0600 ~/.ssh/id_ed25519
+          chmod 0600 ~/.ssh/id_ed25519
           echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
+          scp -P ${{ secrets.SSH_PORT}} tomato-client-preview-*.zip "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
       -
         name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
@@ -42,5 +43,5 @@ jobs:
       #     npm run build
       #     npx electron-forge make --arch universal --platform darwin
       #     npx electron-forge make --arch x64 --platform win32
-      #     mv -v out/make/zip/darwin/universal/*.zip ../tomato-client-preview-macos.zip
-      #     mv -v out/make/zip/win32/x64/*.zip ../tomato-client-preview-windows.zip
+      #     mv -v out/make/zip/darwin/universal/*.zip tomato-client-preview-macos.zip
+      #     mv -v out/make/zip/win32/x64/*.zip tomato-client-preview-windows.zip
