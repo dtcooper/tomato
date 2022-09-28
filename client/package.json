@@ -70,7 +70,9 @@
           "^/src$",
           "^/tailwind.config.js$",
           "^/.eleventy.js$"
-        ]
+        ],
+        "executableName": "tomato",
+        "name": "Tomato"
       },
       "makers": [
         {

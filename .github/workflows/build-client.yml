@@ -19,32 +19,26 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: Setup Node v18
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      -
-        name: Build packages
+        name: test
         run: |
-          brew install wine-stable
-          cd client
-          npm install
-          npm run build
-          npx electron-forge make --arch universal --platform darwin
-          npx electron-forge make --arch x64 --platform win32
-          mv -v out/make/zip/darwin/universal/*.zip ../tomato-client-preview-macos.zip
-          mv -v out/make/zip/win32/x64/*.zip ../tomato-client-preview-windows.zip
+          touch tomato-client-preview-macos.zip tomato-client-preview-windows.zip
+          echo "${{ secrets.SSH_KEY }}" >> ~/.ssh/id_ed25519
       -
-        name: Upload packages
-        uses: nicklasfrahm/scp-action@main
-        with:
-          direction: upload
-          host: ${{ secrets.SSH_HOST }}
-          port: ${{ secrets.SSH_PORT }}
-          fingerprint: ${{ secrets.SSH_FINGERPRINT }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          source: |
-            tomato-client-preview-macos.zip
-            tomato-client-preview-windows.zip
-          target: www/priv.bmir.org
+        name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+      # -
+      #   name: Setup Node v18
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: 18
+      # -
+      #   name: Build packages
+      #   run: |
+      #     brew install wine-stable
+      #     cd client
+      #     npm install
+      #     npm run build
+      #     npx electron-forge make --arch universal --platform darwin
+      #     npx electron-forge make --arch x64 --platform win32
+      #     mv -v out/make/zip/darwin/universal/*.zip ../tomato-client-preview-macos.zip
+      #     mv -v out/make/zip/win32/x64/*.zip ../tomato-client-preview-windows.zip
