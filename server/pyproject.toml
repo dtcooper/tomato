@@ -14,7 +14,7 @@ django-dirtyfields = "^1.8.2"
 django-environ = "^0.9.0"
 django-file-form = "^3.4.1"
 django-redis = {extras = ["hiredis"], version = "^5.2.0"}
-django-user-messages = "^0.8.0"
+django-user-messages = "^1.0.0"
 gunicorn = "^20.1.0"
 huey = "^2.4.3"
 psycopg2 = "^2.9.3"
@@ -25,7 +25,7 @@ watchdog = {extras = ["watchmedo"], version = "^2.1.9"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.8.0"
-django-debug-toolbar = "^3.6.0"
+django-debug-toolbar = "^3.7.0"
 django-extensions = "^3.2.1"
 flake8 = "^5.0.4"
 ipdb = "^0.13.9"

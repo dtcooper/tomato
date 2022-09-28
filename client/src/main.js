@@ -13,6 +13,7 @@ function createWindow () {
     height: 600,
     minHeight: 480,
     webPreferences: {
+      devTools: !app.isPackaged,
       webSecurity: false,
       contextIsolation: false,
       nodeIntegration: true
@@ -28,7 +29,6 @@ function createWindow () {
 }
 
 app.whenReady().then(async () => {
-  console.log('hi mom')
   const alpineDevToolsPath = path.join(
     os.homedir(),
     '/Library/Application Support/Google/Chrome/Default/Extensions/fopaemeedckajflibkpifppcankfmbhk/1.2.0_0'
@@ -47,7 +47,5 @@ app.whenReady().then(async () => {
 })
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+  app.quit()
 })

@@ -5,7 +5,7 @@
   "description": "Tomato Radio Automation (Desktop App)",
   "main": "dist/main.js",
   "scripts": {
-    "common:build:js": "esbuild --bundle --platform=node --target=node16.15.0 --external:electron src/${SCRIPT_NAME}.js --outfile=dist/${SCRIPT_NAME}.js --sourcemap ${ESBUILD_ARG}",
+    "common:build:js": "esbuild --bundle --platform=node --target=node16.16.0 --external:electron src/${SCRIPT_NAME}.js --outfile=dist/${SCRIPT_NAME}.js --sourcemap ${ESBUILD_ARG}",
     "common:css": "tailwindcss --input src/styles.css --output dist/styles.css ${TAILWIND_ARG}",
     "common:eleventy": "eleventy ${ELEVENTY_ARG}",
     "common:js": "npm-run-all -p common:js:*",
@@ -45,7 +45,7 @@
     "alpinejs": "^3.10.3",
     "daisyui": "^2.31.0",
     "download": "^8.0.0",
-    "electron": "^20.2.0",
+    "electron": "^21.0.0",
     "esbuild": "^0.15.9",
     "html-minifier": "^4.0.0",
     "md5-file": "^5.0.0",

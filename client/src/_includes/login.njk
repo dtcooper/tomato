@@ -15,11 +15,11 @@
           <div
             class="radial-progress"
             :style="`--value: ${progress && progress.percent}`"
-            x-text="`${progress && (Math.round(progress.percent * 10) / 10)}%`"
+            x-text="`${progress && Math.round(progress.percent)}%`"
           ></div>
         </div>
         <h2 class="text-3xl italic" x-text="progress ? 'Downloading...' : 'Connecting...'"></h2>
-        <span x-show="progress" x-text="progress && `${progress.index} of ${progress.total}`"></span>
+        <span x-show="progress" x-text="progress && `File ${progress.index} of ${progress.total}`"></span>
         <span class="font-mono text-sm max-w-md truncate" x-show="progress" x-text="progress && progress.filename"></span>
       </div>
       <form class="card-body" @submit.prevent="login" :class="connecting && 'invisible'">
