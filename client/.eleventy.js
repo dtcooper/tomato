@@ -15,9 +15,11 @@ module.exports = (eleventyConfig) => {
     throwOnUndefined: true
   })
 
-  eleventyConfig.addNunjucksGlobal('icon', function (name, classes = '') {
+  eleventyConfig.addNunjucksGlobal('icon', function (name, classes = '', extra = '') {
     const svg = fs.readFileSync(`assets/icons/${name.replace(':', '-')}.svg`, 'utf-8')
-    return new nunjucks.runtime.SafeString(svg.replace(/^<svg/i, `<svg class="${classes}"`))
+    return new nunjucks.runtime.SafeString(
+      svg.replace(/^<svg/i, `<svg${classes && ` class="${classes}"`}${extra && ` ${extra}`}`)
+    )
   })
 
   eleventyConfig.addTransform('htmlmin', function (content) {

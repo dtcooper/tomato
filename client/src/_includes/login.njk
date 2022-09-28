@@ -1,15 +1,26 @@
-<div x-data="login" x-show="!connStore.connected" class="hero min-h-screen bg-base-200" x-cloak>
+<div class="hero min-h-screen bg-base-200">
   <div class="hero-content p-0 flex-col">
     <div class="text-center">
       <h1 class="text-3xl font-bold font-mono">Tomato</h1>
       <h2 class="text-2xl py-1 font-bold font-mono italic pt-1">Radio Automation</h2>
     </div>
-    <div class="card flex-shrink-0 w-full max-w-xl shadow-2xl bg-base-100 relative">
-      <div class="absolute inset-0 flex justify-center items-center text-success" x-show="connecting">
-        {{ icon('mdi:lan-connect', 'h-10 w-10 mr-1.5') }}
-        <h2 class="text-3xl italic">
-          Connecting...
-        </h2>
+    <div x-data="login" class="card flex-shrink-0 w-full max-w-xl shadow-2xl bg-base-100 relative">
+      <div
+        class="absolute inset-0 flex justify-center items-center text-success"
+        :class="progress && 'flex-col space-y-2'"
+        x-show="connecting"
+      >
+        {{ icon('mdi:lan-connect', 'h-10 w-10 mr-1.5', 'x-show="!progress"') }}
+        <div x-show="progress">
+          <div
+            class="radial-progress"
+            :style="`--value: ${progress && progress.percent}`"
+            x-text="`${progress && (Math.round(progress.percent * 10) / 10)}%`"
+          ></div>
+        </div>
+        <h2 class="text-3xl italic" x-text="progress ? 'Downloading...' : 'Connecting...'"></h2>
+        <span x-show="progress" x-text="progress && `${progress.index} of ${progress.total}`"></span>
+        <span class="font-mono text-sm max-w-md truncate" x-show="progress" x-text="progress && progress.filename"></span>
       </div>
       <form class="card-body" @submit.prevent="login" :class="connecting && 'invisible'">
         <div class="form-control">

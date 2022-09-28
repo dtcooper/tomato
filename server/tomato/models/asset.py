@@ -13,9 +13,6 @@ from .base import NAME_MAX_LENGTH, EnabledBeginEndWeightMixin, TomatoModelBase
 from .rotator import Rotator
 
 
-ERROR_DETAIL_LENGTH = 1024
-
-
 class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
     class Status(models.IntegerChoices):
         PENDING = 0, "Pending processing"

@@ -8,6 +8,7 @@ document.addEventListener('alpine:init', () => {
       error: false,
       authError: false,
       connecting: false,
+      progress: null,
       password: '',
       async init () {
         if (this.connStore.connected) {
@@ -38,7 +39,7 @@ document.addEventListener('alpine:init', () => {
         try {
           address = new URL(this.connStore.address)
         } catch {
-          error('Invalid Server Address')
+          error('Invalid server address')
           return
         }
         if (!['https:', 'http:'].includes(address.protocol)) {
@@ -65,8 +66,12 @@ document.addEventListener('alpine:init', () => {
 
         this.password = ''
         this.connStore.accessToken = auth.access_token
-        this.connStore.connected = true
-        this.connStore.authenticated = true
+        if (await this.connStore.sync((progress) => { this.progress = progress })) {
+          this.connStore.connected = true
+          this.connStore.authenticated = true
+        }
+
+        this.progress = null
         this.connecting = false
       }
     }

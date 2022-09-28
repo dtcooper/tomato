@@ -5,7 +5,7 @@ import md5File from 'md5-file'
 import download from 'download'
 
 const appData = process.env.APPDATA || `${process.env.HOME}${process.platform === 'darwin' ? '/Library/Preferences' : '/.local/share'}`
-const dataDir = path.join(appData, 'tomato-radio-automation')
+const dataDir = path.join(appData, 'com.bmir.tomato')
 
 const fileExists = async (asset) => {
   try {
@@ -31,8 +31,15 @@ const downloadAsset = async (asset) => {
 
 const isMd5Correct = async (asset) => {
   try {
-    return await md5File(asset.file.filename) === asset.md5sum
+    const sum = await md5File(asset.file.filename)
+    if (sum !== asset.md5sum) {
+      console.error(`Bad md5sum for ${path.basename(asset.file.filename)}`)
+      return false
+    } else {
+      return true
+    }
   } catch {
+    console.warn(`Error computing md5sum for ${asset.file.filename}`)
     return false
   }
 }
@@ -49,7 +56,12 @@ const sync = async (address, accessToken, progressCallback = null) => {
     return false
   }
 
-  for (const [id, asset] of Object.entries(data.assets)) {
+  const total = data.assets.length
+  const badAssets = new Set()
+
+  // TODO: assets is a list now, so needs to be deleted
+  for (let i = 0; i < total; i++) {
+    const asset = data.assets[i]
     let url = asset.file.url
     if (url.startsWith('/')) {
       url = url.substr(1)
@@ -59,21 +71,24 @@ const sync = async (address, accessToken, progressCallback = null) => {
     asset.localUrl = `file://${asset.file.filename}`
     const shortname = path.basename(asset.file.filename)
 
+    if (progressCallback) {
+      progressCallback({ index: i + 1, total, percent: i / total * 100, filename: shortname })
+    }
+
     if (!await fileExists(asset) || !await isMd5Correct(asset)) {
       if (await downloadAsset(asset)) {
         if (!await isMd5Correct(asset)) {
           console.error(`Bad sum for ${shortname}`)
-          delete data.assets[id]
+          badAssets.add(i)
         }
       } else {
         console.error(`Error downloading ${shortname}`)
-        delete data.assets[id]
+        badAssets.add(i)
       }
     }
-
-    asset.file = `file://${asset.file.filename}`
   }
 
+  data.assets = data.assets.filter((_, i) => !badAssets.has(i))
   return data
 }
 

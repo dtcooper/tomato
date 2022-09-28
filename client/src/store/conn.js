@@ -10,21 +10,26 @@ document.addEventListener('alpine:init', () => {
     username: Alpine.$persist('').as('username'),
     address: Alpine.$persist('').as('address'),
     accessToken: Alpine.$persist('').as('accessToken'),
-    data: Alpine.$persist({ assets: [], stopsets: [], rotators: {} }).as('data'),
+    data: Alpine.$persist(null).as('data'),
+    // TODO: store naked on localstorage, and throw an event when it's updated
     logout () {
       this.connected = this.authenticated = false
       this.password = this.accessToken = ''
     },
-    async sync () {
-      const data = await sync(this.address, this.accessToken)
-      if (data) {
-        for (const [key, value] of Object.entries(data)) {
-          if (key in this.data) {
-            this.data[key] = value
-          }
+    async sync (callback = null) {
+      if (!callback) {
+        callback = (event) => {
+          const { index, total, filename } = event
+          console.log(`sync: ${index}/${total} - ${filename}`)
         }
+      }
+      const data = await sync(this.address, this.accessToken, callback)
+      if (data) {
+        this.data = data
+        return true
       } else {
         console.error("Error sync'ing")
+        return false
       }
     },
     hasAssets () {
