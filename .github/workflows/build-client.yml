@@ -1,10 +1,19 @@
 name: Build client
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: docker-build
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: macos-latest
+    name: Build client
     steps:
       -
         name: Checkout
