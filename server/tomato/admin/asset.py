@@ -59,7 +59,6 @@ class StatusFilter(admin.SimpleListFilter):
 class AssetAdmin(FileFormAdminMixin, TomatoModelAdminBase):
     action_form = AssetActionForm
     actions = ("enable", "disable", "add_rotator", "remove_rotator")
-    exclude = ()
     readonly_fields = ("duration", "created_at", "status", "created_by", "file_display")
     list_filter = ("enabled", "rotators", StatusFilter, ("created_by", NoNullRelatedOnlyFieldListFilter))
     list_per_page = 250

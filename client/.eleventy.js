@@ -1,6 +1,8 @@
 
 const process = require('process')
+const fs = require('fs')
 const htmlmin = require('html-minifier')
+const nunjucks = require('nunjucks')
 
 module.exports = (eleventyConfig) => {
   eleventyConfig.setBrowserSyncConfig({
@@ -11,6 +13,11 @@ module.exports = (eleventyConfig) => {
 
   eleventyConfig.setNunjucksEnvironmentOptions({
     throwOnUndefined: true
+  })
+
+  eleventyConfig.addNunjucksGlobal('icon', function (name, classes = '') {
+    const svg = fs.readFileSync(`assets/icons/${name.replace(':', '-')}.svg`, 'utf-8')
+    return new nunjucks.runtime.SafeString(svg.replace(/^<svg/i, `<svg class="${classes}"`))
   })
 
   eleventyConfig.addTransform('htmlmin', function (content) {

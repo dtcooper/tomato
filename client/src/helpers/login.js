@@ -1,4 +1,5 @@
-const timeout = 1
+
+// TODO: timeout on fetch
 
 const ping = async (address, accessToken = null) => {
   let data, response
@@ -7,7 +8,7 @@ const ping = async (address, accessToken = null) => {
   if (accessToken) { headers['X-Access-Token'] = accessToken }
 
   try {
-    response = await fetch(`${address}ping/`, { headers, timeout })
+    response = await fetch(`${address}ping/`, { headers })
     data = await response.json()
   } catch (error) {
     console.error(error)
@@ -24,8 +25,7 @@ const login = async (address, username, password) => {
     response = await fetch(`${address}auth/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
-      timeout
+      body: JSON.stringify({ username, password })
     })
     data = await response.json()
   } catch (error) {

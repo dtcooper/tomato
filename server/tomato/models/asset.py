@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 import os
 
 from django.core.exceptions import ValidationError
@@ -32,6 +33,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         ),
     )
     file = models.FileField("audio file", null=True, blank=False)
+    md5sum = models.BinaryField(max_length=16, null=True, default=None)
     status = models.SmallIntegerField(
         choices=Status.choices, default=Status.PENDING, help_text="All assets will be processed after uploading."
     )
@@ -60,9 +62,19 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         if not self.file:
             return
 
+    def generate_md5sum(self):
+        md5sum = hashlib.md5()
+
+        with self.file.open("rb") as file:
+            while chunk := file.read(1024 * 128):
+                md5sum.update(chunk)
+
+        self.md5sum = md5sum.digest()
+
     def serialize(self):
         return {
             "file": {"filename": self.file.name, "url": self.file.url},
+            "md5sum": self.md5sum.hex(),
             "duration": round(self.duration.total_seconds()),
             "rotators": [rotator.id for rotator in self.rotators.all()],
             **super().serialize(),

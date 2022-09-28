@@ -22,7 +22,7 @@ def process_asset(asset, user=None):
     asset.status = asset.Status.PROCESSING
     asset.save()
 
-    time.sleep(3)
+    asset.generate_md5sum()
 
     asset.status = asset.Status.READY
     asset.save()

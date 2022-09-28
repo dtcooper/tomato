@@ -1,12 +1,15 @@
-<div x-data="conn" x-show="!globals.connected" class="hero min-h-screen bg-base-200" x-cloak>
-  <div class="hero-content p-0 flex-col lg:flex-row-reverse">
-    <div class="text-center lg:text-left">
-      <h1 class="text-3xl font-bold font-mono">Tomato Radio Automation</h1>
-      <p class="py-3 italic">Enter your username, password and server address.</p>
+<div x-data="login" x-show="!connStore.connected" class="hero min-h-screen bg-base-200" x-cloak>
+  <div class="hero-content p-0 flex-col">
+    <div class="text-center">
+      <h1 class="text-3xl font-bold font-mono">Tomato</h1>
+      <h2 class="text-2xl py-1 font-bold font-mono italic pt-1">Radio Automation</h2>
     </div>
     <div class="card flex-shrink-0 w-full max-w-xl shadow-2xl bg-base-100 relative">
-      <div class="absolute inset-0 flex justify-center items-center" x-show="connecting">
-        <h2 class="text-3xl italic align-middle text-success">Connecting...</h2>
+      <div class="absolute inset-0 flex justify-center items-center text-success" x-show="connecting">
+        {{ icon('mdi:lan-connect', 'h-10 w-10 mr-1.5') }}
+        <h2 class="text-3xl italic">
+          Connecting...
+        </h2>
       </div>
       <form class="card-body" @submit.prevent="login" :class="connecting && 'invisible'">
         <div class="form-control">
@@ -16,7 +19,7 @@
           </label>
           <input
             type="text"
-            x-model="address"
+            x-model="connStore.address"
             class="input input-bordered"
             :class="error && 'input-error'"
             @input="error = false"
@@ -31,7 +34,7 @@
             <input
               type="text"
               placeholder="Enter username..."
-              x-model="username"
+              x-model="connStore.username"
               class="input input-bordered"
               :class="authError && 'input-error'"
               @input="authError = false"

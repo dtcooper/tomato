@@ -1,7 +1,4 @@
-from functools import wraps
 import json
-import time
-import random
 
 from django.conf import settings
 from django.contrib.auth import authenticate
@@ -22,11 +19,8 @@ def user_from_request(request):
 
 
 @csrf_exempt
+@require_POST
 def access_token(request):
-    print(request.method)
-    if request.method != 'POST':
-        return HttpResponseNotAllowed()
-
     try:
         json_data = json.loads(request.body)
     except json.JSONDecodeError:
@@ -49,16 +43,26 @@ def sync(request):
     if not user and not settings.DEBUG:
         return HttpResponseForbidden()
 
-    response = {"schema_version": SCHEMA_VERSION}
-    models = {
-        "assets": Asset.objects.prefetch_related("rotators").filter(status=Asset.Status.READY),
-        "rotators": Rotator.objects.all(),
-        "stopsets": Stopset.objects.prefetch_related(
-            Prefetch("rotators", queryset=Rotator.objects.order_by("stopsetrotator__id"))
-        ).all(),
-    }
-    response.update({key: [obj.serialize() for obj in qs] for key, qs in models.items()})
-    return JsonResponse(response)
+    rotators = list(Rotator.objects.order_by("id"))
+    # Only select from rotators that existed at time query was made
+    prefetch_qs = Rotator.objects.only("id").filter(id__in=[r.id for r in rotators])
+    assets = (
+        Asset.objects.prefetch_related(Prefetch("rotators", prefetch_qs.order_by("id")))
+        .filter(status=Asset.Status.READY)
+        .order_by("id")
+    )
+    stopsets = Stopset.objects.prefetch_related(
+        Prefetch("rotators", prefetch_qs.order_by("stopsetrotator__id"))
+    ).order_by("id")
+
+    return JsonResponse(
+        {
+            "assets": [a.serialize() for a in assets],
+            "rotators": {r.id: r.serialize() for r in rotators},
+            "stopsets": [s.serialize() for s in stopsets],
+            "schema_version": SCHEMA_VERSION,
+        }
+    )
 
 
 def ping(request):

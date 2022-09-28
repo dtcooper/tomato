@@ -9,5 +9,19 @@
 </head>
 <body>
   {% include 'login.njk' %}
+  <div x-data x-name="tester-buttons" class="flex flex-col items-center justify-center space-y-2 min-h-screen" x-show="$store.conn.connected">
+    <span class="btn btn-lg" @click="$store.conn.logout()">Logout</span>
+    <span class="btn btn-lg" @click="$store.conn.sync()">Sync</span>
+    <template x-if="$store.conn.hasAssets()">
+      <div
+        class="flex flex-col items-center justify-center space-y-2"
+        x-data="{asset: $store.conn.assets()[Math.floor(Math.random() * $store.conn.assets().length)]}"
+      >
+        <span class="btn btn-lg" @click="asset = $store.conn.assets()[Math.floor(Math.random() * $store.conn.assets().length)]">New Track</span>
+        <audio class="w-80" :src="asset.localUrl" controls autoplay></audio>
+        <span x-text="`Track #${asset.id}: ${asset.name}`"></span>
+      </div>
+    </template>
+  </div>
 </body>
 </html>
