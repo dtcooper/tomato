@@ -34,6 +34,7 @@ jobs:
           npx electron-forge make --arch x64 --platform win32
       -
         name: Upload packages
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           port: ${{ secrets.SSH_PORT }}
