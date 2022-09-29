@@ -25,7 +25,7 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 0600 ~/.ssh/id_ed25519
           echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
-          scp -P ${{ secrets.SSH_PORT}} tomato-client-preview-*.zip "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
+          scp -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT}} tomato-client-preview-*.zip "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
       -
         name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
