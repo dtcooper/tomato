@@ -27,6 +27,8 @@ jobs:
         name: Build packages
         shell: bash
         run: |
+          mkdir -p ~/.ssh
+          chmod 0700 ~/.ssh
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 0600 ~/.ssh/id_ed25519
           echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
@@ -55,6 +57,8 @@ jobs:
         name: Build packages
         shell: bash
         run: |
+          mkdir -p ~/.ssh
+          chmod 0700 ~/.ssh
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 0600 ~/.ssh/id_ed25519
           echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
