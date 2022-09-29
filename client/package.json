@@ -15,8 +15,8 @@
     "build": "NODE_ENV=production ESBUILD_ARG=--minify TAILWIND_ARG=--minify ELEVENTY_ARG= npm-run-all clean -p common:*",
     "dev": "NODE_ENV=development ESBUILD_ARG=--watch TAILWIND_ARG=--watch ELEVENTY_ARG=--serve npm-run-all clean -p -r common:* dev:*",
     "dev:electron": "wait-on -l dist/styles.css dist/script.js dist/main.js http://localhost:8080/ && electron-forge start",
-    "make": "npm run build && npx electron-forge make",
-    "package": "npm run build && npx electron-forge package"
+    "make": "npm run build && electron-forge make",
+    "package": "npm run build && electron-forge package"
   },
   "repository": {
     "type": "git",

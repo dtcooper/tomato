@@ -16,6 +16,6 @@ stages. You can, however download preview builds below.
 
 Download one of the following releases,
 
-  * [:material-download: macOS (Intel)](https://priv.bmir.org/tomato-client-preview-macos-intel.zip)
-  * [:material-download: macOS (Apple M1)](https://priv.bmir.org/tomato-client-preview-macos-m1.zip)
-  * [:material-download: Windows](https://priv.bmir.org/tomato-client-preview-windows.zip)
+  * [:material-download: macOS (Intel)](https://priv.bmir.org/tomato-preview-macos-intel.zip)
+  * [:material-download: macOS (Apple M1)](https://priv.bmir.org/tomato-preview-macos-m1.zip)
+  * [:material-download: Windows](https://priv.bmir.org/tomato-preview-windows.zip)
