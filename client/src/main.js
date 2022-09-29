@@ -1,7 +1,6 @@
 const { app, BrowserWindow, session } = require('electron')
 const fs = require('fs')
 const path = require('path')
-const process = require('process')
 const os = require('os')
 
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors')

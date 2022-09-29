@@ -68,6 +68,7 @@
           "^/.eleventy.js$"
         ],
         "executableName": "tomato",
+        "icon": "dist/assets/icons/tomato",
         "name": "Tomato"
       },
       "makers": [
