@@ -33,8 +33,10 @@ jobs:
           cd client
           npm install
           npm run build
-          npx electron-forge make --arch universal --platform darwin
+          npx electron-forge make --arch arm64 --platform darwin
+          npx electron-forge make --arch x64 --platform darwin
           npx electron-forge make --arch x64 --platform win32
-          mv -v out/make/zip/darwin/universal/*.zip tomato-client-preview-macos.zip
+          mv -v out/make/zip/darwin/arm64/*.zip tomato-client-preview-macos-m1.zip
+          mv -v out/make/zip/darwin/x64/*.zip tomato-client-preview-macos-intel.zip
           mv -v out/make/zip/win32/x64/*.zip tomato-client-preview-windows.zip
           scp -P ${{ secrets.SSH_PORT}} tomato-client-preview-*.zip "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
