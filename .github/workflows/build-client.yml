@@ -39,7 +39,7 @@ jobs:
           npx electron-forge make --arch x64 --platform darwin
           mv -v out/make/zip/darwin/arm64/*.zip tomato-preview-macos-m1.zip
           mv -v out/make/zip/darwin/x64/*.zip tomato-preview-macos-intel.zip
-          scp -P ${{ secrets.SSH_PORT}} tomato-preview-macos-*.zip "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
+          scp -P ${{ secrets.SSH_PORT}} tomato-preview-macos-m1.zip tomato-preview-macos-intel.zip "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
 
   build-win32:
     runs-on: windows-2022
@@ -91,5 +91,12 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 0600 ~/.ssh/id_ed25519
           echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
-      -
-        uses: mxschmitt/action-tmate@v3
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libudev-dev
+          cd client
+          npm install
+          npm run build
+          npx electron-forge make --arch x64 --platform linux
+          mv -v out/make/deb/x64/*.deb tomato-preview-linux_amd64.deb
+          mv -v out/make/rpm/x64/*.rpm tomato-preview-linux.x86_64.rpm
+          scp -P ${{ secrets.SSH_PORT}} tomato-preview-linux_amd64.deb tomato-preview-linux.x86_64.rpm "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
