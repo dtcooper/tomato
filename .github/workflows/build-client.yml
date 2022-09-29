@@ -11,9 +11,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    runs-on: macos-latest
-    name: Build client
+  build-macos:
+    runs-on: macos-11
+    name: Build macOS client
     steps:
       -
         name: Checkout
@@ -25,18 +25,38 @@ jobs:
           node-version: 18
       -
         name: Build packages
+        shell: bash
         run: |
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 0600 ~/.ssh/id_ed25519
           echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
-          brew install wine-stable
           cd client
           npm install
           npm run build
           npx electron-forge make --arch arm64 --platform darwin
           npx electron-forge make --arch x64 --platform darwin
-          npx electron-forge make --arch x64 --platform win32
           mv -v out/make/zip/darwin/arm64/*.zip tomato-client-preview-macos-m1.zip
           mv -v out/make/zip/darwin/x64/*.zip tomato-client-preview-macos-intel.zip
-          mv -v out/make/zip/win32/x64/*.zip tomato-client-preview-windows.zip
           scp -P ${{ secrets.SSH_PORT}} tomato-client-preview-*.zip "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
+
+  build-win32:
+    runs-on: windows-2022
+    name: Build Windows client
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Setup Node v18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      -
+        name: Build packages
+        shell: bash
+        run: |
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 0600 ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
+      -
+        uses: mxschmitt/action-tmate@v3
