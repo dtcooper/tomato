@@ -19,26 +19,22 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: test
+        name: Setup Node v18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      -
+        name: Build packages
         run: |
-          touch tomato-client-preview-macos.zip tomato-client-preview-windows.zip
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 0600 ~/.ssh/id_ed25519
           echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
+          brew install wine-stable
+          cd client
+          npm install
+          npm run build
+          npx electron-forge make --arch universal --platform darwin
+          npx electron-forge make --arch x64 --platform win32
+          mv -v out/make/zip/darwin/universal/*.zip tomato-client-preview-macos.zip
+          mv -v out/make/zip/win32/x64/*.zip tomato-client-preview-windows.zip
           scp -P ${{ secrets.SSH_PORT}} tomato-client-preview-*.zip "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
-      # -
-      #   name: Setup Node v18
-      #   uses: actions/setup-node@v3
-      #   with:
-      #     node-version: 18
-      # -
-      #   name: Build packages
-      #   run: |
-      #     brew install wine-stable
-      #     cd client
-      #     npm install
-      #     npm run build
-      #     npx electron-forge make --arch universal --platform darwin
-      #     npx electron-forge make --arch x64 --platform win32
-      #     mv -v out/make/zip/darwin/universal/*.zip tomato-client-preview-macos.zip
-      #     mv -v out/make/zip/win32/x64/*.zip tomato-client-preview-windows.zip
