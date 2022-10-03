@@ -66,6 +66,13 @@
   src: url('../assets/fonts/space-grotesk-700.woff2') format('woff2');
 }
 
+@font-face {
+  font-family: 'Undefined Medium Local';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../assets/fonts/undefined-medium.woff2') format('woff2');
+}
+
 
 @layer utilities {
   [x-cloak] {

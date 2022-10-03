@@ -1,8 +1,9 @@
-import process from 'process'
-import path from 'path'
-import { promises as fs } from 'fs'
 import md5File from 'md5-file'
 import download from 'download'
+
+const process = require('process')
+const path = require('path')
+const { promises: fs } = require('fs')
 
 const appData = process.env.APPDATA || `${process.env.HOME}${process.platform === 'darwin' ? '/Library/Preferences' : '/.local/share'}`
 const dataDir = path.join(appData, 'com.bmir.tomato')
