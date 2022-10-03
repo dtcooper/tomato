@@ -87,8 +87,6 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
             if not ffprobe_data:
                 raise ValidationError({"file": "Error validating audio file"})
 
-
-
             self.duration = ffprobe_data.duration
 
             self.name = self.name.strip()

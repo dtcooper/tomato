@@ -2,8 +2,8 @@ import itertools
 
 from django.contrib import admin
 from django.templatetags.static import static
-from django.utils.safestring import mark_safe
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
 from constance.admin import Config
 
@@ -36,7 +36,11 @@ MODELS_HELP_DOCS_TEXT = {
 class TomatoAdminSite(admin.AdminSite):
     site_url = None
     site_title = "Tomato Radio Automation"
-    site_header = format_html('<img src="{0}" width="35">&nbsp;&nbsp;{1}&nbsp;&nbsp;<img src="{0}" width="35">', static('tomato/tomato.png'), site_title)
+    site_header = format_html(
+        '<img src="{0}" width="35">&nbsp;&nbsp;{1}&nbsp;&nbsp;<img src="{0}" width="35">',
+        static("tomato/tomato.png"),
+        site_title,
+    )
     index_title = "Tomato administration"
     empty_value_display = mark_safe("<em>None</em>")
 
