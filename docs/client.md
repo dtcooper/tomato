@@ -16,7 +16,10 @@ stages. You can, however download preview builds below.
 
 Download one of the following releases,
 
-  * [:material-download: macOS)](https://priv.bmir.org/tomato-preview-macos.zip) (universal binary for Intel or Apple M1 chips)
+  * [:material-download: macOS](https://priv.bmir.org/tomato-preview-macos.zip)
+    &mdash; universal binary for Intel or Apple M1 chips
   * [:material-download: Windows](https://priv.bmir.org/tomato-preview-windows.zip)
-  * [:material-download: Debian or Ubuntu Linux](https://priv.bmir.org/tomato-preview-linux_amd64.deb) (`.deb` package)
-  * [:material-download: Fedora or Red Hat Linux](https://priv.bmir.org/tomato-preview-linux.x86_64.rpm) (`.rpm` package)
+  * [:material-download: Debian or Ubuntu Linux](https://priv.bmir.org/tomato-preview-linux_amd64.deb)
+    &mdash; `.deb` package
+  * [:material-download: Fedora or Red Hat Linux](https://priv.bmir.org/tomato-preview-linux.x86_64.rpm)
+    &mdash; `.rpm` package
