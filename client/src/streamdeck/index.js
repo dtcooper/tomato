@@ -6,56 +6,96 @@ const isStreamDeck = (device) => {
   return device.vendorId === VENDOR_ID && validProductIds.has(device.productId)
 }
 
+const [font, fontPath] = ['Undefined Medium Local', 'undefined-medium']
+
+const renderText = (text, iconSize, verticalPadding = 15, horizontalPadding = 5) => {
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = iconSize
+  const ctx = canvas.getContext('2d')
+
+  const grd = ctx.createLinearGradient(0, 0, iconSize, iconSize)
+  ctx.fillStyle = 'black'
+  ctx.fillRect(0, 0, iconSize, iconSize)
+  ctx.fill()
+  ctx.fillStyle = 'white'
+
+  let fontWidth, fontHeight
+
+  for (let fontPx = 80; fontPx >= 8; fontPx--) {
+    ctx.font = `${fontPx}px ${font}`
+    const measure = ctx.measureText(text)
+    fontWidth = measure.width
+    fontHeight = measure.actualBoundingBoxAscent + measure.actualBoundingBoxDescent
+
+    if (
+      fontWidth <= (iconSize - horizontalPadding * 2) &&
+      fontHeight <= (iconSize - verticalPadding * 2)) {
+      break
+    }
+  }
+
+  const desiredHeight = iconSize - verticalPadding * 2
+  const stretchFactor = desiredHeight / fontHeight
+  console.log(stretchFactor)
+  ctx.scale(1, stretchFactor)
+  ctx.fillText(text, horizontalPadding, fontHeight + verticalPadding / stretchFactor)
+  ctx.restore()
+
+  const invertedCanvas = document.createElement('canvas')
+  invertedCanvas.width = invertedCanvas.height = iconSize
+  const invertedCtx = invertedCanvas.getContext('2d')
+
+  invertedCtx.drawImage(canvas, 0, 0)
+  invertedCtx.fillStyle = 'white'
+  invertedCtx.globalCompositeOperation = 'difference'
+  invertedCtx.globalAlpha = 1
+  invertedCtx.fillRect(0, 0, iconSize, iconSize)
+  invertedCtx.fill()
+
+  return { canvas, invertedCanvas }
+}
+
 const setupStreamDeck = async () => {
   const streamDecks = (await navigator.hid.getDevices()).filter(device => isStreamDeck(device))
   if (streamDecks.length === 0) {
     return null
   }
   const streamDeck = await openDevice(streamDecks[0])
-
-  const canvas = document.createElement('canvas')
-  canvas.width = canvas.height = streamDeck.ICON_SIZE
-  const ctx = canvas.getContext('2d')
-
-  const grd = ctx.createLinearGradient(0, 0, streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
-  grd.addColorStop(0, '#933')
-  grd.addColorStop(1, '#111')
-  ctx.fillStyle = grd
-  ctx.fillRect(0, 0, streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
-  ctx.fill()
-  ctx.fillStyle = 'lime'
-  ctx.font = '28px Undefined Medium Local'
-  ctx.textBaseline = 'middle'
-  ctx.textAlign = 'center'
-  console.log(ctx.measureText('PLAY').width)
-  ctx.scale(1, 2.65)
-  ctx.fillText('PLAY', streamDeck.ICON_SIZE / 2 + 1, streamDeck.ICON_SIZE / (2 * 2.65) + 1)
-  ctx.restore()
-
-  const invertedCanvas = document.createElement('canvas')
-  invertedCanvas.width = invertedCanvas.height = streamDeck.ICON_SIZE
-  const invertedCtx = invertedCanvas.getContext('2d')
-
-  invertedCtx.drawImage(canvas, 0, 0)
-  invertedCtx.fillStyle = 'white'
-  invertedCtx.globalCompositeOperation='difference';
-  invertedCtx.globalAlpha = 1;  // alpha 0 = no effect 1 = full effect
-  invertedCtx.fillRect(0, 0, streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
-  invertedCtx.fill()
-
-  for (let i = 0; i < streamDeck.NUM_KEYS; i++) {
-    await streamDeck.fillKeyCanvas(i, canvas)
-  }
   await streamDeck.setBrightness(100)
+  const { canvas: playCanvas, invertedCanvas: playInvertedCanvas } = renderText('PLAY', streamDeck.ICON_SIZE)
+  const { canvas: pauseCanvas, invertedCanvas: pauseInvertedCanvas } = renderText('PAUSE', streamDeck.ICON_SIZE)
+  const { canvas: nextCanvas, invertedCanvas: nextInvertedCanvas } = renderText('NEXT', streamDeck.ICON_SIZE)
+
+  const playIndex = 0
+  const pauseIndex = streamDeck.KEY_COLUMNS
+  const nextIndex = streamDeck.KEY_ROWS * streamDeck.KEY_COLUMNS - 1
+  for (let i = 0; i < streamDeck.NUM_KEYS; i++) {
+    if (i !== playIndex && i !== pauseIndex && i !== nextIndex) {
+      await streamDeck.fillKeyColor(i, 0, 0, 0)
+    }
+  }
+  await streamDeck.fillKeyCanvas(playIndex, playCanvas)
+  await streamDeck.fillKeyCanvas(pauseIndex, pauseCanvas)
+  await streamDeck.fillKeyCanvas(nextIndex, nextCanvas)
 
   streamDeck.on('down', async (keyIndex) => {
-    await streamDeck.fillKeyCanvas(keyIndex, invertedCanvas)
-    console.log('key %d down', keyIndex)
+    if (keyIndex === playIndex) {
+      await streamDeck.fillKeyCanvas(keyIndex, playInvertedCanvas)
+    } else if (keyIndex === pauseIndex) {
+      await streamDeck.fillKeyCanvas(keyIndex, pauseInvertedCanvas)
+    } else if (keyIndex === nextIndex) {
+      await streamDeck.fillKeyCanvas(keyIndex, nextInvertedCanvas)
+    }
   })
 
   streamDeck.on('up', async (keyIndex) => {
-    await streamDeck.fillKeyCanvas(keyIndex, canvas)
-    console.log('key %d up', keyIndex)
+    if (keyIndex === playIndex) {
+      await streamDeck.fillKeyCanvas(keyIndex, playCanvas)
+    } else if (keyIndex === pauseIndex) {
+      await streamDeck.fillKeyCanvas(keyIndex, pauseCanvas)
+    } else if (keyIndex === nextIndex) {
+      await streamDeck.fillKeyCanvas(keyIndex, nextCanvas)
+    }
   })
 
   streamDeck.on('error', async (error) => {
@@ -66,6 +106,10 @@ const setupStreamDeck = async () => {
 }
 
 document.addEventListener('alpine:init', async () => {
+  const undefinedMedium = new window.FontFace(font, `url(../assets/fonts/${fontPath}.woff2)`)
+  await undefinedMedium.load()
+  document.fonts.add(undefinedMedium)
+
   let streamDeck = window.streamDeck = await setupStreamDeck()
 
   navigator.hid.addEventListener('connect', async (event) => {
