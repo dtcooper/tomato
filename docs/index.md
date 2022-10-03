@@ -2,7 +2,7 @@
 title: Intro
 ---
 
-# Welcome to Tomato
+# <img src="assets/tomato.png" width="45" valign="middle"> Welcome to Tomato <img src="assets/tomato.png" width="45" valign="middle">
 
 Welcome to Tomato Radio Automation!
 

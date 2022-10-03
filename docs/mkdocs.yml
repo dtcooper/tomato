@@ -29,7 +29,7 @@ plugins:
 
 theme:
   name: material
-  favicon: assets/favicon.svg
+  logo: assets/tomato.png
   font:
     text: Space Grotesk
     code: Space Mono  # ligatures disabled in extra.css

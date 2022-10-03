@@ -1,4 +1,15 @@
-# Tomato Radio Automation
+<h1 align="center">
+  <a href="https://dtcooper.github.io/tomato/">
+    <img src="https://raw.github.com/dtcooper/tomato/main/client/assets/icons/tomato.png" width="100"><br>
+    Tomato Radio Automation
+  </a>
+</h1>
+
+<p align="center">
+  <a href="https://dtcooper.github.io/tomato/">Documentation</a> |
+  <a href="https://dtcooper.github.io/tomato/client/">Desktop App</a> |
+  <a href="https://dtcooper.github.io/tomato/server/">Server</a>
+</p>
 
 Client and server for Tomato Radio Automation software. Tomato is easy to use,
 and hard to screw up playout software written for the specific use case of
