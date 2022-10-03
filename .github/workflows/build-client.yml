@@ -35,11 +35,9 @@ jobs:
           cd client
           npm install
           npm run build
-          npx electron-forge make --arch arm64 --platform darwin
-          npx electron-forge make --arch x64 --platform darwin
-          mv -v out/make/zip/darwin/arm64/*.zip tomato-preview-macos-m1.zip
-          mv -v out/make/zip/darwin/x64/*.zip tomato-preview-macos-intel.zip
-          scp -P ${{ secrets.SSH_PORT}} tomato-preview-macos-m1.zip tomato-preview-macos-intel.zip "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
+          npx electron-forge make --arch universal --platform darwin
+          mv -v out/make/zip/darwin/universal/*.zip tomato-preview-macos.zip
+          scp -P ${{ secrets.SSH_PORT}} tomato-preview-macos.zip tomato-preview-macos.zip "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
 
   build-win32:
     runs-on: windows-2022

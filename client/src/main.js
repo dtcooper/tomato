@@ -1,7 +1,8 @@
-const { app, BrowserWindow, session } = require('electron')
-const fs = require('fs')
-const path = require('path')
-const os = require('os')
+import { app, BrowserWindow, session } from 'electron'
+import fs from 'fs'
+import path from 'path'
+import os from 'os'
+import { VENDOR_ID as ELGATO_VENDOR_ID } from '@elgato-stream-deck/core'
 
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors')
 
@@ -11,12 +12,48 @@ function createWindow () {
     minWidth: 600,
     height: 600,
     minHeight: 480,
+    icon: path.join(__dirname, 'dist/assets/tomato.ico'),
     webPreferences: {
       devTools: !app.isPackaged,
       webSecurity: false,
       contextIsolation: false,
       nodeIntegration: true
     }
+  })
+
+  win.webContents.session.on('select-hid-device', (event, details, callback) => {
+    console.log('select-hid-device', details)
+    win.webContents.session.on('hid-device-added', (event, device) => {
+      console.log('added', device)
+      if (device.vendorId === ELGATO_VENDOR_ID) {
+        console.log('Elgato device plugged in')
+      }
+    })
+
+    win.webContents.session.on('hid-device-removed', (event, device) => {
+      console.log('revemoved', device)
+      if (device.vendorId === ELGATO_VENDOR_ID) {
+        console.log('Elgato device removed')
+      }
+    })
+
+    if (details.deviceList && details.deviceList.length > 0) {
+      callback(details.deviceList[0].deviceId)
+    }
+  })
+
+  win.webContents.session.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
+    if (permission === 'hid') {
+      return true
+    }
+    return false
+  })
+
+  win.webContents.session.setDevicePermissionHandler((details) => {
+    if (details.deviceType === 'hid' && details.device.vendorId === ELGATO_VENDOR_ID) {
+      return true
+    }
+    return false
   })
 
   if (app.isPackaged) {

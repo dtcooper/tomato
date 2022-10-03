@@ -71,4 +71,11 @@
   [x-cloak] {
     display: none !important;
   }
+
+  .btn {
+    @apply no-animation;
+  }
+  .btn:active {
+    filter: brightness(88%);
+  }
 }

@@ -77,16 +77,17 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
             **super().serialize(),
         }
 
+    @property
+    def file_path(self):
+        return self.file.file.file.path if isinstance(self.file.file, UploadedTusFile) else self.file.path
+
     def clean(self):
         if self.file:
-            if isinstance(self.file.file, UploadedTusFile):
-                file_path = self.file.file.file.path
-            else:
-                file_path = self.file.path
-
-            ffprobe_data = ffprobe(file_path)
+            ffprobe_data = ffprobe(self.file_path)
             if not ffprobe_data:
-                raise ValidationError({"file": "Invalid audio file"})
+                raise ValidationError({"file": "Error validating audio file"})
+
+
 
             self.duration = ffprobe_data.duration
 

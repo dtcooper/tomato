@@ -26,7 +26,7 @@
             x-text="`${progress && Math.round(progress.percent)}%`"
           ></div>
         </div>
-        <h2 class="text-3xl italic" x-text="progress ? 'Downloading...' : 'Connecting...'"></h2>
+        <h2 class="text-3xl italic" x-text="progress ? 'Synchronizing...' : 'Logging in...'"></h2>
         <span x-show="progress" x-text="progress && `File ${progress.index} of ${progress.total}`"></span>
         <span class="font-mono text-sm max-w-md truncate" x-show="progress" x-text="progress && progress.filename"></span>
       </div>
