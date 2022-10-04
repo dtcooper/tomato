@@ -30,6 +30,7 @@ plugins:
 theme:
   name: material
   logo: assets/tomato.png
+  favicon: assets/tomato.ico
   font:
     text: Space Grotesk
     code: Space Mono  # ligatures disabled in extra.css
