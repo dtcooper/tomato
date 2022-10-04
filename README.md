@@ -20,7 +20,8 @@ The backend server is written in [Python](https://www.python.org/)'s
 [automatic admin interface](https://docs.djangoproject.com/en/4.1/ref/contrib/admin/).
 
 The client is a native, cross-platform [Electron](https://www.electronjs.org/)
-app.
+app and optionally uses the [Elgato Stream Deck](https://www.elgato.com/en/stream-deck)
+as a tactile controller.
 
 ## Installation
 
