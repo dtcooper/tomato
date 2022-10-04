@@ -11,9 +11,8 @@ const [font, fontPath] = ['Undefined Medium Local', 'undefined-medium']
 const renderText = (text, iconSize, verticalPadding = 15, horizontalPadding = 5) => {
   const canvas = document.createElement('canvas')
   canvas.width = canvas.height = iconSize
-  const ctx = canvas.getContext('2d')
+  const ctx = canvas.getContext('2d', { willReadFrequently: true })
 
-  const grd = ctx.createLinearGradient(0, 0, iconSize, iconSize)
   ctx.fillStyle = 'black'
   ctx.fillRect(0, 0, iconSize, iconSize)
   ctx.fill()
@@ -36,14 +35,13 @@ const renderText = (text, iconSize, verticalPadding = 15, horizontalPadding = 5)
 
   const desiredHeight = iconSize - verticalPadding * 2
   const stretchFactor = desiredHeight / fontHeight
-  console.log(stretchFactor)
   ctx.scale(1, stretchFactor)
   ctx.fillText(text, horizontalPadding, fontHeight + verticalPadding / stretchFactor)
   ctx.restore()
 
   const invertedCanvas = document.createElement('canvas')
   invertedCanvas.width = invertedCanvas.height = iconSize
-  const invertedCtx = invertedCanvas.getContext('2d')
+  const invertedCtx = invertedCanvas.getContext('2d', { willReadFrequently: true })
 
   invertedCtx.drawImage(canvas, 0, 0)
   invertedCtx.fillStyle = 'white'
@@ -65,13 +63,23 @@ const setupStreamDeck = async () => {
   const { canvas: playCanvas, invertedCanvas: playInvertedCanvas } = renderText('PLAY', streamDeck.ICON_SIZE)
   const { canvas: pauseCanvas, invertedCanvas: pauseInvertedCanvas } = renderText('PAUSE', streamDeck.ICON_SIZE)
   const { canvas: nextCanvas, invertedCanvas: nextInvertedCanvas } = renderText('NEXT', streamDeck.ICON_SIZE)
+  const tomatoSvg = new window.Image()
+  await new Promise((resolve) => {
+    tomatoSvg.onload = resolve
+    tomatoSvg.src = '../assets/icons/tomato.svg'
+  })
+
+  const tomatoCanvas = document.createElement('canvas')
+  const tomatoCtx = tomatoCanvas.getContext('2d', { willReadFrequently: true })
+  const tomatoPadding = 2
+  tomatoCtx.drawImage(tomatoSvg, tomatoPadding, tomatoPadding, streamDeck.ICON_SIZE - tomatoPadding * 2, streamDeck.ICON_SIZE - tomatoPadding * 2)
 
   const playIndex = 0
   const pauseIndex = streamDeck.KEY_COLUMNS
   const nextIndex = streamDeck.KEY_ROWS * streamDeck.KEY_COLUMNS - 1
   for (let i = 0; i < streamDeck.NUM_KEYS; i++) {
     if (i !== playIndex && i !== pauseIndex && i !== nextIndex) {
-      await streamDeck.fillKeyColor(i, 0, 0, 0)
+      await streamDeck.fillKeyCanvas(i, tomatoCanvas)
     }
   }
   await streamDeck.fillKeyCanvas(playIndex, playCanvas)

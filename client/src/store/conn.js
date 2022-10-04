@@ -2,7 +2,6 @@ import Alpine from 'alpinejs'
 import { sync } from '../helpers/sync'
 
 document.addEventListener('alpine:init', () => {
-
   Alpine.store('conn', {
     initialized: false,
     online: navigator.onLine,
