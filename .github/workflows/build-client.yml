@@ -89,8 +89,6 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 0600 ~/.ssh/id_ed25519
           echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libudev-dev
           cd client
           npm install
           npm run build
