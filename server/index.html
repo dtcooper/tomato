@@ -473,7 +473,7 @@ Action on the following,</p>
   mode.</li>
 </ul>
 <p>Now, create a symbolic link for the development <a href="https://docs.docker.com/compose/">Compose</a> overrides,</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>ln -s docker-compose.dev.yml docker-compose.overrides.yml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>ln -s docker-compose.dev.yml docker-compose.override.yml
 </code></pre></div>
 <p>Build the containers (or pull them by instead executing <code class="highlight">docker compose pull</code>),</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>docker compose build
@@ -537,7 +537,7 @@ is a requirement of <a href="https://certbot.eff.org/">Certbot</a>, the underlyi
 generates an SSL certificate for you.</p>
 </div>
 <p>Now, create a symbolic link for the Nginx Compose overrides,</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ln -s docker-compose.nginx.yml docker-compose.overrides.yml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ln -s docker-compose.nginx.yml docker-compose.override.yml
 </code></pre></div>
 </div>
 <div class="tabbed-block">
