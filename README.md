@@ -21,7 +21,7 @@ The backend server is written in [Python](https://www.python.org/)'s
 
 The client is a native, cross-platform [Electron](https://www.electronjs.org/)
 app and optionally uses the [Elgato Stream Deck](https://www.elgato.com/en/stream-deck)
-as a tactile controller.
+as a physical control pad.
 
 ## Installation
 
