@@ -47,7 +47,7 @@ cp .env.sample .env
     Now, create a symbolic link for the development [Compose] overrides,
 
     ```bash
-    ln -s docker-compose.dev.yml docker-compose.overrides.yml
+    ln -s docker-compose.dev.yml docker-compose.override.yml
     ```
 
     Build the containers (or pull them by instead executing `#!bash docker compose pull`),
@@ -114,7 +114,7 @@ cp .env.sample .env
         Now, create a symbolic link for the Nginx Compose overrides,
 
         ```bash
-        ln -s docker-compose.nginx.yml docker-compose.overrides.yml
+        ln -s docker-compose.nginx.yml docker-compose.override.yml
         ```
 
     === "Reverse Proxying Yourself"
