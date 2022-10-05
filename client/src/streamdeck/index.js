@@ -28,7 +28,7 @@ const initialize = async () => {
   await Promise.all(iconLoadPromises)
 }
 
-const renderText = (text, iconSize, verticalPadding = 15, horizontalPadding = 5) => {
+const renderText = (text, iconSize, verticalPadding = 8, horizontalPadding = 7, verticalLinePadding = 3) => {
   const canvas = new window.OffscreenCanvas(iconSize, iconSize)
   const ctx = canvas.getContext('2d', { willReadFrequently: true })
 
@@ -37,26 +37,36 @@ const renderText = (text, iconSize, verticalPadding = 15, horizontalPadding = 5)
   ctx.fill()
   ctx.fillStyle = 'white'
 
-  let fontWidth, fontHeight
+  const lines = text.split('\n')
+  const totalHeight = iconSize - verticalPadding * 2 + verticalLinePadding * Math.min(1, lines.length - 1)
+  const lineHeight = totalHeight / lines.length - verticalLinePadding * Math.min(1, lines.length - 1)
 
-  for (let fontPx = 80; fontPx >= 8; fontPx--) {
-    ctx.font = `${fontPx}px ${font}`
-    const measure = ctx.measureText(text)
-    fontWidth = measure.width
-    fontHeight = measure.actualBoundingBoxAscent + measure.actualBoundingBoxDescent
+  for (let lineNum = 0; lineNum < lines.length; lineNum++) {
+    const line = lines[lineNum]
+    let fontWidth, fontHeight
 
-    if (
-      fontWidth <= (iconSize - horizontalPadding * 2) &&
-      fontHeight <= (iconSize - verticalPadding * 2)) {
-      break
+    for (let fontPx = 80; fontPx >= 8; fontPx--) {
+      ctx.font = `${fontPx}px ${font}`
+      const measure = ctx.measureText(line)
+      fontWidth = measure.width
+      fontHeight = measure.actualBoundingBoxAscent + measure.actualBoundingBoxDescent
+
+      if (
+        fontWidth <= (iconSize - horizontalPadding * 2) &&
+        fontHeight <= lineHeight) {
+        break
+      }
     }
-  }
+    console.log(text, fontHeight)
 
-  const desiredHeight = iconSize - verticalPadding * 2
-  const stretchFactor = desiredHeight / fontHeight
-  ctx.scale(1, stretchFactor)
-  ctx.fillText(text, horizontalPadding, fontHeight + verticalPadding / stretchFactor)
-  ctx.restore()
+    const stretchFactor = lineHeight / fontHeight
+    // TODO take into account that 5 somewhere?
+    ctx.setTransform(1, 0, 0, stretchFactor, 0, 0)
+    console.log(stretchFactor)
+    ctx.textAlign = 'center'
+    ctx.fillText(line, iconSize / 2, fontHeight + (verticalPadding + (lineHeight + verticalLinePadding) * lineNum) / stretchFactor)
+    ctx.restore()
+  }
 
   const invertedCanvas = new window.OffscreenCanvas(iconSize, iconSize)
   const invertedCtx = invertedCanvas.getContext('2d', { willReadFrequently: true })
@@ -77,10 +87,11 @@ const setupStreamDeck = async (conn) => {
     return null
   }
   const streamDeck = await openDevice(streamDecks[0])
+  await streamDeck.clearPanel()
   await streamDeck.setBrightness(100)
-  const { canvas: playCanvas, invertedCanvas: playInvertedCanvas } = renderText('PLAY', streamDeck.ICON_SIZE)
+  const { canvas: playNextCanvas, invertedCanvas: playNextInvertedCanvas } = renderText('Tomato\nRadio\nAuto-\nmation', streamDeck.ICON_SIZE, 8, 5, 3)
   const { canvas: pauseCanvas, invertedCanvas: pauseInvertedCanvas } = renderText('PAUSE', streamDeck.ICON_SIZE)
-  const { canvas: nextCanvas, invertedCanvas: nextInvertedCanvas } = renderText('NEXT', streamDeck.ICON_SIZE)
+  const { canvas: playCanvas, invertedCanvas: playInvertedCanvas } = renderText('PLAY', streamDeck.ICON_SIZE)
   const playIconCanvas = new window.OffscreenCanvas(streamDeck.ICON_SIZE, streamDeck.ICON_SIZE)
   let ctx = playIconCanvas.getContext('2d', { willReadFrequently: true })
   ctx.fillStyle = '#36D399'
@@ -107,30 +118,30 @@ const setupStreamDeck = async (conn) => {
   const playIndex = 0
   const pauseIndex = streamDeck.KEY_COLUMNS
   const nextIndex = streamDeck.KEY_ROWS * streamDeck.KEY_COLUMNS - 1
-  await streamDeck.fillKeyCanvas(playIndex, playCanvas)
+  await streamDeck.fillKeyCanvas(playIndex, playNextCanvas)
   await streamDeck.fillKeyCanvas(1, playIconCanvas)
   await streamDeck.fillKeyCanvas(2, pauseIconCanvas)
   await streamDeck.fillKeyCanvas(pauseIndex, pauseCanvas)
   await streamDeck.fillKeyCanvas(4, tomatoIconCanvas)
-  await streamDeck.fillKeyCanvas(nextIndex, nextCanvas)
+  await streamDeck.fillKeyCanvas(nextIndex, playCanvas)
 
   streamDeck.on('down', async (keyIndex) => {
     if (keyIndex === playIndex) {
-      await streamDeck.fillKeyCanvas(keyIndex, playInvertedCanvas)
+      await streamDeck.fillKeyCanvas(keyIndex, playNextInvertedCanvas)
     } else if (keyIndex === pauseIndex) {
       await streamDeck.fillKeyCanvas(keyIndex, pauseInvertedCanvas)
     } else if (keyIndex === nextIndex) {
-      await streamDeck.fillKeyCanvas(keyIndex, nextInvertedCanvas)
+      await streamDeck.fillKeyCanvas(keyIndex, playInvertedCanvas)
     }
   })
 
   streamDeck.on('up', async (keyIndex) => {
     if (keyIndex === playIndex) {
-      await streamDeck.fillKeyCanvas(keyIndex, playCanvas)
+      await streamDeck.fillKeyCanvas(keyIndex, playNextCanvas)
     } else if (keyIndex === pauseIndex) {
       await streamDeck.fillKeyCanvas(keyIndex, pauseCanvas)
     } else if (keyIndex === nextIndex) {
-      await streamDeck.fillKeyCanvas(keyIndex, nextCanvas)
+      await streamDeck.fillKeyCanvas(keyIndex, playCanvas)
     }
   })
 
