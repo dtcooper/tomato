@@ -38,8 +38,9 @@ const renderText = (text, iconSize, verticalPadding = 8, horizontalPadding = 7, 
   ctx.fillStyle = 'white'
 
   const lines = text.split('\n')
-  const totalHeight = iconSize - verticalPadding * 2 + verticalLinePadding * Math.min(1, lines.length - 1)
-  const lineHeight = totalHeight / lines.length - verticalLinePadding * Math.min(1, lines.length - 1)
+  const moreThanOneLine = Math.min(1, lines.length - 1)
+  const totalHeight = iconSize - verticalPadding * 2 + verticalLinePadding * moreThanOneLine
+  const lineHeight = totalHeight / lines.length - verticalLinePadding * moreThanOneLine
 
   for (let lineNum = 0; lineNum < lines.length; lineNum++) {
     const line = lines[lineNum]
@@ -57,12 +58,10 @@ const renderText = (text, iconSize, verticalPadding = 8, horizontalPadding = 7, 
         break
       }
     }
-    console.log(text, fontHeight)
 
     const stretchFactor = lineHeight / fontHeight
     // TODO take into account that 5 somewhere?
     ctx.setTransform(1, 0, 0, stretchFactor, 0, 0)
-    console.log(stretchFactor)
     ctx.textAlign = 'center'
     ctx.fillText(line, iconSize / 2, fontHeight + (verticalPadding + (lineHeight + verticalLinePadding) * lineNum) / stretchFactor)
     ctx.restore()
