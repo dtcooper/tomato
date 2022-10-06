@@ -1,37 +1,4 @@
-FROM python:3.10-bullseye AS base
-
-
-FROM base AS audiowaveform-builder
-
-ARG AUDIOWAVEFORM_VERSION=1.6.0
-
-RUN apt-get update \
-    && apt-get upgrade -y \
-    && apt-get install --no-install-recommends -y \
-        cmake \
-        g++ \
-        gcc \
-        libboost-filesystem-dev \
-        libboost-program-options-dev \
-        libboost-regex-dev \
-        libgd-dev \
-        libid3tag0-dev \
-        libmad0-dev \
-        libsndfile1-dev \
-        make \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN mkdir -p /usr/src/audiowaveform \
-    && cd /usr/src/audiowaveform \
-    && wget -qO - "https://github.com/bbc/audiowaveform/archive/refs/tags/${AUDIOWAVEFORM_VERSION}.tar.gz" | tar xz --strip-components 1 \
-    && mkdir build && cd build \
-    && cmake -D ENABLE_TESTS=0 .. \
-    && make -j "$(nproc)" \
-    && make install \
-    && strip "$(which audiowaveform)"
-
-
-FROM base AS final
+FROM python:3.10-bullseye
 
 ARG DEBUG=0 \
     DJANGO_BASH_COMPLETION_VERSION=4.1 \
@@ -54,14 +21,6 @@ RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install --no-install-recommends -y \
         ffmpeg \
-        # For audiowaveform
-        libboost-filesystem1.74.0 \
-        libboost-program-options1.74.0 \
-        libboost-regex1.74.0 \
-        libgd3 \
-        libid3tag0 \
-        libmad0 \
-        libsndfile1 \
         $([ "$DEBUG" -a "$DEBUG" != '0' ] && echo \
             bash-completion \
             less \
@@ -84,7 +43,6 @@ COPY pyproject.toml poetry.lock /app/
 WORKDIR /app
 RUN poetry install $([ -z "$DEBUG" -o "$DEBUG" = '0' ] && echo '--without=dev')
 
-COPY --from=audiowaveform-builder /usr/local/bin/audiowaveform /usr/local/bin/
 COPY *.py *.sh /app/
 COPY tomato/ /app/tomato/
 WORKDIR /app
