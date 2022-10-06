@@ -43,7 +43,7 @@ function createWindow () {
   })
 
   win.webContents.session.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
-    if (permission === 'hid') {
+    if (permission === 'hid' || permission === 'media') {
       return true
     }
     return false
