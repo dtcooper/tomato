@@ -82,6 +82,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         return self.file.file.file.path if isinstance(self.file.file, UploadedTusFile) else self.file.path
 
     def clean(self):
+        super().clean()
         if self.file:
             ffprobe_data = ffprobe(self.file_path)
             if not ffprobe_data:

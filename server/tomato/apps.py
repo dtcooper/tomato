@@ -2,6 +2,7 @@ from pathlib import Path
 
 from django.apps import AppConfig, apps
 from django.conf import settings
+from django.conf.locale.en import formats as en_formats
 from django.db.models import signals
 
 from .constants import EDIT_ALL_GROUP_NAME, EDIT_ONLY_ASSETS_GROUP_NAME
@@ -13,9 +14,13 @@ class TomatoConfig(AppConfig):
     verbose_name = "Radio automation"
 
     def ready(self):
+        self.patch_formats()
         temp_upload_path = Path(settings.MEDIA_ROOT) / settings.FILE_FORM_UPLOAD_DIR
         temp_upload_path.mkdir(parents=True, exist_ok=True)
         signals.post_migrate.connect(self.create_groups, sender=self)
+
+    def patch_formats(self):
+        en_formats.SHORT_DATETIME_FORMAT = "M j Y, g:i A"
 
     def create_groups(self, using=None, *args, **kwargs):
         all_groups = []

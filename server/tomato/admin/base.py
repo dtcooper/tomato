@@ -1,4 +1,8 @@
 from django.contrib import admin, messages
+from django.templatetags.static import static
+from django.utils import timezone
+from django.utils.formats import date_format as django_date_format
+from django.utils.html import format_html
 
 
 class NoNullRelatedOnlyFieldListFilter(admin.RelatedOnlyFieldListFilter):
@@ -16,10 +20,43 @@ class ListPrefetchRelatedMixin:
         return queryset
 
 
+def format_datetime(dt, format="SHORT_DATETIME_FORMAT"):
+    return django_date_format(timezone.localtime(dt), format)
+
+
 class TomatoModelAdminBase(ListPrefetchRelatedMixin, admin.ModelAdmin):
     save_on_top = True
     search_fields = ("name",)
     exclude = ("created_by",)  # XXX should be excluded by modeladmin directly
+    add_fields = None
+
+    @admin.display(description="Air date")
+    def air_date(self, obj):
+        if obj.begin and obj.end:
+            return f"{format_datetime(obj.begin)} to {format_datetime(obj.end)}"
+        elif obj.begin:
+            return format_html("<strong>Starts</strong> at {}", format_datetime(obj.begin))
+        elif obj.end:
+            return format_html("<strong>Ends</strong> on {}", format_datetime(obj.begin))
+        else:
+            return "Airs any time"
+
+    @admin.display(description="Eligible to Air")
+    def airing(self, obj):
+        if not obj.enabled:
+            return format_html('<img src="{}"> {}', static("admin/img/icon-no.svg"), "Not enabled")
+        else:
+            now = timezone.now()
+            if obj.begin and obj.begin > now:
+                return format_html('<img src="{}"> {}', static("admin/img/icon-no.svg"), "Before start air date")
+            if obj.end and obj.end < now:
+                return format_html('<img src="{}"> {}', static("admin/img/icon-no.svg"), "After end air date")
+        return format_html('<img src="{}">', static("admin/img/icon-yes.svg"))
+
+    def get_fields(self, request, obj=None):
+        if obj is None and self.add_fields is not None:
+            return self.add_fields
+        return super().get_fields(request, obj)
 
     @admin.action(description="Enable selected %(verbose_name_plural)s", permissions=("add", "change", "delete"))
     def enable(self, request, queryset):

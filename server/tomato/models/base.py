@@ -55,6 +55,11 @@ class EnabledBeginEndWeightMixin(models.Model):
         ),
     )
 
+    def clean(self):
+        super().clean()
+        if self.begin and self.end and self.begin > self.end:
+            raise ValidationError({"end": "End air date before begin air date."})
+
     def serialize(self):
         return {
             "enabled": self.enabled,

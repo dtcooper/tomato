@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.db.models import Prefetch
+from django.urls import reverse
 from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
 
@@ -26,11 +27,16 @@ class StopsetRotatorInline(admin.TabularInline):
 
 
 class StopsetAdmin(TomatoModelAdminBase):
-    list_display = ("name", "rotators_display")
+    list_display = ("name", "enabled", "airing", "air_date", "weight", "rotators_display")
+    actions = ("enable", "disable")
     list_prefetch_related = Prefetch("rotators", queryset=Rotator.objects.order_by("stopsetrotator__id"))
     inlines = (StopsetRotatorInline,)
+    list_filter = ("enabled",)
 
     @admin.display(description="Rotators")
     def rotators_display(self, obj):
-        rotators = [(i, r.name) for i, r in enumerate(obj.rotators.all(), 1)]
-        return format_html_join(mark_safe("<br>\n"), "{}. {}", rotators) or None
+        rotators = [
+            (i, reverse("admin:tomato_rotator_change", args=(r.id,)), r.get_color("dark"), r.name)
+            for i, r in enumerate(obj.rotators.all(), 1)
+        ]
+        return format_html_join(mark_safe("<br>\n"), '{}. <a href="{}" style="color: {}">{}</a>', rotators) or None

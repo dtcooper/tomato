@@ -1,6 +1,6 @@
 from django.db import models
 
-from ..constants import COLORS
+from ..constants import COLORS, COLORS_DICT
 from .base import TomatoModelBase
 from .stopset import Stopset
 
@@ -21,6 +21,9 @@ class Rotator(TomatoModelBase):
         through_fields=("rotator", "stopset"),
         verbose_name="stop set",
     )
+
+    def get_color(self, type="normal"):
+        return COLORS_DICT[self.color][type]
 
     class Meta(TomatoModelBase.Meta):
         db_table = "rotators"

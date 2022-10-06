@@ -1,0 +1,16 @@
+{% extends 'admin/change_form.html' %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const color = document.getElementById('id_color')
+      const colorPreview = document.getElementById('id_color_preview')
+      if (color && colorPreview) {
+        color.addEventListener('change', (event) => {
+          colorPreview.style.backgroundColor = TOMATO_DATA.colors[color.value].normal
+        })
+      }
+    })
+  </script>
+{% endblock %}
