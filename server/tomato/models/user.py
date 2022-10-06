@@ -83,6 +83,6 @@ is_superuser_field.help_text = (
 del is_superuser_field
 
 groups_field = User._meta.get_field("groups")
-groups_field.verbose_name = "permission groups"
+groups_field.verbose_name = "permissions"
 groups_field.help_text = "The permission groups this user belongs to."
 del groups_field

@@ -8,13 +8,15 @@ from django.http.request import split_domain_port
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
+from constance import config as constance_config
+
 from .constants import SCHEMA_VERSION
 from .models import Asset, Rotator, Stopset, User
 
 
 def user_from_request(request):
-    auth_token = request.headers.get("X-access-Token") or request.GET.get("access_token")
-    if auth_token:
+    auth_token = request.headers.get("X-Access-Token") or request.GET.get("access_token")
+    if auth_token is not None:
         return User.validate_access_token(auth_token)
 
 
@@ -55,19 +57,23 @@ def sync(request):
         Prefetch("rotators", prefetch_qs.order_by("stopsetrotator__id"))
     ).order_by("id")
 
+    config = {key: getattr(constance_config, key) for key in dir(constance_config)}
+    config["WAIT_INTERVAL"] = int(config.pop("WAIT_INTERVAL_MINUTES") * 60)  # convert to seconds
+
     return JsonResponse(
         {
             "assets": [a.serialize() for a in assets],
             "rotators": {r.id: r.serialize() for r in rotators},
             "stopsets": [s.serialize() for s in stopsets],
             "schema_version": SCHEMA_VERSION,
+            "config": config,
         }
     )
 
 
 def ping(request):
     user = user_from_request(request)
-    return JsonResponse({"success": True, "access_token_valid": user is not None})
+    return JsonResponse({"success": True, "access_token_valid": user is not None, "username": user and user.username})
 
 
 def server_logs(request):

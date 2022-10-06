@@ -59,8 +59,8 @@ class EnabledBeginEndWeightMixin(models.Model):
         return {
             "enabled": self.enabled,
             "weight": round(float(self.weight), 2),
-            "begin": self.begin and self.begin.astimezone(UTC).strftime(ZULU_STRFTIME),
-            "end": self.end and self.end.astimezone(UTC).strftime(ZULU_STRFTIME),
+            "begin": self.begin,
+            "end": self.end,
             **super().serialize(),
         }
 
