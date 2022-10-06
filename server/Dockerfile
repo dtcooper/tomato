@@ -1,4 +1,5 @@
-FROM python:3.10-bullseye
+# TODO when Python 3.11 is released, replace this
+FROM python:3.11-rc-bullseye
 
 ARG DEBUG=0 \
     DJANGO_BASH_COMPLETION_VERSION=4.1 \
