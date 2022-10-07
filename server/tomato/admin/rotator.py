@@ -10,6 +10,8 @@ class RotatorAdmin(TomatoModelAdminBase):
     list_display = ("name", "color_display", "stopsets_display", "created_by")
     list_prefetch_related = "stopsets"
     add_fields = ("name", "color", "color_preview")
+    # Average asset length?
+    # Assets
     fields = ("name", "color", "color_preview", "stopsets_display")
     readonly_fields = ("stopsets_display", "color_preview")
     list_filter = ("stopsets", ("created_by", NoNullRelatedOnlyFieldListFilter))
