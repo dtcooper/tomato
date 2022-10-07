@@ -20,7 +20,8 @@ class TomatoConfig(AppConfig):
         signals.post_migrate.connect(self.create_groups, sender=self)
 
     def patch_formats(self):
-        en_formats.SHORT_DATETIME_FORMAT = "M j Y, g:i A"
+        en_formats.SHORT_DATETIME_FORMAT = "n/j/y g:i A"
+        en_formats.DATETIME_FORMAT = "M j Y, g:i A"
 
     def create_groups(self, using=None, *args, **kwargs):
         all_groups = []

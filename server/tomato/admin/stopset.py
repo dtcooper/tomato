@@ -5,18 +5,17 @@ from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
 
 from ..models import Rotator, StopsetRotator
-from .base import AiringListFilter, TomatoModelAdminBase
+from .base import AiringFilter, NoNullRelatedOnlyFieldFilter, TomatoModelAdminBase
 
 
 class StopsetRotatorInline(admin.TabularInline):
-    save_on_top = True
-    min_num = 1
+    can_delete = True
     extra = 0
+    min_num = 1
     model = StopsetRotator
+    show_change_link = True
     verbose_name = "rotator entry in this stop set"
     verbose_name_plural = "rotator entries in this stop set"
-    can_delete = True
-    show_change_link = True
 
     def get_formset(self, request, obj, **kwargs):
         formset = super().get_formset(request, obj, **kwargs)
@@ -27,11 +26,20 @@ class StopsetRotatorInline(admin.TabularInline):
 
 
 class StopsetAdmin(TomatoModelAdminBase):
-    list_display = ("name", "airing", "enabled", "air_date", "weight", "rotators_display")
     actions = ("enable", "disable")
-    list_prefetch_related = Prefetch("rotators", queryset=Rotator.objects.order_by("stopsetrotator__id"))
+    add_fieldsets = (
+        (None, {"fields": ("name",)}),
+        TomatoModelAdminBase.AIRING_INFO_FIELDSET,
+    )
+    fieldsets = (
+        (None, {"fields": ("name", "airing")}),
+        TomatoModelAdminBase.AIRING_INFO_FIELDSET,
+        ("Additional information", {"fields": ("num_assets", "created_by", "created_at")}),
+    )
     inlines = (StopsetRotatorInline,)
-    list_filter = ("enabled", AiringListFilter)
+    list_display = ("name", "airing", "air_date", "weight", "rotators_display", "num_assets")
+    list_filter = (AiringFilter, "enabled", ("created_by", NoNullRelatedOnlyFieldFilter), "rotators")
+    list_prefetch_related = Prefetch("rotators", queryset=Rotator.objects.order_by("stopsetrotator__id"))
 
     @admin.display(description="Rotators")
     def rotators_display(self, obj):

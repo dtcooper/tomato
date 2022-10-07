@@ -3,18 +3,24 @@ from django.urls import reverse
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 
-from .base import NoNullRelatedOnlyFieldListFilter, TomatoModelAdminBase
+from .base import NoNullRelatedOnlyFieldFilter, TomatoModelAdminBase
 
 
 class RotatorAdmin(TomatoModelAdminBase):
-    list_display = ("name", "color_display", "stopsets_display", "created_by")
+    list_display = ("name", "color_display", "stopsets_display", "num_assets")
     list_prefetch_related = "stopsets"
-    add_fields = ("name", "color", "color_preview")
+    add_fieldsets = (
+        (None, {"fields": ("name",)}),
+        ("Color", {"fields": ("color", "color_preview")}),
+    )
+    fieldsets = add_fieldsets + (
+        ("Stop sets", {"fields": ("stopsets_display",)}),
+        ("Additional information", {"fields": ("num_assets", "created_by", "created_at")}),
+    )
     # Average asset length?
     # Assets
-    fields = ("name", "color", "color_preview", "stopsets_display")
-    readonly_fields = ("stopsets_display", "color_preview")
-    list_filter = ("stopsets", ("created_by", NoNullRelatedOnlyFieldListFilter))
+    readonly_fields = TomatoModelAdminBase.readonly_fields + ("stopsets_display", "color_preview")
+    list_filter = ("stopsets", ("created_by", NoNullRelatedOnlyFieldFilter))
 
     @admin.display(description="Color", ordering="color")
     def color_display(self, obj=None):

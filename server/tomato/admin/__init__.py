@@ -1,6 +1,5 @@
 import itertools
 
-from django.conf import settings
 from django.contrib import admin
 from django.templatetags.static import static
 from django.utils.html import format_html
@@ -8,7 +7,7 @@ from django.utils.safestring import mark_safe
 
 from constance.admin import Config
 
-from ..constants import COLORS_DICT
+from ..constants import COLORS_DICT, HELP_DOCS_URL
 from ..models import Asset, ClientLogEntry, Rotator, Stopset, User
 from .asset import AssetAdmin
 from .client_log_entry import ClientLogEntryAdmin
@@ -18,7 +17,6 @@ from .stopset import StopsetAdmin
 from .user import UserAdmin
 
 
-HELP_DOCS_URL = f"http://{'localhost:8888' if settings.DEBUG else 'dtcooper.github.io'}/tomato/"
 MODELS_HELP_DOCS_TEXT = {
     model_cls: format_html(
         'For more information about {}, <a href="{}concepts#{}" target="_blank">see the docs</a>.',

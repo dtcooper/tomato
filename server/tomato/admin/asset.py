@@ -14,7 +14,7 @@ from django_file_form.model_admin import FileFormAdminMixin
 
 from ..models import Asset, Rotator
 from ..tasks import bulk_process_assets, process_asset
-from .base import NoNullRelatedOnlyFieldListFilter, TomatoModelAdminBase
+from .base import AiringFilter, NoNullRelatedOnlyFieldFilter, TomatoModelAdminBase
 
 
 class AssetActionForm(ActionForm):
@@ -57,17 +57,31 @@ class StatusFilter(admin.SimpleListFilter):
 
 
 class AssetAdmin(FileFormAdminMixin, TomatoModelAdminBase):
+    ROTATORS_FIELDSET = ("Rotators", {"fields": ("rotators",)})
+
+    add_fieldsets = (
+        (None, {"fields": ("name",)}),
+        ("Audio file", {"fields": ("file",)}),
+        ROTATORS_FIELDSET,
+        TomatoModelAdminBase.AIRING_INFO_FIELDSET,
+    )
     action_form = AssetActionForm
     actions = ("enable", "disable", "add_rotator", "remove_rotator")
-    readonly_fields = ("duration", "created_at", "status", "created_by", "file_display")
-    list_filter = ("enabled", "rotators", StatusFilter, ("created_by", NoNullRelatedOnlyFieldListFilter))
-    list_per_page = 250
-    filter_horizontal = ("rotators",)
-    list_display = ("name", "enabled", "status", "weight", "rotators_display", "created_at")
     date_hierarchy = "created_at"
+    fieldsets = (
+        (None, {"fields": ("name", "airing")}),
+        ("Audio file", {"fields": ("file", "file_display", "duration")}),
+        ROTATORS_FIELDSET,
+        TomatoModelAdminBase.AIRING_INFO_FIELDSET,
+        ("Additional information", {"fields": ("created_at", "created_by", "status")}),
+    )
+    filter_horizontal = ("rotators",)
+    list_display = ("name", "airing", "air_date", "weight", "rotators_display", "created_at")
+    list_filter = (AiringFilter, "rotators", StatusFilter, "enabled", ("created_by", NoNullRelatedOnlyFieldFilter))
     list_prefetch_related = "rotators"
+    readonly_fields = ("duration", "status", "file_display") + TomatoModelAdminBase.readonly_fields
 
-    @admin.display(description="Audio", empty_value="")
+    @admin.display(description="Player")
     def file_display(self, obj):
         if obj.file:
             return format_html(

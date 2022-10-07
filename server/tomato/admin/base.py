@@ -1,19 +1,23 @@
 from django.contrib import admin, messages
+from django.template.defaultfilters import pluralize
 from django.templatetags.static import static
 from django.utils import timezone
 from django.utils.formats import date_format as django_date_format
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
+from django.utils.safestring import mark_safe
+
+from ..models import Asset, Stopset
 
 
 YES_ICON = static("admin/img/icon-yes.svg")
 NO_ICON = static("admin/img/icon-no.svg")
 
 
-class NoNullRelatedOnlyFieldListFilter(admin.RelatedOnlyFieldListFilter):
+class NoNullRelatedOnlyFieldFilter(admin.RelatedOnlyFieldListFilter):
     include_empty_choice = False
 
 
-class AiringListFilter(admin.SimpleListFilter):
+class AiringFilter(admin.SimpleListFilter):
     title = "airing"
     parameter_name = "airing"
 
@@ -46,11 +50,16 @@ def format_datetime(dt, format="SHORT_DATETIME_FORMAT"):
 
 
 class TomatoModelAdminBase(ListPrefetchRelatedMixin, admin.ModelAdmin):
+    AIRING_INFO_FIELDSET = ("Airing Information", {"fields": ("enabled", "weight", "begin", "end")})
+
+    add_fieldsets = None
+    list_max_show_all = 2500
+    list_per_page = 50
+    readonly_fields = ("created_by", "created_at", "num_assets", "airing")
     save_on_top = True
     search_fields = ("name",)
-    exclude = ("created_by",)  # XXX should be excluded by modeladmin directly
-    add_fields = None
 
+    # TODO: pull airing related (enabled, weight, start/end) into it's own mixin?
     @admin.display(description="Air date")
     def air_date(self, obj):
         if obj.begin and obj.end:
@@ -62,7 +71,26 @@ class TomatoModelAdminBase(ListPrefetchRelatedMixin, admin.ModelAdmin):
         else:
             return "Can air any time"
 
-    @admin.display(description="Eligible to Air")
+    @admin.display(description="Assets")
+    def num_assets(self, obj):
+        if isinstance(obj, Stopset):
+            assets = Asset.objects.filter(rotators__in=obj.rotators.distinct().values_list("id", flat=True))
+        else:
+            assets = Asset.objects.filter(rotators=obj.id)
+
+        display = []
+        total = assets.count()
+        num_eligible = assets.eligible_to_air().count()
+        num_not_eligible = total - num_eligible
+
+        if num_eligible:
+            display.append((f"{num_eligible} eligible to air",))
+        if num_not_eligible:
+            display.append((f"{num_not_eligible} not eligible to air",))
+        display.append((format_html("<strong>{} asset{} total</strong>", total, pluralize(total)),))
+        return format_html_join(mark_safe("<br>\n"), "&#x25cf; {}", display)
+
+    @admin.display(description="Eligible to air")
     def airing(self, obj):
         eligible, reason = obj.is_eligible_to_air(with_reason=True)
         if eligible:
@@ -70,10 +98,10 @@ class TomatoModelAdminBase(ListPrefetchRelatedMixin, admin.ModelAdmin):
         else:
             return format_html('<img src="{}"> {}', NO_ICON, reason)
 
-    def get_fields(self, request, obj=None):
-        if obj is None and self.add_fields is not None:
-            return self.add_fields
-        return super().get_fields(request, obj)
+    def get_fieldsets(self, request, obj=None):
+        if obj is None and self.add_fieldsets is not None:
+            return self.add_fieldsets
+        return super().get_fieldsets(request, obj)
 
     @admin.action(description="Enable selected %(verbose_name_plural)s", permissions=("add", "change", "delete"))
     def enable(self, request, queryset):

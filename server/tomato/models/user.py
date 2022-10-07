@@ -16,6 +16,8 @@ class User(AbstractUser):
         f"!{ACCESS_TOKEN_SALT_LENGTH}sq{hmac.new(b'key', digestmod=ACCESS_TOKEN_ALGORITHM).digest_size}s"
     )
 
+    created_at = models.DateTimeField("created at", auto_now_add=True, db_index=True)
+    created_by = models.ForeignKey("User", verbose_name="created by", on_delete=models.SET_NULL, null=True)
     enable_client_logs = models.BooleanField(
         "client logs entries enabled",
         default=True,
@@ -28,8 +30,9 @@ class User(AbstractUser):
     first_name = None
     last_name = None
     email = EMAIL_FIELD = None
+    date_joined = None
     REQUIRED_FIELDS = ()
-    REMOVED_FIELDS = ("is_staff", "first_name", "last_name", "email")
+    REMOVED_FIELDS = ("is_staff", "first_name", "last_name", "email", "date_joined")
 
     class Meta:
         db_table = "users"

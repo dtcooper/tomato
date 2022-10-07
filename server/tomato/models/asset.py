@@ -9,11 +9,18 @@ from dirtyfields import DirtyFieldsMixin
 from django_file_form.uploaded_file import UploadedTusFile
 
 from ..ffmpeg import ffprobe
-from .base import NAME_MAX_LENGTH, EnabledBeginEndWeightMixin, TomatoModelBase
+from .base import NAME_MAX_LENGTH, EligibleToAirQuerySet, EnabledBeginEndWeightMixin, TomatoModelBase
 from .rotator import Rotator
 
 
+class AssetEligibleToAirQuerySet(EligibleToAirQuerySet):
+    def _get_currently_airing_Q(self, now=None):
+        return models.Q(status=Asset.Status.READY) & super()._get_currently_airing_Q(now)
+
+
 class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
+    objects = AssetEligibleToAirQuerySet.as_manager()
+
     class Status(models.IntegerChoices):
         PENDING = 0, "Pending processing"
         PROCESSING = 1, "Processing"
@@ -54,6 +61,11 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         db_table = "assets"
         verbose_name = "audio asset"
         ordering = ("-created_at",)
+
+    def is_eligible_to_air(self, now=None, with_reason=False):
+        if self.status != self.Status.READY:
+            return (False, "Processing") if with_reason else False
+        return super().is_eligible_to_air(now, with_reason)
 
     def generate_peaks(self):
         if not self.file:

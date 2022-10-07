@@ -5,7 +5,7 @@ from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
 
 from ..constants import EDIT_ALL_GROUP_NAME, EDIT_ONLY_ASSETS_GROUP_NAME
-from .base import ListPrefetchRelatedMixin
+from .base import ListPrefetchRelatedMixin, NoNullRelatedOnlyFieldFilter
 
 
 class UserAdmin(ListPrefetchRelatedMixin, DjangoUserAdmin):
@@ -17,13 +17,13 @@ class UserAdmin(ListPrefetchRelatedMixin, DjangoUserAdmin):
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         ("Permissions", {"fields": ("is_active", "is_superuser", "enable_client_logs", "groups")}),
-        ("Important dates", {"fields": ("last_login", "date_joined")}),
+        ("Additional information", {"fields": ("last_login", "created_at", "created_by")}),
     )
     filter_horizontal = ("groups",)
     list_display = ("username", "is_active", "groups_display")
-    list_filter = ("is_superuser", "is_active", "groups")
+    list_filter = ("is_superuser", "is_active", "groups", ("created_by", NoNullRelatedOnlyFieldFilter))
     list_prefetch_related = "groups"
-    readonly_fields = ("last_login", "date_joined")
+    readonly_fields = ("last_login", "created_at", "created_by")
     save_on_top = True
     search_fields = ("username",)
 
