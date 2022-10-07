@@ -5,7 +5,7 @@ from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
 
 from ..models import Rotator, StopsetRotator
-from .base import TomatoModelAdminBase
+from .base import AiringListFilter, TomatoModelAdminBase
 
 
 class StopsetRotatorInline(admin.TabularInline):
@@ -27,11 +27,11 @@ class StopsetRotatorInline(admin.TabularInline):
 
 
 class StopsetAdmin(TomatoModelAdminBase):
-    list_display = ("name", "enabled", "airing", "air_date", "weight", "rotators_display")
+    list_display = ("name", "airing", "enabled", "air_date", "weight", "rotators_display")
     actions = ("enable", "disable")
     list_prefetch_related = Prefetch("rotators", queryset=Rotator.objects.order_by("stopsetrotator__id"))
     inlines = (StopsetRotatorInline,)
-    list_filter = ("enabled",)
+    list_filter = ("enabled", AiringListFilter)
 
     @admin.display(description="Rotators")
     def rotators_display(self, obj):

@@ -1,5 +1,6 @@
 import itertools
 
+from django.conf import settings
 from django.contrib import admin
 from django.templatetags.static import static
 from django.utils.html import format_html
@@ -17,19 +18,15 @@ from .stopset import StopsetAdmin
 from .user import UserAdmin
 
 
-HELP_DOCS_URL = "https://dtcooper.github.io/tomato/"
+HELP_DOCS_URL = f"http://{'localhost:8888' if settings.DEBUG else 'dtcooper.github.io'}/tomato/"
 MODELS_HELP_DOCS_TEXT = {
-    Asset: mark_safe(
-        f'For information about audio assets, <a href="{HELP_DOCS_URL}concepts/#audio-asset" target="_blank">see the'
-        " docs</a>."
-    ),
-    Rotator: mark_safe(
-        f'For information about rotators, <a href="{HELP_DOCS_URL}concepts/#rotator" target="_blank">see the docs</a>.'
-    ),
-    Stopset: mark_safe(
-        f'For information about stop sets, <a href="{HELP_DOCS_URL}concepts/#stop-set" target="_blank">see the'
-        " docs</a>."
-    ),
+    model_cls: format_html(
+        'For more information about {}, <a href="{}concepts#{}" target="_blank">see the docs</a>.',
+        model_cls._meta.verbose_name_plural,
+        HELP_DOCS_URL,
+        model_cls._meta.verbose_name.lower().replace(" ", "-"),
+    )
+    for model_cls in (Asset, Rotator, Stopset)
 }
 
 

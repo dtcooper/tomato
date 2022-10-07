@@ -42,7 +42,7 @@ in it.
 A rotator **can** be (and often is) in a stop set more than once. Think having
 station ID jingles at the start and end of a stop set, as in the example below.
 
-!!! example "Stop Set Example"
+???+ example "Stop Set Example"
     If stop sets are a bit confusing to you, don't worry. Follow along.
 
     Let's say we have the following rotators created, and we've put assets in

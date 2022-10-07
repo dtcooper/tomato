@@ -14,12 +14,16 @@ stages. You can, however download preview builds below.
     you may have to go through your operating system's security settings to be
     able to run them.
 
+    Read more about [how to do that on macOS :simple-apple: here](https://support.apple.com/en-gb/HT202491)
+    under the section _"If you want to open an app that hasn't been notarized or
+    is from an unidentified developer."_
+
 Download one of the following releases,
 
-  * [:material-download: macOS](https://priv.bmir.org/tomato-preview-macos.zip)
+  * [:material-download: macOS :simple-apple:](https://priv.bmir.org/tomato-preview-macos.zip)
     &mdash; universal binary for Intel or Apple M1 chips
-  * [:material-download: Windows](https://priv.bmir.org/tomato-preview-windows.zip)
-  * [:material-download: Debian or Ubuntu Linux](https://priv.bmir.org/tomato-preview-linux_amd64.deb)
+  * [:material-download: Windows :simple-windows: ](https://priv.bmir.org/tomato-preview-windows.zip)
+  * [:material-download: Ubuntu :simple-ubuntu: or Debian :simple-debian: Linux](https://priv.bmir.org/tomato-preview-linux_amd64.deb)
     &mdash; `.deb` package
-  * [:material-download: Fedora or Red Hat Linux](https://priv.bmir.org/tomato-preview-linux.x86_64.rpm)
+  * [:material-download: Fedora :simple-fedora: or Red Hat :simple-redhat: Linux](https://priv.bmir.org/tomato-preview-linux.x86_64.rpm)
     &mdash; `.rpm` package

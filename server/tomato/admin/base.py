@@ -5,8 +5,29 @@ from django.utils.formats import date_format as django_date_format
 from django.utils.html import format_html
 
 
+YES_ICON = static("admin/img/icon-yes.svg")
+NO_ICON = static("admin/img/icon-no.svg")
+
+
 class NoNullRelatedOnlyFieldListFilter(admin.RelatedOnlyFieldListFilter):
     include_empty_choice = False
+
+
+class AiringListFilter(admin.SimpleListFilter):
+    title = "airing"
+    parameter_name = "airing"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("eligible", "Eligible to air"),
+            ("not-eligible", "Not eligible to air"),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == "eligible":
+            return queryset.eligible_to_air()
+        if self.value() == "not-eligible":
+            return queryset.not_eligible_to_air()
 
 
 class ListPrefetchRelatedMixin:
@@ -39,19 +60,15 @@ class TomatoModelAdminBase(ListPrefetchRelatedMixin, admin.ModelAdmin):
         elif obj.end:
             return format_html("<strong>Ends</strong> on {}", format_datetime(obj.begin))
         else:
-            return "Airs any time"
+            return "Can air any time"
 
     @admin.display(description="Eligible to Air")
     def airing(self, obj):
-        if not obj.enabled:
-            return format_html('<img src="{}"> {}', static("admin/img/icon-no.svg"), "Not enabled")
+        eligible, reason = obj.is_eligible_to_air(with_reason=True)
+        if eligible:
+            return format_html('<img src="{}">', YES_ICON)
         else:
-            now = timezone.now()
-            if obj.begin and obj.begin > now:
-                return format_html('<img src="{}"> {}', static("admin/img/icon-no.svg"), "Before start air date")
-            if obj.end and obj.end < now:
-                return format_html('<img src="{}"> {}', static("admin/img/icon-no.svg"), "After end air date")
-        return format_html('<img src="{}">', static("admin/img/icon-yes.svg"))
+            return format_html('<img src="{}"> {}', NO_ICON, reason)
 
     def get_fields(self, request, obj=None):
         if obj is None and self.add_fields is not None:

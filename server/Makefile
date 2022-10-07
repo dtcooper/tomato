@@ -25,3 +25,8 @@ check-env:
 	done ; \
 	colordiff -u /tmp/diff-.env.sample /tmp/diff-.env ; \
 	rm /tmp/diff-.env*
+
+.PHONY: distclean
+distclean:
+	$(COMPOSE) down -v
+	rm -rf serve
