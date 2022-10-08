@@ -5,6 +5,14 @@ import os from 'os'
 import { VENDOR_ID as ELGATO_VENDOR_ID } from '@elgato-stream-deck/core'
 
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors')
+app.setAboutPanelOptions({
+  applicationName: 'Tomato Radio Automation\n(Desktop App)',
+  copyright: `\u00A9 2019-${(new Date()).getFullYear()} David Cooper & BMIR.\nAll rights reserved.`,
+  website: 'https://github.com/dtcooper/tomato',
+  iconPath: 'dist/assets/icons/tomato.png'
+})
+
+// TODO single app lock?
 
 function createWindow () {
   const win = new BrowserWindow({
@@ -12,7 +20,7 @@ function createWindow () {
     minWidth: 600,
     height: 600,
     minHeight: 480,
-    icon: path.join(__dirname, 'dist/assets/tomato.ico'),
+    icon: path.join(__dirname, 'dist/assets/icons/tomato.ico'),
     webPreferences: {
       devTools: !app.isPackaged,
       webSecurity: false,
