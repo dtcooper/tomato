@@ -13,6 +13,10 @@ YES_ICON = static("admin/img/icon-yes.svg")
 NO_ICON = static("admin/img/icon-no.svg")
 
 
+def format_datetime(dt, format="SHORT_DATETIME_FORMAT"):
+    return django_date_format(timezone.localtime(dt), format)
+
+
 class NoNullRelatedOnlyFieldFilter(admin.RelatedOnlyFieldListFilter):
     include_empty_choice = False
 
@@ -45,21 +49,17 @@ class ListPrefetchRelatedMixin:
         return queryset
 
 
-def format_datetime(dt, format="SHORT_DATETIME_FORMAT"):
-    return django_date_format(timezone.localtime(dt), format)
+class SaveCreatedByMixin:
+    def save_model(self, request, obj, form, change):
+        if not change and hasattr(obj, "created_by"):
+            obj.created_by = request.user
+        return super().save_model(request, obj, form, change)
 
 
-class TomatoModelAdminBase(ListPrefetchRelatedMixin, admin.ModelAdmin):
+class AiringMixin:
     AIRING_INFO_FIELDSET = ("Airing Information", {"fields": ("enabled", "weight", "begin", "end")})
 
-    add_fieldsets = None
-    list_max_show_all = 2500
-    list_per_page = 50
-    readonly_fields = ("created_by", "created_at", "num_assets", "airing")
-    save_on_top = True
-    search_fields = ("name",)
-
-    # TODO: pull airing related (enabled, weight, start/end) into it's own mixin?
+   # TODO: pull airing related (enabled, weight, start/end) into it's own mixin?
     @admin.display(description="Air date")
     def air_date(self, obj):
         if obj.begin and obj.end:
@@ -97,12 +97,6 @@ class TomatoModelAdminBase(ListPrefetchRelatedMixin, admin.ModelAdmin):
             return format_html('<img src="{}">', YES_ICON)
         else:
             return format_html('<img src="{}"> {}', NO_ICON, reason)
-
-    def get_fieldsets(self, request, obj=None):
-        if obj is None and self.add_fieldsets is not None:
-            return self.add_fieldsets
-        return super().get_fieldsets(request, obj)
-
     @admin.action(description="Enable selected %(verbose_name_plural)s", permissions=("add", "change", "delete"))
     def enable(self, request, queryset):
         num = queryset.update(enabled=True)
@@ -115,13 +109,21 @@ class TomatoModelAdminBase(ListPrefetchRelatedMixin, admin.ModelAdmin):
         if num:
             self.message_user(request, f"Disabled {num} {self.model._meta.verbose_name}(s).", messages.SUCCESS)
 
+class TomatoModelAdminBase(ListPrefetchRelatedMixin, SaveCreatedByMixin, admin.ModelAdmin):
+    add_fieldsets = None
+    list_max_show_all = 2500
+    list_per_page = 50
+    readonly_fields = ("created_by", "created_at", "num_assets", "airing")
+    save_on_top = True
+    search_fields = ("name",)
+
+    def get_fieldsets(self, request, obj=None):
+        if obj is None and self.add_fieldsets is not None:
+            return self.add_fieldsets
+        return super().get_fieldsets(request, obj)
+
     def has_view_permission(self, request, obj=None):
         return True
 
     def has_module_permission(self, request):
         return True
-
-    def save_model(self, request, obj, form, change):
-        if not change and hasattr(obj, "created_by"):
-            obj.created_by = request.user
-        return super().save_model(request, obj, form, change)
