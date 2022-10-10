@@ -5,7 +5,7 @@ from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
 
 from ..models import Rotator, StopsetRotator
-from .base import AiringFilter, NoNullRelatedOnlyFieldFilter, TomatoModelAdminBase
+from .base import AiringFilter, AiringMixin, NoNullRelatedOnlyFieldFilter, NumAssetsMixin, TomatoModelAdminBase
 
 
 class StopsetRotatorInline(admin.TabularInline):
@@ -25,21 +25,22 @@ class StopsetRotatorInline(admin.TabularInline):
         return formset
 
 
-class StopsetAdmin(TomatoModelAdminBase):
+class StopsetAdmin(AiringMixin, NumAssetsMixin, TomatoModelAdminBase):
     actions = ("enable", "disable")
     add_fieldsets = (
         (None, {"fields": ("name",)}),
-        TomatoModelAdminBase.AIRING_INFO_FIELDSET,
+        AiringMixin.AIRING_INFO_FIELDSET,
     )
     fieldsets = (
         (None, {"fields": ("name", "airing")}),
-        TomatoModelAdminBase.AIRING_INFO_FIELDSET,
+        AiringMixin.AIRING_INFO_FIELDSET,
         ("Additional information", {"fields": ("num_assets", "created_by", "created_at")}),
     )
     inlines = (StopsetRotatorInline,)
     list_display = ("name", "airing", "air_date", "weight", "rotators_display", "num_assets")
     list_filter = (AiringFilter, "enabled", ("created_by", NoNullRelatedOnlyFieldFilter), "rotators")
     list_prefetch_related = Prefetch("rotators", queryset=Rotator.objects.order_by("stopsetrotator__id"))
+    readonly_fields = ("num_assets", "airing") + TomatoModelAdminBase.readonly_fields
 
     @admin.display(description="Rotators")
     def rotators_display(self, obj):

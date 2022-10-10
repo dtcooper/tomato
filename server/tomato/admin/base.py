@@ -59,7 +59,6 @@ class SaveCreatedByMixin:
 class AiringMixin:
     AIRING_INFO_FIELDSET = ("Airing Information", {"fields": ("enabled", "weight", "begin", "end")})
 
-   # TODO: pull airing related (enabled, weight, start/end) into it's own mixin?
     @admin.display(description="Air date")
     def air_date(self, obj):
         if obj.begin and obj.end:
@@ -71,6 +70,28 @@ class AiringMixin:
         else:
             return "Can air any time"
 
+    @admin.display(description="Eligible to air")
+    def airing(self, obj):
+        eligible, reason = obj.is_eligible_to_air(with_reason=True)
+        if eligible:
+            return format_html('<img src="{}">', YES_ICON)
+        else:
+            return format_html('<img src="{}"> {}', NO_ICON, reason)
+
+    @admin.action(description="Enable selected %(verbose_name_plural)s", permissions=("add", "change", "delete"))
+    def enable(self, request, queryset):
+        num = queryset.update(enabled=True)
+        if num:
+            self.message_user(request, f"Enabled {num} {self.model._meta.verbose_name}(s).", messages.SUCCESS)
+
+    @admin.action(description="Disable selected %(verbose_name_plural)s", permissions=("add", "change", "delete"))
+    def disable(self, request, queryset):
+        num = queryset.update(enabled=False)
+        if num:
+            self.message_user(request, f"Disabled {num} {self.model._meta.verbose_name}(s).", messages.SUCCESS)
+
+
+class NumAssetsMixin:
     @admin.display(description="Assets")
     def num_assets(self, obj):
         if isinstance(obj, Stopset):
@@ -90,30 +111,12 @@ class AiringMixin:
         display.append((format_html("<strong>{} asset{} total</strong>", total, pluralize(total)),))
         return format_html_join(mark_safe("<br>\n"), "&#x25cf; {}", display)
 
-    @admin.display(description="Eligible to air")
-    def airing(self, obj):
-        eligible, reason = obj.is_eligible_to_air(with_reason=True)
-        if eligible:
-            return format_html('<img src="{}">', YES_ICON)
-        else:
-            return format_html('<img src="{}"> {}', NO_ICON, reason)
-    @admin.action(description="Enable selected %(verbose_name_plural)s", permissions=("add", "change", "delete"))
-    def enable(self, request, queryset):
-        num = queryset.update(enabled=True)
-        if num:
-            self.message_user(request, f"Enabled {num} {self.model._meta.verbose_name}(s).", messages.SUCCESS)
-
-    @admin.action(description="Disable selected %(verbose_name_plural)s", permissions=("add", "change", "delete"))
-    def disable(self, request, queryset):
-        num = queryset.update(enabled=False)
-        if num:
-            self.message_user(request, f"Disabled {num} {self.model._meta.verbose_name}(s).", messages.SUCCESS)
 
 class TomatoModelAdminBase(ListPrefetchRelatedMixin, SaveCreatedByMixin, admin.ModelAdmin):
     add_fieldsets = None
     list_max_show_all = 2500
     list_per_page = 50
-    readonly_fields = ("created_by", "created_at", "num_assets", "airing")
+    readonly_fields = ("created_by", "created_at")
     save_on_top = True
     search_fields = ("name",)
 

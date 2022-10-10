@@ -3,10 +3,10 @@ from django.urls import reverse
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 
-from .base import NoNullRelatedOnlyFieldFilter, TomatoModelAdminBase
+from .base import NoNullRelatedOnlyFieldFilter, NumAssetsMixin, TomatoModelAdminBase
 
 
-class RotatorAdmin(TomatoModelAdminBase):
+class RotatorAdmin(NumAssetsMixin, TomatoModelAdminBase):
     list_display = ("name", "color_display", "stopsets_display", "num_assets")
     list_prefetch_related = "stopsets"
     add_fieldsets = (
@@ -19,7 +19,7 @@ class RotatorAdmin(TomatoModelAdminBase):
     )
     # Average asset length?
     # Assets
-    readonly_fields = TomatoModelAdminBase.readonly_fields + ("stopsets_display", "color_preview")
+    readonly_fields = ("stopsets_display", "color_preview", "num_assets") + TomatoModelAdminBase.readonly_fields
     list_filter = ("stopsets", ("created_by", NoNullRelatedOnlyFieldFilter))
 
     @admin.display(description="Color", ordering="color")

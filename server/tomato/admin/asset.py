@@ -14,7 +14,7 @@ from django_file_form.model_admin import FileFormAdminMixin
 
 from ..models import Asset, Rotator
 from ..tasks import bulk_process_assets, process_asset
-from .base import AiringFilter, NoNullRelatedOnlyFieldFilter, TomatoModelAdminBase
+from .base import AiringFilter, AiringMixin, NoNullRelatedOnlyFieldFilter, TomatoModelAdminBase
 
 
 class AssetActionForm(ActionForm):
@@ -56,14 +56,14 @@ class StatusFilter(admin.SimpleListFilter):
             return queryset.exclude(status=Asset.Status.READY)
 
 
-class AssetAdmin(FileFormAdminMixin, TomatoModelAdminBase):
+class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
     ROTATORS_FIELDSET = ("Rotators", {"fields": ("rotators",)})
 
     add_fieldsets = (
         (None, {"fields": ("name",)}),
         ("Audio file", {"fields": ("file",)}),
         ROTATORS_FIELDSET,
-        TomatoModelAdminBase.AIRING_INFO_FIELDSET,
+        AiringMixin.AIRING_INFO_FIELDSET,
     )
     action_form = AssetActionForm
     actions = ("enable", "disable", "add_rotator", "remove_rotator")
@@ -72,14 +72,14 @@ class AssetAdmin(FileFormAdminMixin, TomatoModelAdminBase):
         (None, {"fields": ("name", "airing")}),
         ("Audio file", {"fields": ("file", "file_display", "duration")}),
         ROTATORS_FIELDSET,
-        TomatoModelAdminBase.AIRING_INFO_FIELDSET,
-        ("Additional information", {"fields": ("created_at", "created_by", "status")}),
+        AiringMixin.AIRING_INFO_FIELDSET,
+        ("Additional information", {"fields": ("created_at", "created_by")}),
     )
     filter_horizontal = ("rotators",)
     list_display = ("name", "airing", "air_date", "weight", "rotators_display", "created_at")
-    list_filter = (AiringFilter, "rotators", StatusFilter, "enabled", ("created_by", NoNullRelatedOnlyFieldFilter))
+    list_filter = (AiringFilter, "rotators", "enabled", StatusFilter, ("created_by", NoNullRelatedOnlyFieldFilter))
     list_prefetch_related = "rotators"
-    readonly_fields = ("duration", "status", "file_display") + TomatoModelAdminBase.readonly_fields
+    readonly_fields = ("duration", "file_display", "airing") + TomatoModelAdminBase.readonly_fields
 
     @admin.display(description="Player")
     def file_display(self, obj):
