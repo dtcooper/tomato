@@ -4,15 +4,21 @@ import path from 'path'
 import os from 'os'
 import { VENDOR_ID as ELGATO_VENDOR_ID } from '@elgato-stream-deck/core'
 
+if (!app.isPackaged) {
+  require('electron-reloader')(module)
+  console.log('Using electron-reloader')
+}
+
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors')
 app.setAboutPanelOptions({
   applicationName: 'Tomato Radio Automation\n(Desktop App)',
   copyright: `\u00A9 2019-${(new Date()).getFullYear()} David Cooper & BMIR.\nAll rights reserved.`,
   website: 'https://github.com/dtcooper/tomato',
-  iconPath: 'dist/assets/icons/tomato.png'
+  iconPath: '../assets/icons/tomato.png'
 })
 
 // TODO single app lock?
+console.log(__dirname)
 
 function createWindow () {
   const win = new BrowserWindow({
@@ -20,10 +26,10 @@ function createWindow () {
     minWidth: 600,
     height: 600,
     minHeight: 480,
-    icon: path.join(__dirname, 'dist/assets/icons/tomato.ico'),
+    icon: path.join(__dirname, '../assets/icons/tomato.ico'),
     webPreferences: {
       devTools: !app.isPackaged,
-      webSecurity: false,
+      //webSecurity: false,
       contextIsolation: false,
       nodeIntegration: true
     }
@@ -64,10 +70,9 @@ function createWindow () {
     return false
   })
 
-  if (app.isPackaged) {
-    win.loadFile('dist/index.html')
-  } else {
-    win.loadURL('http://localhost:8080')
+  console.log('PATH:', path.normalize(path.join(__dirname, '..', 'index.html')))
+  win.loadFile(path.normalize(path.join(__dirname, '..', 'index.html')))
+  if (!app.isPackaged) {
     win.webContents.openDevTools({ mode: 'detach' })
   }
 }

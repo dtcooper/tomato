@@ -11,7 +11,8 @@ const colors = Object.keys(materialUIColors).reduce((obj, color) => {
 
 module.exports = {
   content: [
-    './src/**/*.{html,js,njk}'
+    'index.html',
+    './src/**/*.{html,js,svelte}'
   ],
   theme: {
     extend: {

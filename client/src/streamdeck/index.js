@@ -1,4 +1,3 @@
-import Alpine from 'alpinejs'
 import { openDevice } from '@elgato-stream-deck/webhid'
 import { VENDOR_ID, DEVICE_MODELS } from '@elgato-stream-deck/core'
 
@@ -11,7 +10,7 @@ const [font, fontPath] = ['Undefined Medium Local', 'undefined-medium']
 const icons = {}
 
 const initialize = async () => {
-  const undefinedMedium = new window.FontFace(font, `url(../assets/fonts/${fontPath}.woff2)`)
+  const undefinedMedium = new window.FontFace(font, `url(assets/fonts/${fontPath}.woff2)`)
   await undefinedMedium.load()
   document.fonts.add(undefinedMedium)
 
@@ -21,7 +20,7 @@ const initialize = async () => {
     const icon = new window.Image()
     iconLoadPromises.push(new Promise((resolve) => {
       icon.onload = resolve
-      icon.src = `../assets/icons/${iconName}.svg`
+      icon.src = `assets/icons/${iconName}.svg`
     }))
     icons[iconName] = icon
   }
@@ -83,7 +82,7 @@ const renderText = (text, iconSize, verticalPadding = 8, horizontalPadding = 7, 
   return canvas
 }
 
-const setupStreamDeck = async (conn) => {
+const setupStreamDeck = async () => {
   const streamDecks = (await navigator.hid.getDevices()).filter(device => isStreamDeck(device))
   if (streamDecks.length === 0) {
     return null
@@ -148,29 +147,26 @@ const setupStreamDeck = async (conn) => {
   return streamDeck
 }
 
-document.addEventListener('alpine:init', async () => {
-  await initialize()
+await initialize()
 
-  const conn = Alpine.store('conn')
-  let streamDeck = await setupStreamDeck(conn)
+let streamDeck = await setupStreamDeck()
 
-  navigator.hid.addEventListener('connect', async (event) => {
-    if (!streamDeck) {
-      streamDeck = await setupStreamDeck(conn)
-    }
-  })
+navigator.hid.addEventListener('connect', async (event) => {
+  if (!streamDeck) {
+    streamDeck = await setupStreamDeck()
+  }
+})
 
-  navigator.hid.addEventListener('disconnect', async (event) => {
-    if (streamDeck?.device?.device?.device === event.device) {
-      await streamDeck.close()
-      streamDeck = null
-    }
-  })
+navigator.hid.addEventListener('disconnect', async (event) => {
+  if (streamDeck?.device?.device?.device === event.device) {
+    await streamDeck.close()
+    streamDeck = null
+  }
+})
 
-  // TODO better hooking to force waiting
-  window.addEventListener('beforeunload', async () => {
-    if (streamDeck) {
-      await streamDeck.resetToLogo()
-    }
-  })
+// TODO better hooking to force waiting
+window.addEventListener('beforeunload', async () => {
+  if (streamDeck) {
+    await streamDeck.resetToLogo()
+  }
 })
