@@ -23,12 +23,52 @@ The client is a native, cross-platform [Electron](https://www.electronjs.org/)
 app and optionally uses the [Elgato Stream Deck](https://www.elgato.com/en/stream-deck)
 as a physical control pad.
 
-## Installation
+## Running the Code
 
-Currently, only the backend server is implemented. Follow
-[the instructions here](https://dtcooper.github.io/tomato/server/) to get
-started.
+### Server
 
+Detailed instructions on how to install the server in both development and
+production environments
+[can be found here in the docs](https://dtcooper.github.io/tomato/server/).
+
+### Client
+
+To run the client code locally, install [nodejs 16+](https://nodejs.org/).
+Then in your terminal,
+
+```bash
+# Clone the repo
+git clone https://github.com/dtcooper/tomato.git
+
+# Enter the client code
+cd tomato/client
+
+# Install dependencies and run
+npm install
+npm run dev
+```
+
+### Documentation
+
+To run the documentation locally, install [Python 3.9](https://www.python.org/)
+or higher. Then in your terminal,
+
+```bash
+# Install Poetry (for Python dependencies)
+curl -sSL https://install.python-poetry.org | python3 -
+
+# Clone the repo
+git clone https://github.com/dtcooper/tomato.git
+
+# Enter the docs code
+cd tomato/docs
+
+# Install dependencies and run
+poetry install
+poetry run mkdocs serve
+```
+
+Head over to <http://localhost:8888/> in your web browser.
 
 ## License
 
