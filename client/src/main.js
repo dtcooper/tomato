@@ -29,7 +29,6 @@ function createWindow () {
     icon: path.join(__dirname, '../assets/icons/tomato.ico'),
     webPreferences: {
       devTools: !app.isPackaged,
-      //webSecurity: false,
       contextIsolation: false,
       nodeIntegration: true
     }
