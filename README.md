@@ -19,9 +19,10 @@ The backend server is written in [Python](https://www.python.org/)'s
 [Django web framework](https://www.djangoproject.com/), heavily leveraging its
 [automatic admin interface](https://docs.djangoproject.com/en/4.1/ref/contrib/admin/).
 
-The client is a native, cross-platform [Electron](https://www.electronjs.org/)
-app and optionally uses the [Elgato Stream Deck](https://www.elgato.com/en/stream-deck)
-as a physical control pad.
+The client is a native, cross-platform [Svelte](https://svelte.dev/) +
+[Electron](https://www.electronjs.org/) app and optionally uses the
+[Elgato Stream Deck](https://www.elgato.com/en/stream-deck) as a physical control
+pad.
 
 ## Running the Code
 
