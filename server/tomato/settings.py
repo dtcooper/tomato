@@ -293,7 +293,7 @@ CONSTANCE_CONFIG = {
             " (or not) according to this setting at the time of upload."
         ),
     ),
-    "UI_MODES": (["idiot", "easy", "advanced"], "What UI modes are available to the desktop app.", "ui_modes"),
+    "UI_MODES": (["idiot", "easy"], "What UI modes are available to the desktop app.", "ui_modes"),
 }
 CONSTANCE_CONFIG_FIELDSETS = {
     "User Interface Options": (

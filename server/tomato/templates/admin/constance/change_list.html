@@ -1,0 +1,24 @@
+{% extends 'admin/constance/change_list.html' %}
+
+{% block extrahead %}
+  {{ block.super }}
+
+  <script>
+    const multipleChoiceFieldChanges = {
+      'SINGLE_PLAY_ROTATORS': 'None',
+      'UI_MODES': 'Idiot mode &amp; easy mode'
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      Array.from(document.querySelectorAll('.reset-link')).forEach(resetLink => {
+        for (const [setting, defaultText] of Object.entries(multipleChoiceFieldChanges)) {
+          if (resetLink.parentElement && resetLink.parentElement.querySelector(`[name=${setting}]`)) {
+            const row = resetLink.parentElement.parentElement
+            row.children[1].innerHTML = `<p>${defaultText}</p>`
+            resetLink.remove()
+          }
+        }
+      })
+    })
+  </script>
+{% endblock %}
