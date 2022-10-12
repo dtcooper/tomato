@@ -119,11 +119,11 @@ station ID jingles at the start and end of a stop set, as in the example below.
         rotator3 --- stopset
         rotator4 --- stopset
         rotator5 --- stopset
-        asset1 -- randomly\nselected --- rotator1
-        asset2 -- randomly\nselected --- rotator2
-        asset3 -- randomly\nselected --- rotator3
-        asset4 -- randomly\nselected --- rotator4
-        asset5 -- randomly\nselected --- rotator5
+        asset1 -- randomly\nselected\nfrom rotator --- rotator1
+        asset2 -- randomly\nselected\nfrom rotator --- rotator2
+        asset3 -- randomly\nselected\nfrom rotator --- rotator3
+        asset4 -- randomly\nselected\nfrom rotator --- rotator4
+        asset5 -- randomly\nselected\nfrom rotator --- rotator5
     ```
 
 ### Relationship Diagram
