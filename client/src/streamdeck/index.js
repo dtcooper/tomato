@@ -1,4 +1,3 @@
-import { onMount } from 'svelte'
 import { openDevice } from '@elgato-stream-deck/webhid'
 import { VENDOR_ID, DEVICE_MODELS } from '@elgato-stream-deck/core'
 
@@ -121,7 +120,7 @@ const setupStreamDeck = async () => {
     renderText('PAUSE', streamDeck.ICON_SIZE),
     pauseIconCanvas,
     tomatoIconCanvas,
-    renderText('PLAY', streamDeck.ICON_SIZE),
+    renderText('PLAY', streamDeck.ICON_SIZE)
   ]
 
   const invertedCanvases = canvases.map((canvas) => invertCanvas(canvas))

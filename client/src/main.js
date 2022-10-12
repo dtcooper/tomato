@@ -1,5 +1,4 @@
 import { app, BrowserWindow, session } from 'electron'
-import fs from 'fs'
 import path from 'path'
 import { VENDOR_ID as ELGATO_VENDOR_ID } from '@elgato-stream-deck/core'
 

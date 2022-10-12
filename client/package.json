@@ -34,7 +34,7 @@
     "daisyui": "^2.31.0",
     "download": "^8.0.0",
     "electron": "^21.1.0",
-    "electron-releases": "^3.1164.0",
+    "electron-releases": "^3.1165.0",
     "electron-reloader": "^1.2.3",
     "electronmon": "^2.0.2",
     "esbuild": "^0.15.10",
