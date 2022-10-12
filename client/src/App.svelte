@@ -1,11 +1,14 @@
-<script>
-  import './streamdeck'
+<script context="module">
+  import initializeStreamDeck from './streamdeck'
+
+  initializeStreamDeck()
 </script>
 
-<main class="font-mono italic text-center text-5xl mt-4 space-y-10">
-  <h1>Hello World</h1>
-  <span class="btn btn-lg btn-warning">Press me!</span>
-</main>
+<script>
+  import Login from './Login.svelte'
+</script>
+
+<Login/>
 
 <style global lang="postcss">
   @import "./fonts.css";

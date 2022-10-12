@@ -1,7 +1,6 @@
 import md5File from 'md5-file'
 import download from 'download'
 
-const process = require('process')
 const path = require('path')
 const { promises: fs } = require('fs')
 

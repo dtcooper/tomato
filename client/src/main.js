@@ -1,7 +1,6 @@
 import { app, BrowserWindow, session } from 'electron'
 import fs from 'fs'
 import path from 'path'
-import os from 'os'
 import { VENDOR_ID as ELGATO_VENDOR_ID } from '@elgato-stream-deck/core'
 
 if (!app.isPackaged) {
@@ -69,7 +68,6 @@ function createWindow () {
     return false
   })
 
-  console.log('PATH:', path.normalize(path.join(__dirname, '..', 'index.html')))
   win.loadFile(path.normalize(path.join(__dirname, '..', 'index.html')))
   if (!app.isPackaged) {
     win.webContents.openDevTools({ mode: 'detach' })
@@ -77,12 +75,9 @@ function createWindow () {
 }
 
 app.whenReady().then(async () => {
-  const alpineDevToolsPath = path.join(
-    os.homedir(),
-    '/Library/Application Support/Google/Chrome/Default/Extensions/fopaemeedckajflibkpifppcankfmbhk/1.2.0_0'
-  )
-  if (fs.existsSync(alpineDevToolsPath)) {
-    await session.defaultSession.loadExtension(alpineDevToolsPath)
+  if (!app.isPackaged) {
+    // Add devtools
+    session.defaultSession.setPreloads([require.resolve('svelte-devtools-standalone')])
   }
 
   createWindow()

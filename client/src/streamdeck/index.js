@@ -1,3 +1,4 @@
+import { onMount } from 'svelte'
 import { openDevice } from '@elgato-stream-deck/webhid'
 import { VENDOR_ID, DEVICE_MODELS } from '@elgato-stream-deck/core'
 
@@ -147,26 +148,28 @@ const setupStreamDeck = async () => {
   return streamDeck
 }
 
-await initialize()
+export default async () => {
+  await initialize()
 
-let streamDeck = await setupStreamDeck()
+  let streamDeck = await setupStreamDeck()
 
-navigator.hid.addEventListener('connect', async (event) => {
-  if (!streamDeck) {
-    streamDeck = await setupStreamDeck()
-  }
-})
+  navigator.hid.addEventListener('connect', async (event) => {
+    if (!streamDeck) {
+      streamDeck = await setupStreamDeck()
+    }
+  })
 
-navigator.hid.addEventListener('disconnect', async (event) => {
-  if (streamDeck?.device?.device?.device === event.device) {
-    await streamDeck.close()
-    streamDeck = null
-  }
-})
+  navigator.hid.addEventListener('disconnect', async (event) => {
+    if (streamDeck?.device?.device?.device === event.device) {
+      await streamDeck.close()
+      streamDeck = null
+    }
+  })
 
-// TODO better hooking to force waiting
-window.addEventListener('beforeunload', async () => {
-  if (streamDeck) {
-    await streamDeck.resetToLogo()
-  }
-})
+  // TODO better hooking to force waiting
+  window.addEventListener('beforeunload', async () => {
+    if (streamDeck) {
+      await streamDeck.resetToLogo()
+    }
+  })
+}

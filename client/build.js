@@ -2,7 +2,6 @@ const { build: esbuild } = require('esbuild')
 const electronReleases = require('electron-releases')
 const { version: electronVersion } = require('electron/package.json')
 const path = require('path')
-const process = require('process')
 const sveltePlugin = require('esbuild-svelte')
 const sveltePreprocess = require('svelte-preprocess')
 
@@ -21,7 +20,8 @@ const defaults = {
   minify: !isDev,
   platform: 'node',
   sourcemap: true,
-  watch: isDev
+  watch: isDev,
+  define: { 'process.env.NODE_ENV': `"${process.env.NODE_ENV}"` }
 }
 
 if (nodeVersion) {
@@ -37,13 +37,15 @@ const build = (infile, options) => {
   })
 }
 
-build('main.js', { external: ['electron', 'electron-reloader'] })
+build('main.js', { external: ['electron', 'electron-reloader', 'svelte-devtools-standalone'] })
 build('app.js', {
-  external: ['./assets/*'],
+  external: ['./assets/fonts/*'],
   format: 'esm',
+  loader: { '.svg': 'text' },
   plugins: [
     sveltePlugin({
-      compilerOptions: { dev: isDev },
+      compilerOptions: { dev: isDev, enableSourcemap: true },
+      cache: 'overzealous',
       preprocess: sveltePreprocess({
         sourceMap: true,
         postcss: {
