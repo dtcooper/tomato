@@ -1,10 +1,12 @@
 {% extends "admin/change_list.html" %}
 
-{# Add pagination to top of page #}
+{# Add pagination to top of page (if there's more than 1 result #}
 {% block result_list %}
-  {% block pagination %}
-    {{ block.super }}
-  {% endblock %}
+  {% if cl.result_count > 0 %}
+    {% block pagination %}
+      {{ block.super }}
+    {% endblock %}
+  {% endif %}
 
   {{ block.super }}
 {% endblock %}
