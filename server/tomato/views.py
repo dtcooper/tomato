@@ -46,8 +46,9 @@ def sync(request):
         return HttpResponseForbidden()
 
     rotators = list(Rotator.objects.order_by("id"))
+    rotator_ids = [r.id for r in rotators]
     # Only select from rotators that existed at time query was made
-    prefetch_qs = Rotator.objects.only("id").filter(id__in=[r.id for r in rotators])
+    prefetch_qs = Rotator.objects.only("id").filter(id__in=rotator_ids)
     assets = (
         Asset.objects.prefetch_related(Prefetch("rotators", prefetch_qs.order_by("id")))
         .filter(status=Asset.Status.READY)
@@ -58,7 +59,13 @@ def sync(request):
     ).order_by("id")
 
     config = {key: getattr(constance_config, key) for key in dir(constance_config)}
-    config["WAIT_INTERVAL"] = int(config.pop("WAIT_INTERVAL_MINUTES") * 60)  # convert to seconds
+    config.update(
+        {
+            "WAIT_INTERVAL": int(config.pop("WAIT_INTERVAL_MINUTES") * 60),  # convert to seconds
+            # Only intersection of rotators sent to client and value of SINGLE_PLAY_ROTATORS
+            "SINGLE_PLAY_ROTATORS": sorted(set(map(int, config["SINGLE_PLAY_ROTATORS"])) & set(rotator_ids)),
+        }
+    )
 
     return JsonResponse(
         {

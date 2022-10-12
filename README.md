@@ -71,6 +71,22 @@ poetry run mkdocs serve
 
 Head over to <http://localhost:8888/> in your web browser.
 
+## TODO List
+
+### Version 1
+
+- [ ] Button to play an asset from a specific rotator (on Stream Deck too).
+- [ ] Idiot mode, easy mode, advanced mode
+- [ ] Single app client lock
+- [ ] Timeout on fetch
+- [ ] Trim silence on uploaded assets
+
+### Future Versions
+
+- [ ] "Island Mode" with embedded
+      [standalone Python distribution](https://python-build-standalone.readthedocs.io/en/latest/)
+- [ ] Login interstitial to populate with demo data
+
 ## License
 
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT)

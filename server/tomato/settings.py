@@ -1,6 +1,8 @@
 from decimal import Decimal
 from pathlib import Path
 
+from django.core.exceptions import ValidationError
+
 import environ
 
 
@@ -217,12 +219,24 @@ if REQUIRE_STRONG_PASSWORDS:
         {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
     ]
 
+
+def rotator_choices():
+    from tomato.models import Rotator
+
+    return tuple(Rotator.objects.values_list("id", "name").order_by("name"))
+
+
+def validate_no_more_than_three(value):
+    if len(value) > 3:
+        raise ValidationError("Pick a maximum of three choices.")
+
+
 CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
 CONSTANCE_SUPERUSER_ONLY = False
 CONSTANCE_REDIS_CONNECTION = "redis://redis"
 CONSTANCE_ADDITIONAL_FIELDS = {
     "wait_interval_minutes": (
-        "django.forms.fields.DecimalField",
+        "django.forms.DecimalField",
         {
             "decimal_places": 2,
             "max_value": 600,
@@ -231,9 +245,34 @@ CONSTANCE_ADDITIONAL_FIELDS = {
             "widget_kwargs": {"attrs": {"size": 8}},
         },
     ),
+    "ui_modes": (
+        "django.forms.MultipleChoiceField",
+        {
+            "choices": (("idiot", "Idiot mode"), ("easy", "Easy mode"), ("advanced", "Advanced mode")),
+            "widget": "django.forms.widgets.CheckboxSelectMultiple",
+            "required": True,
+        },
+    ),
+    "single_play_rotators": (
+        "django.forms.MultipleChoiceField",
+        {
+            "choices": rotator_choices,
+            "widget": "django.forms.widgets.CheckboxSelectMultiple",
+            "required": False,
+            "validators": (validate_no_more_than_three,),
+        },
+    ),
 }
 CONSTANCE_CONFIG = {
-    "BROADCAST_COMPRESSION": (False, "Enable broadcast compression, smoothing out dynamic range in audio output"),
+    "SINGLE_PLAY_ROTATORS": (
+        [],
+        "Optional rotators to play a single asset from in the Desktop app.",
+        "single_play_rotators",
+    ),
+    "BROADCAST_COMPRESSION": (
+        False,
+        "Enable broadcast compression, smoothing out dynamic range in audio output (client-side).",
+    ),
     "WAIT_INTERVAL_MINUTES": (
         Decimal(20),
         "Time to wait between stop sets (in minutes). Set to 0 to disable the wait interval entirely.",
@@ -242,14 +281,32 @@ CONSTANCE_CONFIG = {
     "WAIT_INTERVAL_SUBTRACTS_STOPSET_PLAYTIME": (
         False,
         (
-            "Wait time subtracts the playtime of a stop set in minutes. This will provide more "
-            "even results, ie the number of stop sets played per hour will be more consistent at "
-            "the expense of a DJs air time."
+            "Wait time subtracts the playtime of a stop set in minutes. This will provide more even results, ie the "
+            "number of stop sets played per hour will be more consistent at the expense of a DJs air time."
         ),
     ),
+    "TRIM_SILENCE": (
+        True,
+        (
+            "Trim silence from the beginning and end of audio files (server-side). Since this processing is done on the"
+            " server, it's applied at the time an audio file is uploaded. This means files will have silence trimmed"
+            " (or not) according to this setting at the time of upload."
+        ),
+    ),
+    "UI_MODES": (["idiot", "easy", "advanced"], "What UI modes are available to the desktop app.", "ui_modes"),
+}
+CONSTANCE_CONFIG_FIELDSETS = {
+    "User Interface Options": (
+        "WAIT_INTERVAL_MINUTES",
+        "WAIT_INTERVAL_SUBTRACTS_STOPSET_PLAYTIME",
+        "UI_MODES",
+        "SINGLE_PLAY_ROTATORS",
+    ),
+    "Audio Options": ("BROADCAST_COMPRESSION", "TRIM_SILENCE"),
 }
 
 SHELL_PLUS_IMPORTS = [
+    "from constance import config",
     "from user_messages import api as user_messages_api",
     "from tomato.ffmpeg import ffprobe",
     "from tomato.tasks import process_asset",

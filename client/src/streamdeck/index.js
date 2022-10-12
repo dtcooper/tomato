@@ -72,7 +72,6 @@ const renderText = (text, iconSize, verticalPadding = 8, horizontalPadding = 7, 
     }
 
     const stretchFactor = lineHeight / fontHeight
-    // TODO take into account that 5 somewhere?
     ctx.setTransform(1, 0, 0, stretchFactor, 0, 0)
     ctx.textAlign = 'center'
     ctx.fillText(line, iconSize / 2, fontHeight + (verticalPadding + (lineHeight + verticalLinePadding) * lineNum) / stretchFactor)
@@ -165,7 +164,6 @@ export default async () => {
     }
   })
 
-  // TODO better hooking to force waiting
   window.addEventListener('beforeunload', async () => {
     if (streamDeck) {
       await streamDeck.resetToLogo()
