@@ -25,5 +25,3 @@ Download one of the following releases,
   * [:material-download: Windows :simple-windows: ](https://priv.bmir.org/tomato-preview-windows.zip)
   * [:material-download: Ubuntu :simple-ubuntu: or Debian :simple-debian: Linux](https://priv.bmir.org/tomato-preview-linux_amd64.deb)
     &mdash; `.deb` package
-  * [:material-download: Fedora :simple-fedora: or Red Hat :simple-redhat: Linux](https://priv.bmir.org/tomato-preview-linux.x86_64.rpm)
-    &mdash; `.rpm` package

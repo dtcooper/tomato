@@ -12,11 +12,11 @@ app.setAboutPanelOptions({
   applicationName: 'Tomato Radio Automation\n(Desktop App)',
   copyright: `\u00A9 2019-${(new Date()).getFullYear()} David Cooper & BMIR.\nAll rights reserved.`,
   website: 'https://github.com/dtcooper/tomato',
-  iconPath: '../assets/icons/tomato.png'
+  iconPath: path.resolve(path.join(__dirname, '../assets/icons/tomato.png'))
 })
 
 // TODO single app lock?
-console.log('dirname', __dirname)
+console.log('dirname', path.resolve(path.join(__dirname, '../assets/icons/tomato.ico')))
 
 function createWindow () {
   const win = new BrowserWindow({
@@ -24,7 +24,7 @@ function createWindow () {
     minWidth: 600,
     height: 600,
     minHeight: 480,
-    icon: path.join(__dirname, '../assets/icons/tomato.ico'),
+    icon: path.resolve(path.join(__dirname, '../assets/icons/tomato.png')),
     webPreferences: {
       devTools: !app.isPackaged,
       contextIsolation: false,

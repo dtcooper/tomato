@@ -94,5 +94,4 @@ jobs:
           npm run build
           npx electron-forge make --arch x64 --platform linux
           mv -v out/make/deb/x64/*.deb tomato-preview-linux_amd64.deb
-          mv -v out/make/rpm/x64/*.rpm tomato-preview-linux.x86_64.rpm
-          scp -P ${{ secrets.SSH_PORT}} tomato-preview-linux_amd64.deb tomato-preview-linux.x86_64.rpm "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
+          scp -P ${{ secrets.SSH_PORT}} tomato-preview-linux_amd64.deb "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
