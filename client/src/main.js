@@ -16,7 +16,7 @@ app.setAboutPanelOptions({
 })
 
 // TODO single app lock?
-console.log(__dirname)
+console.log('dirname', __dirname)
 
 function createWindow () {
   const win = new BrowserWindow({
