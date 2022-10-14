@@ -6,6 +6,7 @@ repo_name: dtcooper/tomato
 repo_url: https://github.com/dtcooper/tomato
 site_name: Tomato Radio Automation
 site_url: https://dtcooper.github.io/tomato/
+site_description: Dead simple radio software
 strict: true
 
 nav:
@@ -29,6 +30,7 @@ plugins:
 
 theme:
   name: material
+  custom_dir: .overrides
   logo: assets/tomato.png
   favicon: assets/tomato.ico
   font:

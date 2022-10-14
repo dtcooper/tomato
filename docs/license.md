@@ -1,3 +1,7 @@
+---
+title: Author & License
+---
+
 # Author & License
 
 ## Author
