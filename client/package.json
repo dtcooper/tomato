@@ -5,7 +5,7 @@
   "description": "Tomato Radio Automation (Desktop App)",
   "main": "dist/main.js",
   "scripts": {
-    "build": "node build.js",
+    "build": "node scripts/build.js",
     "clean": "rm -rf dist out",
     "dev": "NODE_ENV=development npm-run-all clean -p -r build dev:electron",
     "dev:electron": "wait-on -l dist/app.css dist/app.js dist/main.js && electron-forge start",

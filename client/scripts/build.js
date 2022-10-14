@@ -5,6 +5,8 @@ const path = require('path')
 const sveltePlugin = require('esbuild-svelte')
 const sveltePreprocess = require('svelte-preprocess')
 
+process.chdir(path.join(__dirname, '..'))
+
 if (!process.env.NODE_ENV) {
   process.env.NODE_ENV = 'production'
 }

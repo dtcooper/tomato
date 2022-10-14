@@ -22,7 +22,7 @@ class Rotator(TomatoModelBase):
         verbose_name="stop set",
     )
 
-    def get_color(self, type="normal"):
+    def get_color(self, type="regular"):
         return COLORS_DICT[self.color][type]
 
     class Meta(TomatoModelBase.Meta):
