@@ -23,5 +23,6 @@ Download one of the following releases,
   * [:material-download: macOS :simple-apple:](https://priv.bmir.org/tomato-preview-macos.zip)
     &mdash; universal binary for Intel or Apple M1 chips
   * [:material-download: Windows :simple-windows: ](https://priv.bmir.org/tomato-preview-windows.zip)
+    &mdash; `.zip` archive you can extract and run the program executable
   * [:material-download: Ubuntu :simple-ubuntu: or Debian :simple-debian: Linux](https://priv.bmir.org/tomato-preview-linux_amd64.deb)
     &mdash; `.deb` package
