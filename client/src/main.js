@@ -2,11 +2,6 @@ import { app, BrowserWindow, session } from 'electron'
 import path from 'path'
 import { VENDOR_ID as ELGATO_VENDOR_ID } from '@elgato-stream-deck/core'
 
-if (!app.isPackaged) {
-  require('electron-reloader')(module)
-  console.log('Using electron-reloader')
-}
-
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors')
 app.setAboutPanelOptions({
   applicationName: 'Tomato Radio Automation\n(Desktop App)',
@@ -28,26 +23,12 @@ function createWindow () {
     webPreferences: {
       devTools: !app.isPackaged,
       contextIsolation: false,
-      nodeIntegration: true
+      nodeIntegration: true,
+      nativeWindowOpen: true
     }
   })
 
   win.webContents.session.on('select-hid-device', (event, details, callback) => {
-    console.log('select-hid-device', details)
-    win.webContents.session.on('hid-device-added', (event, device) => {
-      console.log('added', device)
-      if (device.vendorId === ELGATO_VENDOR_ID) {
-        console.log('Elgato device plugged in')
-      }
-    })
-
-    win.webContents.session.on('hid-device-removed', (event, device) => {
-      console.log('revemoved', device)
-      if (device.vendorId === ELGATO_VENDOR_ID) {
-        console.log('Elgato device removed')
-      }
-    })
-
     if (details.deviceList && details.deviceList.length > 0) {
       callback(details.deviceList[0].deviceId)
     }
@@ -67,18 +48,19 @@ function createWindow () {
     return false
   })
 
-  win.loadFile(path.normalize(path.join(__dirname, '..', 'index.html')))
   if (!app.isPackaged) {
+    win.webContents.session.setPreloads([require.resolve('svelte-devtools-standalone')])
+  }
+
+  if (app.isPackaged) {
+    win.loadFile(path.normalize(path.join(__dirname, '..', 'index.html')))
+  } else {
+    win.loadURL('http://localhost:3000')
     win.webContents.openDevTools({ mode: 'detach' })
   }
 }
 
 app.whenReady().then(async () => {
-  if (!app.isPackaged) {
-    // Add devtools
-    session.defaultSession.setPreloads([require.resolve('svelte-devtools-standalone')])
-  }
-
   createWindow()
 
   app.on('activate', () => {

@@ -86,6 +86,7 @@ Head over to <http://localhost:8888/> in your web browser.
 - [ ] "Island Mode" with embedded
       [standalone Python distribution](https://python-build-standalone.readthedocs.io/en/latest/)
 - [ ] Login interstitial to populate with demo data
+- [ ] Integrated Twilio call board
 
 ## License
 

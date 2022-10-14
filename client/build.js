@@ -58,3 +58,8 @@ build('app.js', {
     })
   ]
 })
+
+if (isDev) {
+  const browserSync = require('browser-sync')
+  browserSync({ port: 3000, server: '.', open: false, watch: true })
+}

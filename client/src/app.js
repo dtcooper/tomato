@@ -1,7 +1,5 @@
-import Test from './App.svelte'
+import App from './App.svelte'
 
-const test = new Test({
+export default new App({
   target: document.body
 })
-
-export default test
