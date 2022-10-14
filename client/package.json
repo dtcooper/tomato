@@ -10,7 +10,7 @@
     "dev": "NODE_ENV=development npm-run-all clean -p -r build dev:electron",
     "dev:electron": "wait-on -l dist/app.css dist/app.js dist/main.js && electron-forge start",
     "make": "NODE_ENV=production npm-run-all clean build make:forge",
-    "package": "NODE_ENV=production npm-run-all clean build make:package",
+    "package": "NODE_ENV=production npm-run-all clean build package:forge",
     "make:forge": "electron-forge make",
     "package:forge": "electron-forge package"
   },
@@ -59,7 +59,7 @@
       "packagerConfig": {
         "ignore": [
           "^/src$",
-          "^/build.js$",
+          "^/scripts$",
           "^/tailwind.config.js$"
         ],
         "executableName": "tomato",
