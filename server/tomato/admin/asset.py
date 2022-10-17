@@ -5,7 +5,7 @@ from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWid
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
-from django.urls import path
+from django.urls import path, reverse
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 
@@ -27,14 +27,16 @@ class AssetUploadForm(FileFormMixin, forms.Form):
         help_text="Select one or more files to be uploaded as audio assets.",
     )
     rotators = forms.ModelMultipleChoiceField(
-        Rotator.objects.all(), required=False, help_text="Rotators that the newly uploaded asset will be included in."
+        queryset=Rotator.objects.all(),
+        required=False,
+        help_text="Rotators that the newly uploaded asset will be included in.",
+        widget=FilteredSelectMultiple("rotators", False),
     )
 
     def __init__(self, request, admin_site, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         self.fields["rotators"].widget = RelatedFieldWidgetWrapper(
-            FilteredSelectMultiple("rotators", False),
+            self.fields["rotators"].widget,
             Asset._meta.get_field("rotators").remote_field,
             admin_site,
             can_add_related=request.user.has_perm("tomato.add_rotator"),
@@ -114,8 +116,11 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
 
     @admin.display(description="Rotators")
     def rotators_display(self, obj):
-        rotators = [(r.name,) for r in obj.rotators.all()]
-        return format_html_join(mark_safe("<br>\n"), "&#x25cf; {}", rotators) or None
+        rotators = [
+            (reverse("admin:tomato_rotator_change", args=(r.id,)), r.get_color("dark"), r.name)
+            for r in obj.rotators.all()
+        ]
+        return format_html_join(mark_safe("<br>\n"), '&#x25cf; <a href="{}" style="color: {}">{}</a>', rotators) or None
 
     @admin.action(description="Add selected audio assets to rotator", permissions=("add", "change", "delete"))
     def add_rotator(self, request, queryset):

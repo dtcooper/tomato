@@ -80,6 +80,7 @@ Head over to <http://localhost:8888/> in your web browser.
 - [ ] Single app client lock
 - [ ] Timeout on fetch
 - [ ] Trim silence on uploaded assets
+- [ ] Way to parse filename into rotator, start/end date
 
 ### Future Versions
 

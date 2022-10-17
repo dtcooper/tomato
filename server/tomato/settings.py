@@ -262,6 +262,15 @@ CONSTANCE_ADDITIONAL_FIELDS = {
             "validators": (validate_no_more_than_three,),
         },
     ),
+    "asset_end_date_priority_weight_multiplier": (
+        "django.forms.DecimalField",
+        {
+            "decimal_places": 2,
+            "min_value": 0,
+            "widget": "django.forms.TextInput",
+            "widget_kwargs": {"attrs": {"size": 8}},
+        },
+    ),
 }
 CONSTANCE_CONFIG = {
     "SINGLE_PLAY_ROTATORS": (
@@ -272,6 +281,21 @@ CONSTANCE_CONFIG = {
     "BROADCAST_COMPRESSION": (
         False,
         "Enable broadcast compression, smoothing out dynamic range in audio output (client-side).",
+    ),
+    "EXTRACT_METADATA_FROM_FILE": (
+        True,
+        (
+            "Attempt to txtract metadata from audio file (for example an ID3 tag), if this is set to False the system"
+            " just uses filename"
+        ),
+    ),
+    "END_DATE_PRIORITY_WEIGHT_MULTIPLIER": (
+        Decimal(0),
+        (
+            "Multiply an asset's weight by this number if it has an end date AND the current date is the end date (set"
+            " to 0 to disable)"
+        ),
+        "asset_end_date_priority_weight_multiplier",
     ),
     "WAIT_INTERVAL_MINUTES": (
         Decimal(20),
@@ -302,7 +326,8 @@ CONSTANCE_CONFIG_FIELDSETS = {
         "UI_MODES",
         "SINGLE_PLAY_ROTATORS",
     ),
-    "Audio Options": ("BROADCAST_COMPRESSION", "TRIM_SILENCE"),
+    "Airing Options": ("END_DATE_PRIORITY_WEIGHT_MULTIPLIER",),
+    "Audio Options": ("BROADCAST_COMPRESSION", "TRIM_SILENCE", "EXTRACT_METADATA_FROM_FILE"),
 }
 
 SHELL_PLUS_IMPORTS = [

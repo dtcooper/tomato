@@ -70,7 +70,7 @@ def sync(request):
     return JsonResponse(
         {
             "assets": [a.serialize() for a in assets],
-            "rotators": {r.id: r.serialize() for r in rotators},
+            "rotators": [r.serialize() for r in rotators],
             "stopsets": [s.serialize() for s in stopsets],
             "schema_version": SCHEMA_VERSION,
             "config": config,

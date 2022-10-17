@@ -2,8 +2,6 @@ import datetime
 
 from huey import PriorityRedisExpireHuey
 
-from django.conf import settings
-
 from django_redis import get_redis_connection
 
 
