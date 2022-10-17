@@ -48,15 +48,17 @@ build('app.js', {
     sveltePlugin({
       compilerOptions: { dev: isDev, enableSourcemap: true },
       cache: 'overzealous',
-      preprocess: sveltePreprocess({
-        sourceMap: true,
-        postcss: {
-          plugins: [
-            require('tailwindcss'),
-            require('autoprefixer')
-          ]
-        }
-      })
+      preprocess: [
+        sveltePreprocess({
+          sourceMap: true,
+          postcss: {
+            plugins: [
+              require('tailwindcss'),
+              require('autoprefixer')
+            ]
+          }
+        })
+      ]
     })
   ]
 })

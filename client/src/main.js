@@ -1,4 +1,4 @@
-import { app, BrowserWindow, session } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import path from 'path'
 import { VENDOR_ID as ELGATO_VENDOR_ID } from '@elgato-stream-deck/core'
 
@@ -24,6 +24,7 @@ function createWindow () {
       devTools: !app.isPackaged,
       contextIsolation: false,
       nodeIntegration: true,
+      webSecurity: false,
       nativeWindowOpen: true
     }
   })
@@ -48,7 +49,7 @@ function createWindow () {
     return false
   })
 
-  if (!app.isPackaged) {
+  if (!app.isPackaged && process.env.SVELTE_DEVTOOLS) {
     win.webContents.session.setPreloads([require.resolve('svelte-devtools-standalone')])
   }
 

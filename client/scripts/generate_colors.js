@@ -1,12 +1,19 @@
 const muiColors = require('material-ui-colors')
+const Color = require('color')
 
 const filter = ['common', 'brown', 'gray', 'blue-gray']
 const colors = []
 
+// Borrowed front daisyUI
+const contentColor = (color, percentage = 0.8) => {
+  const mixColor = Color(color).isDark() ? 'white' : 'black'
+  return Color(color).mix(Color(mixColor), percentage).saturate(10).round().hex().toLowerCase()
+}
+
 for (let [color, values] of Object.entries(muiColors)) {
   color = color.replace(/([A-Z])/g, '-$&').toLowerCase().replace('grey', 'gray')
   if (!filter.includes(color)) {
-    colors.push({ name: color, light: values.A100, regular: values.A400, dark: values.A700 })
+    colors.push({ name: color, value: values.A400, content: contentColor(values.A400) })
   }
 }
 

@@ -5,10 +5,17 @@
 </script>
 
 <script>
+  import { connected } from './stores/connection'
+
   import Login from './Login.svelte'
+  import Main from './Main.svelte'
 </script>
 
-<Login/>
+{#if !$connected}
+  <Login/>
+{:else}
+  <Main/>
+{/if}
 
 <style global lang="postcss">
   @import "./fonts.css";

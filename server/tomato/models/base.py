@@ -63,7 +63,7 @@ class EnabledBeginEndWeightMixin(models.Model):
     )
     weight = models.DecimalField(
         "weight",
-        max_digits=5,
+        max_digits=6,
         decimal_places=2,
         default=1,
         validators=[greater_than_zero],

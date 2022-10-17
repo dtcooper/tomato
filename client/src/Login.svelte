@@ -1,31 +1,39 @@
 <script>
-  import tomatoIcon from './../assets/icons/tomato.svg'
-  import connectIcon from './../assets/icons/mdi-lan-connect.svg'
+  import { fade } from 'svelte/transition'
 
-  let fakeProgress = 0
-  let interval = null
+  import { progress, sync } from './stores/store'
+  import { address, connected, login, username } from './stores/connection'
+
+  import tomatoIcon from '../assets/icons/tomato.svg'
+  import connectIcon from '../assets/icons/mdi-lan-connect.svg'
 
   export let connecting = false
   export let password = ''
-  export let progress = null
   export let showPassword = false
-  export let error = false
-  export let authError = false
+  export let errors = {auth: false, address: false}
   // export let progress = {percent: 50, index: 4, total: 8, filename: 'test.mp3'}
 
-  export const submit = () => {
+  export const submit = async () => {
+    if (!$address || !$username || !password) {
+      if (!$username || !password)
+        errors.auth = 'You must enter a username or password'
+      if (!$address)
+        errors.address = 'You must enter a server address'
+      return
+    }
+
     connecting = true
-    fakeProgress = 0
-    interval = setInterval(() => {
-      if (++fakeProgress > 100) {
-        clearInterval(interval)
-        error = "Sample connection error"
-        authError = "Sample authentication error"
-        connecting = false
+    const { success, error, errorType } = await login(password)
+    if (success) {
+      if (await sync()) {
+        connected.set(true)
       } else {
-        progress = {percent: fakeProgress, index: fakeProgress, total: 100, filename: `test_${fakeProgress}.mp3`}
+        errors.address = "Error sync'ing with server"
       }
-    }, 15)
+    } else {
+      errors[errorType] = error
+    }
+    connecting = showPassword = false
   }
 </script>
 
@@ -38,22 +46,23 @@
     </div>
     <div class="tomato-svg">{@html tomatoIcon}</div>
   </div>
-  <div class="card w-full bg-base-200 shadow-2xl relative">
+  <div class="card w-full bg-base-300 shadow-2xl relative">
     {#if connecting}
       <div
+        in:fade
         class="absolute inset-0 flex justify-center items-center text-success"
-        class:flex-col={progress}
+        class:flex-col={$progress}
         class:space-y-2={progress}
       >
-        {#if progress}
-          <div class="radial-progress" style="--value: {progress.percent}">{Math.round(progress.percent)}%</div>
+        {#if $progress}
+          <div class="radial-progress" style="--value: {$progress.percent}">{Math.round($progress.percent)}%</div>
         {:else}
           <span class="connect-svg">{@html connectIcon}</span>
         {/if}
         <h2 class="text-3xl italic">Logging in...</h2>
-        {#if progress}
-          <span x-show="progress">File {progress.index} of {progress.total}</span>
-          <span class="font-mono text-sm max-w-md truncate">{progress.filename}</span>
+        {#if $progress}
+          <span>File {$progress.index} of {$progress.total}</span>
+          <span class="font-mono text-sm max-w-md truncate">{$progress.filename}</span>
         {/if}
       </div>
     {/if}
@@ -61,14 +70,15 @@
       <div class="form-control">
         <div class="label">
           <span class="label-text">Server Address</span>
-          {#if error}
-            <span class="label-text-alt font-bold text-error">{error}</span>
+          {#if errors.address}
+            <span class="label-text-alt font-bold text-error">{errors.address}</span>
           {/if}
         </div>
         <input
+          bind:value={$address}
           class="input input-bordered"
-          class:input-error={error}
-          on:input={() => error = false}
+          class:input-error={errors.address}
+          on:input={() => errors.address = false}
           placeholder="https://example.org"
           type="text"
         >
@@ -79,28 +89,29 @@
             <span class="label-text">Username</span>
           </div>
           <input
+            bind:value={$username}
             class="input input-bordered"
-            class:input-error={authError}
+            class:input-error={errors.auth}
             type="text"
             placeholder="Enter username..."
-            on:input={() => authError = false}
+            on:input={() => errors.auth = false}
           >
-          {#if authError}
+          {#if errors.auth}
             <div class="label">
-              <span class="label-text-alt font-bold text-error">{authError}</span>
+              <span class="label-text-alt font-bold text-error">{errors.auth}</span>
             </div>
           {/if}
         </div>
-        <div class="form-control w-full" x-title="password">
+        <div class="form-control w-full">
           <div class="label">
             <span class="label-text">Password</span>
           </div>
           {#if showPassword}
             <input
               bind:value={password}
-              class:input-error={authError}
+              class:input-error={errors.auth}
               class="input input-bordered"
-              on:input={() => authError = false}
+              on:input={() => errors.auth = false}
               placeholder="Enter password..."
               type="text"
               autocapitalize="none"
@@ -110,10 +121,10 @@
           {:else}
             <input
               bind:value={password}
-              class:input-error={authError}
+              class:input-error={errors.auth}
               class:tracking-wider={!showPassword && password.length > 0}
               class="input input-bordered"
-              on:input={() => authError = false}
+              on:input={() => errors.auth = false}
               placeholder="Enter password..."
               type="password"
               autocapitalize="none"

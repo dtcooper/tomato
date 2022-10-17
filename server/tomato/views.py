@@ -59,13 +59,7 @@ def sync(request):
     ).order_by("id")
 
     config = {key: getattr(constance_config, key) for key in dir(constance_config)}
-    config.update(
-        {
-            "WAIT_INTERVAL": int(config.pop("WAIT_INTERVAL_MINUTES") * 60),  # convert to seconds
-            # Only intersection of rotators sent to client and value of SINGLE_PLAY_ROTATORS
-            "SINGLE_PLAY_ROTATORS": sorted(set(map(int, config["SINGLE_PLAY_ROTATORS"])) & set(rotator_ids)),
-        }
-    )
+    config["SINGLE_PLAY_ROTATORS"] = sorted(set(map(int, config["SINGLE_PLAY_ROTATORS"])) & set(rotator_ids))
 
     return JsonResponse(
         {

@@ -22,8 +22,11 @@ class Rotator(TomatoModelBase):
         verbose_name="stop set",
     )
 
-    def get_color(self, type="regular"):
-        return COLORS_DICT[self.color][type]
+    def serialize(self):
+        return {'color': self.color, **super().serialize()}
+
+    def get_color(self, content=False):
+        return COLORS_DICT[self.color]["content" if content else "value"]
 
     class Meta(TomatoModelBase.Meta):
         db_table = "rotators"

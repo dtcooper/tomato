@@ -235,11 +235,11 @@ CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
 CONSTANCE_SUPERUSER_ONLY = False
 CONSTANCE_REDIS_CONNECTION = "redis://redis"
 CONSTANCE_ADDITIONAL_FIELDS = {
-    "wait_interval_minutes": (
+    "wait_interval": (
         "django.forms.DecimalField",
         {
             "decimal_places": 2,
-            "max_value": 600,
+            "max_value": 600 * 60,
             "min_value": 0,
             "widget": "django.forms.TextInput",
             "widget_kwargs": {"attrs": {"size": 8}},
@@ -271,6 +271,16 @@ CONSTANCE_ADDITIONAL_FIELDS = {
             "widget_kwargs": {"attrs": {"size": 8}},
         },
     ),
+    "sync_interval": (
+        "django.forms.DecimalField",
+        {
+            "decimal_places": 2,
+            "max_value": 15 * 60,
+            "min_value": 1,
+            "widget": "django.forms.TextInput",
+            "widget_kwargs": {"attrs": {"size": 8}},
+        },
+    ),
 }
 CONSTANCE_CONFIG = {
     "SINGLE_PLAY_ROTATORS": (
@@ -297,12 +307,13 @@ CONSTANCE_CONFIG = {
         ),
         "asset_end_date_priority_weight_multiplier",
     ),
-    "WAIT_INTERVAL_MINUTES": (
-        Decimal(20),
-        "Time to wait between stop sets (in minutes). Set to 0 to disable the wait interval entirely.",
-        "wait_interval_minutes",
+    "WAIT_INTERVAL": (
+        Decimal(20 * 60),
+        "Time to wait between stop sets (in seconds). Set to 0 to disable the wait interval entirely.",
+        "wait_interval",
     ),
-    "WAIT_INTERVAL_SUBTRACTS_STOPSET_PLAYTIME": (
+    "SYNC_INTERVAL": (Decimal(5 * 20), "Time between client-server syncs (in seconds).", "sync_interval"),
+    "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME": (
         False,
         (
             "Wait time subtracts the playtime of a stop set in minutes. This will provide more even results, ie the "
@@ -321,8 +332,9 @@ CONSTANCE_CONFIG = {
 }
 CONSTANCE_CONFIG_FIELDSETS = {
     "User Interface Options": (
-        "WAIT_INTERVAL_MINUTES",
-        "WAIT_INTERVAL_SUBTRACTS_STOPSET_PLAYTIME",
+        "WAIT_INTERVAL",
+        "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME",
+        "SYNC_INTERVAL",
         "UI_MODES",
         "SINGLE_PLAY_ROTATORS",
     ),
@@ -333,6 +345,7 @@ CONSTANCE_CONFIG_FIELDSETS = {
 SHELL_PLUS_IMPORTS = [
     "from constance import config",
     "from user_messages import api as user_messages_api",
+    "from tomato import constants",
     "from tomato.ffmpeg import ffprobe",
     "from tomato.tasks import process_asset",
 ]
