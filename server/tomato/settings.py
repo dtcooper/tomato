@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from decimal import Decimal
 from pathlib import Path
 
@@ -235,11 +236,11 @@ CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
 CONSTANCE_SUPERUSER_ONLY = False
 CONSTANCE_REDIS_CONNECTION = "redis://redis"
 CONSTANCE_ADDITIONAL_FIELDS = {
-    "wait_interval": (
+    "zero_seconds_to_five_hours": (
         "django.forms.DecimalField",
         {
             "decimal_places": 2,
-            "max_value": 600 * 60,
+            "max_value": 5 * 60 * 60,  # 5 hours
             "min_value": 0,
             "widget": "django.forms.TextInput",
             "widget_kwargs": {"attrs": {"size": 8}},
@@ -275,7 +276,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
         "django.forms.DecimalField",
         {
             "decimal_places": 2,
-            "max_value": 15 * 60,
+            "max_value": 60 * 60,  # 1 hour
             "min_value": 1,
             "widget": "django.forms.TextInput",
             "widget_kwargs": {"attrs": {"size": 8}},
@@ -302,15 +303,23 @@ CONSTANCE_CONFIG = {
     "END_DATE_PRIORITY_WEIGHT_MULTIPLIER": (
         Decimal(0),
         (
-            "Multiply an asset's weight by this number if it has an end date AND the current date is the end date (set"
-            " to 0 to disable)"
+            "Multiply an asset's weight by this number if it has an end date AND the current date is the end date. Set"
+            " to 0 to disable this feature."
         ),
         "asset_end_date_priority_weight_multiplier",
     ),
     "WAIT_INTERVAL": (
         Decimal(20 * 60),
         "Time to wait between stop sets (in seconds). Set to 0 to disable the wait interval entirely.",
-        "wait_interval",
+        "zero_seconds_to_five_hours",
+    ),
+    "NO_REPEAT_ASSETS_TIME": (
+        Decimal(0),
+        (
+            "The time required to elapse for the client to attempt to not repeat any assets. Set to 0 to disable and"
+            " allow potential repetition in the randomization algorithm."
+        ),
+        "zero_seconds_to_five_hours",
     ),
     "SYNC_INTERVAL": (Decimal(5 * 20), "Time between client-server syncs (in seconds).", "sync_interval"),
     "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME": (
@@ -330,17 +339,23 @@ CONSTANCE_CONFIG = {
     ),
     "UI_MODES": (["idiot", "easy"], "What UI modes are available to the desktop app.", "ui_modes"),
 }
-CONSTANCE_CONFIG_FIELDSETS = {
-    "User Interface Options": (
-        "WAIT_INTERVAL",
-        "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME",
-        "SYNC_INTERVAL",
-        "UI_MODES",
-        "SINGLE_PLAY_ROTATORS",
-    ),
-    "Airing Options": ("END_DATE_PRIORITY_WEIGHT_MULTIPLIER",),
-    "Audio Options": ("BROADCAST_COMPRESSION", "TRIM_SILENCE", "EXTRACT_METADATA_FROM_FILE"),
-}
+CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
+    (
+        (
+            "Airing Options",
+            (
+                "WAIT_INTERVAL",
+                "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME",
+                "SYNC_INTERVAL",
+                "SINGLE_PLAY_ROTATORS",
+                "END_DATE_PRIORITY_WEIGHT_MULTIPLIER",
+                "NO_REPEAT_ASSETS_TIME",
+            ),
+        ),
+        ("User Interface Options", ("UI_MODES",)),
+        ("Audio Options", ("BROADCAST_COMPRESSION", "TRIM_SILENCE", "EXTRACT_METADATA_FROM_FILE")),
+    )
+)
 
 SHELL_PLUS_IMPORTS = [
     "from constance import config",

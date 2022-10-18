@@ -48,4 +48,11 @@ class StopsetAdmin(AiringMixin, NumAssetsMixin, TomatoModelAdminBase):
             (i, reverse("admin:tomato_rotator_change", args=(r.id,)), r.get_color(content=True), r.get_color(), r.name)
             for i, r in enumerate(obj.rotators.all(), 1)
         ]
-        return format_html_join(mark_safe("<br>\n"), '{}. <a href="{}" style="padding: 1px 3px; color: {}; background-color: {}">{}</a>', rotators) or None
+        return (
+            format_html_join(
+                mark_safe("<br>\n"),
+                '{}. <a href="{}" style="padding: 1px 3px; color: {}; background-color: {}">{}</a>',
+                rotators,
+            )
+            or None
+        )

@@ -23,7 +23,7 @@ class Rotator(TomatoModelBase):
     )
 
     def serialize(self):
-        return {'color': self.color, **super().serialize()}
+        return {"color": self.color, **super().serialize()}
 
     def get_color(self, content=False):
         return COLORS_DICT[self.color]["content" if content else "value"]
