@@ -32,9 +32,9 @@ Detailed instructions on how to install the server in both development and
 production environments
 [can be found here in the docs](https://dtcooper.github.io/tomato/server/).
 
-### Desktop App
+### Client (Desktop App)
 
-To run the desktop app's code locally, install [nodejs 16+](https://nodejs.org/).
+To run the client's code locally, install [nodejs 16+](https://nodejs.org/).
 Then in your terminal,
 
 ```bash
