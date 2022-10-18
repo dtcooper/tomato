@@ -19,7 +19,7 @@ The backend server is written in [Python](https://www.python.org/)'s
 [Django web framework](https://www.djangoproject.com/), heavily leveraging its
 [automatic admin interface](https://docs.djangoproject.com/en/4.1/ref/contrib/admin/).
 
-The client is a native, cross-platform [Svelte](https://svelte.dev/) +
+The desktop app is a native, cross-platform [Svelte](https://svelte.dev/) +
 [Electron](https://www.electronjs.org/) app and optionally uses the
 [Elgato Stream Deck](https://www.elgato.com/en/stream-deck) as a physical control
 pad.
@@ -32,9 +32,9 @@ Detailed instructions on how to install the server in both development and
 production environments
 [can be found here in the docs](https://dtcooper.github.io/tomato/server/).
 
-### Client
+### Desktop App
 
-To run the client code locally, install [nodejs 16+](https://nodejs.org/).
+To run the desktop app's code locally, install [nodejs 16+](https://nodejs.org/).
 Then in your terminal,
 
 ```bash
