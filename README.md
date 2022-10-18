@@ -82,6 +82,8 @@ Head over to <http://localhost:8888/> in your web browser.
 - [ ] Trim silence on uploaded assets
 - [ ] Way to parse filename into rotator, start/end date
 - [ ] Prevent duplicate assets from playing within a certain time period
+- [ ] Start/end time for assets in client are based on "is likely to play at" time
+- [ ] Empty rotators are warned on (based on feature flag)
 
 ### Future Versions
 
