@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, powerSaveBlocker } from 'electron'
 import path from 'path'
 import windowStateKeeper from 'electron-window-state'
 
@@ -75,6 +75,7 @@ function createWindow () {
 }
 
 app.whenReady().then(async () => {
+  powerSaveBlocker.start('prevent-display-sleep')
   createWindow()
 })
 
