@@ -9,7 +9,8 @@ license = "MIT"
 python = "^3.10"
 django = "^4.1.2"
 django-cleanup = "^6.0.0"
-django-constance = {extras = ["redis"], version = "^2.9.1"}
+# For error messages at top of page, once constance > 2.9.1, can pin again
+django-constance = {git = "https://github.com/jazzband/django-constance.git"}
 django-dirtyfields = "^1.8.2"
 django-environ = "^0.9.0"
 django-file-form = "^3.4.1"
