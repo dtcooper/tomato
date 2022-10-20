@@ -147,6 +147,8 @@ cp .env.sample .env
         server {
           # ... other Nginx config here
 
+          client_max_body_size 25M;
+
           location /assets/ {
             # Replace /home/user/tomato with the path you cloned the repository
             alias /home/user/tomato/server/serve/assets/;

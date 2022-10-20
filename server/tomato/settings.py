@@ -3,6 +3,7 @@ from decimal import Decimal
 from pathlib import Path
 
 from django.core.exceptions import ValidationError
+from django.utils.safestring import mark_safe
 
 import environ
 
@@ -144,11 +145,10 @@ CACHES = {
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 HUEY = {
-    "expire_time": 60 * 60,
-    "huey_class": "tomato.utils.DjangoPriorityRedisExpiryHuey",
+    "results": False,
+    "huey_class": "tomato.utils.DjangoPriorityRedisHuey",
     "immediate": False,
     "name": "tomato",
-    "store_none": True,
 }
 
 LANGUAGE_CODE = "en-us"
@@ -282,6 +282,28 @@ CONSTANCE_ADDITIONAL_FIELDS = {
             "widget_kwargs": {"attrs": {"size": 8}},
         },
     ),
+    "trim_silence_less_than_decibels": (
+        "django.forms.IntegerField",
+        {
+            "max_value": -10,
+            "min_value": -90,
+            "widget": "django.forms.TextInput",
+            "widget_kwargs": {"attrs": {"size": 8}},
+        },
+    ),
+    "audio_format": (
+        "django.forms.ChoiceField",
+        {"choices": (("mp3", "MP3"), ("ogg", "Ogg Vorbis"), ("flac", "FLAC (lossless)"))},
+    ),
+    "audio_bitrate": (
+        "django.forms.ChoiceField",
+        {
+            "choices": tuple(
+                (str(bitrate), f"{bitrate}kbps")
+                for bitrate in (32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320)
+            ),
+        },
+    ),
 }
 CONSTANCE_CONFIG = {
     "SINGLE_PLAY_ROTATORS": (
@@ -291,20 +313,23 @@ CONSTANCE_CONFIG = {
     ),
     "BROADCAST_COMPRESSION": (
         False,
-        "Enable broadcast compression, smoothing out dynamic range in audio output (client-side).",
+        mark_safe(
+            "Enable broadcast compression, smoothing out dynamic range in audio output.<br><strong>NOTE:</strong>"
+            "compression is applied at the time you play an audio asset and performed on-the-fly in the desktop client."
+        ),
     ),
     "EXTRACT_METADATA_FROM_FILE": (
         True,
         (
-            "Attempt to txtract metadata from audio file (for example an ID3 tag), if this is set to False the system"
-            " just uses filename"
+            "Attempt to extract metadata from audio file, if this is set to False the system just uses filename. For"
+            " example with mp3s, metadata would extracted from an ID3 tag."
         ),
     ),
     "END_DATE_PRIORITY_WEIGHT_MULTIPLIER": (
         Decimal(0),
-        (
-            "Multiply an asset's weight by this number if it has an end date AND the current date is the end date. Set"
-            " to 0 to disable this feature."
+        mark_safe(
+            "Multiply an asset's weight by this number if it has an end date <strong>and</strong> the current date is"
+            " the end date. Set to 0 to disable this feature."
         ),
         "asset_end_date_priority_weight_multiplier",
     ),
@@ -331,11 +356,28 @@ CONSTANCE_CONFIG = {
     ),
     "TRIM_SILENCE": (
         True,
-        (
-            "Trim silence from the beginning and end of audio files (server-side). Since this processing is done on the"
-            " server, it's applied at the time an audio file is uploaded. This means files will have silence trimmed"
-            " (or not) according to this setting at the time of upload."
+        mark_safe(
+            "Trim silence from the beginning and end of audio files. Since this processing is done on the server, it's"
+            " applied <strong>only</strong> at the time an audio file is uploaded. This means files will have silence"
+            " trimmed (or not) according to this setting at the time of upload."
         ),
+    ),
+    "TRIM_SILENCE_LESS_THAN_DECIBELS": (
+        -35,
+        (
+            "The amount of decibels (dB) that should be considered silence at the start and end of an audio asset for"
+            " trimming audio. The default of -35 is a good choice."
+        ),
+        "trim_silence_less_than_decibels",
+    ),
+    "AUDIO_BITRATE": (
+        "192",
+        mark_safe(
+            "The audio bitrate to convert an asset to, if <strong>and only if</strong> processing is"
+            " required.<br><strong>NOTE:</strong> processing is required when a file that is uploaded is"
+            " <strong>not</strong> a valid MP3 file or <strong>TRIM_SILENCE</strong> is on."
+        ),
+        "audio_bitrate",
     ),
     "UI_MODES": (["idiot", "easy"], "What user interface modes are available to the desktop app.", "ui_modes"),
     "WARN_ON_EMPTY_ROTATORS": (True, "Warn when a rotator has no eligible assets to choose from."),
@@ -343,7 +385,16 @@ CONSTANCE_CONFIG = {
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
     (
         ("User Interface Options", ("UI_MODES", "WARN_ON_EMPTY_ROTATORS")),
-        ("Audio Options", ("BROADCAST_COMPRESSION", "TRIM_SILENCE", "EXTRACT_METADATA_FROM_FILE")),
+        (
+            "Audio Options",
+            (
+                "BROADCAST_COMPRESSION",
+                "EXTRACT_METADATA_FROM_FILE",
+                "AUDIO_BITRATE",
+                "TRIM_SILENCE",
+                "TRIM_SILENCE_LESS_THAN_DECIBELS",
+            ),
+        ),
         (
             "Airing Options",
             (
@@ -362,6 +413,6 @@ SHELL_PLUS_IMPORTS = [
     "from constance import config",
     "from user_messages import api as user_messages_api",
     "from tomato import constants",
-    "from tomato.ffmpeg import ffprobe",
+    "from tomato.ffmpeg import ffmpeg_convert, ffprobe",
     "from tomato.tasks import process_asset",
 ]

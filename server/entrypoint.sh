@@ -45,7 +45,7 @@ if [ $# = 0 ]; then
     if [ "$__RUN_HUEY" ]; then
         if [ -z "$NUM_HUEY_WORKERS" ]; then
             #  num_cpus * 4 + 2
-            NUM_HUEY_WORKERS="$(python -c 'import multiprocessing as m; print(m.cpu_count() * 4 + 2)')"
+            NUM_HUEY_WORKERS="$(python -c 'import multiprocessing as m; print(m.cpu_count() * 3 + 1)')"
         fi
         CMD="./manage.py run_huey --workers $NUM_HUEY_WORKERS --flush-locks"
         if [ "$DEBUG" -a "$DEBUG" != '0' ]; then

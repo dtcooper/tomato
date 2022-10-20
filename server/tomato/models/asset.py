@@ -1,14 +1,12 @@
 import datetime
 import hashlib
-import os
+from pathlib import Path
 
-from django.core.exceptions import ValidationError
 from django.db import models
 
 from dirtyfields import DirtyFieldsMixin
 from django_file_form.uploaded_file import UploadedTusFile
 
-from ..ffmpeg import ffprobe
 from .base import NAME_MAX_LENGTH, EligibleToAirQuerySet, EnabledBeginEndWeightMixin, TomatoModelBase
 from .rotator import Rotator
 
@@ -32,11 +30,11 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         db_index=True,
         blank=True,
         help_text=(
-            "Optional name, if left unspecified, we'll automatically base it off the audio file's metadata and failing"
+            "Optional name, if left empty, we'll automatically base it off the audio file's metadata and failing"
             " that its filename."
         ),
     )
-    file = models.FileField("audio file", null=True, blank=False)
+    file = models.FileField("audio file")
     md5sum = models.BinaryField(max_length=16, null=True, default=None)
     status = models.SmallIntegerField(
         choices=Status.choices, default=Status.PENDING, help_text="All assets will be processed after uploading."
@@ -67,10 +65,6 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
             return (False, "Processing") if with_reason else False
         return super().is_eligible_to_air(now, with_reason)
 
-    def generate_peaks(self):
-        if not self.file:
-            return
-
     def generate_md5sum(self):
         md5sum = hashlib.md5()
 
@@ -91,24 +85,12 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
 
     @property
     def file_path(self):
-        return self.file.file.file.path if isinstance(self.file.file, UploadedTusFile) else self.file.path
+        return Path(self.file.file.file.path if isinstance(self.file.file, UploadedTusFile) else self.file.path)
 
     def clean(self):
         super().clean()
-        if self.file:
-            ffprobe_data = ffprobe(self.file_path)
-            if not ffprobe_data:
-                raise ValidationError({"file": "Error validating audio file"})
-
-            self.duration = ffprobe_data.duration
-
-            self.name = self.name.strip()
-            if not self.name:
-                if ffprobe_data.title:
-                    self.name = ffprobe_data.title
-                else:
-                    self.name, _ = os.path.splitext(os.path.basename(self.file.name))
-            self.name = self.name[: NAME_MAX_LENGTH - 1].strip() or "Untitled"
+        if not self.name.strip():
+            self.name = Path(self.file.name).stem[:NAME_MAX_LENGTH].strip() or "Untitled"
 
 
 Asset.rotators.through.__str__ = lambda self: f"{self.asset.name} in {self.rotator.name}"

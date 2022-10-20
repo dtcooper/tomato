@@ -12,7 +12,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       Array.from(document.querySelectorAll('.reset-link')).forEach(resetLink => {
         for (const [setting, defaultText] of Object.entries(multipleChoiceFieldChanges)) {
-          if (resetLink.parentElement && resetLink.parentElement.querySelector(`[name=${setting}]`)) {
+          if (resetLink.parentElement && resetLink.parentElement.querySelector(`#id_${setting}`)) {
             const row = resetLink.parentElement.parentElement
             row.children[1].innerHTML = `<p>${defaultText}</p>`
             resetLink.remove()

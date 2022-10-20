@@ -5,15 +5,24 @@ import logging
 import math
 import subprocess
 
+from constance import config
+
 
 logger = logging.getLogger(__name__)
 FFProbe = namedtuple("FFProbe", ("format", "duration", "title"))
 
 
+FILE_FORMATS = {
+    "mp3": {"format": "mp3", "ext": "mp3", "encode_args": ("-ac", "2", "-a:b", "192k")},
+    "ogg/vorbis (128kbit)": {"format": "flac", "ext": "flac"},
+    "ogg (192kpbs)": {"format": "ogg", "ext": "mp3", "encode_args": ("-ac", "2", "-a:b", "192k")},
+}
+
+
 def ffprobe(infile):
     # We want at least one audio channel
     cmd = subprocess.run(
-        [
+        (
             "ffprobe",
             "-i",
             infile,
@@ -27,7 +36,7 @@ def ffprobe(infile):
             "-show_streams",
             "-select_streams",
             "a:0",
-        ],
+        ),
         text=True,
         capture_output=True,
     )
@@ -53,3 +62,41 @@ def ffprobe(infile):
     tags = [tags.get(field, "").strip() for field in ("artist", "title")]
     title = (" - ".join(tag for tag in tags if tag)).strip() or None
     return FFProbe(title=title, **kwargs)
+
+
+def ffmpeg_convert(infile, outfile):
+    if not outfile.name.lower().endswith(".mp3"):
+        raise Exception("Will only convert to MP3")
+
+    args = [
+        "ffmpeg",
+        "-y",
+        "-i",
+        infile,
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-map",
+        "0:a:0",
+        "-b:a",
+        f"{config.AUDIO_BITRATE}k",
+    ]
+    if config.TRIM_SILENCE:
+        args.extend(
+            [
+                "-af",
+                (
+                    "silenceremove=start_periods=1:start_silence=0.1:"
+                    f"start_threshold={config.TRIM_SILENCE_LESS_THAN_DECIBELS}dB,areverse,"
+                    "silenceremove=start_periods=1:start_silence=0.1"
+                    f":start_threshold={config.TRIM_SILENCE_LESS_THAN_DECIBELS}dB,areverse"
+                ),
+            ]
+        )
+    args.append(outfile)
+
+    cmd = subprocess.run(args, text=True, capture_output=True)
+    if cmd.returncode != 0:
+        logger.error(f"ffmpeg returned {cmd.returncode}: {cmd.stderr}")
+
+    return cmd.returncode == 0

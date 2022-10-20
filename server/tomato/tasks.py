@@ -1,54 +1,86 @@
 import logging
-import time
+from pathlib import Path
+import tempfile
 
 from huey import crontab
 
+from django.core.files import File
+
+from constance import config
 from django_file_form.models import TemporaryUploadedFile
 from huey.contrib import djhuey
 from user_messages import api as user_messages_api
 
-from .utils import once_at_startup, pretty_delta
+from .ffmpeg import ffmpeg_convert, ffprobe
+from .models import NAME_MAX_LENGTH
+from .utils import once_at_startup
 
 
 logger = logging.getLogger(__name__)
 
 
-# TODO: retry?
 @djhuey.db_task()
-def process_asset(asset, user=None):
-    begin = time.time()
+def process_asset(asset, empty_name=False, user=None, no_success_message=False, skip_trim=False):
+    def error(message):
+        if user is not None:
+            user_messages_api.error(
+                user,
+                f"{asset.name} {message} and was deleted. Check the file and try again. If this keeps happening,"
+                " check the server logs.",
+            )
+        asset.delete()
 
     asset.refresh_from_db()
+    logger.info(f"Processing {asset.name}")
     asset.status = asset.Status.PROCESSING
     asset.save()
 
-    asset.generate_md5sum()
+    ffprobe_data = ffprobe(asset.file_path)
+    if not ffprobe_data:
+        error("does not appear to contain any audio")
+        return
 
-    # TODO trim silence from beginning and end of audio file
+    asset.duration = ffprobe_data.duration
+
+    if config.EXTRACT_METADATA_FROM_FILE and empty_name:
+        if ffprobe_data.title:
+            asset.name = ffprobe_data.title[:NAME_MAX_LENGTH].strip()
+
+    infile = asset.file_path
+    ffprobe_data = ffprobe(infile)
+
+    if ffprobe_data.format != "mp3" or (config.TRIM_SILENCE and not skip_trim):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            outfile = Path(temp_dir) / "out.mp3"
+            if not ffmpeg_convert(infile, outfile):
+                error("could not be processed")
+                return
+
+            with open(outfile, "rb") as f:
+                asset.file.save(Path(asset.file.name).with_suffix(".mp3"), File(f), save=False)
+            infile.unlink()
+
+    asset.duration = ffprobe(asset.file_path).duration
+    asset.generate_md5sum()
 
     asset.status = asset.Status.READY
     asset.save()
 
-    # TODO: delete asset if it doesn't process properly, error message
-    # # "try again, or if the problem persists the have an administrator check the server logs"
-
-    if user is not None:
-        elapsed = time.time() - begin
-        user_messages_api.success(user, f'Audio asset "{asset.name}" processed after {pretty_delta(elapsed)}!')
+    if not no_success_message and user is not None:
+        user_messages_api.success(user, f'Audio asset "{asset.file_path.name}" processed!')
 
     return True
 
 
 @djhuey.db_task()
-def bulk_process_assets(assets, user=None):
-    begin = time.time()
-    process_calls = process_asset.map((asset, user) for asset in assets)
-    print(process_calls.get(blocking=True))
-    elapsed = time.time() - begin
-    if user:
-        user_messages_api.success(
-            user, f"Bulk processed {len(assets)} audio assets processed after {pretty_delta(elapsed)}!"
-        )
+def bulk_process_assets(assets, user=None, skip_trim=False):
+    for asset in assets:
+        try:
+            process_asset.call_local(asset, empty_name=True, user=user, no_success_message=True, skip_trim=skip_trim)
+        except Exception:
+            pass
+    if user is not None:
+        user_messages_api.success(user, f"Finished processing {len(assets)} audio assets.")
 
 
 @djhuey.db_periodic_task(once_at_startup(crontab(hour="*/6", minute="5")))

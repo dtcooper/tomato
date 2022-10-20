@@ -48,19 +48,19 @@ def sync(request):
 
     error = None
 
-    if request.method == 'POST':
+    if request.method == "POST":
         try:
             json_data = json.loads(request.body)
         except json.JSONDecodeError:
-            error = 'Invalid JSON body.'
+            error = "Invalid JSON body."
         else:
             if isinstance(json_data, list):
                 for client_log_entry in json_data:
                     pass  # TODO process log entries
             else:
-                error = 'Invalid JSON body.'
+                error = "Invalid JSON body."
 
-    log_status = {'success': True} if error is None else {'success': False, 'error': error}
+    log_status = {"success": True} if error is None else {"success": False, "error": error}
 
     rotators = list(Rotator.objects.order_by("id"))
     rotator_ids = [r.id for r in rotators]

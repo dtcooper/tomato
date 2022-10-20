@@ -1,3 +1,4 @@
+import argparse
 import json
 from pathlib import Path
 import shutil
@@ -34,6 +35,7 @@ class Command(BaseCommand):
         )
         parser.add_argument("--tasks", action="store_true", help="Run processing task manually (useful in development)")
         parser.add_argument("--created-by", default=None, help="Username of the user to create assets with")
+        parser.add_argument("--trim-if-enabled", action="store_true", help=argparse.SUPPRESS)
         parser.add_argument("zipfile", nargs="?", help="Optional path of zipfile, otherwise one will be downloaded")
 
     def handle(self, *args, **options):
@@ -58,7 +60,7 @@ class Command(BaseCommand):
             for model_cls in (Asset, Rotator, Stopset):
                 model_cls.objects.all().delete()
 
-            self.stdout.write(self.style.WARNING(f"Deleted {ALL_MODELS_TEXT}!"))
+            self.stdout.write(self.style.WARNING(f"Deleted all {ALL_MODELS_TEXT}!"))
 
         for model_cls in (Asset, Rotator, Stopset):
             if model_cls.objects.exists():
@@ -130,14 +132,14 @@ class Command(BaseCommand):
                     asset.save()
 
                     if options["tasks"]:
-                        process_asset.call_local(asset, user=created_by)
+                        process_asset.call_local(asset, user=created_by, skip_trim=not options["trim_if_enabled"])
 
                     asset.rotators.add(rotator)
                     assets.append(asset)
                     num += 1
 
             if not options["tasks"]:
-                bulk_process_assets(assets, user=created_by)
+                bulk_process_assets(assets, user=created_by, skip_trim=not options["trim_if_enabled"])
 
         for stopset_name, rotator_names in metadata["stopsets"].items():
             self.stdout.write(f"Creating stop set {stopset_name} with {len(rotator_names)} rotators...")

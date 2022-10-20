@@ -1,10 +1,11 @@
 import datetime
 
-from huey import PriorityRedisExpireHuey
+from huey import PriorityRedisHuey
 
 from django_redis import get_redis_connection
 
 
+# XXX unused?
 def pretty_delta(td):
     if isinstance(td, (float, int)):
         td = datetime.timedelta(seconds=round(td))
@@ -39,7 +40,7 @@ def once_at_startup(crontab):
     return startup_crontab
 
 
-class DjangoPriorityRedisExpiryHuey(PriorityRedisExpireHuey):
+class DjangoPriorityRedisHuey(PriorityRedisHuey):
     def __init__(self, *args, **kwargs):
         connection = get_redis_connection()
         kwargs["connection_pool"] = connection.connection_pool

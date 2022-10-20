@@ -78,7 +78,7 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
         ("Additional information", {"fields": ("created_at", "created_by")}),
     )
     filter_horizontal = ("rotators",)
-    list_display = ("name", "airing", "air_date", "weight", "rotators_display", "created_at")
+    list_display = ("name", "airing", "air_date", "weight", "duration", "rotators_display", "created_at")
     list_filter = (AiringFilter, "rotators", "enabled", StatusFilter, ("created_by", NoNullRelatedOnlyFieldFilter))
     list_prefetch_related = "rotators"
     readonly_fields = ("duration", "file_display", "airing") + TomatoModelAdminBase.readonly_fields
@@ -86,11 +86,14 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
     @admin.display(description="Player")
     def file_display(self, obj):
         if obj.file:
-            return format_html(
-                '<audio src="{}" style="height: 45px; width: 100%;" controlslist="nodownload noplaybackrate"'
-                ' preload="auto" controls />',
-                obj.file.url,
-            )
+            if obj.status == obj.Status.READY:
+                return format_html(
+                    '<audio src="{}" style="height: 45px; width: 100%;" controlslist="nodownload noplaybackrate"'
+                    ' preload="auto" controls />',
+                    obj.file.url,
+                )
+            else:
+                return mark_safe("<em>Being processed...</em>")
 
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = list(self.readonly_fields)
@@ -103,10 +106,11 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
         if should_process:
             obj.status = Asset.Status.PENDING
 
+        empty_name = obj.name.strip()
         super().save_model(request, obj, form, change)
 
         if should_process:
-            process_asset(obj, user=request.user)
+            process_asset(obj, empty_name=empty_name, user=request.user)
             self.message_user(
                 request,
                 f'Audio asset "{obj.name}" is being processed. A message will appear when it is ready. Refresh this'
@@ -114,7 +118,7 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
                 messages.WARNING,
             )
 
-    @admin.display(description="Rotators")
+    @admin.display(description="Rotator(s)")
     def rotators_display(self, obj):
         rotators = [
             (reverse("admin:tomato_rotator_change", args=(r.id,)), r.get_color(content=True), r.get_color(), r.name)
