@@ -45,6 +45,22 @@
   <script>
     const TOMATO_DATA = JSON.parse(document.getElementById('tomato-json-data').textContent)
 
+    const getCookie = name => {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          let cookies = document.cookie.split(';')
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim()
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
+                  break
+              }
+          }
+      }
+      return cookieValue
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       Array.from(document.querySelectorAll('.app-tomato.module .model-asset .addlink')).forEach(addLink => {
         const cell = addLink.closest('td')
@@ -54,9 +70,38 @@
         link.href = "{% filter escapejs %}{% url 'admin:tomato_asset_upload' %}{% endfilter %}"
         cell.append(link)
       })
+
+      Array.from(document.querySelectorAll('.dismiss-message')).forEach(dismissLink => {
+        dismissLink.addEventListener('click', async event => {
+          event.preventDefault()
+          const data = new FormData()
+          data.append('id', dismissLink.dataset.messageId)
+          // add form input from hidden input elsewhere on the page
+          data.append('csrfmiddlewaretoken', getCookie('csrftoken'))
+          await fetch("{% url 'dismiss_message' %}", {
+              method: 'POST',
+              body: data,
+              credentials: 'same-origin',
+          })
+          dismissLink.remove()
+        })
+      })
     })
   </script>
 {% endblock %}
+
+{% block messages %}
+  {% if messages %}
+    <ul class="messagelist">{% for message in messages %}
+      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+        {{ message|capfirst }}
+        {% if message.deliver_once is not None and not message.deliver_once %}
+          <a href="#" class="dismiss-message" data-message-id="{{ message.id }}"><strong>Dismiss</strong></a>
+        {% endif %}
+      </li>
+    {% endfor %}</ul>
+  {% endif %}
+{% endblock messages %}
 
 {% block userlinks %}
   <a href="{{ help_docs_url }}" target="_blank">Help Docs</a> /

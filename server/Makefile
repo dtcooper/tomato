@@ -8,11 +8,11 @@ build:
 
 .PHONY: shell
 shell:
-	$(COMPOSE) run --rm --service-ports --use-aliases $(CONTAINER) bash
+	$(COMPOSE) run --rm --service-ports --use-aliases $(CONTAINER) bash || true
 
 .PHONY: up
 up:
-	$(COMPOSE) up --remove-orphans $(shell source .env; if [ -z "$$DEBUG" -o "$$DEBUG" = 0 ]; then echo "-d"; fi)
+	$(COMPOSE) up --remove-orphans $(shell source .env; if [ -z "$$DEBUG" -o "$$DEBUG" = 0 ]; then echo "-d"; fi) || true
 
 .PHONY: down
 down:

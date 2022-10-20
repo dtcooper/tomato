@@ -363,10 +363,11 @@ CONSTANCE_CONFIG = {
         ),
     ),
     "TRIM_SILENCE_LESS_THAN_DECIBELS": (
-        -35,
+        -50,
         (
             "The amount of decibels (dB) that should be considered silence at the start and end of an audio asset for"
-            " trimming audio. The default of -35 is a good choice."
+            " trimming audio. The default of -50 is a good choice, but you can set this as high as -10 at the risk of"
+            " cutting off low-volume intros or outros."
         ),
         "trim_silence_less_than_decibels",
     ),

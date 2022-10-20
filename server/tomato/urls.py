@@ -12,6 +12,7 @@ urlpatterns = [
     path("ping/", views.ping, name="ping"),
     re_path("^server-logs", views.server_logs, name="server_logs"),
     path("upload/", include("django_file_form.urls")),
+    path("dismiss-message", views.dismiss_message, name="dismiss_message"),
 ]
 
 if settings.DEBUG:

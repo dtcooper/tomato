@@ -76,11 +76,11 @@ Head over to <http://localhost:8888/> in your web browser.
 ### Version 1
 
 - [x] [Supress power save mode](https://www.electronjs.org/docs/latest/api/power-save-blocker)
+- [x] Trim silence on uploaded assets
 - [ ] Button to play an asset from a specific rotator (on Stream Deck too).
 - [ ] Idiot mode, easy mode, advanced mode
 - [ ] Single app client lock
 - [ ] Timeout on fetch?
-- [ ] Trim silence on uploaded assets
 - [ ] Way to parse filename into rotator, start/end date
 - [ ] Prevent duplicate assets from playing within a certain time period
 - [ ] Start/end time for assets in client are based on "is likely to play at" time

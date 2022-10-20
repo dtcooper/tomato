@@ -5,10 +5,13 @@ from django.contrib.auth import authenticate
 from django.db.models import Prefetch
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.http.request import split_domain_port
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from constance import config as constance_config
+from user_messages.models import Message
 
 from .constants import SCHEMA_VERSION
 from .models import Asset, Rotator, Stopset, User
@@ -104,3 +107,15 @@ def server_logs(request):
             return HttpResponse(headers={"X-Accel-Redirect": f"/_internal{request.get_full_path()}"})
     else:
         return HttpResponseForbidden()
+
+
+@require_POST
+def dismiss_message(request):
+    if not request.user.is_authenticated:
+        raise HttpResponseForbidden()
+
+    message = get_object_or_404(Message, user=request.user, id=request.POST.get("id"))
+    message.delivered_at = timezone.now()
+    message.save()
+
+    return HttpResponse(status=204)  # No content

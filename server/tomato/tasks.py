@@ -19,57 +19,63 @@ from .utils import once_at_startup
 logger = logging.getLogger(__name__)
 
 
-@djhuey.db_task()
-def process_asset(asset, empty_name=False, user=None, no_success_message=False, skip_trim=False):
+@djhuey.db_task(context=True, retries=3, retry_delay=5)
+def process_asset(asset, empty_name=False, user=None, no_success_message=False, skip_trim=False, task=None):
     def error(message):
         if user is not None:
             user_messages_api.error(
                 user,
                 f"{asset.name} {message} and was deleted. Check the file and try again. If this keeps happening,"
                 " check the server logs.",
+                deliver_once=False,
             )
         asset.delete()
 
-    asset.refresh_from_db()
-    logger.info(f"Processing {asset.name}")
-    asset.status = asset.Status.PROCESSING
-    asset.save()
+    try:
+        asset.refresh_from_db()
+        logger.info(f"Processing {asset.name}")
+        asset.status = asset.Status.PROCESSING
+        asset.save()
 
-    ffprobe_data = ffprobe(asset.file_path)
-    if not ffprobe_data:
-        error("does not appear to contain any audio")
-        return
+        ffprobe_data = ffprobe(asset.file_path)
+        if not ffprobe_data:
+            error("does not appear to contain any audio")
+            return
 
-    asset.duration = ffprobe_data.duration
+        asset.duration = ffprobe_data.duration
 
-    if config.EXTRACT_METADATA_FROM_FILE and empty_name:
-        if ffprobe_data.title:
-            asset.name = ffprobe_data.title[:NAME_MAX_LENGTH].strip()
+        if config.EXTRACT_METADATA_FROM_FILE and empty_name:
+            if ffprobe_data.title:
+                asset.name = ffprobe_data.title[:NAME_MAX_LENGTH].strip()
 
-    infile = asset.file_path
-    ffprobe_data = ffprobe(infile)
+        infile = asset.file_path
+        ffprobe_data = ffprobe(infile)
 
-    if ffprobe_data.format != "mp3" or (config.TRIM_SILENCE and not skip_trim):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            outfile = Path(temp_dir) / "out.mp3"
-            if not ffmpeg_convert(infile, outfile):
-                error("could not be processed")
-                return
+        if ffprobe_data.format != "mp3" or (config.TRIM_SILENCE and not skip_trim):
+            with tempfile.TemporaryDirectory() as temp_dir:
+                outfile = Path(temp_dir) / "out.mp3"
+                if not ffmpeg_convert(infile, outfile):
+                    error("could not be processed")
+                    return
 
-            with open(outfile, "rb") as f:
-                asset.file.save(Path(asset.file.name).with_suffix(".mp3"), File(f), save=False)
-            infile.unlink()
+                with open(outfile, "rb") as f:
+                    asset.file.save(Path(asset.file.name).with_suffix(".mp3"), File(f), save=False)
+                infile.unlink()
 
-    asset.duration = ffprobe(asset.file_path).duration
-    asset.generate_md5sum()
+        asset.duration = ffprobe(asset.file_path).duration
+        asset.generate_md5sum()
 
-    asset.status = asset.Status.READY
-    asset.save()
+        asset.status = asset.Status.READY
+        asset.save()
 
-    if not no_success_message and user is not None:
-        user_messages_api.success(user, f'Audio asset "{asset.file_path.name}" processed!')
+        if not no_success_message and user is not None:
+            user_messages_api.success(user, f'Audio asset "{asset.file_path.name}" processed!')
 
-    return True
+    except Exception:
+        if task is None or task.retries == 0:
+            error("could not be processed")
+
+        raise
 
 
 @djhuey.db_task()
