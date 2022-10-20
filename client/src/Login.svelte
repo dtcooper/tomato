@@ -1,7 +1,7 @@
 <script>
   import { fade } from 'svelte/transition'
 
-  import { progress, sync } from './stores/store'
+  import { darkMode, progress, sync } from './stores/store'
   import { address, connected, login, username } from './stores/connection'
 
   import tomatoIcon from '../assets/icons/tomato.svg'
@@ -37,11 +37,15 @@
   }
 </script>
 
+<button class="btn btn-sm btn-circle absolute top-1.5 right-3" on:click={() => $darkMode = !$darkMode}>
+  {#if $darkMode}&#x2600;&#xFE0F;{:else}&#x1F319;{/if}
+</button>
+
 <div class="flex flex-col justify-center items-center min-h-screen w-full max-w-screen-sm mx-auto space-y-3">
   <div class="flex w-full items-center justify-evenly">
     <div class="tomato-svg">{@html tomatoIcon}</div>
     <div class="flex flex-col items-center font-mono font-bold space-y-1">
-      <h1 class="text-4xl shadow-xl">Tomato</h1>
+      <h1 class="text-4xl">Tomato</h1>
       <h2 class="text-2xl italic">Radio Automation</h2>
     </div>
     <div class="tomato-svg">{@html tomatoIcon}</div>

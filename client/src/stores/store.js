@@ -3,7 +3,7 @@ import download from 'download'
 import dayjs from 'dayjs'
 
 import { derived, get, writable } from 'svelte/store'
-import { writable as persistentWriteable } from 'svelte-local-storage-store'
+import { writable as persistentWritable } from 'svelte-local-storage-store'
 
 import { address, accessToken } from './connection'
 
@@ -13,9 +13,10 @@ const { promises: fs } = require('fs')
 const appData = process.env.APPDATA || `${process.env.HOME}${process.platform === 'darwin' ? '/Library/Preferences' : '/.local/share'}`
 const dataDir = path.join(appData, 'com.bmir.tomato/assets')
 
+export const syncing = writable(false)
 export const progress = writable(false)
 const emptyStore = { assets: [], rotators: [], stopsets: [], config: [] }
-const store = persistentWriteable('store', emptyStore)
+const store = persistentWritable('store', emptyStore)
 let rotatorsById = window.rotatorsById = {}
 
 export const rotators = derived(store, $store => $store.rotators)
@@ -36,6 +37,10 @@ const processAssetsAndStopsets = objs => objs.map(obj => ({
 export const assets = derived(store, $store => processAssetsAndStopsets($store.assets))
 export const stopsets = derived(store, $store => processAssetsAndStopsets($store.stopsets))
 export const config = derived(store, $store => $store.config)
+export const darkMode = persistentWritable('darkMode', window.matchMedia('(prefers-color-scheme: dark)').matches)
+darkMode.subscribe((value) => {
+  document.documentElement.setAttribute('data-theme', value ? 'dark' : 'light')
+})
 
 const fileExists = async (asset) => {
   try {
@@ -77,6 +82,12 @@ const isMd5Correct = async (asset) => {
 
 export const sync = async () => {
   let response, data
+
+  if (get(syncing)) {
+    return
+  }
+
+  syncing.set(true)
 
   try {
     response = await fetch(`${get(address)}sync/`, { headers: { 'X-Access-Token': get(accessToken) } })
@@ -121,6 +132,7 @@ export const sync = async () => {
 
   store.set(data)
   progress.set(false)
+  syncing.set(false)
   console.log("Done sync'ing")
   return true
 }
@@ -157,11 +169,12 @@ export const generateStopset = () => {
     const generated = []
     for (const rotator of stopset.rotators) {
       const rotatorAssets = eligibleAssets.filter(a => a.rotators.findIndex(r => r.id === rotator.id) > -1)
+      let asset = null
       if (rotatorAssets.length > 0) {
-        const asset = rotatorAssets[pickRandomItemByWeight(rotatorAssets)]
-        generated.push([rotator, asset])
+        asset = rotatorAssets[pickRandomItemByWeight(rotatorAssets)]
         eligibleAssets = eligibleAssets.filter(a => a.id !== asset.id)
       }
+      generated.push([rotator, asset])
     }
     if (generated.length > 0) {
       return { stopset, assets: generated }

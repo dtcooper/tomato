@@ -35,7 +35,7 @@ module.exports = {
     }
   },
   daisyui: {
-    themes: ['synthwave']
+    themes: ['dark', 'light']
   },
   plugins: [require('daisyui')]
 }

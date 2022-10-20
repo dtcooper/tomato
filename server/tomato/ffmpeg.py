@@ -10,13 +10,13 @@ logger = logging.getLogger(__name__)
 FFProbe = namedtuple("FFProbe", ("format", "duration", "title"))
 
 
-def ffprobe(path):
+def ffprobe(infile):
     # We want at least one audio channel
     cmd = subprocess.run(
         [
             "ffprobe",
             "-i",
-            path,
+            infile,
             "-print_format",
             "json",
             "-hide_banner",

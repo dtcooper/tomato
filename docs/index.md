@@ -39,6 +39,8 @@ flowchart RL
 
 ## Features
 
+### Non-Features (What Tomato is **<u>Not</u>**)
+
 ## Why The Name?
 
 Simply said, this software was named after my cat, Tomato... or more

@@ -1,10 +1,13 @@
-import { get } from 'svelte/store'
-import { writable as persistentWriteable } from 'svelte-local-storage-store'
+import { get, writable } from 'svelte/store'
+import { writable as persistentWritable } from 'svelte-local-storage-store'
 
-export const accessToken = persistentWriteable('accessToken', '')
-export const address = persistentWriteable('address', '')
-export const connected = persistentWriteable('connected', false)
-export const username = persistentWriteable('username', '')
+export const accessToken = persistentWritable('accessToken', '')
+export const address = persistentWritable('address', '')
+export const connected = persistentWritable('connected', false)
+export const username = persistentWritable('username', '')
+export const online = writable(navigator.onLine)
+window.addEventListener('offline', () => { online.set(false) })
+window.addEventListener('online', () => { online.set(true) })
 
 const ping = async () => {
   let data, response

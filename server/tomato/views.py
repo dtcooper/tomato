@@ -40,10 +40,27 @@ def access_token(request):
     return JsonResponse(response)
 
 
+@csrf_exempt
 def sync(request):
     user = user_from_request(request)
     if not user and not settings.DEBUG:
         return HttpResponseForbidden()
+
+    error = None
+
+    if request.method == 'POST':
+        try:
+            json_data = json.loads(request.body)
+        except json.JSONDecodeError:
+            error = 'Invalid JSON body.'
+        else:
+            if isinstance(json_data, list):
+                for client_log_entry in json_data:
+                    pass  # TODO process log entries
+            else:
+                error = 'Invalid JSON body.'
+
+    log_status = {'success': True} if error is None else {'success': False, 'error': error}
 
     rotators = list(Rotator.objects.order_by("id"))
     rotator_ids = [r.id for r in rotators]
@@ -63,6 +80,7 @@ def sync(request):
 
     return JsonResponse(
         {
+            **log_status,
             "assets": [a.serialize() for a in assets],
             "rotators": [r.serialize() for r in rotators],
             "stopsets": [s.serialize() for s in stopsets],

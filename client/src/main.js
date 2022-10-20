@@ -1,6 +1,9 @@
 import { app, BrowserWindow } from 'electron'
 import path from 'path'
-import { VENDOR_ID as ELGATO_VENDOR_ID } from '@elgato-stream-deck/core'
+import windowStateKeeper from 'electron-window-state'
+
+const elgatoVendorId = 4057
+const [minWidth, minHeight, defaultWidth, defaultHeight] = [800, 600, 1000, 800]
 
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors')
 app.setAboutPanelOptions({
@@ -10,15 +13,23 @@ app.setAboutPanelOptions({
   iconPath: path.resolve(path.join(__dirname, '../assets/icons/tomato.png'))
 })
 
-// TODO single app lock?
-console.log('dirname', path.resolve(path.join(__dirname, '../assets/icons/tomato.ico')))
-
 function createWindow () {
+  const { screen } = require('electron')
+  const primaryDisplay = screen.getPrimaryDisplay()
+  const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize
+
+  const mainWindowState = windowStateKeeper({
+    defaultWidth: Math.min(minWidth, Math.max(screenWidth, defaultWidth)),
+    defaultHeight: Math.min(minHeight, Math.max(screenHeight, defaultHeight))
+  })
+
   const win = new BrowserWindow({
-    width: 800,
-    minWidth: 600,
-    height: 600,
-    minHeight: 480,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
+    minWidth,
+    minHeight,
     icon: path.resolve(path.join(__dirname, '../assets/icons/tomato.png')),
     webPreferences: {
       devTools: !app.isPackaged,
@@ -28,6 +39,8 @@ function createWindow () {
       nativeWindowOpen: true
     }
   })
+
+  mainWindowState.manage(win)
 
   win.webContents.session.on('select-hid-device', (event, details, callback) => {
     if (details.deviceList && details.deviceList.length > 0) {
@@ -43,7 +56,7 @@ function createWindow () {
   })
 
   win.webContents.session.setDevicePermissionHandler((details) => {
-    if (details.deviceType === 'hid' && details.device.vendorId === ELGATO_VENDOR_ID) {
+    if (details.deviceType === 'hid' && details.device.vendorId === elgatoVendorId) {
       return true
     }
     return false
@@ -63,12 +76,6 @@ function createWindow () {
 
 app.whenReady().then(async () => {
   createWindow()
-
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow()
-    }
-  })
 })
 
 app.on('window-all-closed', () => {

@@ -286,7 +286,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
 CONSTANCE_CONFIG = {
     "SINGLE_PLAY_ROTATORS": (
         [],
-        "Optional rotators to play a single asset from in the Desktop app.",
+        "Optional rotators to play a single asset from in the Desktop app. You can choose a maximum of 3.",
         "single_play_rotators",
     ),
     "BROADCAST_COMPRESSION": (
@@ -337,10 +337,13 @@ CONSTANCE_CONFIG = {
             " (or not) according to this setting at the time of upload."
         ),
     ),
-    "UI_MODES": (["idiot", "easy"], "What UI modes are available to the desktop app.", "ui_modes"),
+    "UI_MODES": (["idiot", "easy"], "What user interface modes are available to the desktop app.", "ui_modes"),
+    "WARN_ON_EMPTY_ROTATORS": (True, "Warn when a rotator has no eligible assets to choose from."),
 }
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
     (
+        ("User Interface Options", ("UI_MODES", "WARN_ON_EMPTY_ROTATORS")),
+        ("Audio Options", ("BROADCAST_COMPRESSION", "TRIM_SILENCE", "EXTRACT_METADATA_FROM_FILE")),
         (
             "Airing Options",
             (
@@ -352,8 +355,6 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
                 "NO_REPEAT_ASSETS_TIME",
             ),
         ),
-        ("User Interface Options", ("UI_MODES",)),
-        ("Audio Options", ("BROADCAST_COMPRESSION", "TRIM_SILENCE", "EXTRACT_METADATA_FROM_FILE")),
     )
 )
 
