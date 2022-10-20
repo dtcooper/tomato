@@ -12,7 +12,6 @@ from huey.contrib import djhuey
 from user_messages import api as user_messages_api
 
 from .ffmpeg import ffmpeg_convert, ffprobe
-from .models import NAME_MAX_LENGTH
 from .utils import once_at_startup
 
 
@@ -46,7 +45,7 @@ def process_asset(asset, empty_name=False, user=None, no_success_message=False, 
 
         if config.EXTRACT_METADATA_FROM_FILE and empty_name:
             if ffprobe_data.title:
-                asset.name = ffprobe_data.title[:NAME_MAX_LENGTH].strip()
+                asset.name = ffprobe_data.title
 
         infile = asset.file_path
         ffprobe_data = ffprobe(infile)

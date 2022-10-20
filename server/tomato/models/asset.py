@@ -60,6 +60,10 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         verbose_name = "audio asset"
         ordering = ("-created_at",)
 
+    def save(self, *args, **kwargs):
+        self.name = self.name[:NAME_MAX_LENGTH].strip() or "Untitled"
+        super().save(*args, **kwargs)
+
     def is_eligible_to_air(self, now=None, with_reason=False):
         if self.status != self.Status.READY:
             return (False, "Processing") if with_reason else False
@@ -90,7 +94,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
     def clean(self):
         super().clean()
         if not self.name.strip():
-            self.name = Path(self.file.name).stem[:NAME_MAX_LENGTH].strip() or "Untitled"
+            self.name = Path(self.file.name).stem
 
 
 Asset.rotators.through.__str__ = lambda self: f"{self.asset.name} in {self.rotator.name}"
