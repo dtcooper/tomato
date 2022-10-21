@@ -34,5 +34,11 @@
     .btn:active {
       filter: brightness(97%);
     }
+
+  }
+
+  :root {
+    --padding-card: 0;
+    font-size: 0.9em;
   }
 </style>

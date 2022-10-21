@@ -29,6 +29,7 @@ rotators.subscribe($rotators => {
 
 const processAssetsAndStopsets = objs => objs.map(obj => ({
   ...obj,
+  duration: obj.duration !== undefined ? dayjs.duration(obj.duration, 'seconds') : undefined,
   begin: obj.begin && dayjs(obj.begin),
   end: obj.end && dayjs(obj.end),
   rotators: obj.rotators.map(id => rotatorsById[id])
@@ -174,7 +175,7 @@ export const generateStopset = () => {
         asset = rotatorAssets[pickRandomItemByWeight(rotatorAssets)]
         eligibleAssets = eligibleAssets.filter(a => a.id !== asset.id)
       }
-      generated.push([rotator, asset])
+      generated.push({ rotator, asset })
     }
     if (generated.length > 0) {
       return { stopset, assets: generated }

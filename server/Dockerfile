@@ -39,7 +39,7 @@ RUN apt-get update \
             "https://raw.githubusercontent.com/django/django/${DJANGO_BASH_COMPLETION_VERSION}/extras/django_bash_completion" \
     ; fi
 
-COPY pyproject.toml poetry.lock /app/
+COPY constants.json pyproject.toml poetry.lock /app/
 WORKDIR /app
 RUN poetry install $([ -z "$DEBUG" -o "$DEBUG" = '0' ] && echo '--without=dev')
 

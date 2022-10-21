@@ -3,7 +3,7 @@ import json
 from django.conf import settings
 
 
-with open(settings.PROJECT_DIR / ".." / ".." / "constants.json", "rb") as file:
+with open(settings.PROJECT_DIR / "constants.json", "rb") as file:
     _data = json.load(file)
 
 SCHEMA_VERSION = _data["schema_version"]
