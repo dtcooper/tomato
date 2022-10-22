@@ -307,7 +307,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "huey"
-version = "2.4.3"
+version = "2.4.4"
 description = "huey, a little task queue"
 category = "main"
 optional = false
@@ -758,7 +758,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "2b39ab5b769286f88f692432371111b526092b826fcc28335ea7552b13241593"
+content-hash = "9b5a8792256fb92d36305edcff957070a69eebe9bc3f858c1cdb000a3ef795ee"
 
 [metadata.files]
 appnope = [
@@ -921,7 +921,7 @@ hiredis = [
     {file = "hiredis-2.0.0.tar.gz", hash = "sha256:81d6d8e39695f2c37954d1011c0480ef7cf444d4e3ae24bc5e89ee5de360139a"},
 ]
 huey = [
-    {file = "huey-2.4.3.tar.gz", hash = "sha256:4fa2f6055d581778c3bcf93fc8c9ce87aecc2a345d5ff35bd955da152c02ef37"},
+    {file = "huey-2.4.4.tar.gz", hash = "sha256:6a27a7862a7a982c0508ad4e548d95765e3b0d97093a51106f07540837a09c86"},
 ]
 idna = [
     {file = "idna-3.4-py3-none-any.whl", hash = "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"},
