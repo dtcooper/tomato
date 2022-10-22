@@ -54,8 +54,7 @@ def process_asset(asset, empty_name=False, user=None, no_success_message=False, 
             with tempfile.TemporaryDirectory() as temp_dir:
                 outfile = Path(temp_dir) / "out.mp3"
                 if not ffmpeg_convert(infile, outfile):
-                    error("could not be processed")
-                    return
+                    raise Exception("ffmpeg threw an error!")
 
                 with open(outfile, "rb") as f:
                     asset.file.save(Path(asset.file.name).with_suffix(".mp3"), File(f), save=False)

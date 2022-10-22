@@ -81,15 +81,15 @@ def ffmpeg_convert(infile, outfile):
         "-b:a",
         f"{config.AUDIO_BITRATE}k",
     ]
+
     if config.TRIM_SILENCE:
+        threshold = f"{config.TRIM_SILENCE_LESS_THAN_DECIBELS}"
         args.extend(
             [
                 "-af",
                 (
-                    "silenceremove=start_periods=1:start_silence=0.1:"
-                    f"start_threshold={config.TRIM_SILENCE_LESS_THAN_DECIBELS}dB,areverse,"
-                    "silenceremove=start_periods=1:start_silence=0.1"
-                    f":start_threshold={config.TRIM_SILENCE_LESS_THAN_DECIBELS}dB,areverse"
+                    f"silenceremove=start_periods=1:start_duration=0.25:start_threshold={threshold}dB:"
+                    f"stop_periods=1:stop_duration=0.25:stop_threshold={threshold}dB",
                 ),
             ]
         )

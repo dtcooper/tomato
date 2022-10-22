@@ -95,7 +95,7 @@ class NumAssetsMixin:
     @admin.display(description="Assets")
     def num_assets(self, obj):
         if isinstance(obj, Stopset):
-            assets = Asset.objects.filter(rotators__in=obj.rotators.distinct().values_list("id", flat=True))
+            assets = Asset.objects.filter(rotators__in=obj.rotators.distinct().values_list("id", flat=True)).distinct()
         else:
             assets = Asset.objects.filter(rotators=obj.id)
 
