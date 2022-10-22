@@ -32,7 +32,7 @@ class TomatoAdminSite(admin.AdminSite):
     site_url = None
     site_title = "Tomato Radio Automation"
     site_header = format_html(
-        '<img src="{0}" width="35">&nbsp;&nbsp;{1}&nbsp;&nbsp;<img src="{0}" width="35">',
+        '<img src="{0}" width="32">&nbsp;&nbsp;{1}&nbsp;&nbsp;<img src="{0}" width="32">',
         static("tomato/tomato.png"),
         site_title,
     )

@@ -88,8 +88,8 @@ def ffmpeg_convert(infile, outfile):
             [
                 "-af",
                 (
-                    f"silenceremove=start_periods=1:start_duration=0.25:start_threshold={threshold}dB:"
-                    f"stop_periods=1:stop_duration=0.25:stop_threshold={threshold}dB"
+                    f"silenceremove=start_periods=1:start_duration=0.25:start_threshold={threshold}dB,"
+                    f"silenceremove=stop_periods=1:stop_duration=0.25:stop_threshold={threshold}dB"
                 ),
             ]
         )
