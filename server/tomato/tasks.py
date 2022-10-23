@@ -30,6 +30,8 @@ def process_asset(asset, empty_name=False, user=None, no_success_message=False, 
             )
         asset.delete()
 
+    # TODO: exception being thrown
+
     try:
         asset.refresh_from_db()
         logger.info(f"Processing {asset.name}")

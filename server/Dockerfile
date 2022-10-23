@@ -21,6 +21,7 @@ RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install --no-install-recommends -y \
         ffmpeg \
+        sox \
         $([ "$DEBUG" -a "$DEBUG" != '0' ] && echo \
             bash-completion \
             less \

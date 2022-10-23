@@ -65,38 +65,49 @@ def ffprobe(infile):
 
 
 def ffmpeg_convert(infile, outfile):
+    # May create multiple files in outfile' directory, so it should be removed
+
     if not outfile.name.lower().endswith(".mp3"):
         raise Exception("Will only convert to MP3")
 
-    args = [
+    ARGS_INFILE_INDEX = 3
+    base_args = [
         "ffmpeg",
         "-y",
         "-i",
         infile,
+    ]
+    ARGS_INFILE_INDEX = len(base_args) - 1  # used below
+    base_args.extend([
         "-hide_banner",
         "-loglevel",
         "error",
+        "-id3v2_version",
+        "3",
         "-map",
         "0:a:0",
-        "-b:a",
-        f"{config.AUDIO_BITRATE}k",
-    ]
+    ])
 
     if config.TRIM_SILENCE:
-        threshold = f"{config.TRIM_SILENCE_LESS_THAN_DECIBELS}"
-        args.extend(
-            [
-                "-af",
-                (
-                    f"silenceremove=start_periods=1:start_duration=0.25:start_threshold={threshold}dB,"
-                    f"silenceremove=stop_periods=1:stop_duration=0.25:stop_threshold={threshold}dB"
-                ),
-            ]
-        )
-    args.append(outfile)
+        trimmed_wav_file = outfile.with_suffix('.wav')
+        untrimmed_wav_file = trimmed_wav_file.with_stem(f'{outfile.stem}-untrimmed')
+        args = base_args + [untrimmed_wav_file]
+        cmd = subprocess.run(args, text=True, capture_output=True)
+        if cmd.returncode != 0:
+            logger.error(f"ffmpeg (trim) returned {cmd.returncode}: {cmd.stderr}")
+            return False
 
+        args = ('sox', untrimmed_wav_file, trimmed_wav_file, 'silence', '1', '0.1', '0.1%', 'reverse', 'silence', '1', '0.1', '0.1%', 'reverse')
+        cmd = subprocess.run(args, text=True, capture_output=True)
+        if cmd.returncode != 0:
+            logger.error(f"sox returned {cmd.returncode}: {cmd.stderr}")
+            return False
+
+        base_args[ARGS_INFILE_INDEX] = trimmed_wav_file  # Swap out trimmed file
+
+    args = base_args + ['-b:a', f"{config.AUDIO_BITRATE}k", outfile]
     cmd = subprocess.run(args, text=True, capture_output=True)
     if cmd.returncode != 0:
-        logger.error(f"ffmpeg returned {cmd.returncode}: {cmd.stderr}")
+        logger.error(f"ffmpeg (final) returned {cmd.returncode}: {cmd.stderr}")
 
     return cmd.returncode == 0

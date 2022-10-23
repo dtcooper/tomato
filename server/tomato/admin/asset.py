@@ -88,7 +88,7 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
         if obj.file:
             if obj.status == obj.Status.READY:
                 return format_html(
-                    '<audio src="{}" style="height: 45px; width: 100%;" controlslist="nodownload noplaybackrate"'
+                    '<audio src="{}" style="height: 45px; width: 100%;" controlslist="noplaybackrate"'
                     ' preload="auto" controls />',
                     obj.file.url,
                 )
