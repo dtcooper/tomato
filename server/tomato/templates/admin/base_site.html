@@ -83,7 +83,7 @@
               body: data,
               credentials: 'same-origin',
           })
-          dismissLink.remove()
+          dismissLink.parentElement.remove()
         })
       })
     })
@@ -96,7 +96,9 @@
       <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
         {{ message|capfirst }}
         {% if message.deliver_once is not None and not message.deliver_once %}
-          <a href="#" class="dismiss-message" data-message-id="{{ message.id }}"><strong>Dismiss</strong></a>
+          <span>
+            [<a href="#" class="dismiss-message" data-message-id="{{ message.id }}"><strong>Dismiss alert</strong></a>]
+          </span>
         {% endif %}
       </li>
     {% endfor %}</ul>

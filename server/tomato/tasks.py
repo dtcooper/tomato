@@ -50,19 +50,19 @@ def process_asset(asset, empty_name=False, user=None, no_success_message=False, 
                 asset.name = ffprobe_data.title
 
         infile = asset.file_path
-        ffprobe_data = ffprobe(infile)
-
         if ffprobe_data.format != "mp3" or (config.TRIM_SILENCE and not skip_trim):
             with tempfile.TemporaryDirectory() as temp_dir:
                 outfile = Path(temp_dir) / "out.mp3"
                 if not ffmpeg_convert(infile, outfile):
                     raise Exception("ffmpeg threw an error!")
 
+                infile.unlink(missing_ok=True)
                 with open(outfile, "rb") as f:
                     asset.file.save(Path(asset.file.name).with_suffix(".mp3"), File(f), save=False)
-                infile.unlink()
 
-        asset.duration = ffprobe(asset.file_path).duration
+            ffprobe_data = ffprobe(asset.file_path)
+
+        asset.duration = ffprobe_data.duration
         asset.generate_md5sum()
 
         asset.status = asset.Status.READY
@@ -74,7 +74,6 @@ def process_asset(asset, empty_name=False, user=None, no_success_message=False, 
     except Exception:
         if task is None or task.retries == 0:
             error("could not be processed")
-
         raise
 
 

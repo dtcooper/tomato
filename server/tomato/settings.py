@@ -320,8 +320,10 @@ CONSTANCE_CONFIG = {
     ),
     "EXTRACT_METADATA_FROM_FILE": (
         True,
-        "Attempt to extract metadata from audio file, if this is set to False the system just uses filename. For"
-        " example with mp3s, metadata would extracted from an ID3 tag.",
+        (
+            "Attempt to extract metadata from audio file, if this is set to False the system just uses filename. For"
+            " example with mp3s, metadata would extracted from an ID3 tag."
+        ),
     ),
     "END_DATE_PRIORITY_WEIGHT_MULTIPLIER": (
         Decimal(0),
@@ -338,15 +340,19 @@ CONSTANCE_CONFIG = {
     ),
     "NO_REPEAT_ASSETS_TIME": (
         Decimal(0),
-        "The time required to elapse for the client to attempt to not repeat any assets. Set to 0 to disable and"
-        " allow potential repetition in the randomization algorithm.",
+        (
+            "The time required to elapse for the client to attempt to not repeat any assets. Set to 0 to disable and"
+            " allow potential repetition in the randomization algorithm."
+        ),
         "zero_seconds_to_five_hours",
     ),
     "SYNC_INTERVAL": (Decimal(5 * 20), "Time between client-server syncs (in seconds).", "sync_interval"),
     "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME": (
         False,
-        "Wait time subtracts the playtime of a stop set in minutes. This will provide more even results, ie the "
-        "number of stop sets played per hour will be more consistent at the expense of a DJs air time.",
+        (
+            "Wait time subtracts the playtime of a stop set in minutes. This will provide more even results, ie the "
+            "number of stop sets played per hour will be more consistent at the expense of a DJs air time."
+        ),
     ),
     "TRIM_SILENCE": (
         True,
@@ -355,13 +361,6 @@ CONSTANCE_CONFIG = {
             " applied <strong>only</strong> at the time an audio file is uploaded. This means files will have silence"
             " trimmed (or not) according to this setting at the time of upload."
         ),
-    ),
-    "TRIM_SILENCE_LESS_THAN_DECIBELS": (
-        -75,
-        "The amount of decibels (dB) that should be considered silence at the start and end of an audio asset for"
-        " trimming audio. The default of -75 is a good choice, but you can set this as high as -20 at the risk of"
-        " cutting off low-volume intros or outros.",
-        "trim_silence_less_than_decibels",
     ),
     "AUDIO_BITRATE": (
         "192",
@@ -385,7 +384,6 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
                 "EXTRACT_METADATA_FROM_FILE",
                 "AUDIO_BITRATE",
                 "TRIM_SILENCE",
-                "TRIM_SILENCE_LESS_THAN_DECIBELS",
             ),
         ),
         (
