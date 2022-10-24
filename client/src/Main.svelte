@@ -44,8 +44,9 @@
       if (entry.error) {
         play()
       } else {
+        entry.audio.currentTime = 0 // for testing, should just refresh
         entry.audio.play()
-        entry.audio.currentTime = entry.audio.duration - 5  //for testing
+        //entry.audio.currentTime = entry.audio.duration - 5  //for testing
         entry.audio.addEventListener('error', () => {
           entry.error = true
           generated = v
@@ -62,6 +63,14 @@
     }
   }
 
+  export const next = () => {
+    const entry = generated.assets[playing]
+    if (!entry.error) {
+      entry.audio.pause()
+    }
+    play()
+  }
+
   export const refresh = () => window.location.reload()
 </script>
 
@@ -71,7 +80,7 @@
     <button on:click={sync} class="btn btn-primary" disabled={$syncing}>Sync</button>
     <button on:click={refresh} class="btn btn-secondary">Generate Stopset</button>
     {#if playing > -1}
-      <button class="btn btn-error">Pause</button>
+      <button on:click={next} class="btn btn-error">Next</button>
     {:else}
       <button on:click={play} class="btn btn-success" disabled={!generated.loaded}>Play</button>
     {/if}
@@ -102,16 +111,21 @@
               class:!text-error-content={error}
               class:!bg-error={error}
             >
-              <div
-                class="radial-progress font-mono"
-                class:text-sm={isHour(asset.duration)}
-                style:--value={progress === null ? 0 : progress / Math.ceil(audio.duration) * 100}
-              >
-                {formatDuration(progress === null ? asset.duration : dayjs.duration(Math.ceil(audio.duration) - progress, 'seconds'))}
-              </div>
+              {#if error}
+                <div class="w-20 h-20 text-error-content font-bold flex items-center justify-center">ERROR</div>
+              {:else}
+                <div
+                  class="font-mono w-20 h-20 flex items-center justify-center"
+                  class:radial-progress={progress !== null}
+                  class:text-sm={isHour(asset.duration)}
+                  style:--value={progress === null ? 0 : progress / Math.ceil(audio.duration) * 100}
+                >
+                  {formatDuration(progress === null ? asset.duration : dayjs.duration(Math.ceil(audio.duration) - progress, 'seconds'))}
+                </div>
+              {/if}
               <div class="flex flex-col">
                 <h3 class="font-bold">{asset.name}</h3>
-                <h4>{rotator.name} [loaded:{loaded}, error:{error}]</h4>
+                <h4>{rotator.name}</h4>
               </div>
               <div>
                 {#if asset}
