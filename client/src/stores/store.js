@@ -5,7 +5,7 @@ import dayjs from 'dayjs'
 import { derived, get, writable } from 'svelte/store'
 import { writable as persistentWritable } from 'svelte-local-storage-store'
 
-import { address, accessToken } from './connection'
+import { address, connected, accessToken } from './connection'
 
 const path = require('path')
 const { promises: fs } = require('fs')
@@ -38,10 +38,6 @@ const processAssetsAndStopsets = objs => objs.map(obj => ({
 export const assets = derived(store, $store => processAssetsAndStopsets($store.assets))
 export const stopsets = derived(store, $store => processAssetsAndStopsets($store.stopsets))
 export const config = derived(store, $store => $store.config)
-export const darkMode = persistentWritable('darkMode', window.matchMedia('(prefers-color-scheme: dark)').matches)
-darkMode.subscribe((value) => {
-  document.documentElement.setAttribute('data-theme', value ? 'dark' : 'light')
-})
 
 const fileExists = async (asset) => {
   try {
@@ -92,9 +88,16 @@ export const sync = async () => {
 
   try {
     response = await fetch(`${get(address)}sync/`, { headers: { 'X-Access-Token': get(accessToken) } })
+    if (response.status === 403) {
+      syncing.set(false)
+      connected.set(false)
+      return false
+    }
+
     data = await response.json()
   } catch (error) {
     console.error(error)
+    syncing.set(false)
     return false
   }
 

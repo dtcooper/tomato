@@ -38,7 +38,6 @@
   }
 
   :root {
-    --padding-card: 0;
     font-size: 0.9em;
   }
 </style>

@@ -22,13 +22,12 @@ module.exports = {
   ],
   theme: {
     screens: {
-      sm: '801px', // must match minimum width in electron + 1
-      md: '980px',
-      lg: '1280px'
+      sm: '800px', // must match minimum width in electron + 1
+      lg: '1200px'
     },
     extend: {
       minWidth: {
-        sm: '800px'
+        sm: '600px'
       },
       fontFamily: {
         sans: 'Space Grotesk Local',
@@ -38,7 +37,7 @@ module.exports = {
     }
   },
   daisyui: {
-    themes: ['cyberpunk', 'light']
+    themes: ['synthwave']
   },
   plugins: [require('daisyui')]
 }

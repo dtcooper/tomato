@@ -3,7 +3,7 @@ import path from 'path'
 import windowStateKeeper from 'electron-window-state'
 
 const elgatoVendorId = 4057
-const [minWidth, minHeight, defaultWidth, defaultHeight] = [800, 600, 1000, 800]
+const [minWidth, minHeight, defaultWidth, defaultHeight] = [600, 480, 1000, 800]
 
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors')
 app.setAboutPanelOptions({
@@ -35,8 +35,7 @@ function createWindow () {
       devTools: !app.isPackaged,
       contextIsolation: false,
       nodeIntegration: true,
-      webSecurity: false,
-      nativeWindowOpen: true
+      webSecurity: false
     }
   })
 
