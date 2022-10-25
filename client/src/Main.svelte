@@ -7,18 +7,17 @@
   export let generated
   const generateStopsetWithAudioFiles = () => {
     let stopset = generateStopset()
-    generated = {...stopset, loaded: false, assets: stopset.assets.map(({asset, rotator}, i) => {
+    generated = {...stopset, loaded: false, duration: 0.0, assets: stopset.assets.map(({asset, rotator}, i) => {
       // TODO what if asset if empty?
       const audio = new Audio(asset.file.localUrl + (Math.floor(stopset.assets.length * 2.5 * Math.random()) === 0 ? '-bad' : ''))
       const entry = { asset, rotator, audio, loaded: false, progress: null, error: false}
-      entry.audio.addEventListener('canplaythrough', () => {
+      audio.addEventListener('canplaythrough', () => {
         entry.loaded = true
         if (generated.assets.filter(({loaded, error}) => loaded || error).length === generated.assets.length) {
           generated.loaded = true
         }
-        generated = generated
       })
-      entry.audio.addEventListener('error', () => {
+      audio.addEventListener('error', () => {
         entry.error = true
         if (generated.assets.filter(({loaded, error}) => loaded || error).length === generated.assets.length) {
           generated.loaded = true
@@ -88,21 +87,20 @@
 
   <span>{$address} ({$online ? 'online' : 'offline'})</span>
   {#if generated}
-    {@const stopset = generated.stopset}
-    {@const assets = generated.assets}
+    {@const {assets, stopset, duration} = generated}
     <!-- todo compontent for stopset -->
     <div class="grow w-full max-w-full overflow-y-auto font-sans p-2">
       <div class="w-full sm:w-2/3 lg:w-1/2 flex flex-col space-y-1">
         <div class="divider text-xl font-mono font-bold italic !my-3 before:bg-secondary after:bg-secondary">
-          {stopset.name}
+          {stopset.name} [{formatDuration(dayjs.duration(duration, 'seconds'))}]
         </div>
         {#each assets as {asset, rotator, loaded, audio, error, progress}, index}
           <div
             class="border-l-4 pl-2"
             class:border-error={error}
-            class:border-white={!error && playing < index}
+            class:border-content-base={!error && playing < index}
             class:border-green-A400={!error && playing === index}
-            class:border-black={!error && playing > index}
+            class:border-neutral={!error && playing > index}
           >
             <div
               class="p-2 rounded-xl grid gap-2 grid-cols-[min-content_1fr_min-content]"

@@ -85,6 +85,7 @@ Head over to <http://localhost:8888/> in your web browser.
 - [ ] Prevent duplicate assets from playing within a certain time period
 - [ ] Start/end time for assets in client are based on "is likely to play at" time
 - [ ] Empty rotators are warned on (based on feature flag)
+- [ ] Have a maximum upload asset length
 
 ### Future Versions
 

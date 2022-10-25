@@ -53,7 +53,7 @@ class SaveCreatedByMixin:
     def save_model(self, request, obj, form, change):
         if not change and hasattr(obj, "created_by"):
             obj.created_by = request.user
-        return super().save_model(request, obj, form, change)
+        super().save_model(request, obj, form, change)
 
 
 class AiringMixin:

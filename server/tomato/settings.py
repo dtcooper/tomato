@@ -314,7 +314,7 @@ CONSTANCE_CONFIG = {
     "BROADCAST_COMPRESSION": (
         False,
         mark_safe(
-            "Enable broadcast compression, smoothing out dynamic range in audio output.<br><strong>NOTE:</strong>"
+            "Enable broadcast compression, smoothing out dynamic range in audio output.<br><strong>NOTE:</strong> "
             "compression is applied at the time you play an audio asset and performed on-the-fly in the desktop client."
         ),
     ),

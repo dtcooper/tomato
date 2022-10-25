@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.11-bullseye
 
 ARG DEBUG=0 \
     DJANGO_BASH_COMPLETION_VERSION=4.1 \
