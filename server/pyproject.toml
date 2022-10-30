@@ -30,7 +30,7 @@ django-debug-toolbar = "^3.7.0"
 django-extensions = "^3.2.1"
 flake8 = "^5.0.4"
 ipdb = "^0.13.9"
-ipython = "^8.5.0"
+ipython = "^8.6.0"
 isort = "^5.10.1"
 
 [build-system]
