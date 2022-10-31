@@ -212,6 +212,25 @@ cp .env.sample .env
     Tomato will be configured to auto-restart on crashes, and and system
     start-up.
 
+
+## Configuration
+
+{% for section, config_names in DJANGO_SETTINGS.CONSTANCE_CONFIG_FIELDSETS.items() %}
+### {{ section }}
+
+!!! info ""
+    {% for name in config_names %}
+    {% with config=DJANGO_SETTINGS.CONSTANCE_CONFIG[name] %}
+    {% with default=config[0], description=config[1], type=config[2] %}
+    `{{ name }}` --- **Type: {{ get_constance_config_type(default, type) }}**
+    :   {{ description }}
+
+        Default: `{{ get_constance_config_default(name, default) }}`
+    {% endwith %}
+    {% endwith %}
+    {% endfor %}
+{% endfor %}
+
 [certbot]: https://certbot.eff.org/
 [compose]: https://docs.docker.com/compose/
 [django]: https://www.djangoproject.com/
