@@ -282,19 +282,6 @@ CONSTANCE_ADDITIONAL_FIELDS = {
             "widget_kwargs": {"attrs": {"size": 8}},
         },
     ),
-    "trim_silence_less_than_decibels": (
-        "django.forms.IntegerField",
-        {
-            "max_value": -20,
-            "min_value": -90,
-            "widget": "django.forms.TextInput",
-            "widget_kwargs": {"attrs": {"size": 8}},
-        },
-    ),
-    "audio_format": (
-        "django.forms.ChoiceField",
-        {"choices": (("mp3", "MP3"), ("ogg", "Ogg Vorbis"), ("flac", "FLAC (lossless)"))},
-    ),
     "audio_bitrate": (
         "django.forms.ChoiceField",
         {
