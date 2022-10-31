@@ -398,6 +398,40 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    Configuration
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#user-interface-options" class="md-nav__link">
+    User Interface Options
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audio-options" class="md-nav__link">
+    Audio Options
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#airing-options" class="md-nav__link">
+    Airing Options
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -635,6 +669,82 @@ command line,</p>
 start-up.</p>
 </div>
 </div>
+</div>
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">←</a></h2>
+<h3 id="user-interface-options">User Interface Options<a class="headerlink" href="#user-interface-options" title="Permanent link">←</a></h3>
+<div class="admonition info">
+<dl>
+<dt><code>UI_MODES</code> --- <strong>Type: Choice of: Idiot mode, Easy mode or Advanced mode</strong></dt>
+<dd>
+<p>What user interface modes are available to the desktop app.</p>
+<p>Default: <code>['idiot', 'easy']</code></p>
+</dd>
+<dt><code>WARN_ON_EMPTY_ROTATORS</code> --- <strong>Type: Boolean (true or false)</strong></dt>
+<dd>
+<p>Warn when a rotator has no eligible assets to choose from.</p>
+<p>Default: <code>True</code></p>
+</dd>
+</dl>
+</div>
+<h3 id="audio-options">Audio Options<a class="headerlink" href="#audio-options" title="Permanent link">←</a></h3>
+<div class="admonition info">
+<dl>
+<dt><code>BROADCAST_COMPRESSION</code> --- <strong>Type: Boolean (true or false)</strong></dt>
+<dd>
+<p>Enable broadcast compression, smoothing out dynamic range in audio output.<br><strong>NOTE:</strong> compression is applied at the time you play an audio asset and performed on-the-fly in the desktop client.</p>
+<p>Default: <code>False</code></p>
+</dd>
+<dt><code>EXTRACT_METADATA_FROM_FILE</code> --- <strong>Type: Boolean (true or false)</strong></dt>
+<dd>
+<p>Attempt to extract metadata from audio file, if this is set to False the system just uses filename. For example with mp3s, metadata would extracted from an ID3 tag.</p>
+<p>Default: <code>True</code></p>
+</dd>
+<dt><code>AUDIO_BITRATE</code> --- <strong>Type: 32kbps through 320kbps</strong></dt>
+<dd>
+<p>The audio bitrate to convert an asset to, if <strong>and only if</strong> processing is required.<br><strong>NOTE:</strong> processing is required when a file that is uploaded is <strong>not</strong> a valid MP3 file or <strong>TRIM_SILENCE</strong> is on.</p>
+<p>Default: <code>192kbps</code></p>
+</dd>
+<dt><code>TRIM_SILENCE</code> --- <strong>Type: Boolean (true or false)</strong></dt>
+<dd>
+<p>Trim silence from the beginning and end of audio files. Since this processing is done on the server, it's applied <strong>only</strong> at the time an audio file is uploaded. This means files will have silence trimmed (or not) according to this setting at the time of upload.</p>
+<p>Default: <code>True</code></p>
+</dd>
+</dl>
+</div>
+<h3 id="airing-options">Airing Options<a class="headerlink" href="#airing-options" title="Permanent link">←</a></h3>
+<div class="admonition info">
+<dl>
+<dt><code>WAIT_INTERVAL</code> --- <strong>Type: Numeric</strong></dt>
+<dd>
+<p>Time to wait between stop sets (in seconds). Set to 0 to disable the wait interval entirely.</p>
+<p>Default: <code>1200</code></p>
+</dd>
+<dt><code>WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME</code> --- <strong>Type: Boolean (true or false)</strong></dt>
+<dd>
+<p>Wait time subtracts the playtime of a stop set in minutes. This will provide more even results, ie the number of stop sets played per hour will be more consistent at the expense of a DJs air time.</p>
+<p>Default: <code>False</code></p>
+</dd>
+<dt><code>SYNC_INTERVAL</code> --- <strong>Type: Numeric</strong></dt>
+<dd>
+<p>Time between client-server syncs (in seconds).</p>
+<p>Default: <code>100</code></p>
+</dd>
+<dt><code>SINGLE_PLAY_ROTATORS</code> --- <strong>Type: One or more rotators</strong></dt>
+<dd>
+<p>Optional rotators to play a single asset from in the Desktop app. You can choose a maximum of 3.</p>
+<p>Default: <code>None</code></p>
+</dd>
+<dt><code>END_DATE_PRIORITY_WEIGHT_MULTIPLIER</code> --- <strong>Type: Numeric</strong></dt>
+<dd>
+<p>Multiply an asset's weight by this number if it has an end date <strong>and</strong> the current date is the end date. Set to 0 to disable this feature.</p>
+<p>Default: <code>0</code></p>
+</dd>
+<dt><code>NO_REPEAT_ASSETS_TIME</code> --- <strong>Type: Numeric</strong></dt>
+<dd>
+<p>The time required to elapse for the client to attempt to not repeat any assets. Set to 0 to disable and allow potential repetition in the randomization algorithm.</p>
+<p>Default: <code>0</code></p>
+</dd>
+</dl>
 </div>
 
 
