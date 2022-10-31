@@ -6,6 +6,7 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from constance.admin import Config
+from constance import config as constance_config
 
 from ..constants import COLORS_DICT, HELP_DOCS_URL
 from ..models import Asset, ClientLogEntry, Rotator, Stopset, User
@@ -30,14 +31,20 @@ MODELS_HELP_DOCS_TEXT = {
 
 class TomatoAdminSite(admin.AdminSite):
     site_url = None
-    site_title = "Tomato Radio Automation"
-    site_header = format_html(
-        '<img src="{0}" width="32">&nbsp;&nbsp;{1}&nbsp;&nbsp;<img src="{0}" width="32">',
-        static("tomato/tomato.png"),
-        site_title,
-    )
     index_title = "Tomato administration"
     empty_value_display = mark_safe("<em>None</em>")
+
+    @property
+    def site_title(self):
+        return constance_config.STATION_NAME
+
+    @property
+    def site_header(self):
+        return format_html(
+            '<img src="{0}" width="32">&nbsp;&nbsp;{1}&nbsp;&nbsp;<img src="{0}" width="32">',
+            static("tomato/tomato.png"),
+            self.site_title,
+        )
 
     def each_context(self, request):
         context = super().each_context(request)

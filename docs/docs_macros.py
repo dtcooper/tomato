@@ -2,6 +2,7 @@ import decimal
 import sys
 from unittest.mock import Mock
 
+
 _django_settings = None
 TYPES_TO_STRING = {
     int: "Numerica",
@@ -10,9 +11,8 @@ TYPES_TO_STRING = {
     str: "String",
 }
 TYPE_HINTS_TO_STRING = {
-    #"zero_seconds_to_five_hours": "zero_seconds_to_five_hours",
     "single_play_rotators": "One or more rotators",
-    "audio_bitrate": "32kbps through 320kbps"
+    "audio_bitrate": "32kbps through 320kbps",
 }
 CHOICE_FIELDS = ("ui_modes",)
 
@@ -53,10 +53,10 @@ def get_constance_config_default(name, default):
     if isinstance(default, decimal.Decimal):
         default = int(default)
 
-    if name == 'AUDIO_BITRATE':
-        return f'{default}kbps'
-    elif name == 'SINGLE_PLAY_ROTATORS':
-        return 'None'
+    if name == "AUDIO_BITRATE":
+        return f"{default}kbps"
+    elif name == "SINGLE_PLAY_ROTATORS":
+        return "None"
     return repr(default)
 
 

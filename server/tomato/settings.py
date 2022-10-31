@@ -291,8 +291,13 @@ CONSTANCE_ADDITIONAL_FIELDS = {
             ),
         },
     ),
+    "station_name": (
+        "django.forms.CharField",
+        {"max_length": 50, "widget": "django.forms.TextInput", "widget_kwargs": {"attrs": {"size": 40}}},
+    ),
 }
 CONSTANCE_CONFIG = {
+    "STATION_NAME": ("Tomato Radio Automation", "The name of your station.", "station_name"),
     "SINGLE_PLAY_ROTATORS": (
         [],
         "Optional rotators to play a single asset from in the Desktop app. You can choose a maximum of 3.",
@@ -363,7 +368,7 @@ CONSTANCE_CONFIG = {
 }
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
     (
-        ("User Interface Options", ("UI_MODES", "WARN_ON_EMPTY_ROTATORS")),
+        ("User Interface Options", ("STATION_NAME", "UI_MODES", "WARN_ON_EMPTY_ROTATORS")),
         (
             "Audio Options",
             (
