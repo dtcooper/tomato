@@ -33,7 +33,7 @@ jobs:
           chmod 0600 ~/.ssh/id_ed25519
           echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
           cd client
-          npm install
+          npm clean-install
           npm run build
           npx electron-forge make --arch universal --platform darwin
           mv -v out/make/zip/darwin/universal/*.zip tomato-preview-macos.zip
@@ -62,7 +62,7 @@ jobs:
           echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
           cd client
           npm config set script-shell $(which bash)
-          npm install
+          npm clean-install
           npm run build
           npx electron-forge make --arch x64 --platform win32
           mv -v out/make/zip/win32/x64/*.zip tomato-preview-windows.zip
@@ -90,7 +90,7 @@ jobs:
           chmod 0600 ~/.ssh/id_ed25519
           echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
           cd client
-          npm install
+          npm clean-install
           npm run build
           npx electron-forge make --arch x64 --platform linux
           mv -v out/make/deb/x64/*.deb tomato-preview-linux_amd64.deb
