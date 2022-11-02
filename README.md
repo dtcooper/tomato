@@ -73,7 +73,7 @@ Head over to <http://localhost:8888/> in your web browser.
 
 ## Stack
 
-* Client &mdash; JavaScript ([https://nodejs.org/en/](Node.js))
+* Client &mdash; JavaScript ([Node.js](https://nodejs.org/en/))
   * [Electron](https://electronjs.org/), [Svelte](https://svelte.dev/),
     [Tailwind CSS](https://tailwindcss.com/), [daisyUI](https://daisyui.com/),
     and [esbuild](https://esbuild.github.io/).
