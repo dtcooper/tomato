@@ -39,7 +39,7 @@ const build = (infile, options) => {
   })
 }
 
-build('main.js', { external: ['electron', 'electron-reloader', 'svelte-devtools-standalone'] })
+build('main.js', { external: ['electron', 'svelte-devtools-standalone'] })
 build('app.js', {
   external: ['./assets/fonts/*'],
   format: 'esm',

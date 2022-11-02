@@ -71,6 +71,21 @@ poetry run mkdocs serve
 
 Head over to <http://localhost:8888/> in your web browser.
 
+## Stack
+
+* Client &mdash; JavaScript ([https://nodejs.org/en/](Node.js))
+  * [Electron](https://electronjs.org/), [Svelte](https://svelte.dev/),
+    [Tailwind CSS](https://tailwindcss.com/), [daisyUI](https://daisyui.com/),
+    and [esbuild](https://esbuild.github.io/).
+* Server &mdash; [Python](https://www.python.org/)
+  * Libraries: [Django](https://www.djangoproject.com/), [huey](https://huey.readthedocs.io/en/latest/),
+    and [Constance](https://django-constance.readthedocs.io/en/latest/)
+  * Tools, Databases, and Containers: [PostgreSQL](https://www.postgresql.org/),
+    [Redis](https://redis.io/), [NGINX](https://www.nginx.com/),
+    and [Dozzle](https://dozzle.dev/).
+* Documentation
+  * [MkDocs](https://www.mkdocs.org/) and [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/)
+
 ## TODO List
 
 ### Version 1
