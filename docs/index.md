@@ -39,7 +39,16 @@ flowchart RL
 
 ## Features
 
+* Client and server relationship
+* ... and more
+
 ### Non-Features (What Tomato is **<u>Not</u>**)
+
+Tomato is not full automation software, it only automates the playing of
+short audio files grouped together, ie used for advertisements on the radio.
+
+Tomato does not support the playing of any kinds of music between ad breaks,
+instead relying on a live DJ to do that.
 
 ## Why The Name?
 

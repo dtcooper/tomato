@@ -12,7 +12,7 @@ class Rotator(TomatoModelBase):
         default=COLOR_CHOICES[0][0],
         max_length=20,
         choices=COLOR_CHOICES,
-        help_text="Color that appears in the playout software for assets in this rotator.",
+        help_text="Color that appears in the client for this rotator.",
     )
     stopsets = models.ManyToManyField(
         Stopset,
