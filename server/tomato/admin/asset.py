@@ -59,6 +59,7 @@ class StatusFilter(admin.SimpleListFilter):
 
 
 class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
+    # TODO use rotators_display when in readonly mode for colorization
     ROTATORS_FIELDSET = ("Rotators", {"fields": ("rotators",)})
 
     add_fieldsets = (
@@ -96,9 +97,9 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
                 return mark_safe("<em>Being processed...</em>")
 
     def get_readonly_fields(self, request, obj=None):
-        readonly_fields = list(self.readonly_fields)
+        readonly_fields = self.readonly_fields
         if obj is not None and obj.status != Asset.Status.READY:
-            readonly_fields.append("file")
+            readonly_fields += ("file",)
         return readonly_fields
 
     def save_model(self, request, obj, form, change):
