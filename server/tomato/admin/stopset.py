@@ -40,7 +40,13 @@ class StopsetAdmin(AiringMixin, NumAssetsMixin, TomatoModelAdminBase):
     list_display = ("name", "airing", "air_date", "weight", "rotators_display", "num_assets")
     list_filter = (AiringFilter, "enabled", ("created_by", NoNullRelatedOnlyFieldFilter), "rotators")
     list_prefetch_related = Prefetch("rotators", queryset=Rotator.objects.order_by("stopsetrotator__id"))
-    readonly_fields = ("num_assets", "airing") + TomatoModelAdminBase.readonly_fields
+    readonly_fields = ("num_assets", "rotators_display", "airing") + TomatoModelAdminBase.readonly_fields
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+        if obj is not None and not self.has_change_permission(request, obj):
+            fieldsets += ((StopsetRotatorInline.verbose_name_plural.capitalize(), {"fields": ("rotators_display",)}),)
+        return fieldsets
 
     @admin.display(description="Rotators")
     def rotators_display(self, obj):

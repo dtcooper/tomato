@@ -5,8 +5,8 @@ from django.templatetags.static import static
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
-from constance.admin import Config
 from constance import config as constance_config
+from constance.admin import Config
 
 from ..constants import COLORS_DICT, HELP_DOCS_URL
 from ..models import Asset, ClientLogEntry, Rotator, Stopset, User
