@@ -12,9 +12,15 @@ if (!process.env.NODE_ENV) {
 }
 
 const isDev = process.env.NODE_ENV === 'development'
+const watch = isDev && !process.env.BUILD_NO_WATCH
 const srcDir = 'src'
 const distDir = 'dist'
-const { deps: { node: nodeVersion } = {} } = electronReleases.find(release => release.version === (electronVersion)) || {}
+const { deps: { node: nodeVersion } = {} } = electronReleases.find(release => release.version === electronVersion) || {}
+
+console.log(
+  `Building for ${isDev ? 'development' : 'production'}, electron ${electronVersion}, ` +
+  `node ${nodeVersion || 'unknown'}${watch ? ', watching' : ''}...`
+)
 
 const defaults = {
   bundle: true,
@@ -22,8 +28,8 @@ const defaults = {
   minify: !isDev,
   platform: 'node',
   sourcemap: true,
-  watch: isDev,
-  define: { 'process.env.NODE_ENV': `"${process.env.NODE_ENV}"` }
+  define: { 'process.env.NODE_ENV': `"${process.env.NODE_ENV}"` },
+  watch
 }
 
 if (nodeVersion) {
@@ -63,7 +69,7 @@ build('app.js', {
   ]
 })
 
-if (isDev) {
+if (watch) {
   const browserSync = require('browser-sync')
   browserSync({ port: 3000, server: '.', open: false, watch: true, notify: false })
 }
