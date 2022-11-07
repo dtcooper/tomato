@@ -1,4 +1,5 @@
 const materialUIColors = require('material-ui-colors')
+const { '[data-theme=synthwave]': synthwaveTheme } = require('daisyui/src/colors/themes')
 
 // Use material UI colors
 const colors = Object.keys(materialUIColors).reduce((obj, color) => {
@@ -38,7 +39,14 @@ module.exports = {
   },
   daisyui: {
     darkMode: false,
-    darkTheme: ['synthwave']
+    themes: [{
+      default: {
+        ...synthwaveTheme,
+        primary: '#fc49ab',
+        secondary: '#5fe8ff',
+        accent: '#c07eec'
+      }
+    }]
   },
   plugins: [require('daisyui')]
 }
