@@ -100,7 +100,6 @@ Head over to <http://localhost:8888/> in your web browser.
 - [ ] Prevent duplicate assets from playing within a certain time period
 - [ ] Start/end time for assets in client are based on "is likely to play at" time
 - [ ] Empty rotators are warned on (based on feature flag)
-- [ ] Have a maximum upload asset length
 - [ ] Compression and selecting output device using a bridge to
       [the web audio API](https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createMediaElementSource).
 

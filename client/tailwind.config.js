@@ -38,7 +38,7 @@ module.exports = {
   },
   daisyui: {
     darkMode: false,
-    darkTheme: ['night']
+    darkTheme: ['synthwave']
   },
   plugins: [require('daisyui')]
 }

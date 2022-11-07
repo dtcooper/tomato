@@ -1,20 +1,20 @@
 <script context="module">
-  import initializeStreamDeck from './streamdeck'
+  import initializeStreamDeck from "./streamdeck";
 
-  initializeStreamDeck()
+  initializeStreamDeck();
 </script>
 
 <script>
-  import { connected } from './stores/connection'
+  import { connected } from "./stores/connection";
 
-  import Login from './Login.svelte'
-  import Main from './Main.svelte'
+  import Login from "./Login.svelte";
+  import Main from "./Main.svelte";
 </script>
 
 {#if !$connected}
-  <Login/>
+  <Login />
 {:else}
-  <Main/>
+  <Main />
 {/if}
 
 <style global lang="postcss">
@@ -28,13 +28,15 @@
     .btn {
       @apply no-animation;
     }
-    .btn-warning:hover, .btn-info:hover, .btn-success:hover, .btn-error:hover {
+    .btn-warning:hover,
+    .btn-info:hover,
+    .btn-success:hover,
+    .btn-error:hover {
       filter: brightness(110%);
     }
     .btn:active {
       filter: brightness(97%);
     }
-
   }
 
   :root {
