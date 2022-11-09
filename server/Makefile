@@ -30,3 +30,7 @@ check-env:
 distclean:
 	$(COMPOSE) down -v
 	rm -rf serve
+
+.PHONY: outdated
+outdated:
+	$(COMPOSE) run --rm --no-deps --entrypoint /bin/sh app -c "poetry show -o"
