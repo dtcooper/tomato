@@ -2,8 +2,8 @@
 Name=Tomato Radio Automation
 Comment=Tomato Radio Automation (Desktop App)
 GenericName=Tomato Radio Automation
-StartupWMClass=tomato-radio-automation
-Exec=tomato %U
+StartupWMClass=Tomato Radio Automation
+Exec=/usr/lib/tomato/resources/start-tomato.sh %U
 Icon=tomato
 Type=Application
 StartupNotify=false

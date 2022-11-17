@@ -9,7 +9,11 @@
     "clean": "rm -rf dist out",
     "dev": "NODE_ENV=development npm-run-all clean -p -r build dev:electron",
     "svelte-dev": "SVELTE_DEVTOOLS=1 npm run dev",
-    "dev:electron": "wait-on -l dist/app.css dist/app.js dist/main.js http://localhost:3000/ && electron-forge start",
+    "dev:electron": "npm-run-all dev:electron:wait dev:electron:run",
+    "dev:electron:wait": "wait-on -l dist/app.css dist/app.js dist/main.js http://localhost:3000/",
+    "dev:electron:run": "run-script-os",
+    "dev:electron:run:linux": "./scripts/debian/start-tomato.sh",
+    "dev:electron:run:default": "electron-forge start",
     "make": "NODE_ENV=production npm-run-all clean build make:forge",
     "package": "NODE_ENV=production npm-run-all clean build package:forge",
     "make:forge": "electron-forge make",
@@ -44,6 +48,7 @@
     "material-ui-colors": "^1.0.0",
     "md5-file": "^5.0.0",
     "npm-run-all": "^4.1.5",
+    "run-script-os": "^1.1.6",
     "standard": "^17.0.0",
     "svelte": "^3.53.1",
     "svelte-devtools-standalone": "github:RedHatter/svelte-devtools-standalone",
@@ -54,42 +59,8 @@
   },
   "standard": {
     "ignore": [
-      "dist/*.js"
+      "dist/**/*",
+      "out/**/*"
     ]
-  },
-  "config": {
-    "forge": {
-      "packagerConfig": {
-        "ignore": [
-          "^/src$",
-          "^/scripts$",
-          "^/tailwind.config.js$"
-        ],
-        "executableName": "tomato",
-        "icon": "assets/icons/tomato"
-      },
-      "makers": [
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin",
-            "win32"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {
-            "options": {
-              "icon": "assets/icons/tomato.png",
-              "desktopTemplate": "./scripts/debian/tomato.desktop",
-              "scripts": {
-                "postinst": "./scripts/debian/postinst.sh",
-                "postrm": "./scripts/debian/postrm.sh"
-              }
-            }
-          }
-        }
-      ]
-    }
   }
 }

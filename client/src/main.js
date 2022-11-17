@@ -7,7 +7,6 @@ const [minWidth, minHeight, defaultWidth, defaultHeight] = [600, 480, 1000, 800]
 
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors')
 
-app.setName('tomato-radio-automation')
 app.setAboutPanelOptions({
   applicationName: 'Tomato Radio Automation\n(Desktop App)',
   copyright: `\u00A9 2019-${(new Date()).getFullYear()} David Cooper & BMIR.\nAll rights reserved.`,
