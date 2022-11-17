@@ -7,4 +7,4 @@ Exec=/usr/lib/tomato/resources/start-tomato.sh %U
 Icon=tomato
 Type=Application
 StartupNotify=false
-Categories=GNOME;GTK;Utility;
+Categories=Audio;Music;Player;AudioVideo;

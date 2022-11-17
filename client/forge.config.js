@@ -1,7 +1,9 @@
-const extraResource = []
+const process = require('process')
 
-if (process.platform === "linux") {
-  extraResource.push('./scripts/debian/start-tomato.sh')
+const extraFiles = []
+
+if (process.platform === 'linux') {
+  extraFiles.push('./scripts/debian/start-tomato.sh')
 }
 
 module.exports = {
@@ -9,9 +11,10 @@ module.exports = {
     ignore: [
       '^/src$',
       '^/scripts$',
+      '^/forge.config.js$',
       '^/tailwind.config.js$'
     ],
-    extraResource, 
+    extraResource: extraFiles,
     executableName: 'tomato',
     icon: 'assets/icons/tomato'
   },

@@ -2,6 +2,7 @@
 
 # From https://github.com/julusian/node-elgato-stream-deck#linux
 if [ -d '/etc/udev/rules.d/' ]; then
+    echo 'Adding Elgato Stream Deck rules to udev ...'
     cat > /etc/udev/rules.d/50-elgato.rules <<'HEREDOC'
 SUBSYSTEM=="input", GROUP="input", MODE="0666"
 SUBSYSTEM=="usb", ATTRS{idVendor}=="0fd9", ATTRS{idProduct}=="0060", MODE:="666", GROUP="plugdev"
