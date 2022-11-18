@@ -1,9 +1,17 @@
+const fs = require('fs')
+const path = require('path')
 const process = require('process')
 
-const extraFiles = []
+const afterExtract = []
+const extraLinuxFiles = ['start-tomato.sh', '50-elgato.rules']
 
 if (process.platform === 'linux') {
-  extraFiles.push('./scripts/debian/start-tomato.sh')
+  afterExtract.push((buildPath, electronVersion, platform, arch, done) => {
+    for (const file of extraLinuxFiles) {
+      fs.copyFileSync(path.join('scripts/debian', file), path.join(buildPath, file))
+    }
+    done()
+  })
 }
 
 module.exports = {
@@ -14,9 +22,9 @@ module.exports = {
       '^/forge.config.js$',
       '^/tailwind.config.js$'
     ],
-    extraResource: extraFiles,
     executableName: 'tomato',
-    icon: 'assets/icons/tomato'
+    icon: 'assets/icons/tomato',
+    afterExtract
   },
   makers: [
     {
