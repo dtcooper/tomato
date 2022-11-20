@@ -9,6 +9,12 @@ Welcome to Tomato Radio Automation!
 Tomato is easy to use, and hard to screw up playout software written for the
 specific use case of [Burning Man Information Radio](https://bmir.org).
 
+!!! danger "A Word of Caution"
+    Currently, **Tomato is under <u>_active_</u> development**.
+
+    This documentation may not reflect the latest changes, or may include changes
+    that are not yet available. _Beware!_
+
 ## Quickstart
 
 You'll probably want to either read about the [desktop app](client.md) and
