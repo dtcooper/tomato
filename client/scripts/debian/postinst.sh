@@ -4,7 +4,9 @@ UDEV_FILE='50-elgato.rules'
 
 # From https://github.com/julusian/node-elgato-stream-deck#linux
 if [ -d '/etc/udev/rules.d/' ]; then
-    echo 'Adding Elgato Stream Deck rules to udev ...'
+    echo 'Adding Elgato Stream Deck rules to udev (reinsert Stream Deck to use) ...'
     ln -fs "/usr/lib/tomato/${UDEV_FILE}" "/etc/udev/rules.d/${UDEV_FILE}"
     udevadm control --reload-rules
+else
+    echo 'udev not found, not adding Elgato Stream Deck rules.'
 fi
