@@ -76,7 +76,7 @@ class Command(BaseCommand):
                 self.stdout.write(f"Using local archive {zip_filename}...")
             else:
                 self.stdout.write(f"Downloading {SAMPLE_DATA_URL}...")
-                zip_filename = (temp_dir / SAMPLE_DATA_FOLDER).with_stem(".zip")
+                zip_filename = (temp_dir / SAMPLE_DATA_FOLDER).with_suffix(".zip")
                 with requests.get(SAMPLE_DATA_URL, stream=True) as response:
                     with open(zip_filename, "wb") as zip_file:
                         shutil.copyfileobj(response.raw, zip_file)
