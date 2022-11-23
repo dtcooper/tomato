@@ -11,7 +11,7 @@ const path = require('path')
 const { promises: fs } = require('fs')
 
 const appData = process.env.APPDATA || `${process.env.HOME}${process.platform === 'darwin' ? '/Library/Preferences' : '/.local/share'}`
-const dataDir = path.join(appData, 'com.bmir.tomato/assets')
+const dataDir = path.join(appData, 'tomato-assets')
 
 export const syncing = writable(false)
 export const progress = writable(false)
