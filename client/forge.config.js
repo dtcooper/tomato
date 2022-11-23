@@ -41,7 +41,8 @@ module.exports = {
           icon: 'assets/icons/tomato.png',
           desktopTemplate: './scripts/debian/tomato.desktop',
           recommends: ['udev'],
-          section: "sound",
+          section: 'sound',
+          bin: 'start-tomato.sh',
           scripts: {
             postinst: './scripts/debian/postinst.sh',
             postrm: './scripts/debian/postrm.sh'

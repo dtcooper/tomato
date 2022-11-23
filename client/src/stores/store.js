@@ -8,10 +8,16 @@ import { writable as persistentWritable } from 'svelte-local-storage-store'
 import { address, connected, accessToken } from './connection'
 
 const path = require('path')
+const os = require('os')
 const { promises: fs } = require('fs')
 
-const appData = process.env.APPDATA || `${process.env.HOME}${process.platform === 'darwin' ? '/Library/Preferences' : '/.local/share'}`
-const dataDir = path.join(appData, 'tomato-assets')
+let dataDir
+if (process.platform === 'darwin') {
+  // Common on macOS to store this stuff in ~/Library/Preferences
+  dataDir = path.join(os.homedir(), 'Library', 'Preferences', 'tomato-radio-automation', 'assets')
+} else {
+  dataDir = path.join((new URLSearchParams(window.location.search)).get('userDataDir'), 'tomato-assets')
+}
 
 export const syncing = writable(false)
 export const progress = writable(false)

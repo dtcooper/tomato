@@ -1,9 +1,14 @@
 import { app, BrowserWindow, powerSaveBlocker } from 'electron'
+import fs from 'fs'
 import path from 'path'
 import windowStateKeeper from 'electron-window-state'
 
 const elgatoVendorId = 4057
 const [minWidth, minHeight, defaultWidth, defaultHeight] = [600, 480, 1000, 800]
+
+const userDataDir = path.join(path.dirname(app.getPath('userData')), 'tomato-radio-automation')
+fs.mkdirSync(userDataDir, { recursive: true, permission: 0o700 })
+app.setPath('userData', userDataDir)
 
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors')
 
@@ -66,10 +71,10 @@ function createWindow () {
     win.webContents.session.setPreloads([require.resolve('svelte-devtools-standalone')])
   }
 
-  if (app.isPackaged) {
-    win.loadFile(path.normalize(path.join(__dirname, '..', 'index.html')))
-  } else {
-    win.loadURL('http://localhost:3000')
+  const queryString = 'userDataDir=' + encodeURIComponent(userDataDir)
+  const url = app.isPackaged ? `file://${path.normalize(path.join(__dirname, '..', 'index.html'))}` : 'http://localhost:3000/'
+  win.loadURL(`${url}?${queryString}`)
+  if (!app.isPackaged) {
     win.webContents.openDevTools({ mode: 'detach' })
   }
 }
