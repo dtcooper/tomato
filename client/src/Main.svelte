@@ -156,12 +156,7 @@
             >
               {#if error}
                 <div
-                  class="relative animate-[ping_1.5s_infinite] w-20 h-20 text-error-content font-bold flex items-center justify-center"
-                >
-                  ERROR
-                </div>
-                <div
-                  class="absolute w-20 h-20 text-error-content font-bold flex items-center justify-center"
+                  class="w-20 h-20 text-error-content font-bold flex items-center justify-center"
                 >
                   ERROR
                 </div>
