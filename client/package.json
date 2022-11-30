@@ -40,7 +40,7 @@
     "daisyui": "^2.42.1",
     "dayjs": "^1.11.6",
     "download": "^8.0.0",
-    "electron": "^21.3.0",
+    "electron": "^22.0.0",
     "electron-releases": "^3.1171.0",
     "electron-window-state": "^5.0.3",
     "esbuild": "^0.15.16",
