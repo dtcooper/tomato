@@ -1,6 +1,5 @@
 ---
 title: Author & License
-ᴴₒᴴₒᴴₒ: true
 ---
 
 # Author & License

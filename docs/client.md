@@ -1,6 +1,5 @@
 ---
 title: Desktop App
-ᴴₒᴴₒᴴₒ: true
 ---
 
 # The Tomato Desktop App
