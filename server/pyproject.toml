@@ -22,7 +22,6 @@ psycopg2 = "^2.9.5"
 pybase62 = "^0.5.0"
 python-dotenv = "^0.21.0"
 requests = "^2.28.1"
-watchdog = {extras = ["watchmedo"], version = "^2.1.9"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.10.0"
@@ -32,6 +31,7 @@ flake8 = "^6.0.0"
 ipdb = "^0.13.9"
 ipython = "^8.7.0"
 isort = "^5.10.1"
+watchdog = {extras = ["watchmedo"], version = "^2.2.0"}
 
 [build-system]
 requires = ["poetry-core"]
