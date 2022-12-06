@@ -1,5 +1,5 @@
 {
-    "schema_version": 0,
+    "schema_version": 1,
     "client_log_entry_types": [
         "played_asset",
         "played_part_stopset",

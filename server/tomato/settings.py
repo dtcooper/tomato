@@ -397,5 +397,5 @@ SHELL_PLUS_IMPORTS = [
     "from user_messages import api as user_messages_api",
     "from tomato import constants",
     "from tomato.ffmpeg import ffmpeg_convert, ffprobe",
-    "from tomato.tasks import process_asset",
+    "from tomato.tasks import bulk_process_assets, process_asset",
 ]
