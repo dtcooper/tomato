@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - client/**
+      - server/constants.json
   workflow_dispatch:
 
 concurrency:
@@ -69,7 +72,7 @@ jobs:
           scp -P ${{ secrets.SSH_PORT}} tomato-preview-windows.zip "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
 
   build-linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Build Linux client
     steps:
       -
