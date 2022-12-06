@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Build container
     strategy:
       matrix:
@@ -31,7 +31,7 @@ jobs:
           build-args: DEBUG=${{ matrix.tag == 'dev' && '1' || '0' }}
 
   deploy:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Deploy
     needs: [build]
     steps:
