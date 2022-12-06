@@ -38,7 +38,7 @@
     "browser-sync": "^2.27.10",
     "color": "^4.2.3",
     "daisyui": "^2.42.1",
-    "dayjs": "^1.11.6",
+    "dayjs": "^1.11.7",
     "download": "^8.0.0",
     "electron": "^22.0.0",
     "electron-releases": "^3.1171.0",
