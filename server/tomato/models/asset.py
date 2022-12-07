@@ -3,6 +3,7 @@ import hashlib
 from pathlib import Path
 
 from django.db import models
+from django.utils import timezone
 
 from dirtyfields import DirtyFieldsMixin
 from django_file_form.uploaded_file import UploadedTusFile
@@ -14,6 +15,11 @@ from .rotator import Rotator
 class AssetEligibleToAirQuerySet(EligibleToAirQuerySet):
     def _get_currently_airing_Q(self, now=None):
         return models.Q(status=Asset.Status.READY) & super()._get_currently_airing_Q(now)
+
+
+def asset_upload_to(instance, filename):
+    # Prefix with current time, to avoid filename duplication
+    return f"{timezone.now().strftime('%y%m%d%H%M%S')}-{filename}"
 
 
 class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
@@ -34,7 +40,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
             " that its filename."
         ),
     )
-    file = models.FileField("audio file")
+    file = models.FileField("audio file", upload_to=asset_upload_to)
     md5sum = models.BinaryField(max_length=16, null=True, default=None)
     status = models.SmallIntegerField(
         choices=Status.choices, default=Status.PENDING, help_text="All assets will be processed after uploading."
