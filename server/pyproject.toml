@@ -13,7 +13,7 @@ django-cleanup = "^6.0.0"
 django-constance = {git = "https://github.com/jazzband/django-constance.git"}
 django-dirtyfields = "^1.9.0"
 django-environ = "^0.9.0"
-django-file-form = "^3.4.1"
+django-file-form = "^3.4.2"
 django-redis = {extras = ["hiredis"], version = "^5.2.0"}
 django-user-messages = "^1.0.0"
 gunicorn = "^20.1.0"
