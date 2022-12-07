@@ -1,5 +1,5 @@
+const axios = require('axios')
 const { build: esbuild } = require('esbuild')
-const electronReleases = require('electron-releases')
 const { version: electronVersion } = require('electron/package.json')
 const path = require('path')
 const sveltePlugin = require('esbuild-svelte')
@@ -11,65 +11,82 @@ if (!process.env.NODE_ENV) {
   process.env.NODE_ENV = 'production'
 }
 
-const isDev = process.env.NODE_ENV === 'development'
-const watch = isDev && !process.env.BUILD_NO_WATCH
-const srcDir = 'src'
-const distDir = 'dist'
-const { deps: { node: nodeVersion } = {} } = electronReleases.find(release => release.version === electronVersion) || {}
+const releasesUrl = 'https://electronjs.org/headers/index.json'
 
-console.log(
-  `Building for ${isDev ? 'development' : 'production'}, electron ${electronVersion}, ` +
-  `node ${nodeVersion || 'unknown'}${watch ? ', watching' : ''}...`
-)
+const runBuild = async () => {
+  let electronReleases
+  try {
+    electronReleases = (await axios.get(releasesUrl, { timeout: 5000, maxContentLength: 1024 * 1024 * 1024 })).data
+    if (!Array.isArray(electronReleases)) {
+      throw new Error('Response not a JSON array')
+    }
+  } catch (e) {
+    console.error(`Error fetching Electron releases: ${e.message}`)
+    electronReleases = []
+  }
 
-const defaults = {
-  bundle: true,
-  logLevel: 'info',
-  minify: !isDev,
-  platform: 'node',
-  sourcemap: true,
-  define: { 'process.env.NODE_ENV': `"${process.env.NODE_ENV}"` },
-  watch
-}
+  const isDev = process.env.NODE_ENV === 'development'
+  const watch = isDev && !process.env.BUILD_NO_WATCH
+  const srcDir = 'src'
+  const distDir = 'dist'
+  const { node: nodeVersion } = electronReleases.find(release => release.version === electronVersion) || {}
 
-if (nodeVersion) {
-  defaults.target = `node${nodeVersion}`
-}
+  console.log(
+    `Building for ${isDev ? 'development' : 'production'}, electron ${electronVersion}, ` +
+    `node ${nodeVersion || 'unknown'}${watch ? ', watching' : ''}...`
+  )
 
-const build = (infile, options) => {
-  return esbuild({
-    entryPoints: [path.join(srcDir, infile)],
-    outfile: path.join(distDir, infile),
-    ...defaults,
-    ...options
-  })
-}
+  const defaults = {
+    bundle: true,
+    logLevel: 'info',
+    minify: !isDev,
+    platform: 'node',
+    sourcemap: true,
+    define: { 'process.env.NODE_ENV': `"${process.env.NODE_ENV}"` },
+    watch
+  }
 
-build('main.js', { external: ['electron', 'svelte-devtools-standalone'] })
-build('app.js', {
-  external: ['./assets/fonts/*'],
-  format: 'esm',
-  loader: { '.svg': 'text' },
-  plugins: [
-    sveltePlugin({
-      compilerOptions: { dev: isDev, enableSourcemap: true },
-      cache: 'overzealous',
-      preprocess: [
-        sveltePreprocess({
-          sourceMap: true,
-          postcss: {
-            plugins: [
-              require('tailwindcss'),
-              require('autoprefixer')
-            ]
-          }
-        })
-      ]
+  if (nodeVersion) {
+    defaults.target = `node${nodeVersion}`
+  }
+
+  const build = (infile, options) => {
+    return esbuild({
+      entryPoints: [path.join(srcDir, infile)],
+      outfile: path.join(distDir, infile),
+      ...defaults,
+      ...options
     })
-  ]
-})
+  }
 
-if (watch) {
-  const browserSync = require('browser-sync')
-  browserSync({ port: 3000, server: '.', open: false, watch: true, notify: false })
+  build('main.js', { external: ['electron', 'svelte-devtools-standalone'] })
+  build('app.js', {
+    external: ['./assets/fonts/*'],
+    format: 'esm',
+    loader: { '.svg': 'text' },
+    plugins: [
+      sveltePlugin({
+        compilerOptions: { dev: isDev, enableSourcemap: true },
+        cache: 'overzealous',
+        preprocess: [
+          sveltePreprocess({
+            sourceMap: true,
+            postcss: {
+              plugins: [
+                require('tailwindcss'),
+                require('autoprefixer')
+              ]
+            }
+          })
+        ]
+      })
+    ]
+  })
+
+  if (watch) {
+    const browserSync = require('browser-sync')
+    browserSync({ port: 3000, server: '.', open: false, watch: true, notify: false })
+  }
 }
+
+runBuild()
