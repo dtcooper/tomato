@@ -43,7 +43,7 @@
     "download": "^8.0.0",
     "electron": "^22.0.0",
     "electron-window-state": "^5.0.3",
-    "esbuild": "^0.16.1",
+    "esbuild": "^0.16.3",
     "esbuild-svelte": "^0.7.3",
     "material-ui-colors": "^1.0.0",
     "md5-file": "^5.0.0",
