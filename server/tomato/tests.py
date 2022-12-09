@@ -20,7 +20,7 @@ class ViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
 
-        self.assertDictContainsSubset({"status": "ok"}, data)
+        self.assertDictContainsSubset({"success": True}, data)
         self.assertNotIn("error", data)
         self.assertIn("access_token", data)
 
@@ -34,12 +34,12 @@ class ViewTests(TestCase):
         response = self.post_json(url, {"username": "david", "password": "bad-password"})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
-        self.assertEqual({"status": "error", "error": "Invalid username and password combination."}, data)
+        self.assertEqual({"success": False, "error": "Invalid username or password."}, data)
 
         response = self.post_json(url, {"user": "david", "pass": "top-secret"})
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
-        self.assertEqual({"status": "error", "error": "Please provide a username and password."}, data)
+        self.assertEqual({"success": False, "error": "Invalid request."}, data)
 
     def test_access_token(self):
         user = User.objects.create_user(username="david", password="top-secret")
