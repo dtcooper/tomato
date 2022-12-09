@@ -10,6 +10,10 @@ build:
 shell:
 	$(COMPOSE) run --rm --service-ports --use-aliases $(CONTAINER) bash || true
 
+.PHONY: shell-nodeps
+shell-nodeps:
+	$(COMPOSE) run --rm --no-deps --entrypoint bash $(CONTAINER) || true
+
 .PHONY: up
 up:
 	$(COMPOSE) up --remove-orphans $(shell source .env; if [ -z "$$DEBUG" -o "$$DEBUG" = 0 ]; then echo "-d"; fi) || true

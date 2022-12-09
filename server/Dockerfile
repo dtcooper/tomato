@@ -6,11 +6,6 @@ ENV DJANGO_SETTINGS_MODULE=tomato.settings \
     PYTHONUNBUFFERED=1 \
     POETRY_VIRTUALENVS_CREATE=false
 
-ARG WAIT_FOR_IT_VERSION=81b1373f
-RUN wget -qO /usr/local/bin/wait-for-it \
-        "https://raw.githubusercontent.com/vishnubob/wait-for-it/${WAIT_FOR_IT_VERSION}/wait-for-it.sh" \
-    && chmod +x /usr/local/bin/wait-for-it
-
 ARG POETRY_VERSION=1.3.0
 RUN curl -sSL https://install.python-poetry.org | python -
 ENV PATH="/root/.local/bin:${PATH}"
