@@ -6,7 +6,7 @@ ENV DJANGO_SETTINGS_MODULE=tomato.settings \
     PYTHONUNBUFFERED=1 \
     POETRY_VIRTUALENVS_CREATE=false
 
-ARG POETRY_VERSION=1.3.0
+ARG POETRY_VERSION=1.3.1
 RUN curl -sSL https://install.python-poetry.org | python -
 ENV PATH="/root/.local/bin:${PATH}"
 
