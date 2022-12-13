@@ -37,12 +37,13 @@ services:
 
   logs:
     restart: always
-    image: amir20/dozzle:v4.5.0
+    image: amir20/dozzle:v4.6.0
     volumes:
       - "${DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock"
     environment:
       - DOZZLE_ADDR=:8000
       - DOZZLE_BASE=/server-logs
+      - "DOZZLE_HOSTNAME=${DOMAIN_NAME}"
 
 volumes:
   postgres_data:
