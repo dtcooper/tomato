@@ -31,7 +31,7 @@ django-extensions = "^3.2.1"
 flake8 = "^6.0.0"
 ipdb = "^0.13.11"
 ipython = "^8.7.0"
-isort = "^5.11.2"
+isort = "^5.11.3"
 watchdog = {extras = ["watchmedo"], version = "^2.2.0"}
 
 [build-system]

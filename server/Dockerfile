@@ -10,8 +10,7 @@ ARG POETRY_VERSION=1.3.1
 RUN curl -sSL https://install.python-poetry.org | python -
 ENV PATH="/root/.local/bin:${PATH}"
 
-ARG DEBUG=0 \
-    DJANGO_BASH_COMPLETION_VERSION=4.1
+ARG DEBUG=0
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install --no-install-recommends -y \
@@ -31,13 +30,16 @@ RUN apt-get update \
         echo "alias redis-cli='redis-cli -h redis'" >> /root/.bashrc \
         && echo "alias ls='ls --color=auto'" >> /root/.bashrc \
         && echo '. /etc/bash_completion' >> /root/.bashrc \
-        && wget -qO /etc/bash_completion.d/django_bash_completion \
-            "https://raw.githubusercontent.com/django/django/${DJANGO_BASH_COMPLETION_VERSION}/extras/django_bash_completion" \
     ; fi
 
 COPY constants.json pyproject.toml poetry.lock /app/
 WORKDIR /app
-RUN poetry install $([ -z "$DEBUG" -o "$DEBUG" = '0' ] && echo '--without=dev')
+RUN poetry install $([ -z "$DEBUG" -o "$DEBUG" = '0' ] && echo '--without=dev') \
+    && if [ "$DEBUG" -a "$DEBUG" != 0 ]; then \
+        # Download relevant verion's bash completion (in dev only)
+        wget -qO /etc/bash_completion.d/django_bash_completion \
+            "https://raw.githubusercontent.com/django/django/$(python -c 'import django; print(".".join(map(str, django.VERSION[:2])))')/extras/django_bash_completion" \
+    ; fi
 
 COPY *.py *.sh /app/
 COPY tomato/ /app/tomato/
