@@ -32,7 +32,7 @@ flake8 = "^6.0.0"
 ipdb = "^0.13.11"
 ipython = "^8.7.0"
 isort = "^5.11.4"
-watchdog = {extras = ["watchmedo"], version = "^2.2.0"}
+watchdog = {extras = ["watchmedo"], version = "^2.2.1"}
 
 [build-system]
 requires = ["poetry-core"]
