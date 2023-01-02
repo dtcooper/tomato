@@ -10,6 +10,7 @@ from constance import config
 from django_file_form.models import TemporaryUploadedFile
 from huey.contrib import djhuey
 from user_messages import api as user_messages_api
+from user_messages.models import Message as UserMessage
 
 from .ffmpeg import ffmpeg_convert, ffprobe
 from .utils import once_at_startup
@@ -24,8 +25,10 @@ def process_asset(asset, empty_name=False, user=None, no_success_message=False, 
         if user is not None:
             user_messages_api.error(
                 user,
-                f"{asset.name} {message} and was deleted. Check the file and try again. If this keeps happening,"
-                " check the server logs.",
+                (
+                    f"{asset.name} {message} and was deleted. Check the file and try again. If this keeps happening,"
+                    " check the server logs."
+                ),
                 deliver_once=False,
             )
         asset.delete()
@@ -89,9 +92,14 @@ def bulk_process_assets(assets, user=None, skip_trim=False):
 
 
 @djhuey.db_periodic_task(once_at_startup(crontab(hour="*/6", minute="5")))
-def delete_unused_uploaded_files():
+def cleanup():
+    # Delete unused uploaded files
     deleted_files = TemporaryUploadedFile.objects.delete_unused_files()
     if not deleted_files:
         logger.info("No files deleted")
     else:
         logger.info("Deleted files: {', '.join(deleted_files)}")
+
+    # Cleanup read messages
+    deleted_messages, _ = UserMessage.objects.filter(delivered_at__isnull=False).delete()
+    logger.info(f"Deleted {deleted_messages} already delievered user message(s)")

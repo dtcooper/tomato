@@ -68,9 +68,11 @@ class EnabledBeginEndWeightMixin(models.Model):
         default=1,
         validators=[greater_than_zero],
         help_text=format_html(
-            "The weight (ie selection bias) for how likely random selection occurs, eg '1' is just as likely as all"
-            " others, '2' is 2x as likely, '3' is 3x as likely, '0.5' half as likely, and so on. See the"
-            ' <a href="{}concepts#weight" target="_blank">docs for more information</a>.',
+            (
+                "The weight (ie selection bias) for how likely random selection occurs, eg '1' is just as likely as all"
+                " others, '2' is 2x as likely, '3' is 3x as likely, '0.5' half as likely, and so on. See the"
+                ' <a href="{}concepts#weight" target="_blank">docs for more information</a>.'
+            ),
             HELP_DOCS_URL,
         ),
     )

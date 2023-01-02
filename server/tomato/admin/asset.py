@@ -89,8 +89,10 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
         if obj.file:
             if obj.status == obj.Status.READY:
                 return format_html(
-                    '<audio src="{}" style="height: 45px; width: 100%;" controlslist="noplaybackrate"'
-                    ' preload="auto" controls />',
+                    (
+                        '<audio src="{}" style="height: 45px; width: 100%;" controlslist="noplaybackrate"'
+                        ' preload="auto" controls />'
+                    ),
                     obj.file.url,
                 )
             else:
@@ -114,8 +116,10 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
             process_asset(obj, empty_name=empty_name, user=request.user)
             self.message_user(
                 request,
-                f'Audio asset "{obj.name}" is being processed. A message will appear when it is ready. Refresh this'
-                " page and you can edit it at that time.",
+                (
+                    f'Audio asset "{obj.name}" is being processed. A message will appear when it is ready. Refresh this'
+                    " page and you can edit it at that time."
+                ),
                 messages.WARNING,
             )
 
