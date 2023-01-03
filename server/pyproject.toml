@@ -7,7 +7,7 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-django = "^4.1.4"
+django = "^4.1.5"
 django-cleanup = "^6.0.0"
 # For error messages at top of page, once constance > 2.9.1, can pin again
 django-constance = {git = "https://github.com/jazzband/django-constance.git"}
@@ -30,7 +30,7 @@ django-debug-toolbar = "^3.8.1"
 django-extensions = "^3.2.1"
 flake8 = "^6.0.0"
 ipdb = "^0.13.11"
-ipython = "^8.7.0"
+ipython = "^8.8.0"
 isort = "^5.11.4"
 watchdog = {extras = ["watchmedo"], version = "^2.2.1"}
 
