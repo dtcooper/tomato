@@ -1,5 +1,5 @@
 const axios = require('axios')
-const { build: esbuild } = require('esbuild')
+const { context: esbuildContext, build: esbuild } = require('esbuild')
 const { version: electronVersion } = require('electron/package.json')
 const path = require('path')
 const sveltePlugin = require('esbuild-svelte')
@@ -42,21 +42,32 @@ const runBuild = async () => {
     minify: !isDev,
     platform: 'node',
     sourcemap: true,
-    define: { 'process.env.NODE_ENV': `"${process.env.NODE_ENV}"` },
-    watch
+    define: { 'process.env.NODE_ENV': `"${process.env.NODE_ENV}"` }
   }
 
   if (nodeVersion) {
     defaults.target = `node${nodeVersion}`
   }
 
-  const build = (infile, options) => {
-    return esbuild({
+  const build = async (infile, options) => {
+    options = {
       entryPoints: [path.join(srcDir, infile)],
       outfile: path.join(distDir, infile),
       ...defaults,
       ...options
-    })
+    }
+
+    if (watch) {
+      const ctx = await esbuildContext({
+        entryPoints: [path.join(srcDir, infile)],
+        outfile: path.join(distDir, infile),
+        ...defaults,
+        ...options
+      })
+      ctx.watch()
+    } else {
+      esbuild(options)
+    }
   }
 
   build('main.js', { external: ['electron', 'svelte-devtools-standalone'] })
