@@ -11,9 +11,9 @@ django = "^4.1.5"
 django-cleanup = "^6.0.0"
 # For error messages at top of page, once constance > 2.9.1, can pin again
 django-constance = {git = "https://github.com/jazzband/django-constance.git"}
-django-dirtyfields = "^1.9.0"
+django-dirtyfields = "^1.9.1"
 django-environ = "^0.9.0"
-django-file-form = "^3.4.2"
+django-file-form = "^3.4.3"
 django-redis = {extras = ["hiredis"], version = "^5.2.0"}
 django-user-messages = "^1.0.0"
 gunicorn = "^20.1.0"
