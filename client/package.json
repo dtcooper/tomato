@@ -35,7 +35,7 @@
     "@electron-forge/maker-zip": "^6.0.4",
     "@elgato-stream-deck/webhid": "^5.7.1",
     "autoprefixer": "^10.4.13",
-    "axios": "^1.2.4",
+    "axios": "^1.2.5",
     "browser-sync": "^2.27.11",
     "color": "^4.2.3",
     "daisyui": "^2.49.0",
