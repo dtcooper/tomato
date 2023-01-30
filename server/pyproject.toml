@@ -13,7 +13,7 @@ django-cleanup = "^6.0.0"
 django-constance = {git = "https://github.com/jazzband/django-constance.git"}
 django-dirtyfields = "^1.9.1"
 django-environ = "^0.9.0"
-django-file-form = "^3.4.3"
+django-file-form = "^3.4.4"
 django-redis = {extras = ["hiredis"], version = "^5.2.0"}
 django-user-messages = "^1.0.0"
 gunicorn = "^20.1.0"
@@ -30,8 +30,8 @@ django-debug-toolbar = "^3.8.1"
 django-extensions = "^3.2.1"
 flake8 = "^6.0.0"
 ipdb = "^0.13.11"
-ipython = "^8.8.0"
-isort = "^5.11.4"
+ipython = "^8.9.0"
+isort = "^5.12.0"
 watchdog = {extras = ["watchmedo"], version = "^2.2.1"}
 
 [build-system]
