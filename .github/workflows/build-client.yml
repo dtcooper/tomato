@@ -118,5 +118,6 @@ jobs:
           chmod 0600 ~/.ssh/id_ed25519
           echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
           docker run --rm -v "$PWD:/build" archlinux:base-devel sh -c 'pacman -Sy && useradd --uid 1001 -m build && echo "build ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/build && cd /build/client/scripts/arch && sudo -u build makepkg -s --noconfirm'
+          sudo chown $(id -u):$(id -g) client/scripts/arch/*.pkg.tar.zst
           client/scripts/arch/*.pkg.tar.zst tomato-preview-linux-x86_64.pkg.tar.zst
           scp -P ${{ secrets.SSH_PORT}} tomato-preview-linux-x86_64.pkg.tar.zst "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"

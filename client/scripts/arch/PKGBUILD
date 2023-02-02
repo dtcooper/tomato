@@ -4,6 +4,7 @@ pkgrel=1
 arch=('x86_64')
 url="https://github.com/dtcooper/tomato"
 license=('MIT')
+# nodejs-lts-gallium = Node v16
 makedepends=('nodejs-lts-gallium' 'npm' 'git' 'dpkg')
 
 pkgver() {
