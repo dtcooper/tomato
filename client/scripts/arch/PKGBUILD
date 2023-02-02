@@ -4,8 +4,10 @@ pkgrel=1
 arch=('x86_64')
 url="https://github.com/dtcooper/tomato"
 license=('MIT')
-# nodejs-lts-gallium = Node v16
-makedepends=('nodejs-lts-gallium' 'npm' 'git' 'dpkg')
+# Probably need more, but minimum required to get running
+depends=('gtk3' 'nss' 'alsa-lib')
+makedepends=('nodejs' 'npm' 'git' 'dpkg')
+options=('!strip')
 
 pkgver() {
     printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
