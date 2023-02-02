@@ -1,0 +1,30 @@
+pkgname=tomato-radio-automation
+pkgver=0
+pkgrel=1
+arch=('x86_64')
+url="https://github.com/dtcooper/tomato"
+license=('MIT')
+makedepends=('npm' 'dpkg')
+
+pkgver() {
+    printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+prepare() {
+    cd "${startdir}/../.."
+    npm install
+}
+
+build() {
+    cd "${startdir}/../.."
+    npm run make
+}
+
+package() {
+    bsdtar -Oxf "${startdir}/../../out/make/deb/x64/"*.deb 'data.tar.*' \
+        | bsdtar -C "${pkgdir}" -xf -
+    cd "${pkgdir}"
+
+    install -dm 755 usr/lib/udev/rules.d
+    ln -s ../../tomato/50-elgato.rules usr/lib/udev/rules.d
+}

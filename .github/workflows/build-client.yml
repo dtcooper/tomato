@@ -71,9 +71,9 @@ jobs:
           mv -v out/make/zip/win32/x64/*.zip tomato-preview-windows.zip
           scp -P ${{ secrets.SSH_PORT}} tomato-preview-windows.zip "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
 
-  build-linux:
+  build-linux-debian:
     runs-on: ubuntu-22.04
-    name: Build Linux client
+    name: Build Linux client (Debian/Ubuntu)
     steps:
       -
         name: Checkout
@@ -98,3 +98,22 @@ jobs:
           npx electron-forge make --arch x64 --platform linux
           mv -v out/make/deb/x64/*.deb tomato-preview-linux_amd64.deb
           scp -P ${{ secrets.SSH_PORT}} tomato-preview-linux_amd64.deb "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
+
+  build-linux-arch:
+    runs-on: ubuntu-22.04
+    name: Build Linux client (Arch)
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Build packages
+        shell: bash
+        run: |
+          mkdir -p ~/.ssh
+          chmod 0700 ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 0600 ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
+      - name: Debug
+        uses: mxschmitt/action-tmate@v3
