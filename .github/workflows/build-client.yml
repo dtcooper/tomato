@@ -115,5 +115,6 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 0600 ~/.ssh/id_ed25519
           echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
+          #docker run --rm -it -v "$PWD:/build" -w /build/scripts/arch archlinux:base-devel sh -c 'pacman -Sy && useradd --uid 1001 -m build && sudo -u build makepkg -s --noconfirm'
       - name: Debug
         uses: mxschmitt/action-tmate@v3
