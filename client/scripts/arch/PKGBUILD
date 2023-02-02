@@ -12,12 +12,13 @@ pkgver() {
 
 prepare() {
     cd "${startdir}/../.."
-    npm install
+    npm clean-install
 }
 
 build() {
     cd "${startdir}/../.."
-    npm run make
+    npm run build
+    npx electron-forge make --arch x64 --platform linux
 }
 
 package() {
