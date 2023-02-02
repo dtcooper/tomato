@@ -25,4 +25,6 @@ Download one of the following releases,
   * [:material-download: Windows :simple-windows: ](https://priv.bmir.org/tomato-preview-windows.zip)
     &mdash; `.zip` archive you can extract and run the program executable
   * [:material-download: Ubuntu :simple-ubuntu: or Debian :simple-debian: Linux](https://priv.bmir.org/tomato-preview-linux_amd64.deb)
-    &mdash; `.deb` package
+    &mdash; package in `.deb` format (amd64 only)
+  * [:material-download: Arch :simple-archlinux: or Manjaro :simple-manjaro: Linux](https://priv.bmir.org/tomato-preview-linux-x86_64.pkg.tar.zst)
+    &mdash; package in `.pkg.tar.zst` format (amd64 only)
