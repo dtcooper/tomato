@@ -120,5 +120,3 @@ jobs:
           docker run --rm -it -v "$PWD:/build" archlinux:base-devel sh -c 'pacman -Sy && useradd --uid 1001 -m build && echo "build ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/build && cd /build/client/scripts/arch && sudo -u build makepkg -s --noconfirm'
           client/scripts/arch/*.pkg.tar.zst tomato-preview-linux-x86_64.pkg.tar.zst
           scp -P ${{ secrets.SSH_PORT}} tomato-preview-linux-x86_64.pkg.tar.zst "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
-      - name: Debug
-        uses: mxschmitt/action-tmate@v3
