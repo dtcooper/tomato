@@ -102,6 +102,7 @@ Head over to <http://localhost:8888/> in your web browser.
 - [ ] Empty rotators are warned on (based on feature flag)
 - [ ] Compression and selecting output device using a bridge to
       [the web audio API](https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createMediaElementSource).
+- [ ] Any custom django admin pages can [follow this guide](https://dev.to/daiquiri_team/creating-a-custom-page-in-django-admin-4pbd)
 
 ### Future Versions
 
