@@ -892,14 +892,14 @@ tests = ["pytest"]
 
 [[package]]
 name = "pybase62"
-version = "0.5.0"
+version = "0.6.0"
 description = "Python module for base62 encoding"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "pybase62-0.5.0-py3-none-any.whl", hash = "sha256:f6eb0b570d05be56774d624401e299f338b832cd0e2d4b22944f42ff91f13fd2"},
-    {file = "pybase62-0.5.0.tar.gz", hash = "sha256:678dc33464e05012da28936914aa7925b61b940d5802dcb0d33d4038e0a37d10"},
+    {file = "pybase62-0.6.0-py3-none-any.whl", hash = "sha256:1b69a8aa1380c16c4c516c60b131042245b6dfb21549e8dd22204d31ed525594"},
+    {file = "pybase62-0.6.0.tar.gz", hash = "sha256:b5dfa56480855d159e1be64543535b24d2c35cdd18d617f107bef7e2f7413722"},
 ]
 
 [[package]]
@@ -1231,4 +1231,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "720a6f0de5a354ec848e6d1047a471dfb951efaaf6c841e00d3cd4938a435947"
+content-hash = "45cea2db316d699db870f509cd352118954ab33b54d5fd2d8d0300309fb5fbcf"
