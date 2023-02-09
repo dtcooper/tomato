@@ -585,13 +585,13 @@ files = [
 
 [[package]]
 name = "huey"
-version = "2.4.4"
+version = "2.4.5"
 description = "huey, a little task queue"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "huey-2.4.4.tar.gz", hash = "sha256:6a27a7862a7a982c0508ad4e548d95765e3b0d97093a51106f07540837a09c86"},
+    {file = "huey-2.4.5.tar.gz", hash = "sha256:760cf150deff1fa34b852da37701a5a750d1148f03ea07aa2b3764dc6060b4c3"},
 ]
 
 [package.extras]
@@ -1231,4 +1231,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "45cea2db316d699db870f509cd352118954ab33b54d5fd2d8d0300309fb5fbcf"
+content-hash = "a8cc0b59d97f2025a79a5693e98fc885bf046cf13c7578dee77bde5a5d0e0ec0"

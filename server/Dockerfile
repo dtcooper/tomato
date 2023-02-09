@@ -1,6 +1,5 @@
 FROM python:3.11-bullseye
 
-
 ENV DJANGO_SETTINGS_MODULE=tomato.settings \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
