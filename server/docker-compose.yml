@@ -23,7 +23,7 @@ services:
 
   db:
     restart: always
-    image: postgres:15.1-alpine
+    image: postgres:15.2-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
