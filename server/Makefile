@@ -1,4 +1,5 @@
 COMPOSE:=docker compose
+SHELL=/bin/bash
 CONTAINERS:=
 CONTAINER:=app
 
