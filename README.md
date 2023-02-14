@@ -34,7 +34,7 @@ production environments
 
 ### Client (Desktop App)
 
-To run the client's code locally, install [nodejs 16+](https://nodejs.org/).
+To run the client's code locally, install [nodejs 18+](https://nodejs.org/).
 Then in your terminal,
 
 ```bash

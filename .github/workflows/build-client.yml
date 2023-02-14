@@ -22,10 +22,10 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: Setup Node v16
+        name: Setup Node v18
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
       -
         name: Build & upload package
         shell: bash
@@ -50,10 +50,10 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: Setup Node v16
+        name: Setup Node v18
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
       -
         name: Build & upload package
         shell: bash
@@ -79,10 +79,10 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: Setup Node v16
+        name: Setup Node v18
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
       -
         name: Build & upload package
         shell: bash
@@ -114,13 +114,13 @@ jobs:
       -
         name: Build & upload package
         shell: bash
-        # nodejs-lts-gallium = Node v16
+        # nodejs-lts-hydrogen = Node v18
         run: |
           mkdir -p ~/.ssh
           chmod 0700 ~/.ssh
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 0600 ~/.ssh/id_ed25519
           echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
-          docker run --rm -v "$PWD:/build" -w /build/client/scripts/arch archlinux:base-devel sh -c 'pacman -Syu --noconfirm nodejs-lts-gallium && env EUID=1 makepkg -s --noconfirm'
+          docker run --rm -v "$PWD:/build" -w /build/client/scripts/arch archlinux:base-devel sh -c 'pacman -Syu --noconfirm nodejs-lts-hydrogen && env EUID=1 makepkg -s --noconfirm'
           mv client/scripts/arch/*.pkg.tar.zst tomato-preview-linux-x86_64.pkg.tar.zst
           scp -P ${{ secrets.SSH_PORT}} tomato-preview-linux-x86_64.pkg.tar.zst "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
