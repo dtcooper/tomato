@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# Overwrite executable with start-tomato.sh
-ln -fs /usr/lib/tomato/start-tomato.sh /usr/bin/tomato
-
 # From https://github.com/julusian/node-elgato-stream-deck#linux
 if [ -d '/etc/udev/rules.d/' ]; then
     echo 'Adding Elgato Stream Deck rules to udev (reinsert Stream Deck to use) ...'
