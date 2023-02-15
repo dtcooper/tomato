@@ -8,3 +8,5 @@ if [ -d '/etc/udev/rules.d/' ]; then
 else
     echo 'udev not found, not adding Elgato Stream Deck rules.'
 fi
+
+exit 0
