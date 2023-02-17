@@ -12,6 +12,7 @@
 /client/scripts/arch/*.pkg.tar.zst
 /client/scripts/arch/pkg/
 /client/scripts/arch/src/
+/client/standalone/
 
 # server
 __pycache__/

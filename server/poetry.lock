@@ -49,7 +49,7 @@ test = ["astroid", "pytest"]
 name = "async-timeout"
 version = "4.0.2"
 description = "Timeout context manager for asyncio programs"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -398,7 +398,7 @@ files = [
 name = "django-redis"
 version = "5.2.0"
 description = "Full featured redis cache backend for Django."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -467,7 +467,7 @@ pyflakes = ">=3.0.0,<3.1.0"
 name = "gunicorn"
 version = "20.1.0"
 description = "WSGI HTTP Server for UNIX"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.5"
 files = [
@@ -488,7 +488,7 @@ tornado = ["tornado (>=0.2)"]
 name = "hiredis"
 version = "2.2.2"
 description = "Python wrapper for hiredis"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -844,7 +844,7 @@ wcwidth = "*"
 name = "psycopg2"
 version = "2.9.5"
 description = "psycopg2 - Python-PostgreSQL Database Adapter"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -1010,7 +1010,7 @@ files = [
 name = "redis"
 version = "4.5.1"
 description = "Python client for Redis database and key-value store"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -1052,7 +1052,7 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 name = "setuptools"
 version = "67.3.2"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -1231,4 +1231,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "4499acedf5c9de9d509a2990b70813aa785faf2649a2892d611092b024f413fe"
+content-hash = "48bb0cf4b4ac5e8ff9bbe66c46ee971a3dc4656c01a295ea2f85bccca6c459d1"

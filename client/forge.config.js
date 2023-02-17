@@ -24,6 +24,9 @@ module.exports = {
     ],
     executableName: 'tomato',
     icon: 'assets/icons/tomato',
+    osxUniversal: {
+      x64ArchFiles: 'Contents/Resources/app/standalone/**'
+    },
     afterExtract
   },
   makers: [
