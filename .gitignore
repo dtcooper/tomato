@@ -16,6 +16,7 @@
 
 # server
 __pycache__/
+/server/*.sqlite3
 /server/.env
 /server/docker-compose.override.yml
 /server/serve/

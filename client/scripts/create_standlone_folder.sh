@@ -3,6 +3,7 @@
 set -e
 
 cd "$(dirname "$0")/.."
+ROOT_DIR="$(pwd)"
 
 POETRY_VERSION=1.3.2
 
@@ -17,7 +18,8 @@ FFMPEG_URL_PREFIX="https://github.com/eugeneware/ffmpeg-static/releases/download
 FFPROBE_RELEASE=73b68af8
 FFPROBE_URL_PREFIX="https://github.com/joshwnj/ffprobe-static/raw/${FFPROBE_RELEASE}/bin"
 
-STANDALONE_DIR="$(pwd)/standalone"
+STANDALONE_DIR="$ROOT_DIR/standalone"
+SERVER_DIR="$ROOT_DIR/../server"
 
 case "$OSTYPE" in
     msys)
@@ -59,21 +61,30 @@ curl -fsSL "$PYTHON_URL" | tar xz -C "$STANDALONE_DIR" --strip-components=1
 
 "$STANDALONE_DIR/bin/pip" install --no-cache-dir "poetry==${POETRY_VERSION}" pip-autoremove
 
-cd ../server
+echo "Copying over server Python files"
+cd "${STANDALONE_DIR}"
+cp -r \
+    "${SERVER_DIR}/constants.json" \
+    "${SERVER_DIR}/pyproject.toml" \
+    "${SERVER_DIR}/poetry.lock" \
+    "${SERVER_DIR}/manage.py" \
+    "${SERVER_DIR}/tomato" \
+    .
+
 export POETRY_VIRTUALENVS_CREATE=false
 "$STANDALONE_DIR/bin/poetry" install --without=server --without=dev
-cd ../client
 
 echo 'Removing unnecessary python files'
 "$STANDALONE_DIR/bin/pip-autoremove" --yes poetry
 "$STANDALONE_DIR/bin/pip" uninstall --yes pip-autoremove
 find "$STANDALONE_DIR" | grep -E '(/__pycache__$|\.pyc$|\.pyo$)' | xargs rm -rf
+rm pyproject.toml poetry.lock
 
-cd standalone/bin
+cd "${STANDALONE_DIR}/bin"
 echo 'Downloading ffmpeg'
 
 if [ "$FFMPEG_TARGET" = darwin ]; then
-    # Universal binary for ffmpeg, beacuse why not
+    # Universal binary for ffmpeg on macOS, because it's CPU intensive
     curl -fsSL "${FFMPEG_URL_PREFIX}/darwin-x64.gz" | gzip -d > ffmpeg-x64
     curl -fsSL "${FFMPEG_URL_PREFIX}/darwin-arm64.gz" | gzip -d > ffmpeg-arm64
     chmod +x ffmpeg-x64 ffmpeg-arm64

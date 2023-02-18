@@ -162,6 +162,7 @@ if STANDALONE_MODE:
     )
 
     CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
+    MEDIA_ROOT = PROJECT_DIR / "assets"  # TODO better location
 
 else:
     DATABASES = {
@@ -192,15 +193,16 @@ else:
     HUEY["huey_class"] = "tomato.utils.DjangoPriorityRedisHuey"
     CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
     CONSTANCE_REDIS_CONNECTION = "redis://redis"
+    STATIC_ROOT = "/serve/static"
+    MEDIA_ROOT = "/serve/assets"
 
 LANGUAGE_CODE = "en-us"
 USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
-STATIC_ROOT = "/serve/static"
+
 MEDIA_URL = "/assets/"
-MEDIA_ROOT = "/serve/assets"
 FILE_FORM_MUST_LOGIN = True
 FILE_FORM_UPLOAD_DIR = "_temp_uploads"
 
@@ -408,7 +410,7 @@ CONSTANCE_CONFIG = {
 }
 
 if STANDALONE_MODE:
-    CONSTANCE_ADDITIONAL_FIELDS["disabled_boolean"] = ("django.forms.BooleanField", {"disabled": True})
+    CONSTANCE_ADDITIONAL_FIELDS["disabled_boolean"] = ("django.forms.BooleanField", {"disabled": True, "required": False})
     CONSTANCE_CONFIG["TRIM_SILENCE"] = (
         False,
         CONSTANCE_CONFIG["TRIM_SILENCE"][1] + mark_safe(" <strong>(Unavailable in standalone mode!)</strong>"),

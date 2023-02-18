@@ -1,4 +1,5 @@
 from tomato.models import User
+from django.contrib.auth import login
 
 
 class AlwaysLoggedInMiddleware:
@@ -6,6 +7,7 @@ class AlwaysLoggedInMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        user, _ = User.objects.get_or_create(username="admin", defaults={"password": "admin", "is_superuser": True})
-        request.user = user
+        if not request.user.is_authenticated:
+            user, _ = User.objects.get_or_create(username="admin", defaults={"password": "admin", "is_superuser": True})
+            login(request, user)
         return self.get_response(request)
