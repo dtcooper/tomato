@@ -105,6 +105,12 @@ MIDDLEWARE.extend(
         "django.middleware.common.CommonMiddleware",
         "django.middleware.csrf.CsrfViewMiddleware",
         "django.contrib.auth.middleware.AuthenticationMiddleware",
+    ]
+)
+if STANDALONE_MODE:
+    MIDDLEWARE.append("tomato.middleware.AlwaysLoggedInMiddleware")
+MIDDLEWARE.extend(
+    [
         "django.contrib.messages.middleware.MessageMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
     ]

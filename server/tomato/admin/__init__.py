@@ -1,5 +1,6 @@
 import itertools
 
+from django.conf import settings
 from django.contrib import admin
 from django.templatetags.static import static
 from django.utils.html import format_html
@@ -58,6 +59,7 @@ class TomatoAdminSite(admin.AdminSite):
         return {
             "help_docs_url": HELP_DOCS_URL,
             "help_docs_text": help_docs_text,
+            "standalone_mode": settings.STANDALONE_MODE,
             "tomato_json_data": {"colors": COLORS_DICT},
             **context,
         }
@@ -70,4 +72,6 @@ admin_site.register(ClientLogEntry, ClientLogEntryAdmin)
 admin_site.register([Config], ConfigAdmin)
 admin_site.register(Rotator, RotatorAdmin)
 admin_site.register(Stopset, StopsetAdmin)
-admin_site.register(User, UserAdmin)
+
+if not settings.STANDALONE_MODE:
+    admin_site.register(User, UserAdmin)

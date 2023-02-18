@@ -106,11 +106,14 @@
 {% endblock messages %}
 
 {% block userlinks %}
-  <a href="{{ help_docs_url }}" target="_blank">Help Docs</a> /
-  {% if user.is_superuser %}
-    <a href="{% url 'server_logs' %}" target="_blank">Server Logs</a> /
+  <a href="{{ help_docs_url }}" target="_blank">Help Docs</a>
+  {% if not standalone_mode %}
+    /
+    {% if user.is_superuser %}
+      <a href="{% url 'server_logs' %}" target="_blank">Server Logs</a> /
+    {% endif %}
+    {{ block.super }}
   {% endif %}
-  {{ block.super }}
 {% endblock %}
 
 {% block content_subtitle %}
