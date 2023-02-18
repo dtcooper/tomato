@@ -410,7 +410,10 @@ CONSTANCE_CONFIG = {
 }
 
 if STANDALONE_MODE:
-    CONSTANCE_ADDITIONAL_FIELDS["disabled_boolean"] = ("django.forms.BooleanField", {"disabled": True, "required": False})
+    CONSTANCE_ADDITIONAL_FIELDS["disabled_boolean"] = (
+        "django.forms.BooleanField",
+        {"disabled": True, "required": False},
+    )
     CONSTANCE_CONFIG["TRIM_SILENCE"] = (
         False,
         CONSTANCE_CONFIG["TRIM_SILENCE"][1] + mark_safe(" <strong>(Unavailable in standalone mode!)</strong>"),

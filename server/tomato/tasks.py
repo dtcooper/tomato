@@ -25,6 +25,8 @@ def process_asset(asset, empty_name=False, user=None, no_success_message=False, 
         if user is not None:
             user_messages_api.error(
                 user,
+                # TODO: {asset.name} used here and below doesn't have original file extension, which leads to a poor
+                # # error message
                 (
                     f"{asset.name} {message} and was deleted. Check the file and try again. If this keeps happening,"
                     " check the server logs."
@@ -32,8 +34,6 @@ def process_asset(asset, empty_name=False, user=None, no_success_message=False, 
                 deliver_once=False,
             )
         asset.delete()
-
-    # TODO: exception being thrown
 
     try:
         asset.refresh_from_db()

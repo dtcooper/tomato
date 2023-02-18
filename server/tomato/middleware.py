@@ -1,5 +1,6 @@
-from tomato.models import User
 from django.contrib.auth import login
+
+from tomato.models import User
 
 
 class AlwaysLoggedInMiddleware:
