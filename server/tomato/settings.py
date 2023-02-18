@@ -8,22 +8,31 @@ from django.utils.safestring import mark_safe
 import environ
 
 
-env = environ.Env()
-env.read_env("/.env")
-
 BASE_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = BASE_DIR.parent
 
-DEBUG = env.bool("DEBUG", default=False)
+env = environ.Env()
+STANDALONE_MODE = env("__TOMATO_STANDALONE_MODE", default=False)
 
-DOMAIN_NAME = env("DOMAIN_NAME", default=None)
-REQUIRE_STRONG_PASSWORDS = env("REQUIRE_STRONG_PASSWORDS", default=not DEBUG)
-SECRET_KEY = env("SECRET_KEY")
+if STANDALONE_MODE:
+    SECRET_KEY = "insecure-secret-key"
+    DEBUG = False
+    DOMAIN_NAME = None
+    REQUIRE_STRONG_PASSWORDS = False
+    EMAIL_EXCEPTIONS_ENABLED = False
+
+else:
+    env.read_env("/.env")
+
+    SECRET_KEY = env("SECRET_KEY")
+    DEBUG = env.bool("DEBUG", default=False)
+    DOMAIN_NAME = env("DOMAIN_NAME", default=None)
+    REQUIRE_STRONG_PASSWORDS = env("REQUIRE_STRONG_PASSWORDS", default=not DEBUG)
+    DEBUG_LOGS_PORT = env.int("DEBUG_LOGS_PORT", default=8001)
+    EMAIL_EXCEPTIONS_ENABLED = env.bool("EMAIL_EXCEPTIONS_ENABLED", default=True)
+
 TIME_ZONE = env("TIMEZONE", default="US/Pacific")
 
-DEBUG_LOGS_PORT = env.int("DEBUG_LOGS_PORT", default=8001)
-
-EMAIL_EXCEPTIONS_ENABLED = env.bool("EMAIL_EXCEPTIONS_ENABLED", default=True)
 if EMAIL_EXCEPTIONS_ENABLED:
     EMAIL_ADMIN_ADDRESS = env("EMAIL_ADMIN_ADDRESS")
     EMAIL_HOST = env("EMAIL_HOST")
@@ -35,7 +44,7 @@ if EMAIL_EXCEPTIONS_ENABLED:
 
 
 ALLOWED_HOSTS = {"app"}
-if DEBUG:
+if DEBUG or STANDALONE_MODE:
     ALLOWED_HOSTS.add("localhost")
 if DOMAIN_NAME:
     ALLOWED_HOSTS.add(DOMAIN_NAME)
@@ -55,12 +64,19 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # Third-party
-    "constance",
-    "huey.contrib.djhuey",
-    "django_file_form",
-    "user_messages",
 ]
+if STANDALONE_MODE:
+    INSTALLED_APPS.append("django.contrib.sessions")
+
+INSTALLED_APPS.extend(
+    [
+        # Third-party
+        "constance",
+        "huey.contrib.djhuey",
+        "django_file_form",
+        "user_messages",
+    ]
+)
 if DEBUG:
     INSTALLED_APPS.extend(
         [
@@ -118,38 +134,58 @@ SILENCED_SYSTEM_CHECKS = ("admin.E404",)  # Needed for django-user-messages
 WSGI_APPLICATION = "tomato.wsgi.application"
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "postgres",
-        "USER": "postgres",
-        "PASSWORD": "postgres",
-        "HOST": "db",
-        "PORT": 5432,
-    }
-}
-
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "CONNECTION_POOL_KWARGS": {"max_connections": 50},
-            "PARSER_CLASS": "redis.connection.HiredisParser",
-        },
-        "KEY_PREFIX": "cache",
-    }
-}
-
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-
 HUEY = {
     "results": False,
-    "huey_class": "tomato.utils.DjangoPriorityRedisHuey",
     "immediate": False,
     "name": "tomato",
 }
+
+if STANDALONE_MODE:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": PROJECT_DIR / "db.sqlite3",  # TODO better location
+        },
+    }
+
+    HUEY.update(
+        {
+            "huey_class": "huey.SqliteHuey",
+            "connection": {"filename": PROJECT_DIR / "huey.sqlite3"},  # TODO better location
+        }
+    )
+
+    CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
+
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": "postgres",
+            "USER": "postgres",
+            "PASSWORD": "postgres",
+            "HOST": "db",
+            "PORT": 5432,
+        }
+    }
+
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": "redis://redis",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "CONNECTION_POOL_KWARGS": {"max_connections": 50},
+                "PARSER_CLASS": "redis.connection.HiredisParser",
+            },
+            "KEY_PREFIX": "cache",
+        }
+    }
+
+    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    HUEY["huey_class"] = "tomato.utils.DjangoPriorityRedisHuey"
+    CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
+    CONSTANCE_REDIS_CONNECTION = "redis://redis"
 
 LANGUAGE_CODE = "en-us"
 USE_I18N = True
@@ -232,9 +268,7 @@ def validate_no_more_than_three(value):
         raise ValidationError("Pick a maximum of three choices.")
 
 
-CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
 CONSTANCE_SUPERUSER_ONLY = False
-CONSTANCE_REDIS_CONNECTION = "redis://redis"
 CONSTANCE_ADDITIONAL_FIELDS = {
     "zero_seconds_to_five_hours": (
         "django.forms.DecimalField",
@@ -366,6 +400,15 @@ CONSTANCE_CONFIG = {
     "UI_MODES": (["idiot", "easy"], "What user interface modes are available to the desktop app.", "ui_modes"),
     "WARN_ON_EMPTY_ROTATORS": (True, "Warn when a rotator has no eligible assets to choose from."),
 }
+
+if STANDALONE_MODE:
+    CONSTANCE_ADDITIONAL_FIELDS["disabled_boolean"] = ("django.forms.BooleanField", {"disabled": True})
+    CONSTANCE_CONFIG["TRIM_SILENCE"] = (
+        False,
+        CONSTANCE_CONFIG["TRIM_SILENCE"][1] + mark_safe(" <strong>(Unavailable in standalone mode!)</strong>"),
+        "disabled_boolean",
+    )
+
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
     (
         ("User Interface Options", ("STATION_NAME", "UI_MODES", "WARN_ON_EMPTY_ROTATORS")),

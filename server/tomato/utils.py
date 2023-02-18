@@ -2,7 +2,11 @@ import datetime
 
 from huey import PriorityRedisHuey
 
-from django_redis import get_redis_connection
+
+try:
+    from django_redis import get_redis_connection
+except ModuleNotFoundError:
+    pass
 
 
 # XXX unused?

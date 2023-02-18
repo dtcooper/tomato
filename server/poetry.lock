@@ -309,6 +309,9 @@ python-versions = ">=3.6"
 files = []
 develop = false
 
+[package.dependencies]
+django-picklefield = {version = "*", optional = true, markers = "extra == \"database\""}
+
 [package.extras]
 database = ["django-picklefield"]
 redis = ["redis"]
@@ -316,7 +319,7 @@ redis = ["redis"]
 [package.source]
 type = "git"
 url = "https://github.com/jazzband/django-constance.git"
-reference = "HEAD"
+reference = "master"
 resolved_reference = "8b030129187a6842a3915946dab49fba8557ff47"
 
 [[package]]
@@ -393,6 +396,24 @@ files = [
     {file = "django-file-form-3.4.4.tar.gz", hash = "sha256:81188f9dd4fcf35506d29178c1e5b6729213aeb83dd4db14a428e009dff86387"},
     {file = "django_file_form-3.4.4-py3-none-any.whl", hash = "sha256:54bba2e614543d2a06de702519004f108adf18766ecf00e428911633020802a5"},
 ]
+
+[[package]]
+name = "django-picklefield"
+version = "3.1"
+description = "Pickled object field for Django"
+category = "main"
+optional = false
+python-versions = ">=3"
+files = [
+    {file = "django-picklefield-3.1.tar.gz", hash = "sha256:c786cbeda78d6def2b43bff4840d19787809c8909f7ad683961703060398d356"},
+    {file = "django_picklefield-3.1-py3-none-any.whl", hash = "sha256:d77c504df7311e8ec14e8b779f10ca6fec74de6c7f8e2c136e1ef60cf955125d"},
+]
+
+[package.dependencies]
+Django = ">=3.2"
+
+[package.extras]
+tests = ["tox"]
 
 [[package]]
 name = "django-redis"
@@ -1231,4 +1252,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "48bb0cf4b4ac5e8ff9bbe66c46ee971a3dc4656c01a295ea2f85bccca6c459d1"
+content-hash = "af73d93242289f390ac9180f951612a87b992ca639e5bb47f91ebf334b23fbcc"
