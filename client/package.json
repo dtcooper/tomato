@@ -18,7 +18,7 @@
     "package": "NODE_ENV=production npm-run-all clean build package:forge",
     "make:forge": "electron-forge make",
     "package:forge": "electron-forge package",
-    "format": "prettier --write ."
+    "format": "prettier --write . ../server/constants.json"
   },
   "repository": {
     "type": "git",

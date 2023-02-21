@@ -1,29 +1,29 @@
 {
-    "schema_version": 1,
-    "client_log_entry_types": [
-        "played_asset",
-        "played_part_stopset",
-        "played_stopset",
-        "skipped_asset",
-        "skipped_stopset",
-        "waited"
-    ],
-    "colors": [
-        {"name": "red", "value": "#ff1744", "content": "#ffd1da"},
-        {"name": "pink", "value": "#f50057", "content": "#ffccde"},
-        {"name": "purple", "value": "#d500f9", "content": "#f7ccff"},
-        {"name": "deep-purple", "value": "#651fff", "content": "#e0d1ff"},
-        {"name": "indigo", "value": "#3d5afe", "content": "#d6dcff"},
-        {"name": "blue", "value": "#2979ff", "content": "#d6e5ff"},
-        {"name": "light-blue", "value": "#00b0ff", "content": "#002333"},
-        {"name": "cyan", "value": "#00e5ff", "content": "#002e33"},
-        {"name": "teal", "value": "#1de9b6", "content": "#003326"},
-        {"name": "green", "value": "#00e676", "content": "#002e18"},
-        {"name": "light-green", "value": "#76ff03", "content": "#173300"},
-        {"name": "lime", "value": "#c6ff00", "content": "#283300"},
-        {"name": "yellow", "value": "#ffea00", "content": "#332f00"},
-        {"name": "amber", "value": "#ffc400", "content": "#332700"},
-        {"name": "orange", "value": "#ff9100", "content": "#331d00"},
-        {"name": "deep-orange", "value": "#ff3d00", "content": "#ffd8cc"}
-    ]
+  "schema_version": 1,
+  "client_log_entry_types": [
+    "played_asset",
+    "played_part_stopset",
+    "played_stopset",
+    "skipped_asset",
+    "skipped_stopset",
+    "waited"
+  ],
+  "colors": [
+    { "name": "red", "value": "#ff1744", "content": "#ffd1da" },
+    { "name": "pink", "value": "#f50057", "content": "#ffccde" },
+    { "name": "purple", "value": "#d500f9", "content": "#f7ccff" },
+    { "name": "deep-purple", "value": "#651fff", "content": "#e0d1ff" },
+    { "name": "indigo", "value": "#3d5afe", "content": "#d6dcff" },
+    { "name": "blue", "value": "#2979ff", "content": "#d6e5ff" },
+    { "name": "light-blue", "value": "#00b0ff", "content": "#002333" },
+    { "name": "cyan", "value": "#00e5ff", "content": "#002e33" },
+    { "name": "teal", "value": "#1de9b6", "content": "#003326" },
+    { "name": "green", "value": "#00e676", "content": "#002e18" },
+    { "name": "light-green", "value": "#76ff03", "content": "#173300" },
+    { "name": "lime", "value": "#c6ff00", "content": "#283300" },
+    { "name": "yellow", "value": "#ffea00", "content": "#332f00" },
+    { "name": "amber", "value": "#ffc400", "content": "#332700" },
+    { "name": "orange", "value": "#ff9100", "content": "#331d00" },
+    { "name": "deep-orange", "value": "#ff3d00", "content": "#ffd8cc" }
+  ]
 }
