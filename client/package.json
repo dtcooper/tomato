@@ -17,7 +17,8 @@
     "make": "NODE_ENV=production npm-run-all clean build make:forge",
     "package": "NODE_ENV=production npm-run-all clean build package:forge",
     "make:forge": "electron-forge make",
-    "package:forge": "electron-forge package"
+    "package:forge": "electron-forge package",
+    "format": "prettier --write ."
   },
   "repository": {
     "type": "git",
@@ -48,19 +49,16 @@
     "material-ui-colors": "^1.0.0",
     "md5-file": "^5.0.0",
     "npm-run-all": "^4.1.5",
+    "prettier": "^2.8.4",
+    "prettier-plugin-organize-imports": "^3.2.2",
+    "prettier-plugin-svelte": "^2.9.0",
+    "prettier-plugin-tailwindcss": "^0.2.3",
     "run-script-os": "^1.1.6",
-    "standard": "^17.0.0",
     "svelte": "^3.55.1",
     "svelte-devtools-standalone": "github:RedHatter/svelte-devtools-standalone",
     "svelte-local-storage-store": "^0.4.0",
     "svelte-preprocess": "^5.0.1",
     "tailwindcss": "^3.2.7",
     "wait-on": "^7.0.1"
-  },
-  "standard": {
-    "ignore": [
-      "dist/**/*",
-      "out/**/*"
-    ]
   }
 }
