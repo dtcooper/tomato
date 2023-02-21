@@ -1,26 +1,32 @@
-import { get, writable } from 'svelte/store'
-import { writable as persistentWritable } from 'svelte-local-storage-store'
+import { writable as persistentWritable } from "svelte-local-storage-store"
+import { get, writable } from "svelte/store"
 
-export const accessToken = persistentWritable('accessToken', '')
-export const address = persistentWritable('address', '')
-export const connected = persistentWritable('connected', false)
-export const username = persistentWritable('username', '')
+export const accessToken = persistentWritable("accessToken", "")
+export const address = persistentWritable("address", "")
+export const connected = persistentWritable("connected", false)
+export const username = persistentWritable("username", "")
 export const online = writable(navigator.onLine)
-window.addEventListener('offline', () => { online.set(false) })
-window.addEventListener('online', () => { online.set(true) })
+window.addEventListener("offline", () => {
+  online.set(false)
+})
+window.addEventListener("online", () => {
+  online.set(true)
+})
 
 const ping = async () => {
   let data, response
   const headers = {}
 
-  if (accessToken) { headers['X-Access-Token'] = get(accessToken) }
+  if (accessToken) {
+    headers["X-Access-Token"] = get(accessToken)
+  }
 
   try {
     response = await fetch(`${get(address)}ping/`, { headers })
     data = await response.json()
   } catch (error) {
     console.error(error)
-    return { success: false, error: 'Invalid handshake. Are you sure this address is correct?' }
+    return { success: false, error: "Invalid handshake. Are you sure this address is correct?" }
   }
 
   return data
@@ -31,14 +37,14 @@ const authenticate = async (password) => {
 
   try {
     response = await fetch(`${get(address)}auth/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username: get(username), password })
     })
     data = await response.json()
   } catch (error) {
     console.error(error)
-    return { success: false, error: 'Server error while logging in' }
+    return { success: false, error: "Server error while logging in" }
   }
 
   return data
@@ -47,7 +53,7 @@ const authenticate = async (password) => {
 export const login = async (password) => {
   let addressUrl
 
-  const error = (error, errorType = 'address') => {
+  const error = (error, errorType = "address") => {
     return { success: false, error, errorType }
   }
 
@@ -57,16 +63,16 @@ export const login = async (password) => {
     try {
       addressUrl = new URL(`https://${get(address)}`)
     } catch {
-      return error('Invalid server address')
+      return error("Invalid server address")
     }
   }
 
-  if (!['https:', 'http:'].includes(addressUrl.protocol)) {
-    return error('Server must being with http:// or https://')
+  if (!["https:", "http:"].includes(addressUrl.protocol)) {
+    return error("Server must being with http:// or https://")
   }
 
-  if (!addressUrl.pathname.endsWith('/')) {
-    addressUrl.pathname += '/'
+  if (!addressUrl.pathname.endsWith("/")) {
+    addressUrl.pathname += "/"
   }
   address.set(addressUrl.toString())
 
@@ -77,7 +83,7 @@ export const login = async (password) => {
 
   const auth = await authenticate(password)
   if (!auth.success) {
-    return error(auth.error, 'auth')
+    return error(auth.error, "auth")
   }
 
   accessToken.set(auth.access_token)
@@ -86,6 +92,6 @@ export const login = async (password) => {
 
 export const logout = () => {
   connected.set(false)
-  accessToken.set('')
+  accessToken.set("")
   window.location.reload()
 }

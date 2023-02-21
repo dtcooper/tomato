@@ -1,14 +1,14 @@
 <script context="module">
-  import initializeStreamDeck from "./streamdeck";
+  import initializeStreamDeck from "./streamdeck"
 
-  initializeStreamDeck();
+  initializeStreamDeck()
 </script>
 
 <script>
-  import { connected } from "./stores/connection";
+  import { connected } from "./stores/connection"
 
-  import Login from "./Login.svelte";
-  import Main from "./Main.svelte";
+  import Login from "./Login.svelte"
+  import Main from "./Main.svelte"
 </script>
 
 {#if !$connected}

@@ -1,49 +1,50 @@
-import md5File from 'md5-file'
-import download from 'download'
-import dayjs from 'dayjs'
+import dayjs from "dayjs"
+import download from "download"
+import md5File from "md5-file"
 
-import { derived, get, writable } from 'svelte/store'
-import { writable as persistentWritable } from 'svelte-local-storage-store'
+import { writable as persistentWritable } from "svelte-local-storage-store"
+import { derived, get, writable } from "svelte/store"
 
-import { address, connected, accessToken } from './connection'
+import { accessToken, address, connected } from "./connection"
 
-const path = require('path')
-const os = require('os')
-const { promises: fs } = require('fs')
+const path = require("path")
+const os = require("os")
+const { promises: fs } = require("fs")
 
 let dataDir
-if (process.platform === 'darwin') {
+if (process.platform === "darwin") {
   // Common on macOS to store this stuff in ~/Library/Preferences
-  dataDir = path.join(os.homedir(), 'Library', 'Preferences', 'tomato-radio-automation', 'assets')
+  dataDir = path.join(os.homedir(), "Library", "Preferences", "tomato-radio-automation", "assets")
 } else {
-  dataDir = path.join((new URLSearchParams(window.location.search)).get('userDataDir'), 'tomato-assets')
+  dataDir = path.join(new URLSearchParams(window.location.search).get("userDataDir"), "tomato-assets")
 }
 
 export const syncing = writable(false)
 export const progress = writable(false)
 const emptyStore = { assets: [], rotators: [], stopsets: [], config: [] }
-const store = persistentWritable('store', emptyStore)
-let rotatorsById = window.rotatorsById = {}
+const store = persistentWritable("store", emptyStore)
+let rotatorsById = (window.rotatorsById = {})
 
-export const rotators = derived(store, $store => $store.rotators)
-rotators.subscribe($rotators => {
+export const rotators = derived(store, ($store) => $store.rotators)
+rotators.subscribe(($rotators) => {
   rotatorsById = ($rotators || []).reduce((obj, rotator) => {
     obj[rotator.id] = rotator
     return obj
   }, {})
 })
 
-const processAssetsAndStopsets = objs => objs.map(obj => ({
-  ...obj,
-  duration: obj.duration !== undefined ? dayjs.duration(obj.duration, 'seconds') : undefined,
-  begin: obj.begin && dayjs(obj.begin),
-  end: obj.end && dayjs(obj.end),
-  rotators: obj.rotators.map(id => rotatorsById[id])
-}))
+const processAssetsAndStopsets = (objs) =>
+  objs.map((obj) => ({
+    ...obj,
+    duration: obj.duration !== undefined ? dayjs.duration(obj.duration, "seconds") : undefined,
+    begin: obj.begin && dayjs(obj.begin),
+    end: obj.end && dayjs(obj.end),
+    rotators: obj.rotators.map((id) => rotatorsById[id])
+  }))
 
-export const assets = derived(store, $store => processAssetsAndStopsets($store.assets))
-export const stopsets = derived(store, $store => processAssetsAndStopsets($store.stopsets))
-export const config = derived(store, $store => $store.config)
+export const assets = derived(store, ($store) => processAssetsAndStopsets($store.assets))
+export const stopsets = derived(store, ($store) => processAssetsAndStopsets($store.stopsets))
+export const config = derived(store, ($store) => $store.config)
 
 const fileExists = async (asset) => {
   try {
@@ -57,11 +58,9 @@ const fileExists = async (asset) => {
 const downloadAsset = async (asset) => {
   try {
     console.log(`Downloading ${path.basename(asset.file.filename)}`)
-    return await download(
-      asset.file.url,
-      path.dirname(asset.file.filename),
-      { filename: path.basename(asset.file.filename) }
-    )
+    return await download(asset.file.url, path.dirname(asset.file.filename), {
+      filename: path.basename(asset.file.filename)
+    })
   } catch (error) {
     console.error(error)
     return false
@@ -93,7 +92,7 @@ export const sync = async () => {
   syncing.set(true)
 
   try {
-    response = await fetch(`${get(address)}sync/`, { headers: { 'X-Access-Token': get(accessToken) } })
+    response = await fetch(`${get(address)}sync/`, { headers: { "X-Access-Token": get(accessToken) } })
     if (response.status === 403) {
       syncing.set(false)
       connected.set(false)
@@ -114,7 +113,7 @@ export const sync = async () => {
   for (let i = 0; i < total; i++) {
     const asset = data.assets[i]
     let url = asset.file.url
-    if (url.startsWith('/')) {
+    if (url.startsWith("/")) {
       url = url.substr(1)
     }
     asset.file.url = `${get(address)}${url}`
@@ -122,11 +121,11 @@ export const sync = async () => {
     asset.file.localUrl = `file://${asset.file.filename}`
     const shortname = path.basename(asset.file.filename)
 
-    progress.set({ index: i + 1, total, percent: i / total * 100, filename: shortname })
+    progress.set({ index: i + 1, total, percent: (i / total) * 100, filename: shortname })
 
-    if (!await fileExists(asset) || !await isMd5Correct(asset)) {
+    if (!(await fileExists(asset)) || !(await isMd5Correct(asset))) {
       if (await downloadAsset(asset)) {
-        if (!await isMd5Correct(asset)) {
+        if (!(await isMd5Correct(asset))) {
           console.error(`Bad sum for ${shortname}`)
           badAssets.add(i)
         }
@@ -138,7 +137,9 @@ export const sync = async () => {
   }
 
   data.assets = data.assets.filter((_, i) => !badAssets.has(i))
-  data.config.SINGLE_PLAY_ROTATORS = (data.config.SINGLE_PLAY_ROTATORS || []).map(rotatorId => rotatorsById[rotatorId])
+  data.config.SINGLE_PLAY_ROTATORS = (data.config.SINGLE_PLAY_ROTATORS || []).map(
+    (rotatorId) => rotatorsById[rotatorId]
+  )
 
   store.set(data)
   progress.set(false)
@@ -151,12 +152,14 @@ const isCurrentlyAiring = (obj, now = null) => {
   if (now === null) {
     now = dayjs()
   }
-  return obj.enabled &&
+  return (
+    obj.enabled &&
     (obj.begin === null || obj.begin.isSame(now) || obj.begin.isBefore(now)) &&
     (obj.end === null || obj.end.isSame(now) || obj.end.isAfter(now))
+  )
 }
 
-const pickRandomItemByWeight = objects => {
+const pickRandomItemByWeight = (objects) => {
   const totalWeight = objects.reduce((weight, obj) => weight + obj.weight, 0)
   const randomWeight = Math.random() * totalWeight
   let weight = 0
@@ -171,18 +174,18 @@ const pickRandomItemByWeight = objects => {
 
 export const generateStopset = () => {
   const now = dayjs()
-  let eligibleAssets = get(assets).filter(asset => isCurrentlyAiring(asset, now))
-  const eligibleStopsets = get(stopsets).filter(stopset => isCurrentlyAiring(stopset, now))
+  let eligibleAssets = get(assets).filter((asset) => isCurrentlyAiring(asset, now))
+  const eligibleStopsets = get(stopsets).filter((stopset) => isCurrentlyAiring(stopset, now))
 
   while (eligibleStopsets.length > 0) {
     const stopset = eligibleStopsets.splice(pickRandomItemByWeight(eligibleStopsets), 1)[0]
     const generated = []
     for (const rotator of stopset.rotators) {
-      const rotatorAssets = eligibleAssets.filter(a => a.rotators.findIndex(r => r.id === rotator.id) > -1)
+      const rotatorAssets = eligibleAssets.filter((a) => a.rotators.findIndex((r) => r.id === rotator.id) > -1)
       let asset = null
       if (rotatorAssets.length > 0) {
         asset = rotatorAssets[pickRandomItemByWeight(rotatorAssets)]
-        eligibleAssets = eligibleAssets.filter(a => a.id !== asset.id)
+        eligibleAssets = eligibleAssets.filter((a) => a.id !== asset.id)
       }
       generated.push({ rotator, asset })
     }

@@ -1,7 +1,7 @@
-import dayjs from 'dayjs'
-import duration from 'dayjs/plugin/duration'
+import dayjs from "dayjs"
+import duration from "dayjs/plugin/duration"
 
-import App from './App.svelte'
+import App from "./App.svelte"
 
 dayjs.extend(duration)
 
