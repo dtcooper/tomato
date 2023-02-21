@@ -10,9 +10,15 @@
   export let connecting = false
   export let password = ""
   export let showPassword = false
+  export let demoMode = false
   export let errors = { auth: false, address: false }
 
   export const submit = async () => {
+    if (demoMode) {
+      alert('Demo mode not yet implemented')
+      return
+    }
+
     if (!$address || !$username || !password) {
       if (!$username || !password) errors.auth = "You must enter a username or password"
       if (!$address) errors.address = "You must enter a server address"
@@ -48,8 +54,8 @@
       <div
         in:fade
         class="absolute inset-0 flex items-center justify-center text-success"
-        class:flex-col="{$progress}"
-        class:space-y-2="{progress}"
+        class:flex-col={$progress}
+        class:space-y-2={progress}
       >
         {#if $progress}
           <div class="radial-progress" style="--value: {$progress.percent}">
@@ -65,19 +71,32 @@
         {/if}
       </div>
     {/if}
-    <form class="card-body" class:invisible="{connecting}" on:submit|preventDefault="{submit}">
+    <form class="card-body" class:invisible={connecting} on:submit|preventDefault={submit}>
+      <div class="form-control items-end">
+        <label class="label cursor-pointer space-x-3 pr-0">
+          <span class="label-text">
+            {#if demoMode}
+              <span class="font-bold text-success">Demo mode enabled</span>
+            {:else}
+              Enable demo mode
+            {/if}
+          </span>
+          <input type="checkbox" class="toggle" bind:checked={demoMode} />
+        </label>
+      </div>
       <div class="form-control">
         <div class="label">
-          <span class="label-text">Server Address</span>
+          <span class="label-text">Server address</span>
           {#if errors.address}
             <span class="label-text-alt font-bold text-error">{errors.address}</span>
           {/if}
         </div>
         <input
-          bind:value="{$address}"
+          bind:value={$address}
+          disabled={demoMode}
           class="input-bordered input"
-          class:input-error="{errors.address}"
-          on:input="{() => (errors.address = false)}"
+          class:input-error={errors.address}
+          on:input={() => (errors.address = false)}
           placeholder="https://example.org"
           type="text"
         />
@@ -88,12 +107,13 @@
             <span class="label-text">Username</span>
           </div>
           <input
-            bind:value="{$username}"
+            bind:value={$username}
+            disabled={demoMode}
             class="input-bordered input"
-            class:input-error="{errors.auth}"
+            class:input-error={errors.auth}
             type="text"
             placeholder="Enter username..."
-            on:input="{() => (errors.auth = false)}"
+            on:input={() => (errors.auth = false)}
           />
           {#if errors.auth}
             <div class="label">
@@ -105,12 +125,13 @@
           <div class="label">
             <span class="label-text">Password</span>
           </div>
-          {#if showPassword}
+          {#if showPassword && !demoMode}
             <input
-              bind:value="{password}"
-              class:input-error="{errors.auth}"
+              bind:value={password}
+              disabled={demoMode}
+              class:input-error={errors.auth}
               class="input-bordered input"
-              on:input="{() => (errors.auth = false)}"
+              on:input={() => (errors.auth = false)}
               placeholder="Enter password..."
               type="text"
               autocapitalize="none"
@@ -119,11 +140,12 @@
             />
           {:else}
             <input
-              bind:value="{password}"
-              class:input-error="{errors.auth}"
-              class:tracking-wider="{!showPassword && password.length > 0}"
+              bind:value={password}
+              disabled={demoMode}
+              class:input-error={errors.auth}
+              class:tracking-wider={(!showPassword || demoMode) && password.length > 0}
               class="input-bordered input"
-              on:input="{() => (errors.auth = false)}"
+              on:input={() => (errors.auth = false)}
               placeholder="Enter password..."
               type="password"
               autocapitalize="none"
@@ -134,7 +156,7 @@
           <div class="form-control items-end">
             <label class="label cursor-pointer space-x-3 pr-0">
               <span class="label-text">{showPassword ? "Hide" : "Reveal"} password</span>
-              <input type="checkbox" class="checkbox" bind:checked="{showPassword}" />
+              <input disabled={demoMode} type="checkbox" class="checkbox" bind:checked={showPassword} />
             </label>
           </div>
         </div>

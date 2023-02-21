@@ -90,13 +90,13 @@
 
 <div class="flex h-screen max-h-screen w-full max-w-full flex-col items-center space-y-1">
   <div class="btn-group mt-2 p-2">
-    <button on:click="{logout}" class="btn btn-warning">Logout</button>
-    <button on:click="{sync}" class="btn btn-primary" disabled="{$syncing}">Sync</button>
-    <button on:click="{refresh}" class="btn btn-secondary">Generate Stopset</button>
+    <button on:click={logout} class="btn btn-warning">Logout</button>
+    <button on:click={sync} class="btn btn-primary" disabled={$syncing}>Sync</button>
+    <button on:click={refresh} class="btn btn-secondary">Generate Stopset</button>
     {#if playing > -1}
-      <button on:click="{next}" class="btn btn-error">Next</button>
+      <button on:click={next} class="btn btn-error">Next</button>
     {:else}
-      <button on:click="{play}" class="btn btn-success" disabled="{!generated.loaded}">Play</button>
+      <button on:click={play} class="btn btn-success" disabled={!generated.loaded}>Play</button>
     {/if}
   </div>
 
@@ -112,26 +112,26 @@
         {#each assets as { asset, rotator, loaded, audio, error, progress }, index}
           <div
             class="rounded-l-xl border-l-4 pl-2 sm:border-l-[6px]  lg:border-l-8"
-            class:border-error="{error}"
-            class:border-content-base="{!error && playing < index}"
-            class:border-green-A400="{!error && playing === index}"
-            class:border-gray-500="{!error && playing > index}"
+            class:border-error={error}
+            class:border-content-base={!error && playing < index}
+            class:border-green-A400={!error && playing === index}
+            class:border-gray-500={!error && playing > index}
           >
             <div
               class="grid grid-cols-[min-content_1fr_min-content] gap-2 rounded-xl p-2"
-              style:background-color="{getColor(rotator.color)}"
-              style:color="{getColor(rotator.color, "content")}"
-              class:!text-error-content="{error}"
-              class:!bg-error="{error}"
+              style:background-color={getColor(rotator.color)}
+              style:color={getColor(rotator.color, "content")}
+              class:!text-error-content={error}
+              class:!bg-error={error}
             >
               {#if error}
                 <div class="flex h-20 w-20 items-center justify-center font-bold text-error-content">ERROR</div>
               {:else}
                 <div
                   class="flex h-20 w-20 items-center justify-center font-mono"
-                  class:radial-progress="{progress !== null}"
-                  class:text-sm="{isHour(asset.duration)}"
-                  style:--value="{progress === null ? 0 : (progress / Math.ceil(audio.duration)) * 100}"
+                  class:radial-progress={progress !== null}
+                  class:text-sm={isHour(asset.duration)}
+                  style:--value={progress === null ? 0 : (progress / Math.ceil(audio.duration)) * 100}
                 >
                   {formatDuration(
                     progress === null ? asset.duration : dayjs.duration(Math.ceil(audio.duration) - progress, "seconds")

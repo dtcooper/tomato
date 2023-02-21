@@ -3,7 +3,7 @@
   "semi": false,
   "bracketSameLine": false,
   "printWidth": 120,
-  "svelteStrictMode": true,
+  "svelteStrictMode": false,
   "trailingComma": "none",
   "plugins": ["prettier-plugin-svelte", "prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"],
   "pluginSearchDirs": false,
