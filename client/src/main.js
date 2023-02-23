@@ -44,6 +44,7 @@ function createWindow() {
       webSecurity: false
     }
   })
+  win.webContents.setVisualZoomLevelLimits(1, 1)
 
   mainWindowState.manage(win)
 
