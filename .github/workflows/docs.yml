@@ -19,6 +19,8 @@ jobs:
     name: Publish
     env:
       POETRY_VERSION: 1.4.0
+      PYTHONDONTWRITEBYTECODE: 1
+      PYTHONUNBUFFERED: 1
     steps:
       -
         name: Checkout
