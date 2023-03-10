@@ -54,14 +54,14 @@ theme:
   palette:
     - scheme: default
       media: "(prefers-color-scheme: light)"
-      primary: indigo
+      primary: pink
       accent: blue
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - scheme: slate
       media: "(prefers-color-scheme: dark)"
-      primary: deep purple
+      primary: pink
       accent: light blue
       toggle:
         icon: material/weather-night
