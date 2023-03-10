@@ -5,10 +5,6 @@ ENV DJANGO_SETTINGS_MODULE=tomato.settings \
     PYTHONUNBUFFERED=1 \
     POETRY_VIRTUALENVS_CREATE=false
 
-ARG POETRY_VERSION=1.4.0
-RUN curl -sSL https://install.python-poetry.org | python -
-ENV PATH="/root/.local/bin:${PATH}"
-
 ARG DEBUG=0
 RUN apt-get update \
     && apt-get upgrade -y \
@@ -30,6 +26,10 @@ RUN apt-get update \
         && echo "alias ls='ls --color=auto'" >> /root/.bashrc \
         && echo '. /etc/bash_completion' >> /root/.bashrc \
     ; fi
+
+ARG POETRY_VERSION=1.4.0
+RUN curl -sSL https://install.python-poetry.org | python -
+ENV PATH="/root/.local/bin:${PATH}"
 
 COPY constants.json pyproject.toml poetry.lock /app/
 WORKDIR /app
