@@ -296,8 +296,10 @@ python-versions = ">=3.6"
 files = []
 develop = false
 
+[package.dependencies]
+django-picklefield = "*"
+
 [package.extras]
-database = ["django-picklefield"]
 redis = ["redis"]
 
 [package.source]
@@ -380,6 +382,24 @@ files = [
     {file = "django-file-form-3.4.4.tar.gz", hash = "sha256:81188f9dd4fcf35506d29178c1e5b6729213aeb83dd4db14a428e009dff86387"},
     {file = "django_file_form-3.4.4-py3-none-any.whl", hash = "sha256:54bba2e614543d2a06de702519004f108adf18766ecf00e428911633020802a5"},
 ]
+
+[[package]]
+name = "django-picklefield"
+version = "3.1"
+description = "Pickled object field for Django"
+category = "main"
+optional = false
+python-versions = ">=3"
+files = [
+    {file = "django-picklefield-3.1.tar.gz", hash = "sha256:c786cbeda78d6def2b43bff4840d19787809c8909f7ad683961703060398d356"},
+    {file = "django_picklefield-3.1-py3-none-any.whl", hash = "sha256:d77c504df7311e8ec14e8b779f10ca6fec74de6c7f8e2c136e1ef60cf955125d"},
+]
+
+[package.dependencies]
+Django = ">=3.2"
+
+[package.extras]
+tests = ["tox"]
 
 [[package]]
 name = "django-redis"
@@ -1218,4 +1238,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "bf08c001c50ab5aec192bda01aa7b31d743629d5b453caa309a86069a958d158"
+content-hash = "d764eada2f8b19ef598f67a6d957d759c0e29cc6056c8f7e794f82f615f5a919"
