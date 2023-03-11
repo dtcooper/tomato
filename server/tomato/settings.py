@@ -232,6 +232,7 @@ def validate_no_more_than_three(value):
         raise ValidationError("Pick a maximum of three choices.")
 
 
+MIGRATION_MODULES = {"constance": None}  # Ignore constance models
 CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
 CONSTANCE_SUPERUSER_ONLY = False
 CONSTANCE_REDIS_CONNECTION = "redis://redis"
