@@ -292,7 +292,7 @@ version = "2.9.1"
 description = "Django live settings with pluggable backends, including Redis."
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 files = []
 develop = false
 
@@ -306,7 +306,7 @@ redis = ["redis"]
 type = "git"
 url = "https://github.com/jazzband/django-constance.git"
 reference = "HEAD"
-resolved_reference = "79fd8af0f4456b8ef717fbe10a6db835fe923d8d"
+resolved_reference = "b4860568022edf8016985cd8346e85f5b6f46edb"
 
 [[package]]
 name = "django-debug-toolbar"
@@ -1238,4 +1238,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "d764eada2f8b19ef598f67a6d957d759c0e29cc6056c8f7e794f82f615f5a919"
+content-hash = "bf08c001c50ab5aec192bda01aa7b31d743629d5b453caa309a86069a958d158"
