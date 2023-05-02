@@ -18,11 +18,11 @@ django-redis = {extras = ["hiredis"], version = "^5.2.0"}
 django-user-messages = "^1.0.0"
 gunicorn = "^20.1.0"
 huey = "^2.4.5"
+psycopg = "^3.1.9"
 pybase62 = "^0.6.0"
 python-dotenv = "^1.0.0"
-requests = "^2.28.1"
-wait-for-it = "^2.2.1"
-psycopg = "^3.1.8"
+requests = "^2.29.0"
+wait-for-it = "^2.2.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
@@ -30,7 +30,7 @@ django-debug-toolbar = "^4.0.0"
 django-extensions = "^3.2.1"
 flake8 = "^6.0.0"
 ipdb = "^0.13.13"
-ipython = "^8.12.0"
+ipython = "^8.13.1"
 isort = "^5.12.0"
 watchdog = {extras = ["watchmedo"], version = "^3.0.0"}
 
