@@ -3,6 +3,13 @@
 {% block extrahead %}
   {{ block.super }}
 
+  <style>
+    /* Prevent weird yellow highlighting due to checkbox selected */
+    #changelist table tbody tr {
+      background-color: #ffffff !important;
+    }
+  </style>
+
   <script>
     const multipleChoiceFieldChanges = {
       'SINGLE_PLAY_ROTATORS': 'None',
