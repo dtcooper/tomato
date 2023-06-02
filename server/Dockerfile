@@ -27,7 +27,7 @@ RUN apt-get update \
         && echo '. /etc/bash_completion' >> /root/.bashrc \
     ; fi
 
-ARG POETRY_VERSION=1.5.0
+ARG POETRY_VERSION=1.5.1
 RUN curl -sSL https://install.python-poetry.org | python -
 ENV PATH="/root/.local/bin:${PATH}"
 

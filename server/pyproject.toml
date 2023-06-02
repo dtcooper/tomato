@@ -13,15 +13,15 @@ django-cleanup = "^7.0.0"
 django-constance = {git = "https://github.com/jazzband/django-constance.git"}
 django-dirtyfields = "^1.9.2"
 django-environ = "^0.10.0"
-django-file-form = "^3.5.1"
+django-file-form = "^3.5.2"
 django-redis = {extras = ["hiredis"], version = "^5.2.0"}
 django-user-messages = "^1.0.0"
 gunicorn = "^20.1.0"
 huey = "^2.4.5"
 psycopg = "^3.1.9"
-pybase62 = "^0.6.0"
+pybase62 = "^1.0.0"
 python-dotenv = "^1.0.0"
-requests = "^2.30.0"
+requests = "^2.31.0"
 wait-for-it = "^2.2.2"
 
 [tool.poetry.group.dev.dependencies]
@@ -30,7 +30,7 @@ django-debug-toolbar = "^4.1.0"
 django-extensions = "^3.2.1"
 flake8 = "^6.0.0"
 ipdb = "^0.13.13"
-ipython = "^8.13.2"
+ipython = "^8.14.0"
 isort = "^5.12.0"
 watchdog = {extras = ["watchmedo"], version = "^3.0.0"}
 
