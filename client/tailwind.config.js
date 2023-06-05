@@ -1,5 +1,5 @@
 const materialUIColors = require("material-ui-colors")
-const { "[data-theme=synthwave]": synthwaveTheme } = require("daisyui/src/colors/themes")
+const { "[data-theme=synthwave]": synthwaveTheme } = require("daisyui/src/theming/themes")
 
 // Use material UI colors
 const colors = Object.keys(materialUIColors).reduce(
