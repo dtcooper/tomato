@@ -1,4 +1,4 @@
-FROM python:3.11-bullseye
+FROM python:3.11-bookworm
 
 ENV DJANGO_SETTINGS_MODULE=tomato.settings \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -16,7 +16,7 @@ RUN apt-get update \
             less \
             iputils-ping \
             nano \
-            netcat \
+            netcat-openbsd \
             postgresql-client \
             redis-tools \
         ) \
