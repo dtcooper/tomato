@@ -30,17 +30,11 @@ jobs:
         name: Build & upload package
         shell: bash
         run: |
-          mkdir -p ~/.ssh
-          chmod 0700 ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 0600 ~/.ssh/id_ed25519
-          echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
           cd client
           npm clean-install
           npm run build
           npx electron-forge make --arch universal --platform darwin
           mv -v out/make/zip/darwin/universal/*.zip tomato-preview-macos.zip
-          scp -P ${{ secrets.SSH_PORT}} tomato-preview-macos.zip tomato-preview-macos.zip "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
 
   build-win32:
     runs-on: windows-2022
@@ -58,18 +52,12 @@ jobs:
         name: Build & upload package
         shell: bash
         run: |
-          mkdir -p ~/.ssh
-          chmod 0700 ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 0600 ~/.ssh/id_ed25519
-          echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
           cd client
           npm config set script-shell $(which bash)
           npm clean-install
           npm run build
           npx electron-forge make --arch x64 --platform win32
           mv -v out/make/zip/win32/x64/*.zip tomato-preview-windows.zip
-          scp -P ${{ secrets.SSH_PORT}} tomato-preview-windows.zip "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
 
   build-linux-debian:
     runs-on: ubuntu-22.04
@@ -87,17 +75,11 @@ jobs:
         name: Build & upload package
         shell: bash
         run: |
-          mkdir -p ~/.ssh
-          chmod 0700 ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 0600 ~/.ssh/id_ed25519
-          echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
           cd client
           npm clean-install
           npm run build
           npx electron-forge make --arch x64 --platform linux
           mv -v out/make/deb/x64/*.deb tomato-preview-linux_amd64.deb
-          scp -P ${{ secrets.SSH_PORT}} tomato-preview-linux_amd64.deb "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
 
   build-linux-arch:
     runs-on: ubuntu-22.04
@@ -116,11 +98,13 @@ jobs:
         shell: bash
         # nodejs-lts-hydrogen = Node v18
         run: |
-          mkdir -p ~/.ssh
-          chmod 0700 ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 0600 ~/.ssh/id_ed25519
-          echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
           docker run --rm -v "$PWD:/build" -w /build/client/scripts/arch archlinux:base-devel sh -c 'pacman -Syu --noconfirm nodejs-lts-hydrogen && env EUID=1 makepkg -s --noconfirm'
           mv client/scripts/arch/*.pkg.tar.zst tomato-preview-linux-x86_64.pkg.tar.zst
-          scp -P ${{ secrets.SSH_PORT}} tomato-preview-linux-x86_64.pkg.tar.zst "${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{ secrets.CLIENT_BUILD_UPLOAD_DIR }}"
+      -
+        name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-linux-arch
+          path: tomato-preview-linux-x86_64.pkg.tar.zst
+      -
+        uses: mxschmitt/action-tmate@v3
