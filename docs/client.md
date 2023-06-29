@@ -24,11 +24,11 @@ Preview builds
 [are available on GitHub](https://github.com/dtcooper/tomato/releases/tag/preview-build)
 or can be download below.
 
-  * [:material-download: macOS :simple-apple:](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-preview-macos.zip)
+  * [:material-download: macOS :simple-apple:](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-macos.zip)
     &mdash; universal binary for Intel or Apple M1 chips
-  * [:material-download: Windows :simple-windows: ](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-preview-windows.zip)
+  * [:material-download: Windows :simple-windows: ](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-windows.zip)
     &mdash; `.zip` archive you can extract and run the program executable
-  * [:material-download: Ubuntu :simple-ubuntu: or Debian :simple-debian: Linux](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-preview-linux_amd64.deb)
+  * [:material-download: Ubuntu :simple-ubuntu: or Debian :simple-debian: Linux](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_amd64.deb)
     &mdash; package in `.deb` format (amd64 only)
-  * [:material-download: Arch :simple-archlinux: or Manjaro :simple-manjaro: Linux](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-preview-linux-x86_64.pkg.tar.zst)
+  * [:material-download: Arch :simple-archlinux: or Manjaro :simple-manjaro: Linux](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux-x86_64.pkg.tar.zst)
     &mdash; package in `.pkg.tar.zst` format (amd64 only)

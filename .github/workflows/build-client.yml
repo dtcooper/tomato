@@ -34,13 +34,13 @@ jobs:
           npm clean-install
           npm run build
           npx electron-forge make --arch universal --platform darwin
-          mv -v out/make/zip/darwin/universal/*.zip ../tomato-preview-macos.zip
+          mv -v out/make/zip/darwin/universal/*.zip ../tomato-client-preview-macos.zip
       -
         name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
           name: tomato-preview-build-macos
-          path: tomato-preview-macos.zip
+          path: tomato-client-preview-macos.zip
 
   build-win32:
     runs-on: windows-2022
@@ -63,13 +63,13 @@ jobs:
           npm clean-install
           npm run build
           npx electron-forge make --arch x64 --platform win32
-          mv -v out/make/zip/win32/x64/*.zip ../tomato-preview-windows.zip
+          mv -v out/make/zip/win32/x64/*.zip ../tomato-client-preview-windows.zip
       -
         name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
           name: tomato-preview-build-win32
-          path: tomato-preview-windows.zip
+          path: tomato-client-preview-windows.zip
 
   build-linux-debian:
     runs-on: ubuntu-22.04
@@ -91,13 +91,13 @@ jobs:
           npm clean-install
           npm run build
           npx electron-forge make --arch x64 --platform linux
-          mv -v out/make/deb/x64/*.deb ../tomato-preview-linux_amd64.deb
+          mv -v out/make/deb/x64/*.deb ../tomato-client-preview-linux_amd64.deb
       -
         name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
           name: tomato-preview-build-linux-debian
-          path: tomato-preview-linux_amd64.deb
+          path: tomato-client-preview-linux_amd64.deb
 
   build-linux-arch:
     runs-on: ubuntu-22.04
@@ -117,13 +117,13 @@ jobs:
         # nodejs-lts-hydrogen = Node v18
         run: |
           docker run --rm -v "$PWD:/build" -w /build/client/scripts/arch archlinux:base-devel sh -c 'pacman -Syu --noconfirm nodejs-lts-hydrogen && env EUID=1 makepkg -s --noconfirm'
-          mv client/scripts/arch/*.pkg.tar.zst tomato-preview-linux-x86_64.pkg.tar.zst
+          mv client/scripts/arch/*.pkg.tar.zst tomato-client-preview-linux-x86_64.pkg.tar.zst
       -
         name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
           name: tomato-preview-build-linux-arch
-          path: tomato-preview-linux-x86_64.pkg.tar.zst
+          path: tomato-client-preview-linux-x86_64.pkg.tar.zst
 
   tag:
     runs-on: ubuntu-22.04
