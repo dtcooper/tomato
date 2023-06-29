@@ -18,13 +18,17 @@ stages. You can, however download preview builds below.
     under the section _"If you want to open an app that hasn't been notarized or
     is from an unidentified developer."_
 
-Download one of the following releases,
+**Development preview builds may not be safe: use them at your own risk.**
 
-  * [:material-download: macOS :simple-apple:](https://priv.bmir.org/tomato-preview-macos.zip)
+Preview builds
+[are available on GitHub](https://github.com/dtcooper/tomato/releases/tag/preview-build)
+or can be download below.
+
+  * [:material-download: macOS :simple-apple:](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-preview-macos.zip)
     &mdash; universal binary for Intel or Apple M1 chips
-  * [:material-download: Windows :simple-windows: ](https://priv.bmir.org/tomato-preview-windows.zip)
+  * [:material-download: Windows :simple-windows: ](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-preview-windows.zip)
     &mdash; `.zip` archive you can extract and run the program executable
-  * [:material-download: Ubuntu :simple-ubuntu: or Debian :simple-debian: Linux](https://priv.bmir.org/tomato-preview-linux_amd64.deb)
+  * [:material-download: Ubuntu :simple-ubuntu: or Debian :simple-debian: Linux](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-preview-linux_amd64.deb)
     &mdash; package in `.deb` format (amd64 only)
-  * [:material-download: Arch :simple-archlinux: or Manjaro :simple-manjaro: Linux](https://priv.bmir.org/tomato-preview-linux-x86_64.pkg.tar.zst)
+  * [:material-download: Arch :simple-archlinux: or Manjaro :simple-manjaro: Linux](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-preview-linux-x86_64.pkg.tar.zst)
     &mdash; package in `.pkg.tar.zst` format (amd64 only)

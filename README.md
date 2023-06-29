@@ -34,8 +34,10 @@ production environments
 
 ### Client (Desktop App)
 
-To run the client's code locally, install [nodejs 18+](https://nodejs.org/).
-Then in your terminal,
+Download a
+[development preview build here](https://github.com/dtcooper/tomato/releases/tag/preview-build)
+or run the client's code locally, by
+installing [nodejs 18+](https://nodejs.org/). Then in your terminal,
 
 ```bash
 # Clone the repo
