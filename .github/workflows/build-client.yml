@@ -34,7 +34,13 @@ jobs:
           npm clean-install
           npm run build
           npx electron-forge make --arch universal --platform darwin
-          mv -v out/make/zip/darwin/universal/*.zip tomato-preview-macos.zip
+          mv -v out/make/zip/darwin/universal/*.zip ../tomato-preview-macos.zip
+      -
+        name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: tomato-preview-build-macos
+          path: tomato-preview-macos.zip
 
   build-win32:
     runs-on: windows-2022
@@ -57,7 +63,13 @@ jobs:
           npm clean-install
           npm run build
           npx electron-forge make --arch x64 --platform win32
-          mv -v out/make/zip/win32/x64/*.zip tomato-preview-windows.zip
+          mv -v out/make/zip/win32/x64/*.zip ../tomato-preview-windows.zip
+      -
+        name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: tomato-preview-build-win32
+          path: tomato-preview-windows.zip
 
   build-linux-debian:
     runs-on: ubuntu-22.04
@@ -79,7 +91,13 @@ jobs:
           npm clean-install
           npm run build
           npx electron-forge make --arch x64 --platform linux
-          mv -v out/make/deb/x64/*.deb tomato-preview-linux_amd64.deb
+          mv -v out/make/deb/x64/*.deb ../tomato-preview-linux_amd64.deb
+      -
+        name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: tomato-preview-build-linux-debian
+          path: tomato-preview-linux_amd64.deb
 
   build-linux-arch:
     runs-on: ubuntu-22.04
@@ -104,7 +122,33 @@ jobs:
         name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: build-linux-arch
+          name: tomato-preview-build-linux-arch
           path: tomato-preview-linux-x86_64.pkg.tar.zst
+
+  tag:
+    runs-on: ubuntu-22.04
+    name: Tag preview release
+    needs: [build-macos, build-win32, build-linux-debian, build-linux-arch]
+    steps:
+      -
+        name: Download build artifact (macOS)
+        uses: actions/download-artifact@v3
+        with:
+          name: tomato-preview-build-macos
+      -
+        name: Download build artifact (Windows)
+        uses: actions/download-artifact@v3
+        with:
+          name: tomato-preview-build-win32
+      -
+        name: Download build artifact (Linux, Debian)
+        uses: actions/download-artifact@v3
+        with:
+          name: tomato-preview-build-linux-debian
+      -
+        name: Download build artifact (Linux, Arch)
+        uses: actions/download-artifact@v3
+        with:
+          name: tomato-preview-build-linux-arch
       -
         uses: mxschmitt/action-tmate@v3
