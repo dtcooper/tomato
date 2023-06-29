@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: 18
       -
-        name: Build & upload package
+        name: Build package
         shell: bash
         run: |
           cd client
@@ -55,7 +55,7 @@ jobs:
         with:
           node-version: 18
       -
-        name: Build & upload package
+        name: Build package
         shell: bash
         run: |
           cd client
@@ -84,7 +84,7 @@ jobs:
         with:
           node-version: 18
       -
-        name: Build & upload package
+        name: Build package
         shell: bash
         run: |
           cd client
@@ -112,7 +112,7 @@ jobs:
         name: Setup rootless Docker
         uses: ScribeMD/rootless-docker@0.2.2
       -
-        name: Build & upload package
+        name: Build package
         shell: bash
         # nodejs-lts-hydrogen = Node v18
         run: |
@@ -151,4 +151,18 @@ jobs:
         with:
           name: tomato-preview-build-linux-arch
       -
-        uses: mxschmitt/action-tmate@v3
+        name: Remove old release
+        uses: dev-drprasad/delete-tag-and-release@v0.2.1
+        with:
+          delete_release: true
+          tag_name: preview-build
+      -
+        name: Tag new preview release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "./*"
+          name: 'Tomato Preview Build'
+          body: 'This development preview build may not be safe: use it at your own risk.'
+          prerelease: true
+          tag: preview-build
+          token: ${{ secrets.GITHUB_TOKEN }}
