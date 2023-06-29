@@ -156,6 +156,7 @@ jobs:
         with:
           delete_release: true
           tag_name: preview-build
+          github_token: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Tag new preview release
         uses: ncipollo/release-action@v1
