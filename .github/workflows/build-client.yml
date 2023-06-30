@@ -172,6 +172,5 @@ jobs:
           artifacts: "./preview-release/*"
           name: 'Tomato Preview Build'
           body: 'This development preview build may not be safe: use it at your own risk.'
-          prerelease: true
           tag: preview-build
           token: ${{ secrets.GITHUB_TOKEN }}
