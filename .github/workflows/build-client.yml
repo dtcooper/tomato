@@ -159,11 +159,12 @@ jobs:
           path: preview-release
       -
         name: Remove old release
-        uses: dev-drprasad/delete-tag-and-release@v1.0.1
+        uses: dev-drprasad/delete-tag-and-release@v1
         with:
           delete_release: true
           tag_name: preview-build
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Tag new preview release
         uses: ncipollo/release-action@v1
