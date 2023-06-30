@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - .github/workflows/build-client.yml
       - client/**
       - server/constants.json
   workflow_dispatch:
@@ -165,6 +166,11 @@ jobs:
           tag_name: preview-build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Wait for old release deletion
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '30s'
       -
         name: Tag and upload release
         uses: ncipollo/release-action@v1
