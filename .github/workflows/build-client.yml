@@ -131,25 +131,32 @@ jobs:
     needs: [build-macos, build-win32, build-linux-debian, build-linux-arch]
     steps:
       -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
         name: Download build artifact (macOS)
         uses: actions/download-artifact@v3
         with:
           name: tomato-preview-build-macos
+          path: preview-release
       -
         name: Download build artifact (Windows)
         uses: actions/download-artifact@v3
         with:
           name: tomato-preview-build-win32
+          path: preview-release
       -
         name: Download build artifact (Linux, Debian)
         uses: actions/download-artifact@v3
         with:
           name: tomato-preview-build-linux-debian
+          path: preview-release
       -
         name: Download build artifact (Linux, Arch)
         uses: actions/download-artifact@v3
         with:
           name: tomato-preview-build-linux-arch
+          path: preview-release
       -
         name: Remove old release
         uses: dev-drprasad/delete-tag-and-release@v1.0.1
@@ -161,7 +168,7 @@ jobs:
         name: Tag new preview release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "./*"
+          artifacts: "./preview-release/*"
           name: 'Tomato Preview Build'
           body: 'This development preview build may not be safe: use it at your own risk.'
           prerelease: true
