@@ -185,7 +185,7 @@ jobs:
         with:
           artifacts: "./release-files/*"
           name: 'Tomato Build (${{ env.TOMATO_VERSION }})'
-          body: ${{ github.ref_type != 'tag' && 'This development preview build may not be safe: use it at your own risk.' || '' }}
+          body: ${{ github.ref_type != 'tag' && 'This development preview build may not be safe. Use it at your own risk.' || '' }}
           tag: ${{ env.TOMATO_RELEASE }}
           prerelease: ${{ github.ref_type == 'tag' }}
           token: ${{ secrets.GITHUB_TOKEN }}
