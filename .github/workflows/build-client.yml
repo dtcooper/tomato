@@ -181,6 +181,6 @@ jobs:
         if: github.ref_type == 'tag'
         with:
           artifacts: "./client-build-files/*"
-          name: 'Tomato Release ${{ env.TOMATO_VERSION }}'
+          name: 'Tomato Release ${{ github.ref_name }}'
           tag: ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
