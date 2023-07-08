@@ -137,7 +137,7 @@ jobs:
 
   tag:
     runs-on: ubuntu-22.04
-    name: Tag preview release
+    name: Tag release
     needs: [build-macos, build-win32, build-linux-debian, build-linux-arch]
     steps:
       -
