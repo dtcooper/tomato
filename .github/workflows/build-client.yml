@@ -47,6 +47,7 @@ jobs:
         with:
           name: tomato-client-${{ env.TOMATO_VERSION }}-build
           path: tomato-client-${{ env.TOMATO_VERSION }}-macos.zip
+          retention-days: 2
 
   build-win32:
     runs-on: windows-2022
@@ -76,6 +77,7 @@ jobs:
         with:
           name: tomato-client-${{ env.TOMATO_VERSION }}-build
           path: tomato-client-${{ env.TOMATO_VERSION }}-windows.zip
+          retention-days: 2
 
   build-linux-debian:
     runs-on: ubuntu-22.04
@@ -104,6 +106,7 @@ jobs:
         with:
           name: tomato-client-${{ env.TOMATO_VERSION }}-build
           path: tomato-client-${{ env.TOMATO_VERSION }}-linux_amd64.deb
+          retention-days: 2
 
   build-linux-arch:
     runs-on: ubuntu-22.04
@@ -130,6 +133,7 @@ jobs:
         with:
           name: tomato-client-${{ env.TOMATO_VERSION }}-build
           path: tomato-client-${{ env.TOMATO_VERSION }}-linux-x86_64.pkg.tar.zst
+          retention-days: 2
 
   tag:
     runs-on: ubuntu-22.04
@@ -165,7 +169,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "./release-files/*"
-          name: 'Tomato Build (${{ env.TOMATO_VERSION }})'
+          name: ${{ github.ref_type == 'tag' && format('Tomato Release {0}', env.TOMATO_VERSION) || 'Tomato Preview Build' }}
           body: ${{ github.ref_type != 'tag' && 'This development preview build may not be safe. Use it at your own risk.' || '' }}
           tag: ${{ env.TOMATO_VERSION }}
           prerelease: ${{ github.ref_type != 'tag' }}
