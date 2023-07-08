@@ -45,7 +45,7 @@ jobs:
         name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: tomato-client-${{ env.TOMATO_VERSION }}-macos
+          name: tomato-client-${{ env.TOMATO_VERSION }}-build
           path: tomato-client-${{ env.TOMATO_VERSION }}-macos.zip
 
   build-win32:
@@ -74,7 +74,7 @@ jobs:
         name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: tomato-client-${{ env.TOMATO_VERSION }}-win32
+          name: tomato-client-${{ env.TOMATO_VERSION }}-build
           path: tomato-client-${{ env.TOMATO_VERSION }}-windows.zip
 
   build-linux-debian:
@@ -102,7 +102,7 @@ jobs:
         name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: tomato-client-${{ env.TOMATO_VERSION }}-linux-debian
+          name: tomato-client-${{ env.TOMATO_VERSION }}-build
           path: tomato-client-${{ env.TOMATO_VERSION }}-linux_amd64.deb
 
   build-linux-arch:
@@ -128,7 +128,7 @@ jobs:
         name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: tomato-client-${{ env.TOMATO_VERSION }}-linux-arch
+          name: tomato-client-${{ env.TOMATO_VERSION }}-build
           path: tomato-client-${{ env.TOMATO_VERSION }}-linux-x86_64.pkg.tar.zst
 
   tag:
@@ -140,28 +140,10 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
-        name: Download build artifact (macOS)
+        name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: tomato-client-${{ env.TOMATO_VERSION }}-macos
-          path: release-files
-      -
-        name: Download build artifact (Windows)
-        uses: actions/download-artifact@v3
-        with:
-          name: tomato-client-${{ env.TOMATO_VERSION }}-win32
-          path: release-files
-      -
-        name: Download build artifact (Linux, Debian)
-        uses: actions/download-artifact@v3
-        with:
-          name: tomato-client-${{ env.TOMATO_VERSION }}-linux-debian
-          path: release-files
-      -
-        name: Download build artifact (Linux, Arch)
-        uses: actions/download-artifact@v3
-        with:
-          name: tomato-client-${{ env.TOMATO_VERSION }}-linux-arch
+          name: tomato-client-${{ env.TOMATO_VERSION }}-build
           path: release-files
       -
         name: Remove old preview release
