@@ -45,7 +45,7 @@ jobs:
         name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: tomato-client-${{ env.TOMATO_VERSION }}-build
+          name: client-build-files
           path: tomato-client-${{ env.TOMATO_VERSION }}-macos.zip
           retention-days: 2
 
@@ -75,7 +75,7 @@ jobs:
         name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: tomato-client-${{ env.TOMATO_VERSION }}-build
+          name: client-build-files
           path: tomato-client-${{ env.TOMATO_VERSION }}-windows.zip
           retention-days: 2
 
@@ -104,7 +104,7 @@ jobs:
         name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: tomato-client-${{ env.TOMATO_VERSION }}-build
+          name: client-build-files
           path: tomato-client-${{ env.TOMATO_VERSION }}-linux_amd64.deb
           retention-days: 2
 
@@ -131,7 +131,7 @@ jobs:
         name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: tomato-client-${{ env.TOMATO_VERSION }}-build
+          name: client-build-files
           path: tomato-client-${{ env.TOMATO_VERSION }}-linux-x86_64.pkg.tar.zst
           retention-days: 2
 
@@ -147,12 +147,12 @@ jobs:
         name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: tomato-client-${{ env.TOMATO_VERSION }}-build
-          path: release-files
+          name: client-build-files
+          path: client-build-files
       -
         name: Remove old preview release
-        if: github.ref_type != 'tag'
         uses: dev-drprasad/delete-tag-and-release@v0.2.1
+        if: github.ref_type != 'tag'
         with:
           delete_release: true
           tag_name: preview-build
@@ -160,17 +160,27 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Wait for old preview release deletion
-        if: github.ref_type != 'tag'
         shell: bash
+        if: github.ref_type != 'tag'
         run: |
           sleep 30s
       -
+        name: Tag and upload preview release
+        uses: ncipollo/release-action@v1
+        if: github.ref_type != 'tag'
+        with:
+          artifacts: "./client-build-files/*"
+          name: 'Tomato Preview Build'
+          body: 'This development preview build may not be safe: use it at your own risk.'
+          tag: 'preview-build'
+          prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      -
         name: Tag and upload release
         uses: ncipollo/release-action@v1
+        if: github.ref_type == 'tag'
         with:
-          artifacts: "./release-files/*"
-          name: ${{ github.ref_type == 'tag' && format('Tomato Release {0}', env.TOMATO_VERSION) || 'Tomato Preview Build' }}
-          body: ${{ github.ref_type != 'tag' && 'This development preview build may not be safe. Use it at your own risk.' || '' }}
-          tag: ${{ github.ref_type == 'tag' && github.ref_name || 'preview-build' }}
-          prerelease: ${{ github.ref_type != 'tag' }}
+          artifacts: "./client-build-files/*"
+          name: 'Tomato Release ${{ env.TOMATO_VERSION }}'
+          tag: ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
