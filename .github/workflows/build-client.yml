@@ -180,7 +180,6 @@ jobs:
           time: '30s'
       -
         name: Tag and upload release
-        if: not contains(github.ref, 'refs/tags/v')
         uses: ncipollo/release-action@v1
         with:
           artifacts: "./release-files/*"
