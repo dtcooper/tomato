@@ -161,9 +161,9 @@ jobs:
       -
         name: Wait for old preview release deletion
         if: github.ref_type != 'tag'
-        uses: jakejarvis/wait-action@master
-        with:
-          time: '30s'
+        shell: bash
+        run: |
+          sleep 30s
       -
         name: Tag and upload release
         uses: ncipollo/release-action@v1
