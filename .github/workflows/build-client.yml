@@ -179,4 +179,5 @@ jobs:
           name: 'Tomato Preview Build'
           body: 'This development preview build may not be safe: use it at your own risk.'
           tag: preview-build
+          prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
