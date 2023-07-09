@@ -131,8 +131,11 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
         ]
         return (
             format_html_join(
-                mark_safe("<br>\n"),
-                '&#x25cf; <a href="{}" style="padding: 1px 3px; color: {}; background-color: {};">{}</a>',
+                mark_safe("\n"),
+                (
+                    '<div style="padding: 2px 0">&#x25cf; <a href="{}" style="color: {}; background-color:'
+                    ' {};">{}</a></div>'
+                ),
                 rotators,
             )
             or None

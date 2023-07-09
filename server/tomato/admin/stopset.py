@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.db.models import Prefetch
 from django.urls import reverse
 from django.utils.html import format_html_join
-from django.utils.safestring import mark_safe
 
 from ..models import Rotator, StopsetRotator
 from .base import AiringFilter, AiringMixin, NoNullRelatedOnlyFieldFilter, NumAssetsMixin, TomatoModelAdminBase
@@ -56,8 +55,8 @@ class StopsetAdmin(AiringMixin, NumAssetsMixin, TomatoModelAdminBase):
         ]
         return (
             format_html_join(
-                mark_safe("<br>\n"),
-                '{}. <a href="{}" style="padding: 1px 3px; color: {}; background-color: {}">{}</a>',
+                "\n",
+                '<div style="padding: 2px 0">{}. <a href="{}" style="color: {}; background-color: {}">{}</a></div>',
                 rotators,
             )
             or None
