@@ -83,12 +83,14 @@ class AiringMixin:
         num = queryset.update(enabled=True)
         if num:
             self.message_user(request, f"Enabled {num} {self.model._meta.verbose_name}(s).", messages.SUCCESS)
+            self.mark_models_dirty(request)
 
     @admin.action(description="Disable selected %(verbose_name_plural)s", permissions=("add", "change", "delete"))
     def disable(self, request, queryset):
         num = queryset.update(enabled=False)
         if num:
             self.message_user(request, f"Disabled {num} {self.model._meta.verbose_name}(s).", messages.SUCCESS)
+            self.mark_models_dirty(request)
 
 
 class NumAssetsMixin:
@@ -130,3 +132,18 @@ class TomatoModelAdminBase(ListPrefetchRelatedMixin, SaveCreatedByMixin, admin.M
 
     def has_module_permission(self, request):
         return True
+
+    def mark_models_dirty(self, request):
+        request._models_dirty = True
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        self.mark_models_dirty(request)
+
+    def delete_model(self, request, obj):
+        super().delete_model(request, obj)
+        self.mark_models_dirty(request)
+
+    def delete_queryset(self, request, queryset):
+        super().delete_queryset(request, queryset)
+        self.mark_models_dirty(request)

@@ -151,6 +151,7 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
             self.message_user(
                 request, f"Added {len(queryset)} audio assets to rotator {rotator.name}.", messages.SUCCESS
             )
+            self.mark_models_dirty(request)
         else:
             self.message_user(request, "You must select a rotator to add audio assets to.", messages.WARNING)
 
@@ -164,6 +165,7 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
             self.message_user(
                 request, f"Removed {len(queryset)} audio assets from rotator {rotator.name}.", messages.SUCCESS
             )
+            self.mark_models_dirty(request)
         else:
             self.message_user(request, "You must select a rotator to remove audio assets from.", messages.WARNING)
 
