@@ -8,7 +8,6 @@ from django.views.decorators.http import require_POST
 from user_messages.models import Message
 
 
-
 def server_logs(request):
     if request.user.is_superuser:
         if settings.DEBUG and not request.is_secure():

@@ -12,7 +12,7 @@ CLIENT_LOG_ENTRY_TYPES = _data["client_log_entry_types"]
 COLORS = _data["colors"]
 COLORS_DICT = {c["name"]: {k: c[k] for k in c.keys() if k != "name"} for c in COLORS}
 
-MODELS_DIRTY_REDIS_PUBSUB_KEY = "tomato::models::dirty"
+REDIS_PUBSUB_KEY = "tomato::pubsub"
 
 EDIT_ONLY_ASSETS_GROUP_NAME = "Edit ONLY audio assets"
 EDIT_ALL_GROUP_NAME = "Edit audio assets, rotators & stop sets"

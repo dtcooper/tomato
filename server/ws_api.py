@@ -1,7 +1,7 @@
 import asyncio
 import json
 import logging
-from weakref import WeakSet
+import weakref
 
 from asgiref.sync import sync_to_async
 import redis.asyncio as redis
@@ -20,8 +20,11 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 django.setup()
 
-from tomato.constants import MODELS_DIRTY_REDIS_PUBSUB_KEY, PROTOCOL_VERSION  # noqa - after django.setup()
+from tomato.constants import PROTOCOL_VERSION, REDIS_PUBSUB_KEY  # noqa - after django.setup()
 from tomato.models import ClientLogEntry, serialize_for_api  # noqa
+
+
+PUBSUB_TIMEOUT = 120
 
 
 logger = logging.getLogger(__name__)
@@ -50,7 +53,7 @@ def failure(reason):
 
 class APIWebSocketEndpoint(WebSocketEndpoint):
     encoding = "json"
-    subscribers = WeakSet()
+    subscribers = weakref.WeakKeyDictionary()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -94,7 +97,7 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
             await websocket.send_json({"success": True})
             self.authenticated = True
             await self.broadcast_data_change(single_websocket=websocket)
-            self.subscribers.add(websocket)
+            self.subscribers[websocket] = self
         else:
             logger.info("Invalid login credentials")
             await websocket.send_json(failure("Invalid username or password."))
@@ -106,7 +109,7 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
             logger.warning("No initial data from app yet! Trying again.")
             await asyncio.sleep(0.5)
 
-        subscribers = cls.subscribers if single_websocket is None else (single_websocket,)
+        subscribers = cls.subscribers.keys() if single_websocket is None else (single_websocket,)
         json_data = json.dumps({"type": "data", "data": app.state.data}, cls=DjangoJSONEncoder)
         num_broadcasted_to = 0
 
@@ -118,6 +121,14 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
             num_broadcasted_to += 1
 
         return num_broadcasted_to
+
+    @classmethod
+    async def logout_users(cls, user_ids):
+        user_ids = set(user_ids)
+        for websocket, endpoint in cls.subscribers.items():
+            if endpoint.user is not None and endpoint.user.id in user_ids:
+                logger.info(f"Disconnecting user {endpoint.user} by request from backend")
+                await websocket.close()
 
 
 async def background_subscriber():
@@ -139,19 +150,25 @@ async def background_subscriber():
     await update_from_api_and_broadcast()
 
     async with conn.pubsub() as pubsub:
-        await pubsub.subscribe(MODELS_DIRTY_REDIS_PUBSUB_KEY)
-        logger.info(f"Subscribed to redis key {MODELS_DIRTY_REDIS_PUBSUB_KEY!r}")
+        await pubsub.subscribe(REDIS_PUBSUB_KEY)
+        logger.info(f"Subscribed to redis key {REDIS_PUBSUB_KEY!r}")
+        got_first_none = False  # After connection, we get a stray None, no sense broadcasting because of it
 
         while True:
-            message = await pubsub.get_message(ignore_subscribe_messages=True, timeout=None)
-
-            # Consume all additional messages (avoids duplication)
-            while (skipped := await pubsub.get_message(ignore_subscribe_messages=True, timeout=0)) is not None:
-                logger.debug(f"Skipped: {skipped['data'].decode()}")
+            message = await pubsub.get_message(ignore_subscribe_messages=True, timeout=PUBSUB_TIMEOUT)
 
             if message is not None:
-                logger.debug(f"Got message: {message['data'].decode()}")
+                message = json.loads(message["data"])
+                logger.debug(f"Got message: {message}")
+                if message["type"] == "update":
+                    await update_from_api_and_broadcast()
+                elif message["type"] == "logout":
+                    await APIWebSocketEndpoint.logout_users(message["data"])
+            elif got_first_none:
+                logger.info(f"Subscription timed out after {PUBSUB_TIMEOUT} seconds.")
                 await update_from_api_and_broadcast()
+            else:
+                got_first_none = True
 
 
 async def startup():

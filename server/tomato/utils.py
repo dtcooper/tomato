@@ -1,31 +1,11 @@
 import datetime
+import json
 
 from huey import PriorityRedisHuey
 
 from django_redis import get_redis_connection
 
-from .constants import MODELS_DIRTY_REDIS_PUBSUB_KEY
-
-
-# XXX unused?
-def pretty_delta(td):
-    if isinstance(td, (float, int)):
-        td = datetime.timedelta(seconds=round(td))
-
-    d = dict(days=td.days)
-    d["hrs"], rem = divmod(td.seconds, 3600)
-    d["min"], d["sec"] = divmod(rem, 60)
-
-    if d["min"] == 0:
-        fmt = "{sec} sec"
-    elif d["hrs"] == 0:
-        fmt = "{min} min {sec} sec"
-    elif d["days"] == 0:
-        fmt = "{hrs} hr(s) {min} min {sec} sec"
-    else:
-        fmt = "{days} day(s) {hrs} hr(s) {min} min {sec} sec"
-
-    return fmt.format(**d)
+from .constants import REDIS_PUBSUB_KEY
 
 
 def once_at_startup(crontab):
@@ -42,9 +22,17 @@ def once_at_startup(crontab):
     return startup_crontab
 
 
-def mark_models_dirty():
+def send_redis_message(message_type, data):
     conn = get_redis_connection()
-    conn.publish(MODELS_DIRTY_REDIS_PUBSUB_KEY, str(datetime.datetime.now()))
+    conn.publish(REDIS_PUBSUB_KEY, json.dumps({"type": message_type, "data": data}))
+
+
+def mark_models_dirty():
+    send_redis_message("update", datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))
+
+
+def mark_logged_out_users(user_ids):
+    send_redis_message("logout", user_ids)
 
 
 class DjangoPriorityRedisHuey(PriorityRedisHuey):

@@ -133,13 +133,17 @@ class Command(BaseCommand):
                     asset.save()
 
                     if options["tasks"]:
-                        process_asset.call_local(asset, user=created_by, skip_trim=not options["trim_if_enabled"])
+                        process_asset.call_local(
+                            asset, user=created_by, skip_trim=not options["trim_if_enabled"], mark_dirty=False
+                        )
 
                     asset.rotators.add(rotator)
                     assets.append(asset)
                     num += 1
 
-            if not options["tasks"]:
+            if options["tasks"]:
+                mark_models_dirty()
+            else:
                 bulk_process_assets(assets, user=created_by, skip_trim=not options["trim_if_enabled"])
 
         for stopset_name, rotator_names in metadata["stopsets"].items():
@@ -151,5 +155,4 @@ class Command(BaseCommand):
                     rotator=rotators[rotator_name],
                 )
 
-        mark_models_dirty()
         self.stdout.write(self.style.SUCCESS(f"Done! Took {time.time() - before_time:.3f} seconds."))

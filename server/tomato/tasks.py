@@ -20,7 +20,9 @@ logger = logging.getLogger(__name__)
 
 
 @djhuey.db_task(context=True, retries=3, retry_delay=5)
-def process_asset(asset, empty_name=False, user=None, no_success_message=False, skip_trim=False, task=None):
+def process_asset(
+    asset, empty_name=False, user=None, no_success_message=False, skip_trim=False, mark_dirty=True, task=None
+):
     def error(message):
         if user is not None:
             user_messages_api.error(
@@ -32,8 +34,6 @@ def process_asset(asset, empty_name=False, user=None, no_success_message=False, 
                 deliver_once=False,
             )
         asset.delete()
-
-    # TODO: exception being thrown
 
     try:
         asset.refresh_from_db()
@@ -70,12 +70,14 @@ def process_asset(asset, empty_name=False, user=None, no_success_message=False, 
 
         asset.status = asset.Status.READY
         asset.save()
-        mark_models_dirty()
+        if mark_dirty:
+            mark_models_dirty()
 
         if not no_success_message and user is not None:
             user_messages_api.success(user, f'Audio asset "{asset.file_path.name}" processed!')
 
     except Exception:
+        logger.exception("process_asset threw exception")
         if task is None or task.retries == 0:
             error("could not be processed")
         raise
@@ -85,9 +87,12 @@ def process_asset(asset, empty_name=False, user=None, no_success_message=False, 
 def bulk_process_assets(assets, user=None, skip_trim=False):
     for asset in assets:
         try:
-            process_asset.call_local(asset, empty_name=True, user=user, no_success_message=True, skip_trim=skip_trim)
+            process_asset.call_local(
+                asset, empty_name=True, user=user, no_success_message=True, skip_trim=skip_trim, mark_dirty=False
+            )
         except Exception:
             pass
+    mark_models_dirty()
     if user is not None:
         user_messages_api.success(user, f"Finished processing {len(assets)} audio assets.")
 
