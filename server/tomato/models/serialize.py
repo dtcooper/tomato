@@ -5,7 +5,6 @@ from django.db.models import Prefetch
 
 from constance import config as constance_config
 
-from ..constants import PROTOCOL_VERSION
 from .asset import Asset
 from .rotator import Rotator
 from .stopset import Stopset
@@ -46,6 +45,5 @@ async def serialize_for_api(async_redis_conn=None):
         "assets": [a.serialize() async for a in assets],
         "rotators": [r.serialize() for r in rotators],
         "stopsets": [s.serialize() async for s in stopsets],
-        "PROTOCOL_VERSION": PROTOCOL_VERSION,
         "config": config,
     }
