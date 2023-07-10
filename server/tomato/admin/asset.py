@@ -199,6 +199,7 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
                     asset.save()
                     if rotators:
                         asset.rotators.add(*rotators)
+                self.mark_models_dirty(request)
                 bulk_process_assets(assets, user=request.user)
 
                 form.delete_temporary_files()

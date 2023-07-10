@@ -14,6 +14,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from tomato.models import Asset, Rotator, Stopset, StopsetRotator, User
 from tomato.tasks import bulk_process_assets, process_asset
+from tomato.utils import mark_models_dirty
 
 
 SAMPLE_DATA_URL = "https://tomato.nyc3.digitaloceanspaces.com/bmir-sample-assets.zip"
@@ -150,4 +151,5 @@ class Command(BaseCommand):
                     rotator=rotators[rotator_name],
                 )
 
+        mark_models_dirty()
         self.stdout.write(self.style.SUCCESS(f"Done! Took {time.time() - before_time:.3f} seconds."))

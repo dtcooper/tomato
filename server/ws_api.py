@@ -20,7 +20,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 django.setup()
 
-from tomato.constants import MODELS_DIRTY_REDIS_PUBSUB_KEY, PROTOCOL_VERSION  # noqa [after django.setup()]
+from tomato.constants import MODELS_DIRTY_REDIS_PUBSUB_KEY, PROTOCOL_VERSION  # noqa - after django.setup()
 from tomato.models import ClientLogEntry, serialize_for_api  # noqa
 
 

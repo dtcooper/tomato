@@ -4,6 +4,8 @@ from huey import PriorityRedisHuey
 
 from django_redis import get_redis_connection
 
+from .constants import MODELS_DIRTY_REDIS_PUBSUB_KEY
+
 
 # XXX unused?
 def pretty_delta(td):
@@ -38,6 +40,11 @@ def once_at_startup(crontab):
             return crontab(*args, **kwargs)
 
     return startup_crontab
+
+
+def mark_models_dirty():
+    conn = get_redis_connection()
+    conn.publish(MODELS_DIRTY_REDIS_PUBSUB_KEY, str(datetime.datetime.now()))
 
 
 class DjangoPriorityRedisHuey(PriorityRedisHuey):

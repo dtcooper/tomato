@@ -13,7 +13,7 @@ from user_messages import api as user_messages_api
 from user_messages.models import Message as UserMessage
 
 from .ffmpeg import ffmpeg_convert, ffprobe
-from .utils import once_at_startup
+from .utils import mark_models_dirty, once_at_startup
 
 
 logger = logging.getLogger(__name__)
@@ -70,6 +70,7 @@ def process_asset(asset, empty_name=False, user=None, no_success_message=False, 
 
         asset.status = asset.Status.READY
         asset.save()
+        mark_models_dirty()
 
         if not no_success_message and user is not None:
             user_messages_api.success(user, f'Audio asset "{asset.file_path.name}" processed!')
