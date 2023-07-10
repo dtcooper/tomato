@@ -76,6 +76,10 @@
         cell.append(link)
       })
 
+      {% if perms.tomato.immediate_play_asset %}
+        {# add immediate play link here #}
+      {% endif %}
+
       Array.from(document.querySelectorAll('.dismiss-message')).forEach(dismissLink => {
         dismissLink.addEventListener('click', async event => {
           event.preventDefault()

@@ -46,12 +46,16 @@ class TomatoConfig(AppConfig):
             (f"View and export {ClientLogEntry._meta.verbose_name_plural}", (client_log_entry,)),
         ):
             group, _ = Group.objects.get_or_create(name=name)
-            group.permissions.add(*Permission.objects.filter(content_type__in=content_types))
+            group.permissions.add(*Permission.objects.filter(content_type__in=content_types).exclude(codename="immediate_play_asset"))
             all_groups.append(group)
 
         group, _ = Group.objects.get_or_create(name="Modify configuration")
         # tomato comes after constance in INSTALLED_APPS, so this should always exist
         group.permissions.add(Permission.objects.get(codename="change_config"))
+        all_groups.append(group)
+
+        group, _ = Group.objects.get_or_create(name="Can immediately schedule audio assets to play")
+        group.permissions.add(Permission.objects.get(codename="immediate_play_asset"))
         all_groups.append(group)
 
         Group.objects.exclude(id__in=[group.id for group in all_groups]).delete()

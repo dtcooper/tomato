@@ -65,6 +65,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         db_table = "assets"
         verbose_name = "audio asset"
         ordering = ("-created_at",)
+        permissions = [("immediate_play_asset", "Can immediately play audio assets")]
 
     def save(self, *args, **kwargs):
         self.name = self.name[:NAME_MAX_LENGTH].strip() or "Untitled"
