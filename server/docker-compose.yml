@@ -74,7 +74,7 @@ services:
       - "${DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock"
     environment:
       DOZZLE_ADDR: ":8000"
-      DOZZLE_BASE: /server-logs
+      DOZZLE_BASE: "/server-logs"
       DOZZLE_HOSTNAME: "${DOMAIN_NAME}"
 
 volumes:

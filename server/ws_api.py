@@ -69,27 +69,15 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
         uuid = data.pop("id")
         data["created_by"] = self.user
         _, created = await ClientLogEntry.objects.aupdate_or_create(id=uuid, defaults=data)
-        return {"success": True, "updated": not created}
+        return {"success": True, "updated_existing": not created}
 
     async def on_recieve_authenticated(self, websocket, data):
-        # Temporary remove from subscribers to prevent data change broadcast
-        self.subscribers.remove(websocket)
-        before_data = app.state.data
-
         message_type = data.get("type")
         if message_type == "log":
             response = await self.process_log(data["data"])
         else:
             response = failure(f"Invalid message type: {json.dumps(message_type)}")
         await websocket.send_json(response)
-
-        # Dict object will change when new data comes in, hence the "is" comparison
-        if before_data is not app.state.data:
-            logger.debug("Data changed while processing a message from a subscriber. Sending it now.")
-            await self.broadcast_data_change(single_websocket=websocket)
-
-        # Add back
-        self.subscribers.add(websocket)
 
     async def on_recieve_unauthenticated(self, websocket, data):
         if set(data.keys()) == {"username", "password", "protocol_version"}:
