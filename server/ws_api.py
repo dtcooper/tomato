@@ -5,22 +5,22 @@ from weakref import WeakSet
 
 from asgiref.sync import sync_to_async
 import redis.asyncio as redis
+from uvicorn.logging import ColourizedFormatter
+
 from starlette.applications import Starlette
 from starlette.endpoints import WebSocketEndpoint
 from starlette.responses import PlainTextResponse
-from starlette.routing import WebSocketRoute, Route
-from uvicorn.logging import ColourizedFormatter
+from starlette.routing import Route, WebSocketRoute
 
 import django
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.core.serializers.json import DjangoJSONEncoder
 
-from tomato.constants import MODELS_DIRTY_REDIS_PUBSUB_KEY, PROTOCOL_VERSION
-
 
 django.setup()
 
+from tomato.constants import MODELS_DIRTY_REDIS_PUBSUB_KEY, PROTOCOL_VERSION  # noqa [after django.setup()]
 from tomato.models import ClientLogEntry, serialize_for_api  # noqa
 
 
@@ -66,7 +66,7 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
             await self.on_recieve_authenticated(websocket, data)
 
     async def process_log(self, data):
-        uuid = data.pop('id')
+        uuid = data.pop("id")
         data["created_by"] = self.user
         _, created = await ClientLogEntry.objects.aupdate_or_create(id=uuid, defaults=data)
         return {"success": True, "updated": not created}
@@ -146,7 +146,7 @@ async def background_subscriber():
             else:
                 logger.info("Updated data, no subscribers yet")
         else:
-            logger.info(f"Broadcast requested, but no data change. Ignoring.")
+            logger.info("Broadcast requested, but no data change. Ignoring.")
 
     await update_from_api_and_broadcast()
 
@@ -180,7 +180,7 @@ async def shutdown():
 def init_logger():
     # Use a uvicorn-like logger
     handler = logging.StreamHandler()
-    formatter = ColourizedFormatter("{levelprefix:<8} [api] {message}", style="{", use_colors=True)
+    formatter = ColourizedFormatter("{levelprefix:<8} [api] {message}", style="{")
     handler.setFormatter(formatter)
     logger.setLevel("DEBUG" if settings.DEBUG else "INFO")
     logger.addHandler(handler)
@@ -189,7 +189,7 @@ def init_logger():
 app = Starlette(
     debug=settings.DEBUG,
     routes=[
-        Route('/', index),
+        Route("/", index),
         WebSocketRoute("/api/", APIWebSocketEndpoint),
     ],
     on_startup=[startup],
