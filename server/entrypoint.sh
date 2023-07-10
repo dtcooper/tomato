@@ -14,7 +14,7 @@ fi
 wait-for-it --timeout 0 --service db:5432 --service redis:6379
 
 # If we're not running huey, migration and create tomato:tomato when DEBUG=1
-if [ -z "$__RUN_HUEY" ]; then
+if [ -z "$__RUN_HUEY" -a -z "$__RUN_API" ]; then
     if [ "$NO_SECRET_KEY" ]; then
         echo 'Generating SECRET_KEY...'
         python -c 'import base62 as b, dotenv as d, secrets as s; d.set_key("/.env", "SECRET_KEY", b.encodebytes(s.token_bytes(40)))'
@@ -55,6 +55,15 @@ if [ $# = 0 ]; then
             exec $CMD
         fi
 
+    elif [ "$__RUN_API" ]; then
+        CMD="uvicorn --host 0.0.0.0 --port 8000 --workers 1 --forwarded-allow-ips '*' --proxy-headers"
+        if [ "$DEBUG" -a "$DEBUG" != '0' ]; then
+            CMD="$CMD --reload"
+        else
+            echo 'Delaying api startup for 10 seconds...'
+            sleep 10
+        fi
+        exec $CMD ws_api:app
     else
         if [ "$DEBUG" -a "$DEBUG" != '0' ]; then
             exec ./manage.py runserver

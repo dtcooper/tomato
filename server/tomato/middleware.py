@@ -2,7 +2,7 @@ import datetime
 
 from django_redis import get_redis_connection
 
-from .constants import MODELS_DIRTY_REDIS_KEY
+from .constants import MODELS_DIRTY_REDIS_PUBSUB_KEY
 
 
 class DirtyModelsToRedisMiddleware:
@@ -15,6 +15,6 @@ class DirtyModelsToRedisMiddleware:
 
         if request._models_dirty:
             conn = get_redis_connection()
-            conn.lpush(MODELS_DIRTY_REDIS_KEY, str(datetime.datetime.now()))
+            conn.publish(MODELS_DIRTY_REDIS_PUBSUB_KEY, str(datetime.datetime.now()))
 
         return response

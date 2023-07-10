@@ -13,6 +13,18 @@ services:
   tasks:
     <<: *dev-app-template
 
+  api:
+    <<: *dev-app-template
+    ports:
+      - "${DEBUG_API_PORT:-8001}:8000"
+
+  nginx:
+    restart: 'no'
+    volumes:
+      - ./local-ca:/etc/local_ca
+    environment:
+      USE_LOCAL_CA: "${NGINX_DEBUG_MODE_ONLY_USE_LOCAL_CA:-0}"
+      __NGINX_STATIC_FILES_CONF: "# Static files disabled by configuration override in docker-compose.dev.yml"
   db:
     restart: 'no'
     ports:
@@ -26,4 +38,4 @@ services:
   logs:
     restart: 'no'
     ports:
-      - "127.0.0.1:${DEBUG_LOGS_PORT:-8001}:8000"
+      - "127.0.0.1:${DEBUG_LOGS_PORT:-8002}:8000"

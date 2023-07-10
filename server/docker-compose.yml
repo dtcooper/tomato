@@ -19,7 +19,39 @@ services:
   tasks:
     <<: *app-template
     environment:
-      - __RUN_HUEY=1
+      __RUN_HUEY: 1
+
+  api:
+    <<: *app-template
+    environment:
+      __RUN_API: 1
+
+  nginx:
+    restart: always
+    image: jonasal/nginx-certbot:4.3-alpine
+    depends_on:
+      - app
+      - api
+      - logs
+    volumes:
+      - ./nginx.conf:/etc/nginx/templates/app.conf.template:ro
+      - ./serve:/serve:ro
+      - nginx_secrets:/etc/letsencrypt
+    environment:
+      CERTBOT_EMAIL: "${CERTBOT_EMAIL:?CERTBOT_EMAIL needs to be set. See .env file.}"
+      DOMAIN_NAME: "${DOMAIN_NAME:?DOMAIN_NAME needs to be set. See .env file.}"
+      __NGINX_STATIC_FILES_CONF: |
+        # Static files enabled via docker-compose.yml
+        location /assets/ {
+            alias /serve/assets/;
+        }
+
+        location /static/ {
+            alias /serve/static/;
+        }
+    ports:
+      - 80:80
+      - 443:443
 
   db:
     restart: always
@@ -27,7 +59,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_PASSWORD=postgres
+      POSTGRES_PASSWORD: postgres
 
   redis:
     restart: always
@@ -41,10 +73,11 @@ services:
     volumes:
       - "${DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock"
     environment:
-      - DOZZLE_ADDR=:8000
-      - DOZZLE_BASE=/server-logs
-      - "DOZZLE_HOSTNAME=${DOMAIN_NAME}"
+      DOZZLE_ADDR: ":8000"
+      DOZZLE_BASE: /server-logs
+      DOZZLE_HOSTNAME: "${DOMAIN_NAME}"
 
 volumes:
+  nginx_secrets:
   postgres_data:
   redis_data:

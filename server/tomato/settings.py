@@ -21,7 +21,7 @@ REQUIRE_STRONG_PASSWORDS = env("REQUIRE_STRONG_PASSWORDS", default=not DEBUG)
 SECRET_KEY = env("SECRET_KEY")
 TIME_ZONE = env("TIMEZONE", default="US/Pacific")
 
-DEBUG_LOGS_PORT = env.int("DEBUG_LOGS_PORT", default=8001)
+DEBUG_LOGS_PORT = env.int("DEBUG_LOGS_PORT", default=8002)
 
 EMAIL_EXCEPTIONS_ENABLED = env.bool("EMAIL_EXCEPTIONS_ENABLED", default=True)
 if EMAIL_EXCEPTIONS_ENABLED:
@@ -137,6 +137,7 @@ CACHES = {
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "CONNECTION_POOL_KWARGS": {"max_connections": 50},
+            "PICKLE_VERSION": -1,
             "PARSER_CLASS": "redis.connection.HiredisParser",
         },
         "KEY_PREFIX": "cache",
@@ -399,5 +400,6 @@ SHELL_PLUS_IMPORTS = [
     "from user_messages import api as user_messages_api",
     "from tomato import constants",
     "from tomato.ffmpeg import ffmpeg_convert, ffprobe",
+    "from tomato.models import serialize_for_api",
     "from tomato.tasks import bulk_process_assets, process_asset",
 ]

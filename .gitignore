@@ -17,4 +17,5 @@
 __pycache__/
 /server/.env
 /server/docker-compose.override.yml
+/server/local-ca/
 /server/serve/

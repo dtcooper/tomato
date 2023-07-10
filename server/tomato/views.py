@@ -13,7 +13,7 @@ from django.views.decorators.http import require_POST
 from constance import config as constance_config
 from user_messages.models import Message
 
-from .constants import SCHEMA_VERSION
+from .constants import PROTOCOL_VERSION
 from .models import Asset, Rotator, Stopset, User
 
 
@@ -87,7 +87,7 @@ def sync(request):
             "assets": [a.serialize() for a in assets],
             "rotators": [r.serialize() for r in rotators],
             "stopsets": [s.serialize() for s in stopsets],
-            "schema_version": SCHEMA_VERSION,
+            "PROTOCOL_VERSION": PROTOCOL_VERSION,
             "config": config,
         }
     )
