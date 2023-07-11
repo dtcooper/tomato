@@ -94,6 +94,7 @@ Head over to <http://localhost:8888/> in your web browser.
 
 - [x] [Supress power save mode](https://www.electronjs.org/docs/latest/api/power-save-blocker)
 - [x] Trim silence on uploaded assets
+- [ ] Reject files based on pre-processed file hash
 - [ ] Add configurable silence between ads
 - [ ] Button to play an asset from a specific rotator (on Stream Deck too).
 - [ ] Idiot mode, easy mode, advanced mode

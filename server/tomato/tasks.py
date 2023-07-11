@@ -104,7 +104,7 @@ def cleanup():
     if not deleted_files:
         logger.info("No files deleted")
     else:
-        logger.info("Deleted files: {', '.join(deleted_files)}")
+        logger.info(f"Deleted files: {', '.join(deleted_files)}")
 
     # Cleanup read messages
     deleted_messages, _ = UserMessage.objects.filter(delivered_at__isnull=False).delete()

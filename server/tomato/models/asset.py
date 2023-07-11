@@ -36,8 +36,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         db_index=True,
         blank=True,
         help_text=(
-            "Optional name, if left empty, we'll automatically base it off the audio file's metadata and failing"
-            " that its filename."
+            "Optional name, if left empty, we'll automatically choose one for you."
         ),
     )
     file = models.FileField("audio file", upload_to=asset_upload_to)
