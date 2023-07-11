@@ -28,7 +28,7 @@ def send_redis_message(message_type, data):
 
 
 def mark_models_dirty():
-    send_redis_message("update", datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'))
+    send_redis_message("update", datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"))
 
 
 def mark_logged_out_users(user_ids):

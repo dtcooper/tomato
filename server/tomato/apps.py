@@ -46,7 +46,9 @@ class TomatoConfig(AppConfig):
             (f"View and export {ClientLogEntry._meta.verbose_name_plural}", (client_log_entry,)),
         ):
             group, _ = Group.objects.get_or_create(name=name)
-            group.permissions.add(*Permission.objects.filter(content_type__in=content_types).exclude(codename="immediate_play_asset"))
+            group.permissions.add(
+                *Permission.objects.filter(content_type__in=content_types).exclude(codename="immediate_play_asset")
+            )
             all_groups.append(group)
 
         group, _ = Group.objects.get_or_create(name="Modify configuration")

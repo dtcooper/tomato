@@ -18,8 +18,11 @@ class AssetEligibleToAirQuerySet(EligibleToAirQuerySet):
 
 
 def asset_upload_to(instance, filename):
-    # Prefix with current time, to avoid filename duplication
-    return f"{timezone.now().strftime('%y%m%d%H%M%S')}-{filename}"
+    # Prefix with current time, to avoid filename duplication - only if model exists
+    if instance.id:
+        return f"{timezone.now().strftime('%y%m%d%H%M%S')}-{filename}"
+    else:
+        return filename
 
 
 class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
@@ -35,9 +38,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         max_length=NAME_MAX_LENGTH,
         db_index=True,
         blank=True,
-        help_text=(
-            "Optional name, if left empty, we'll automatically choose one for you."
-        ),
+        help_text="Optional name, if left empty, we'll automatically choose one for you.",
     )
     file = models.FileField("audio file", upload_to=asset_upload_to)
     md5sum = models.BinaryField(max_length=16, null=True, default=None)
