@@ -84,7 +84,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
                 raise ValidationError(
                     {
                         "__all__": "An audio asset already exists with this audio file. Please try another one.",
-                        "file": "Please select another file.",
+                        "file": "Please select another audio file.",
                     }
                 )
 
