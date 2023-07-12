@@ -34,10 +34,8 @@ class RotatorAdmin(NumAssetsMixin, TomatoModelAdminBase):
     @admin.display(description="Color preview")
     def color_preview(self, obj):
         return format_html(
-            (
-                '<div id="id_color_preview" style="width: 8em; height: 3em; border: 1px solid #333; display:'
-                ' inline-block; background-color: {};"></div>'
-            ),
+            '<div id="id_color_preview" style="width: 8em; height: 3em; border: 1px solid #333; display:'
+            ' inline-block; background-color: {};"></div>',
             obj.get_color(),
         )
 

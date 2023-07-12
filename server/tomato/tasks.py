@@ -27,10 +27,8 @@ def process_asset(
         if user is not None:
             user_messages_api.error(
                 user,
-                (
-                    f"{asset.name} {message} and was deleted. Check the file and try again. If this keeps happening,"
-                    " check the server logs."
-                ),
+                f"{asset.name} {message} and was deleted. Check the file and try again. If this keeps happening,"
+                " check the server logs.",
                 deliver_once=False,
             )
         asset.delete()

@@ -301,13 +301,13 @@ min-versions = ["babel (==2.9.0)", "click (==7.0)", "colorama (==0.4)", "ghp-imp
 
 [[package]]
 name = "mkdocs-macros-plugin"
-version = "1.0.1"
+version = "1.0.2"
 description = "Unleash the power of MkDocs with macros and variables"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "mkdocs-macros-plugin-1.0.1.tar.gz", hash = "sha256:b10cbc1cd4d4a127eea9f8ee3cc57f5aa91b2a1d44e0f02249d7910a43b975a1"},
-    {file = "mkdocs_macros_plugin-1.0.1-py3-none-any.whl", hash = "sha256:d6c545571ce98420232260ceb1533ffabcc39a19f26285ec45ef8fb060f10bda"},
+    {file = "mkdocs-macros-plugin-1.0.2.tar.gz", hash = "sha256:70687faff5c6c3a747a401b9c95954ac11421ce4194250eece33316174c3106a"},
+    {file = "mkdocs_macros_plugin-1.0.2-py3-none-any.whl", hash = "sha256:3894e98b673cdd032d10f99e7d379e3ab699070eb49bac2acfcd86ab961feb6b"},
 ]
 
 [package.dependencies]
@@ -701,4 +701,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "83245d0984d720ec6bcbb2f34d64a15dd31515d2cf8657076493de904a54c99c"
+content-hash = "f86450222084a2186f083918d424b4bf53e243ada094d8290acd6747649d60fd"
