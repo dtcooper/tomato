@@ -3,20 +3,17 @@ from constance.admin import ConstanceAdmin as ConstanceConfigAdmin
 from constance.apps import ConstanceConfig
 from constance.forms import ConstanceForm
 
+from ..utils import mark_models_dirty
+
 
 Config._meta.verbose_name = Config._meta.verbose_name_plural = "configuration"
 ConstanceConfig.verbose_name = "Settings"
 
 
 class ConfigForm(ConstanceForm):
-    def __init__(self, initial, request=None, *args, **kwargs):
-        self.request = request
-        super().__init__(initial, request=None, *args, **kwargs)
-
     def save(self):
         super().save()
-        if self.request:
-            self.request._models_dirty = True
+        mark_models_dirty()
 
 
 class ConfigAdmin(ConstanceConfigAdmin):
