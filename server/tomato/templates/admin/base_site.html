@@ -71,7 +71,7 @@
         const cell = addLink.closest('td')
         const link = document.createElement('a')
         link.classList.add('addlink', 'bulk-upload-addlink')
-        link.text = 'Bulk upload'
+        link.textContent = 'Bulk upload'
         link.href = "{% filter escapejs %}{% url 'admin:tomato_asset_upload' %}{% endfilter %}"
         cell.append(link)
       })

@@ -356,6 +356,13 @@ CONSTANCE_CONFIG = {
             " trimmed (or not) according to this setting at the time of upload."
         ),
     ),
+    "PREVENT_DUPLICATES": (
+        True,
+        (
+            "Prevent duplicate audio assets from being uploaded when set. If not set, you may have multiple audio"
+            " assets with the same underlying audio file."
+        ),
+    ),
     "AUDIO_BITRATE": (
         "192",
         mark_safe(
@@ -378,6 +385,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
                 "EXTRACT_METADATA_FROM_FILE",
                 "AUDIO_BITRATE",
                 "TRIM_SILENCE",
+                "PREVENT_DUPLICATES",
             ),
         ),
         (

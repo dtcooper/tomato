@@ -2,9 +2,11 @@ import datetime
 import hashlib
 from pathlib import Path
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
+from constance import config
 from dirtyfields import DirtyFieldsMixin
 from django_file_form.uploaded_file import UploadedTusFile
 
@@ -41,6 +43,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         help_text="Optional name, if left empty, we'll automatically choose one for you.",
     )
     file = models.FileField("audio file", upload_to=asset_upload_to)
+    pre_process_md5sum = models.BinaryField(max_length=16, null=True, default=None)
     md5sum = models.BinaryField(max_length=16, null=True, default=None)
     status = models.SmallIntegerField(
         choices=Status.choices, default=Status.PENDING, help_text="All assets will be processed after uploading."
@@ -71,6 +74,20 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         self.name = self.name[:NAME_MAX_LENGTH].strip() or "Untitled"
         super().save(*args, **kwargs)
 
+    def full_clean(self, *args, **kwargs):
+        super().full_clean(*args, **kwargs)
+        if config.PREVENT_DUPLICATES and self.file and "file" in self.get_dirty_fields():
+            qs = Asset.objects.filter(pre_process_md5sum=self.generate_md5sum())
+            if self.id is not None:
+                qs = qs.exclude(id=self.id)
+            if qs.exists():
+                raise ValidationError(
+                    {
+                        "__all__": "An audio asset already exists with this audio file. Please try another one.",
+                        "file": "Please select another file.",
+                    }
+                )
+
     def is_eligible_to_air(self, now=None, with_reason=False):
         if self.status != self.Status.READY:
             return (False, "Processing") if with_reason else False
@@ -79,11 +96,11 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
     def generate_md5sum(self):
         md5sum = hashlib.md5()
 
-        with self.file.open("rb") as file:
+        with open(self.file_path, "rb") as file:
             while chunk := file.read(1024 * 128):
                 md5sum.update(chunk)
 
-        self.md5sum = md5sum.digest()
+        return md5sum.digest()
 
     def serialize(self):
         return {

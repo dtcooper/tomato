@@ -40,6 +40,8 @@ def process_asset(
         logger.info(f"Processing {asset.name}")
         asset.status = asset.Status.PROCESSING
         asset.save()
+        asset.pre_process_md5sum = asset.generate_md5sum()
+        asset.save()
 
         ffprobe_data = ffprobe(asset.file_path)
         if not ffprobe_data:
@@ -66,7 +68,7 @@ def process_asset(
             ffprobe_data = ffprobe(asset.file_path)
 
         asset.duration = ffprobe_data.duration
-        asset.generate_md5sum()
+        asset.md5sum = asset.generate_md5sum()
 
         asset.status = asset.Status.READY
         asset.save()
