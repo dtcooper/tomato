@@ -51,3 +51,13 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           fingerprint: ${{ secrets.SSH_FINGERPRINT }}
           script: ./deploy-tomato-server.sh
+
+  generate_demo_data:
+    runs-on: ubuntu-22.04
+    name: Generate Demo Data
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        uses: mxschmitt/action-tmate@v3

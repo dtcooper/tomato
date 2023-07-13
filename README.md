@@ -97,10 +97,9 @@ Head over to <http://localhost:8888/> in your web browser.
 - [x] Reject files based on pre-processed file hash
 - [ ] Add configurable silence between ads
 - [ ] Button to play an asset from a specific rotator (on Stream Deck too).
+  - [x] Backend done as `SINGLE_PLAY_ROTATORS`
 - [ ] Idiot mode, easy mode, advanced mode
-- [ ] Single app client lock
-- [ ] Timeout on fetch?
-- [ ] Way to parse filename into rotator, start/end date
+- [ ] ~~Timeout on fetch?~~ (websockets makes this unneeded, except for downloading files)
 - [ ] Prevent duplicate assets from playing within a certain time period
 - [ ] Start/end time for assets in client are based on "is likely to play at" time
 - [ ] Empty rotators are warned on (based on feature flag)
@@ -115,6 +114,8 @@ Head over to <http://localhost:8888/> in your web browser.
       or preloaded sample JSON/assets downloaded from S3
 - [ ] Login interstitial to populate with demo data
 - [ ] Integrated Twilio call board
+- [ ] Single app client lock (ie only ONE client per username/password)'
+- [ ] Way to parse filename into rotator, start/end date
 
 ## License
 
