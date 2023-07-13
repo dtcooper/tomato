@@ -51,22 +51,3 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           fingerprint: ${{ secrets.SSH_FINGERPRINT }}
           script: ./deploy-tomato-server.sh
-
-  generate_demo_data:
-    runs-on: ubuntu-22.04
-    name: Generate Demo Data
-    #needs: [build]  # XXX enable
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      -
-        shell: bash
-        run: |
-          cd server
-          cp .env.sample .env
-          sed -i 's/^DEBUG=1/DEBUG=0/' .env
-
-          docker compose run --rm --env __SILENT=1 -v "$PWD:/mnt" app ./manage.py prefill_sample_data
-      -
-        uses: mxschmitt/action-tmate@v3
