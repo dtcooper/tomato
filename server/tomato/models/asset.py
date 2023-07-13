@@ -5,6 +5,7 @@ from pathlib import Path
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 
 from constance import config
 from dirtyfields import DirtyFieldsMixin
@@ -83,8 +84,11 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
             if qs.exists():
                 raise ValidationError(
                     {
-                        "__all__": "An audio asset already exists with this audio file. Please try another one.",
-                        "file": "Please select another audio file.",
+                        "__all__": mark_safe(
+                            "An audio asset already exists with this audio file. Rejecting duplicate. You can turn this"
+                            " feature off with setting <code>PREVENT_DUPLICATES</code>."
+                        ),
+                        "file": "Please try another audio file.",
                     }
                 )
 
