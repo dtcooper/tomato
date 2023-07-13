@@ -1,6 +1,6 @@
 x-app-template: &app-template
   restart: always
-  image: ghcr.io/dtcooper/tomato-server:latest
+  image: "ghcr.io/dtcooper/tomato-server:${TOMATO_VERSION:-latest}"
   depends_on:
     - db
     - redis
