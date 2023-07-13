@@ -42,11 +42,8 @@ class RotatorAdmin(NumAssetsMixin, TomatoModelAdminBase):
     @admin.display(description="Stop sets")
     def stopsets_display(self, obj):
         stopsets = sorted(set(obj.stopsets.all()), key=lambda s: s.name)  # Simulated distinct()
-        return (
-            format_html_join(
-                mark_safe("<br>\n"),
-                '&#x25cf; <a href="{}">{}</a>',
-                [(reverse("admin:tomato_stopset_change", args=(s.id,)), s.name) for s in stopsets],
-            )
-            or None
-        )
+        return format_html_join(
+            mark_safe("<br>\n"),
+            '&#x25cf; <a href="{}">{}</a>',
+            [(reverse("admin:tomato_stopset_change", args=(s.id,)), s.name) for s in stopsets],
+        ) or mark_safe('<span style="color: red"><strong>WARNING:</strong> not in any stop sets</span>')

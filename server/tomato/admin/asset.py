@@ -126,15 +126,11 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
             (reverse("admin:tomato_rotator_change", args=(r.id,)), r.get_color(content=True), r.get_color(), r.name)
             for r in obj.rotators.all()
         ]
-        return (
-            format_html_join(
-                mark_safe("\n"),
-                '<div style="padding: 2px 0">&#x25cf; <a href="{}" style="color: {}; background-color:'
-                ' {};">{}</a></div>',
-                rotators,
-            )
-            or None
-        )
+        return format_html_join(
+            mark_safe("\n"),
+            '<div style="padding: 2px 0">&#x25cf; <a href="{}" style="color: {}; background-color: {};">{}</a></div>',
+            rotators,
+        ) or mark_safe('<span style="color: red"><strong>WARNING:</strong> not in any rotators</span>')
 
     @admin.action(description="Add selected audio assets to rotator", permissions=("add", "change", "delete"))
     def add_rotator(self, request, queryset):

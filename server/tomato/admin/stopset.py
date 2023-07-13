@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.db.models import Prefetch
 from django.urls import reverse
 from django.utils.html import format_html_join
+from django.utils.safestring import mark_safe
 
 from ..models import Rotator, StopsetRotator
 from .base import AiringFilter, AiringMixin, NoNullRelatedOnlyFieldFilter, NumAssetsMixin, TomatoModelAdminBase
@@ -53,11 +54,8 @@ class StopsetAdmin(AiringMixin, NumAssetsMixin, TomatoModelAdminBase):
             (i, reverse("admin:tomato_rotator_change", args=(r.id,)), r.get_color(content=True), r.get_color(), r.name)
             for i, r in enumerate(obj.rotators.all(), 1)
         ]
-        return (
-            format_html_join(
-                "\n",
-                '<div style="padding: 2px 0">{}. <a href="{}" style="color: {}; background-color: {}">{}</a></div>',
-                rotators,
-            )
-            or None
-        )
+        return format_html_join(
+            "\n",
+            '<div style="padding: 2px 0">{}. <a href="{}" style="color: {}; background-color: {}">{}</a></div>',
+            rotators,
+        ) or mark_safe('<span style="color: red"><strong>WARNING:</strong> no rotators in this stop set</span>')
