@@ -65,7 +65,7 @@ jobs:
         run: |
           cd server
           cp .env.sample .env
-          sed -i 's/^DEBUG=1/DEBUG=0/' .env.sample
+          sed -i 's/^DEBUG=1/DEBUG=0/' .env
 
           docker compose run --rm --env __SILENT=1 -v "$PWD:/mnt" app ./manage.py prefill_sample_data
       -
