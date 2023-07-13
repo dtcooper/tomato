@@ -36,12 +36,15 @@ function createWindow() {
     height: mainWindowState.height,
     minWidth,
     minHeight,
+    fullscreen: false,
+    fullscreenable: false,
     icon: path.resolve(path.join(__dirname, "../assets/icons/tomato.png")),
     webPreferences: {
       devTools: !app.isPackaged,
       contextIsolation: false,
       nodeIntegration: true,
-      webSecurity: false
+      webSecurity: false,
+      spellcheck: false
     }
   })
   win.webContents.setVisualZoomLevelLimits(1, 1)
