@@ -55,6 +55,7 @@ jobs:
   generate_demo_data:
     runs-on: ubuntu-22.04
     name: Generate Demo Data
+    needs: [build]
     steps:
       -
         name: Checkout
