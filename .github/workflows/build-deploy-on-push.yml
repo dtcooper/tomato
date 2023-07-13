@@ -55,7 +55,7 @@ jobs:
   generate_demo_data:
     runs-on: ubuntu-22.04
     name: Generate Demo Data
-    needs: [build]
+    #needs: [build]  # XXX enable
     steps:
       -
         name: Checkout
@@ -65,7 +65,7 @@ jobs:
         run: |
           cd server
           cp .env.sample .env
-          sed 's/^DEBUG=1/DEBUG=0/' .env.sample
+          sed -i 's/^DEBUG=1/DEBUG=0/' .env.sample
 
           docker compose run --rm --env __SILENT=1 -v "$PWD:/mnt" app ./manage.py prefill_sample_data
       -
