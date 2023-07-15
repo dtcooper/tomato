@@ -5,9 +5,8 @@ import shutil
 import tempfile
 import time
 from urllib.parse import urlparse
+from urllib.request import urlretrieve
 import zipfile
-
-import requests
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
@@ -78,9 +77,7 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(f"Downloading {SAMPLE_DATA_URL}...")
                 zip_filename = (temp_dir / SAMPLE_DATA_FOLDER).with_suffix(".zip")
-                with requests.get(SAMPLE_DATA_URL, stream=True) as response:
-                    with open(zip_filename, "wb") as zip_file:
-                        shutil.copyfileobj(response.raw, zip_file)
+                urlretrieve(SAMPLE_DATA_URL, zip_filename)
 
             self.stdout.write("Extracting zip archive...")
             with zipfile.ZipFile(zip_filename, "r") as archive:
