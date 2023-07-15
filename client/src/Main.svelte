@@ -111,7 +111,7 @@
         </div>
         {#each assets as { asset, rotator, loaded, audio, error, progress }, index}
           <div
-            class="rounded-l-xl border-l-4 pl-2 sm:border-l-[6px]  lg:border-l-8"
+            class="rounded-l-xl border-l-4 pl-2 sm:border-l-[6px] lg:border-l-8"
             class:border-error={error}
             class:border-content-base={!error && playing < index}
             class:border-green-A400={!error && playing === index}

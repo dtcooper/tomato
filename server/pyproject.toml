@@ -22,7 +22,7 @@ psycopg = "^3.1.9"
 pybase62 = "^1.0.0"
 python-dotenv = "^1.0.0"
 requests = "^2.31.0"
-starlette = "^0.28.0"
+starlette = "^0.30.0"
 uvicorn = {extras = ["standard"], version = "^0.22.0"}
 wait-for-it = "^2.2.2"
 

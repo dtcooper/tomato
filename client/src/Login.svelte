@@ -15,7 +15,7 @@
 
   export const submit = async () => {
     if (demoMode) {
-      alert('Demo mode not yet implemented')
+      alert("Demo mode not yet implemented")
       return
     }
 
@@ -94,7 +94,7 @@
         <input
           bind:value={$address}
           disabled={demoMode}
-          class="input-bordered input"
+          class="input input-bordered"
           class:input-error={errors.address}
           on:input={() => (errors.address = false)}
           placeholder="https://example.org"
@@ -109,7 +109,7 @@
           <input
             bind:value={$username}
             disabled={demoMode}
-            class="input-bordered input"
+            class="input input-bordered"
             class:input-error={errors.auth}
             type="text"
             placeholder="Enter username..."
@@ -130,7 +130,7 @@
               bind:value={password}
               disabled={demoMode}
               class:input-error={errors.auth}
-              class="input-bordered input"
+              class="input input-bordered"
               on:input={() => (errors.auth = false)}
               placeholder="Enter password..."
               type="text"
@@ -144,7 +144,7 @@
               disabled={demoMode}
               class:input-error={errors.auth}
               class:tracking-wider={(!showPassword || demoMode) && password.length > 0}
-              class="input-bordered input"
+              class="input input-bordered"
               on:input={() => (errors.auth = false)}
               placeholder="Enter password..."
               type="password"
@@ -162,7 +162,7 @@
         </div>
       </div>
       <div class="form-control mt-6">
-        <button class="btn-primary btn" type="submit">Login</button>
+        <button class="btn btn-primary" type="submit">Login</button>
       </div>
     </form>
   </div>
