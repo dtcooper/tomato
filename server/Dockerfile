@@ -24,6 +24,8 @@ RUN apt-get update \
     && if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
         echo "alias redis-cli='redis-cli -h redis'" >> /root/.bashrc \
         && echo "alias ls='ls --color=auto'" >> /root/.bashrc \
+        && echo "alias rs='./manage.py runserver'" >> /root/.bashrc \
+        && echo "alias sp='./manage.py shell_plus'" >> /root/.bashrc \
         && echo '. /etc/bash_completion' >> /root/.bashrc \
     ; fi
 

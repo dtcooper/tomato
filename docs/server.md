@@ -95,7 +95,7 @@ cp .env.sample .env
     3. `DOMAIN_NAME` is set to a domain name that resolves to a publicly
        accessible IP address of the server.
 
-    === "Setting Up an Nginx Container"
+    === "With Included Nginx Container"
 
         It's **highly recommended** that you use the production [Nginx]
         container, which automatically generates an SSL certificate for you and
@@ -111,41 +111,46 @@ cp .env.sample .env
             is a requirement of [Certbot], the underlying component that automatically
             generates an SSL certificate for you.
 
-        Now, create a symbolic link for the Nginx Compose overrides,
-
-        ```bash
-        ln -s docker-compose.nginx.yml docker-compose.override.yml
-        ```
+        The nginx container is now included in the default installation, so no
+        further action need be taken.
 
     === "Reverse Proxying Yourself"
 
-        !!! danger "Reverse proxying yourself is **NOT** recommended."
+        !!! danger "Reverse proxying yourself is NOT recommended."
             This is method of setting up Tomato on your server is unsupported,
             and not recommended. However, here is a guide for non-standard
             setups, or if you don't have port `80` and `443` available on your
-            server.
+            server and still want to server Tomato on the default web ports.
 
         Create and edit a file named `docker-compose.overrides.yml`,
 
-        ```yaml title="server/docker-compose.overrides.yml"
+        ```yaml title="server/docker-compose.overrides.yml" hl_lines="4-6 9-10 13-14"
         services:
-          app:
-            ports:
-              # Replace 1234 with any port you like (app server)
-              - 127.0.0.1:1234:8000
           logs:
             ports:
-              # Replace 4321 with any port you like (logs server)
-              - 127.0.0.1:4321:8000
+              # Replace 6666 with any port you like (logs server)
+              # WARNING: should NOT be accessible, mark "internal;" with Nginx
+              - 127.0.0.1:6666:8000
+          api:
+            ports:
+              # Replace 7777 with any port you like (api server)
+              - 127.0.0.1:7777:8000:8000"
+          app:
+            ports:
+              # Replace 8888 with any port you like (app server)
+              - 127.0.0.1:8888:8000
+          nginx:
+            profiles:
+              - do-not-start
         ```
 
-        Then in your web server, reverse proxy into port you chose.
+        Then in your web server, reverse proxy into the ports you chose.
 
-        If you're using Nginx, you can use configuration like this,
+        If you're using Nginx, you can use this configuration snippet,
 
-        ```nginx title="sample.conf"
+        ```nginx title="tomato.conf" hl_lines="2 7-8 12-13 24-25 37-38 45-46"
         server {
-          # ... other Nginx config here
+          # ... your other Nginx config goes here
 
           client_max_body_size 25M;
 
@@ -167,8 +172,20 @@ cp .env.sample .env
             proxy_set_header X-Forwarded-Proto $scheme;
             proxy_buffering off;
             proxy_cache off;
-            # Replace 1234 with the port you chose above (logs server)
-            proxy_pass http://127.0.0.1:4321/server-logs;
+            # Replace 6666 with the port you chose above (logs server)
+            proxy_pass http://127.0.0.1:6666/server-logs;
+          }
+
+          location /api/ {
+            proxy_http_version 1.1;
+            proxy_set_header Connection $connection_upgrade;
+            proxy_set_header Host $http_host;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Real-IP $remote_addr;
+            # Replace 7777 with the port you chose above (app server)
+            proxy_pass http://127.0.0.1:7777;
           }
 
           location / {
@@ -176,11 +193,20 @@ cp .env.sample .env
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
-            # Replace 1234 with the port you chose above (app server)
-            proxy_pass http://127.0.0.1:1234;
+            # Replace 8888 with the port you chose above (app server)
+            proxy_pass http://127.0.0.1:8888;
           }
         }
         ```
+
+        !!! warning "Logs server should be private!"
+
+            Access to the logs server should be private. For example, Tomato uses
+            the Nginx feature
+            [X-Accel-Redirect](https://www.nginx.com/resources/wiki/start/topics/examples/x-accel/#x-accel-redirect)
+            to protect it. The Nginx configuration snippet functions correctly
+            in this regard, but if you're using another web server, take care to
+            configure it appropriately.
 
     Pull the containers (or build them by instead executing `#!bash docker compose build`),
 
