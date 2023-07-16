@@ -5,7 +5,9 @@ title: Desktop App
 # The Tomato Desktop App
 
 The desktop app is undocumented as it's being written and is in early alpha
-stages. You can, however download preview builds below.
+stages. You can, however download [preview builds](#preview-builds) or
+[run the development code yourself](#run-development-code).
+
 
 ## Preview Builds
 
@@ -32,3 +34,32 @@ or can be download below.
     &mdash; package in `.deb` format (amd64 only)
   * [:material-download: Arch :simple-archlinux: or Manjaro :simple-manjaro: Linux](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux-x86_64.pkg.tar.zst)
     &mdash; package in `.pkg.tar.zst` format (amd64 only)
+
+
+## Run Development Code
+
+The development code runs on Windows, macOS, and Linux.
+
+Prerequisites:
+
+  * [Git]
+    * On Windows, install [Git for Windows](https://gitforwindows.org/) and use
+      its included "Git Bash" terminal
+  * [Node.js v18+](https://nodejs.org/)
+
+To get the development code running, in your terminal run
+
+```bash
+# Clone the repo
+git clone https://github.com/dtcooper/tomato.git
+
+# Enter the client code
+cd tomato/client
+
+# Windows only: set  npm's script shell to bash
+[ "$(uname -o)" = "Msys" ] && npm config --location=project set script-shell $(which bash)
+
+# Install dependencies and run
+npm install
+npm run dev
+```

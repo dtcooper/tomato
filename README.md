@@ -36,20 +36,8 @@ production environments
 
 Download a
 [development preview build here](https://github.com/dtcooper/tomato/releases/tag/preview-build)
-or run the client's code locally, by
-installing [nodejs 18+](https://nodejs.org/). Then in your terminal,
-
-```bash
-# Clone the repo
-git clone https://github.com/dtcooper/tomato.git
-
-# Enter the client code
-cd tomato/client
-
-# Install dependencies and run
-npm install
-npm run dev
-```
+or run the client's code locally
+[following the instruction here](https://dtcooper.github.io/tomato/client/#run-development-code)
 
 ### Documentation
 
