@@ -62,6 +62,7 @@ jobs:
         name: Build package
         shell: bash
         run: |
+          echo "Building Tomato for ${{ matrix.title }}"
           cd client
           if [ "${{ matrix.name }}" = "windows" ]; then
             npm config set --location=project script-shell $(which bash)
@@ -69,7 +70,7 @@ jobs:
           npm clean-install
           npm run build
           npx electron-forge make --arch ${{ matrix.arch }} --platform ${{ matrix.platform }}
-          mv -v "out/make/${{ matrix.out_path }}" "../tomato-client-${{ env.TOMATO_VERSION }}-${{ matrix.filename_suffix }}"
+          mv -v out/make/${{ matrix.out_path }} "../tomato-client-${{ env.TOMATO_VERSION }}-${{ matrix.filename_suffix }}"
       -
         name: Upload build artifact
         uses: actions/upload-artifact@v3
