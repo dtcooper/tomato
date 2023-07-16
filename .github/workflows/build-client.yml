@@ -70,13 +70,13 @@ jobs:
           npm run build
           npx electron-forge make --arch ${{ matrix.arch }} --platform ${{ matrix.platform }}
           mv -v "out/make/${{ matrix.ext }}/${{ matrix.platform }}/${{ matrix.arch }}/*.${{ matrix.ext }}" "../${{ matrix.filename }}"
-        -
-          name: Upload build artifact
-          uses: actions/upload-artifact@v3
-          with:
-            name: client-build-files
-            path: ${{ matrix.filename }}
-            retention-days: 2
+      -
+        name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: client-build-files
+          path: ${{ matrix.filename }}
+          retention-days: 2
 
   build-linux-arch:
     runs-on: ubuntu-22.04
