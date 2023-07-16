@@ -392,6 +392,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#run-development-code" class="md-nav__link">
+    Run Development Code
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -462,7 +469,8 @@
 
 <h1 id="the-tomato-desktop-app">The Tomato Desktop App<a class="headerlink" href="#the-tomato-desktop-app" title="Permanent link">←</a></h1>
 <p>The desktop app is undocumented as it's being written and is in early alpha
-stages. You can, however download preview builds below.</p>
+stages. You can, however download <a href="#preview-builds">preview builds</a> or
+<a href="#run-development-code">run the development code yourself</a>.</p>
 <h2 id="preview-builds">Preview Builds<a class="headerlink" href="#preview-builds" title="Permanent link">←</a></h2>
 <div class="admonition danger">
 <p class="admonition-title">Unsigned Binaries</p>
@@ -487,6 +495,31 @@ or can be download below.</p>
 <li><a href="https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux-x86_64.pkg.tar.zst"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7Z"/></svg></span> Arch <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.39.605C10.376 3.092 9.764 4.72 8.635 7.132c.693.734 1.543 1.589 2.923 2.554-1.484-.61-2.496-1.224-3.252-1.86C6.86 10.842 4.596 15.138 0 23.395c3.612-2.085 6.412-3.37 9.021-3.862a6.61 6.61 0 0 1-.171-1.547l.003-.115c.058-2.315 1.261-4.095 2.687-3.973 1.426.12 2.534 2.096 2.478 4.409a6.52 6.52 0 0 1-.146 1.243c2.58.505 5.352 1.787 8.914 3.844-.702-1.293-1.33-2.459-1.929-3.57-.943-.73-1.926-1.682-3.933-2.713 1.38.359 2.367.772 3.137 1.234-6.09-11.334-6.582-12.84-8.67-17.74zM22.898 21.36v-.623h-.234v-.084h.562v.084h-.234v.623h.331v-.707h.142l.167.5.034.107a2.26 2.26 0 0 1 .038-.114l.17-.493H24v.707h-.091v-.593l-.206.593h-.084l-.205-.602v.602h-.091"/></svg></span> or Manjaro <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0v24h6.75V6.75h8.625V0H0zm8.625 8.625V24h6.75V8.625h-6.75zM17.25 0v24H24V0h-6.75z"/></svg></span> Linux</a>
     &mdash; package in <code>.pkg.tar.zst</code> format (amd64 only)</li>
 </ul>
+<h2 id="run-development-code">Run Development Code<a class="headerlink" href="#run-development-code" title="Permanent link">←</a></h2>
+<p>The development code runs on Windows, macOS, and Linux.</p>
+<p>Prerequisites:</p>
+<ul>
+<li>[Git]<ul>
+<li>On Windows, install <a href="https://gitforwindows.org/">Git for Windows</a> and use
+  its included "Git Bash" terminal</li>
+</ul>
+</li>
+<li><a href="https://nodejs.org/">Node.js v18+</a></li>
+</ul>
+<p>To get the development code running, in your terminal run</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Clone the repo</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/dtcooper/tomato.git
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Enter the client code</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">cd</span><span class="w"> </span>tomato/client
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Windows only: set  npm&#39;s script shell to bash</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>uname<span class="w"> </span>-o<span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Msys&quot;</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>config<span class="w"> </span>--location<span class="o">=</span>project<span class="w"> </span><span class="nb">set</span><span class="w"> </span>script-shell<span class="w"> </span><span class="k">$(</span>which<span class="w"> </span>bash<span class="k">)</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Install dependencies and run</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>npm<span class="w"> </span>install
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>npm<span class="w"> </span>run<span class="w"> </span>dev
+</code></pre></div>
 
 
 
