@@ -14,6 +14,8 @@ on:
 
 env:
   TOMATO_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || 'preview' }}
+  # Arch package should match this (nodejs-lts-hydrogen = v18 below)
+  NODE_VERSION: 18
 
 concurrency:
   group: client-build-${{ github.ref_type == 'tag' && github.ref_name || 'preview' }}
@@ -29,185 +31,126 @@ jobs:
           -
             title: macOS
             os: macos-11
-            name: macos
+            arch: universal
+            platform: darwin
+            ext: zip
+            filename: tomato-client-${{ env.TOMATO_VERSION }}-macos.zip
           -
             title: Windows
-            os: window-2022
-            name: windows
+            os: windows-2022
+            arch: x64
+            platform: win32
+            ext: zip
+            filename: tomato-client-${{ env.TOMATO_VERSION }}-windows.zip
           -
             title: Debian/Ubuntu
             os: ubuntu-22.04
-            name: linux
+            arch: x64
+            platform: linux
+            ext: deb
+            filename: tomato-client-${{ env.TOMATO_VERSION }}-linux_amd64.deb
     steps:
       -
-        name: Test
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Setup Node v18
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      -
+        name: Build package
         shell: bash
         run: |
-          echo "${{ matrix.title }}"
-          echo "${{ matrix.name }}"
-          uname -a
+          cd client
+          if [ "${{ matrix.name }}" = "windows" ]; then
+            npm config set --location=project script-shell $(which bash)
+          fi
+          npm clean-install
+          npm run build
+          npx electron-forge make --arch ${{ matrix.arch }} --platform ${{ matrix.platform }}
+          mv -v "out/make/${{ matrix.ext }}/${{ matrix.platform }}/${{ matrix.arch }}/*.${{ matrix.ext }}" "../${{ matrix.filename }}"
+        -
+          name: Upload build artifact
+          uses: actions/upload-artifact@v3
+          with:
+            name: client-build-files
+            path: ${{ matrix.filename }}
+            retention-days: 2
 
-  # build-macos:
-  #   runs-on: macos-11
-  #   name: Build macOS client
-  #   steps:
-  #     -
-  #       name: Checkout
-  #       uses: actions/checkout@v3
-  #     -
-  #       name: Setup Node v18
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 18
-  #     -
-  #       name: Build package
-  #       shell: bash
-  #       run: |
-  #         cd client
-  #         npm clean-install
-  #         npm run build
-  #         npx electron-forge make --arch universal --platform darwin
-  #         mv -v out/make/zip/darwin/universal/*.zip "../tomato-client-${TOMATO_VERSION}-macos.zip"
-  #     -
-  #       name: Upload build artifact
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: client-build-files
-  #         path: tomato-client-${{ env.TOMATO_VERSION }}-macos.zip
-  #         retention-days: 2
+  build-linux-arch:
+    runs-on: ubuntu-22.04
+    name: Build Linux client (Arch)
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      -
+        name: Setup rootless Docker
+        uses: ScribeMD/rootless-docker@0.2.2
+      -
+        name: Build package
+        shell: bash
+        # nodejs-lts-hydrogen = Node v18
+        run: |
+          docker run --rm -v "$PWD:/build" -w /build/client/scripts/arch archlinux:base-devel sh -c 'pacman -Syu --noconfirm nodejs-lts-hydrogen && env EUID=1 makepkg -s --noconfirm'
+          mv client/scripts/arch/*.pkg.tar.zst "tomato-client-${TOMATO_VERSION}-linux-x86_64.pkg.tar.zst"
+      -
+        name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: client-build-files
+          path: tomato-client-${{ env.TOMATO_VERSION }}-linux-x86_64.pkg.tar.zst
+          retention-days: 2
 
-  # build-win32:
-  #   runs-on: windows-2022
-  #   name: Build Windows client
-  #   steps:
-  #     -
-  #       name: Checkout
-  #       uses: actions/checkout@v3
-  #     -
-  #       name: Setup Node v18
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 18
-  #     -
-  #       name: Build package
-  #       shell: bash
-  #       run: |
-  #         cd client
-  #         npm config set script-shell $(which bash)
-  #         npm clean-install
-  #         npm run build
-  #         npx electron-forge make --arch x64 --platform win32
-  #         mv -v out/make/zip/win32/x64/*.zip "../tomato-client-${TOMATO_VERSION}-windows.zip"
-  #     -
-  #       name: Upload build artifact
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: client-build-files
-  #         path: tomato-client-${{ env.TOMATO_VERSION }}-windows.zip
-  #         retention-days: 2
-
-  # build-linux-debian:
-  #   runs-on: ubuntu-22.04
-  #   name: Build Linux client (Debian/Ubuntu)
-  #   steps:
-  #     -
-  #       name: Checkout
-  #       uses: actions/checkout@v3
-  #     -
-  #       name: Setup Node v18
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 18
-  #     -
-  #       name: Build package
-  #       shell: bash
-  #       run: |
-  #         cd client
-  #         npm clean-install
-  #         npm run build
-  #         npx electron-forge make --arch x64 --platform linux
-  #         mv -v out/make/deb/x64/*.deb "../tomato-client-${TOMATO_VERSION}-linux_amd64.deb"
-  #     -
-  #       name: Upload build artifact
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: client-build-files
-  #         path: tomato-client-${{ env.TOMATO_VERSION }}-linux_amd64.deb
-  #         retention-days: 2
-
-  # build-linux-arch:
-  #   runs-on: ubuntu-22.04
-  #   name: Build Linux client (Arch)
-  #   steps:
-  #     -
-  #       name: Checkout
-  #       uses: actions/checkout@v3
-  #       with:
-  #         fetch-depth: 0
-  #     -
-  #       name: Setup rootless Docker
-  #       uses: ScribeMD/rootless-docker@0.2.2
-  #     -
-  #       name: Build package
-  #       shell: bash
-  #       # nodejs-lts-hydrogen = Node v18
-  #       run: |
-  #         docker run --rm -v "$PWD:/build" -w /build/client/scripts/arch archlinux:base-devel sh -c 'pacman -Syu --noconfirm nodejs-lts-hydrogen && env EUID=1 makepkg -s --noconfirm'
-  #         mv client/scripts/arch/*.pkg.tar.zst "tomato-client-${TOMATO_VERSION}-linux-x86_64.pkg.tar.zst"
-  #     -
-  #       name: Upload build artifact
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: client-build-files
-  #         path: tomato-client-${{ env.TOMATO_VERSION }}-linux-x86_64.pkg.tar.zst
-  #         retention-days: 2
-
-  # tag:
-  #   runs-on: ubuntu-22.04
-  #   name: Tag release
-  #   needs: [build-macos, build-win32, build-linux-debian, build-linux-arch]
-  #   steps:
-  #     -
-  #       name: Checkout
-  #       uses: actions/checkout@v3
-  #     -
-  #       name: Download build artifacts
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: client-build-files
-  #         path: client-build-files
-  #     -
-  #       name: Remove old preview release
-  #       uses: dev-drprasad/delete-tag-and-release@v0.2.1
-  #       if: github.ref_type != 'tag'
-  #       with:
-  #         delete_release: true
-  #         tag_name: preview-build
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #     -
-  #       name: Wait for old preview release deletion
-  #       shell: bash
-  #       if: github.ref_type != 'tag'
-  #       run: |
-  #         sleep 30s
-  #     -
-  #       name: Tag and upload preview release
-  #       uses: ncipollo/release-action@v1
-  #       if: github.ref_type != 'tag'
-  #       with:
-  #         artifacts: "./client-build-files/*"
-  #         name: 'Tomato Preview Build'
-  #         body: 'This development preview build may not be safe: use it at your own risk.'
-  #         tag: 'preview-build'
-  #         prerelease: true
-  #         token: ${{ secrets.GITHUB_TOKEN }}
-  #     -
-  #       name: Tag and upload release
-  #       uses: ncipollo/release-action@v1
-  #       if: github.ref_type == 'tag'
-  #       with:
-  #         artifacts: "./client-build-files/*"
-  #         name: 'Tomato Release ${{ github.ref_name }}'
-  #         tag: ${{ github.ref_name }}
-  #         token: ${{ secrets.GITHUB_TOKEN }}
+  tag:
+    runs-on: ubuntu-22.04
+    name: Tag release
+    needs: [build, build-linux-arch]
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: client-build-files
+          path: client-build-files
+      -
+        name: Remove old preview release
+        uses: dev-drprasad/delete-tag-and-release@v0.2.1
+        if: github.ref_type != 'tag'
+        with:
+          delete_release: true
+          tag_name: preview-build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Wait for old preview release deletion
+        shell: bash
+        if: github.ref_type != 'tag'
+        run: |
+          sleep 30s
+      -
+        name: Tag and upload preview release
+        uses: ncipollo/release-action@v1
+        if: github.ref_type != 'tag'
+        with:
+          artifacts: "./client-build-files/*"
+          name: 'Tomato Preview Build'
+          body: 'This development preview build may not be safe: use it at your own risk.'
+          tag: 'preview-build'
+          prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Tag and upload release
+        uses: ncipollo/release-action@v1
+        if: github.ref_type == 'tag'
+        with:
+          artifacts: "./client-build-files/*"
+          name: 'Tomato Release ${{ github.ref_name }}'
+          tag: ${{ github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
