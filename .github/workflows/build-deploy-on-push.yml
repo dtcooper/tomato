@@ -50,4 +50,4 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           fingerprint: ${{ secrets.SSH_FINGERPRINT }}
-          script: ./deploy-tomato-server.sh
+          script: ${{ secrets.DEPLOY_SCRIPT_PATH }}
