@@ -105,7 +105,7 @@ jobs:
         # nodejs-lts-hydrogen = Node v18
         run: |
           docker run --rm -v "$PWD:/build" -w /build/client/scripts/arch archlinux:base-devel sh -c 'pacman -Syu --noconfirm nodejs-lts-hydrogen && env EUID=1 makepkg -s --noconfirm'
-          mv client/scripts/arch/*.pkg.tar.zst "${ env.CLIENT_FILENAME }}"
+          mv client/scripts/arch/*.pkg.tar.zst "${{ env.CLIENT_FILENAME }}"
       -
         name: Upload build artifact
         uses: actions/upload-artifact@v3
