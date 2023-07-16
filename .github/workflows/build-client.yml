@@ -50,6 +50,10 @@ jobs:
             out_path: deb/x64/*.deb
             filename_suffix: linux_amd64.deb
     steps:
+      - name: Set variables
+        shell: bash
+        run: |
+          echo "CLIENT_FILENAME=tomato-client-${{ env.TOMATO_VERSION }}-${{ matrix.filename_suffix }}" >> "$GITHUB_ENV"
       -
         name: Checkout
         uses: actions/checkout@v3
@@ -70,18 +74,20 @@ jobs:
           npm clean-install
           npm run build
           npx electron-forge make --arch ${{ matrix.arch }} --platform ${{ matrix.platform }}
-          mv -v out/make/${{ matrix.out_path }} "../tomato-client-${{ env.TOMATO_VERSION }}-${{ matrix.filename_suffix }}"
+          mv -v out/make/${{ matrix.out_path }} "../${{ env.CLIENT_FILENAME }}"
       -
         name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
           name: client-build-files
-          path: tomato-client-${{ env.TOMATO_VERSION }}-${{ matrix.filename_suffix }}
+          path: ${{ env.CLIENT_FILENAME }}
           retention-days: 2
 
   build-linux-arch:
     runs-on: ubuntu-22.04
     name: Build Linux client (Arch)
+    env:
+      CLIENT_FILENAME: tomato-client-${{ env.TOMATO_VERSION }}-linux-x86_64.pkg.tar.zst
     steps:
       -
         name: Checkout
@@ -97,13 +103,13 @@ jobs:
         # nodejs-lts-hydrogen = Node v18
         run: |
           docker run --rm -v "$PWD:/build" -w /build/client/scripts/arch archlinux:base-devel sh -c 'pacman -Syu --noconfirm nodejs-lts-hydrogen && env EUID=1 makepkg -s --noconfirm'
-          mv client/scripts/arch/*.pkg.tar.zst "tomato-client-${TOMATO_VERSION}-linux-x86_64.pkg.tar.zst"
+          mv client/scripts/arch/*.pkg.tar.zst "${ env.CLIENT_FILENAME }}"
       -
         name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
           name: client-build-files
-          path: tomato-client-${{ env.TOMATO_VERSION }}-linux-x86_64.pkg.tar.zst
+          path: ${ env.CLIENT_FILENAME }}
           retention-days: 2
 
   tag:
