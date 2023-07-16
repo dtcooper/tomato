@@ -86,9 +86,11 @@ jobs:
   build-linux-arch:
     runs-on: ubuntu-22.04
     name: Build Linux client (Arch)
-    env:
-      CLIENT_FILENAME: tomato-client-${{ env.TOMATO_VERSION }}-linux-x86_64.pkg.tar.zst
     steps:
+      - name: Set variables
+        shell: bash
+        run: |
+          echo "CLIENT_FILENAME=tomato-client-${{ env.TOMATO_VERSION }}-linux-x86_64.pkg.tar.zst" >> "$GITHUB_ENV"
       -
         name: Checkout
         uses: actions/checkout@v3

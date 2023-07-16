@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - .github/actions/docker-build-push/action.yml
       - .github/workflows/build-deploy-on-push.yml
       - server/**
   workflow_dispatch:
