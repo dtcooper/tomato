@@ -43,8 +43,8 @@ The development code runs on Windows, macOS, and Linux.
 Prerequisites:
 
   * [Git](https://git-scm.com/)
-    * On Windows, install [Git for Windows](https://gitforwindows.org/) and use
-      its included "Git Bash" terminal
+    * On Windows, install [Git for Windows](https://gitforwindows.org/) and
+      **make sure to use its included "Git Bash" terminal.**
   * [Node.js v18+](https://nodejs.org/)
 
 To get the development code running, in your terminal run
@@ -56,7 +56,7 @@ git clone https://github.com/dtcooper/tomato.git
 # Enter the client code
 cd tomato/client
 
-# Windows only: set  npm's script shell to bash
+# Windows only: set npm's script shell to bash
 [ "$(uname -o)" = "Msys" ] && npm config --location=project set script-shell $(which bash)
 
 # Install dependencies and run
