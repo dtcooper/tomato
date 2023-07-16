@@ -45,7 +45,7 @@ To run the documentation locally, install [Python 3.9](https://www.python.org/)
 or higher. Then in your terminal,
 
 ```bash
-# Install Poetry (for Python dependencies)
+# Install Poetry (for Python dependencies) if you don't already have it.
 curl -sSL https://install.python-poetry.org | python3 -
 
 # Clone the repo
