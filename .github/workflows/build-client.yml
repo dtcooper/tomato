@@ -34,21 +34,21 @@ jobs:
             arch: universal
             platform: darwin
             ext: zip
-            filename: tomato-client-${{ env.TOMATO_VERSION }}-macos.zip
+            filename_suffix: macos.zip
           -
             title: Windows
             os: windows-2022
             arch: x64
             platform: win32
             ext: zip
-            filename: tomato-client-${{ env.TOMATO_VERSION }}-windows.zip
+            filename_suffix: windows.zip
           -
             title: Debian/Ubuntu
             os: ubuntu-22.04
             arch: x64
             platform: linux
             ext: deb
-            filename: tomato-client-${{ env.TOMATO_VERSION }}-linux_amd64.deb
+            filename_suffix: linux_amd64.deb
     steps:
       -
         name: Checkout
@@ -69,13 +69,14 @@ jobs:
           npm clean-install
           npm run build
           npx electron-forge make --arch ${{ matrix.arch }} --platform ${{ matrix.platform }}
-          mv -v "out/make/${{ matrix.ext }}/${{ matrix.platform }}/${{ matrix.arch }}/*.${{ matrix.ext }}" "../${{ matrix.filename }}"
+          mv -v "out/make/${{ matrix.ext }}/${{ matrix.platform }}/${{ matrix.arch }}/*.${{ matrix.ext }}" \
+            "../tomato-client-${{ env.TOMATO_VERSION }}-${{ matrix.filename_suffix }}"
       -
         name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
           name: client-build-files
-          path: ${{ matrix.filename }}
+          path: tomato-client-${{ env.TOMATO_VERSION }}-${{ matrix.filename_suffix }}
           retention-days: 2
 
   build-linux-arch:
