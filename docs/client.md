@@ -42,7 +42,7 @@ The development code runs on Windows, macOS, and Linux.
 
 Prerequisites:
 
-  * [Git]
+  * [Git](https://git-scm.com/)
     * On Windows, install [Git for Windows](https://gitforwindows.org/) and use
       its included "Git Bash" terminal
   * [Node.js v18+](https://nodejs.org/)
