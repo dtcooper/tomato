@@ -111,7 +111,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: client-build-files
-          path: ${ env.CLIENT_FILENAME }}
+          path: ${{ env.CLIENT_FILENAME }}
           retention-days: 2
 
   tag:
