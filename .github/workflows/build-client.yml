@@ -33,21 +33,21 @@ jobs:
             os: macos-11
             arch: universal
             platform: darwin
-            ext: zip
+            out_path: zip/darwin/universal/*.zip
             filename_suffix: macos.zip
           -
             title: Windows
             os: windows-2022
             arch: x64
             platform: win32
-            ext: zip
+            out_path: zip/win32/x64/*.zip
             filename_suffix: windows.zip
           -
             title: Debian/Ubuntu
             os: ubuntu-22.04
             arch: x64
             platform: linux
-            ext: deb
+            out_path: deb/x64/*.deb
             filename_suffix: linux_amd64.deb
     steps:
       -
@@ -69,8 +69,7 @@ jobs:
           npm clean-install
           npm run build
           npx electron-forge make --arch ${{ matrix.arch }} --platform ${{ matrix.platform }}
-          mv -v "out/make/${{ matrix.ext }}/${{ matrix.platform }}/${{ matrix.arch }}/*.${{ matrix.ext }}" \
-            "../tomato-client-${{ env.TOMATO_VERSION }}-${{ matrix.filename_suffix }}"
+          mv -v "out/make/${{ matrix.out_path }}" "../tomato-client-${{ env.TOMATO_VERSION }}-${{ matrix.filename_suffix }}"
       -
         name: Upload build artifact
         uses: actions/upload-artifact@v3
