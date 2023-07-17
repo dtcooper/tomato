@@ -46,7 +46,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         help_text="Optional name, if left empty, we'll automatically choose one for you.",
     )
     file = AudioFileField("audio file", upload_to=asset_upload_to)
-    filename = models.CharField(max_length=FILE_MAX_LENGTH)
+    original_filename = models.CharField(max_length=FILE_MAX_LENGTH)
     pre_process_md5sum = models.BinaryField(max_length=16, null=True, default=None)
     md5sum = models.BinaryField(max_length=16, null=True, default=None)
     status = models.SmallIntegerField(
@@ -74,10 +74,10 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         ordering = ("-created_at",)
         permissions = [("immediate_play_asset", "Can immediately play audio assets")]
 
-    def save(self, *args, **kwargs):
+    def save(self, dont_overwrite_original_filename=False, *args, **kwargs):
         self.name = self.name[:NAME_MAX_LENGTH].strip() or "Untitled"
-        if "file" in self.get_dirty_fields():
-            self.filename = Path(self.file.name).with_suffix("").name
+        if not dont_overwrite_original_filename and "file" in self.get_dirty_fields():
+            self.original_filename = Path(self.file.name).with_suffix("").name
         super().save(*args, **kwargs)
 
     def full_clean(self, *args, **kwargs):
@@ -119,6 +119,10 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
             "rotators": [rotator.id for rotator in self.rotators.all()],
             **super().serialize(),
         }
+
+    @property
+    def filename(self):
+        return f"{self.original_filename}{Path(self.file.name).suffix}"
 
     def clean(self):
         super().clean()

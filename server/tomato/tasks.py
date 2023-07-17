@@ -69,7 +69,7 @@ def process_asset(
         asset.md5sum = asset.generate_md5sum()
 
         asset.status = asset.Status.READY
-        asset.save()
+        asset.save(dont_overwrite_original_filename=True)
         if mark_dirty:
             mark_models_dirty()
 

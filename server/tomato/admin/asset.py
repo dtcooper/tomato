@@ -1,11 +1,12 @@
-from pathlib import Path
+import urllib.parse
 
 from django import forms
 from django.contrib import admin, messages
 from django.contrib.admin.helpers import ActionForm
 from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import redirect
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.html import format_html, format_html_join
@@ -89,7 +90,9 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
 
     @admin.display(description="Filename")
     def filename_display(self, obj):
-        return f"{obj.filename}{Path(obj.file.name).suffix}"
+        return format_html(
+            '<a href="{}" target="_blank">{}</a>', reverse("admin:tomato_asset_download", args=(obj.id,)), obj.filename
+        )
 
     @admin.display(description="Player")
     def file_display(self, obj):
@@ -166,6 +169,18 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
         else:
             self.message_user(request, "You must select a rotator to remove audio assets from.", messages.WARNING)
 
+    def download_view(self, request, asset_id):
+        if not self.has_view_permission(request):
+            raise PermissionDenied
+
+        asset = get_object_or_404(Asset, id=asset_id)
+
+        # Use fancy feature of nginx to provide content disposition headers
+        response = HttpResponse()
+        response["X-Accel-Redirect"] = asset.file.url
+        response["Content-Disposition"] = f"attachment; filename*=utf-8''{urllib.parse.quote(asset.filename)}"
+        return response
+
     def upload_view(self, request):
         if not self.has_add_permission(request):
             raise PermissionDenied
@@ -221,5 +236,6 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
 
     def get_urls(self):
         return [
-            path(r"upload/", self.admin_site.admin_view(self.upload_view), name="tomato_asset_upload")
+            path("<asset_id>/download/", self.admin_site.admin_view(self.download_view), name="tomato_asset_download"),
+            path("upload/", self.admin_site.admin_view(self.upload_view), name="tomato_asset_upload"),
         ] + super().get_urls()

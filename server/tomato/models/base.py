@@ -15,8 +15,8 @@ from ..ffmpeg import ffprobe
 from .user import User
 
 
-NAME_MAX_LENGTH = 70
-FILE_MAX_LENGTH = 100
+NAME_MAX_LENGTH = 120
+FILE_MAX_LENGTH = 120
 UTC = zoneinfo.ZoneInfo("UTC")
 
 
