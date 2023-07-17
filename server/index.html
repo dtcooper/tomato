@@ -606,8 +606,8 @@ and not recommended. However, here is a guide for non-standard
 setups, or if you don't have port <code>80</code> and <code>443</code> available on your
 server and still want to server Tomato on the default web ports.</p>
 </div>
-<p>Create and edit a file named <code>docker-compose.overrides.yml</code>,</p>
-<div class="highlight"><span class="filename">server/docker-compose.overrides.yml</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">services</span><span class="p">:</span>
+<p>Create and edit a file named <code>docker-compose.override.yml</code>,</p>
+<div class="highlight"><span class="filename">server/docker-compose.override.yml</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">services</span><span class="p">:</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">logs</span><span class="p">:</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="hll"><span class="w">      </span><span class="c1"># Replace 6666 with any port you like (logs server)</span>
