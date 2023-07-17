@@ -134,7 +134,7 @@ cp .env.sample .env
           api:
             ports:
               # Replace 7777 with any port you like (api server)
-              - 127.0.0.1:7777:8000:8000"
+              - 127.0.0.1:7777:8000"
           app:
             ports:
               # Replace 8888 with any port you like (app server)
@@ -184,7 +184,7 @@ cp .env.sample .env
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
             proxy_set_header X-Real-IP $remote_addr;
-            # Replace 7777 with the port you chose above (app server)
+            # Replace 7777 with the port you chose above (api server)
             proxy_pass http://127.0.0.1:7777;
           }
 
