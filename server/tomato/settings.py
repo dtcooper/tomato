@@ -33,6 +33,8 @@ if EMAIL_EXCEPTIONS_ENABLED:
     EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=(EMAIL_PORT == 587))
     DEFAULT_FROM_EMAIL = SERVER_EMAIL = env("EMAIL_FROM_ADDRESS")
 
+# For development purposes only only
+HUEY_IMMEDIATE_MODE = DEBUG and env("HUEY_IMMEDIATE_MODE", default=False)
 
 ALLOWED_HOSTS = {"app"}
 if DEBUG:
@@ -148,7 +150,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 HUEY = {
     "results": False,
     "huey_class": "tomato.utils.DjangoPriorityRedisHuey",
-    "immediate": False,
+    "immediate": HUEY_IMMEDIATE_MODE,
     "name": "tomato",
 }
 
@@ -335,8 +337,8 @@ CONSTANCE_CONFIG = {
     "NO_REPEAT_ASSETS_TIME": (
         Decimal(0),
         (
-            "The time required to elapse for the client to attempt to not repeat any assets. Set to 0 to disable and"
-            " allow potential repetition in the randomization algorithm."
+            "The time (in seconds) required to elapse for the client to attempt to not repeat any assets. Set to 0 to"
+            " disable and allow potential repetition in the randomization algorithm."
         ),
         "zero_seconds_to_five_hours",
     ),

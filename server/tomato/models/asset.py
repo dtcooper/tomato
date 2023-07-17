@@ -1,6 +1,7 @@
 import datetime
 import hashlib
 from pathlib import Path
+import re
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -9,9 +10,8 @@ from django.utils.safestring import mark_safe
 
 from constance import config
 from dirtyfields import DirtyFieldsMixin
-from django_file_form.uploaded_file import UploadedTusFile
 
-from .base import NAME_MAX_LENGTH, EligibleToAirQuerySet, EnabledBeginEndWeightMixin, TomatoModelBase
+from .base import NAME_MAX_LENGTH, AudioFileField, EligibleToAirQuerySet, EnabledBeginEndWeightMixin, TomatoModelBase
 from .rotator import Rotator
 
 
@@ -20,12 +20,13 @@ class AssetEligibleToAirQuerySet(EligibleToAirQuerySet):
         return models.Q(status=Asset.Status.READY) & super()._get_currently_airing_Q(now)
 
 
+TIMESTAMP_PREFIX = re.compile(r"^\d{15}_")
+
+
 def asset_upload_to(instance, filename):
-    # Prefix with current time, to avoid filename duplication - only if model exists
-    if instance.id:
-        return f"{timezone.now().strftime('%y%m%d%H%M%S')}-{filename}"
-    else:
-        return filename
+    # Prefix with current time to avoid dupes, scrubbing last prefix to avoid massive filenames
+    filename = TIMESTAMP_PREFIX.sub("", str(filename))
+    return f"{timezone.now().strftime('%y%m%d%H%M%S%f')[:-3]}_{filename}"
 
 
 class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
@@ -43,7 +44,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         blank=True,
         help_text="Optional name, if left empty, we'll automatically choose one for you.",
     )
-    file = models.FileField("audio file", upload_to=asset_upload_to)
+    file = AudioFileField("audio file", upload_to=asset_upload_to)
     pre_process_md5sum = models.BinaryField(max_length=16, null=True, default=None)
     md5sum = models.BinaryField(max_length=16, null=True, default=None)
     status = models.SmallIntegerField(
@@ -88,7 +89,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
                             "An audio asset already exists with this audio file. Rejecting duplicate. You can turn this"
                             " feature off with setting <code>PREVENT_DUPLICATES</code>."
                         ),
-                        "file": "Please try another audio file.",
+                        "file": "A duplicate of this file already exists.",
                     }
                 )
 
@@ -117,7 +118,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
 
     @property
     def file_path(self):
-        return Path(self.file.file.file.path if isinstance(self.file.file, UploadedTusFile) else self.file.path)
+        return self.file.real_path
 
     def clean(self):
         super().clean()

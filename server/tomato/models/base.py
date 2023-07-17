@@ -1,12 +1,17 @@
+from pathlib import Path
 import zoneinfo
 
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
+from django.db.models.fields.files import FieldFile
 from django.utils import timezone
 from django.utils.html import format_html
 
+from django_file_form.uploaded_file import UploadedTusFile
+
 from ..constants import HELP_DOCS_URL
+from ..ffmpeg import ffprobe
 from .user import User
 
 
@@ -17,6 +22,23 @@ UTC = zoneinfo.ZoneInfo("UTC")
 def greater_than_zero(value):
     if value <= 0:
         raise ValidationError("Value must be greater than 0")
+
+
+class AudioFieldFile(FieldFile):
+    @property
+    def real_path(self):
+        # Hack to work with django-file-form as well
+        return Path(self.file.file.path if isinstance(self.file, UploadedTusFile) else super().path)
+
+
+class AudioFileField(models.FileField):
+    attr_class = AudioFieldFile
+
+    def validate(self, value, model_instance):
+        super().validate(value, model_instance)
+
+        if not ffprobe(value.real_path):
+            raise ValidationError("No audio detected in this file. Try again with another file.")
 
 
 class EligibleToAirQuerySet(models.QuerySet):
