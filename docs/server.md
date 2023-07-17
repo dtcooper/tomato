@@ -122,9 +122,9 @@ cp .env.sample .env
             setups, or if you don't have port `80` and `443` available on your
             server and still want to server Tomato on the default web ports.
 
-        Create and edit a file named `docker-compose.overrides.yml`,
+        Create and edit a file named `docker-compose.override.yml`,
 
-        ```yaml title="server/docker-compose.overrides.yml" hl_lines="4-6 9-10 13-14"
+        ```yaml title="server/docker-compose.override.yml" hl_lines="4-6 9-10 13-14"
         services:
           logs:
             ports:
