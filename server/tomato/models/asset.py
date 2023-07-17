@@ -101,7 +101,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
     def generate_md5sum(self):
         md5sum = hashlib.md5()
 
-        with open(self.file_path, "rb") as file:
+        with open(self.file.real_path, "rb") as file:
             while chunk := file.read(1024 * 128):
                 md5sum.update(chunk)
 
@@ -115,10 +115,6 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
             "rotators": [rotator.id for rotator in self.rotators.all()],
             **super().serialize(),
         }
-
-    @property
-    def file_path(self):
-        return self.file.real_path
 
     def clean(self):
         super().clean()

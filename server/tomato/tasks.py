@@ -41,7 +41,7 @@ def process_asset(
         asset.pre_process_md5sum = asset.generate_md5sum()
         asset.save()
 
-        ffprobe_data = ffprobe(asset.file_path)
+        ffprobe_data = ffprobe(asset.file.real_path)
         if not ffprobe_data:
             error("does not appear to contain any audio")
             return
@@ -52,7 +52,7 @@ def process_asset(
             if ffprobe_data.title:
                 asset.name = ffprobe_data.title
 
-        infile = asset.file_path
+        infile = asset.file.real_path
         if ffprobe_data.format != "mp3" or (config.TRIM_SILENCE and not skip_trim):
             with tempfile.TemporaryDirectory() as temp_dir:
                 outfile = Path(temp_dir) / "out.mp3"
@@ -63,7 +63,7 @@ def process_asset(
                 with open(outfile, "rb") as f:
                     asset.file.save(Path(asset.file.name).with_suffix(".mp3"), File(f), save=False)
 
-            ffprobe_data = ffprobe(asset.file_path)
+            ffprobe_data = ffprobe(asset.file.real_path)
 
         asset.duration = ffprobe_data.duration
         asset.md5sum = asset.generate_md5sum()
@@ -74,7 +74,7 @@ def process_asset(
             mark_models_dirty()
 
         if not no_success_message and user is not None:
-            user_messages_api.success(user, f'Audio asset "{asset.file_path.name}" processed!')
+            user_messages_api.success(user, f'Audio asset "{asset.file.real_path.name}" processed!')
 
     except Exception:
         logger.exception("process_asset threw exception")
