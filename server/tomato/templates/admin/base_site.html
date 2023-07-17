@@ -123,9 +123,11 @@
 {% endblock %}
 
 {% block content_subtitle %}
-  {{ block.super }}
-  {% if help_docs_text %}
-    <p>{{ help_docs_text }}</p>
+  {% if subtitle or help_docs_text %}
+    <h2>
+      {% if subtitle %}{{ subtitle }}{% endif %}
+      {% if help_docs_text %}<small><em>{{ help_docs_text }}</em></small>{% endif %}
+    </h2>
   {% endif %}
 {% endblock %}
 
