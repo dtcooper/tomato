@@ -1,17 +1,23 @@
 import datetime
 import hashlib
 from pathlib import Path
-import re
+import uuid
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from constance import config
 from dirtyfields import DirtyFieldsMixin
 
-from .base import NAME_MAX_LENGTH, AudioFileField, EligibleToAirQuerySet, EnabledBeginEndWeightMixin, TomatoModelBase
+from .base import (
+    FILE_MAX_LENGTH,
+    NAME_MAX_LENGTH,
+    AudioFileField,
+    EligibleToAirQuerySet,
+    EnabledBeginEndWeightMixin,
+    TomatoModelBase,
+)
 from .rotator import Rotator
 
 
@@ -20,13 +26,8 @@ class AssetEligibleToAirQuerySet(EligibleToAirQuerySet):
         return models.Q(status=Asset.Status.READY) & super()._get_currently_airing_Q(now)
 
 
-TIMESTAMP_PREFIX = re.compile(r"^\d{15}_")
-
-
 def asset_upload_to(instance, filename):
-    # Prefix with current time to avoid dupes, scrubbing last prefix to avoid massive filenames
-    filename = TIMESTAMP_PREFIX.sub("", str(filename))
-    return f"{timezone.now().strftime('%y%m%d%H%M%S%f')[:-3]}_{filename}"
+    return f"{uuid.uuid4()}{Path(filename).suffix}"
 
 
 class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
@@ -45,6 +46,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         help_text="Optional name, if left empty, we'll automatically choose one for you.",
     )
     file = AudioFileField("audio file", upload_to=asset_upload_to)
+    filename = models.CharField(max_length=FILE_MAX_LENGTH)
     pre_process_md5sum = models.BinaryField(max_length=16, null=True, default=None)
     md5sum = models.BinaryField(max_length=16, null=True, default=None)
     status = models.SmallIntegerField(
@@ -74,6 +76,8 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
 
     def save(self, *args, **kwargs):
         self.name = self.name[:NAME_MAX_LENGTH].strip() or "Untitled"
+        if "file" in self.get_dirty_fields():
+            self.filename = Path(self.file.name).with_suffix("").name
         super().save(*args, **kwargs)
 
     def full_clean(self, *args, **kwargs):

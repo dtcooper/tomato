@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from django import forms
 from django.contrib import admin, messages
 from django.contrib.admin.helpers import ActionForm
@@ -74,7 +76,7 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
     date_hierarchy = "created_at"
     fieldsets = (
         (None, {"fields": ("name", "airing")}),
-        ("Audio file", {"fields": ("file", "file_display", "duration")}),
+        ("Audio file", {"fields": ("file", "filename_display", "file_display", "duration")}),
         ROTATORS_FIELDSET,
         AiringMixin.AIRING_INFO_FIELDSET,
         ("Additional information", {"fields": ("created_at", "created_by")}),
@@ -83,7 +85,11 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
     list_display = ("name", "airing", "air_date", "weight", "duration", "rotators_display", "created_at")
     list_filter = (AiringFilter, "rotators", "enabled", StatusFilter, ("created_by", NoNullRelatedOnlyFieldFilter))
     list_prefetch_related = "rotators"
-    readonly_fields = ("duration", "file_display", "airing") + TomatoModelAdminBase.readonly_fields
+    readonly_fields = ("duration", "file_display", "filename_display", "airing") + TomatoModelAdminBase.readonly_fields
+
+    @admin.display(description="Filename")
+    def filename_display(self, obj):
+        return f"{obj.filename}{Path(obj.file.name).suffix}"
 
     @admin.display(description="Player")
     def file_display(self, obj):

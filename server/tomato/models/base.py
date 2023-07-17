@@ -16,6 +16,7 @@ from .user import User
 
 
 NAME_MAX_LENGTH = 70
+FILE_MAX_LENGTH = 100
 UTC = zoneinfo.ZoneInfo("UTC")
 
 
@@ -33,6 +34,9 @@ class AudioFieldFile(FieldFile):
 
 class AudioFileField(models.FileField):
     attr_class = AudioFieldFile
+
+    def __init__(self, max_length=FILE_MAX_LENGTH, *args, **kwargs):
+        super().__init__(max_length=FILE_MAX_LENGTH, *args, **kwargs)
 
     def validate(self, value, model_instance):
         super().validate(value, model_instance)
