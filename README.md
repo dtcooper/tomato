@@ -104,6 +104,8 @@ Head over to <http://localhost:8888/> in your web browser.
 - [ ] Integrated Twilio call board
 - [ ] Single app client lock (ie only ONE client per username/password)'
 - [ ] Way to parse filename into rotator, start/end date
+- [ ] Export all audio assets as zip
+  - [ ] Import as well (have to be careful with different `protocol.json:protocol_version`)
 
 ## License
 
