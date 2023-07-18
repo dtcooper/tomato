@@ -26,13 +26,20 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
+        name: Set variables
+        shell: bash
+        run: |
+          echo "SHA_SHORT=$(git rev-parse --short=8 HEAD)" >> "$GITHUB_ENV"
+      -
         name: Build container
         uses: ./.github/actions/docker-build-push
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           container: server
           tag: ${{ matrix.tag }}
-          build-args: DEBUG=${{ matrix.tag == 'dev' && '1' || '0' }}
+          build-args: |
+            DEBUG=${{ matrix.tag == 'dev' && '1' || '0' }}
+            TOMATO_VERSION=${{ env.SHA_SHORT }}
 
   deploy:
     runs-on: ubuntu-22.04

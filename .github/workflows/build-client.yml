@@ -50,13 +50,14 @@ jobs:
             out_path: deb/x64/*.deb
             filename_suffix: linux_amd64.deb
     steps:
-      - name: Set variables
-        shell: bash
-        run: |
-          echo "CLIENT_FILENAME=tomato-client-${{ env.TOMATO_VERSION }}-${{ matrix.filename_suffix }}" >> "$GITHUB_ENV"
       -
         name: Checkout
         uses: actions/checkout@v3
+      -
+        name: Set variables
+        shell: bash
+        run: |
+          echo "CLIENT_FILENAME=tomato-client-${{ env.TOMATO_VERSION }}-${{ matrix.filename_suffix }}" >> "$GITHUB_ENV"
       -
         name: Setup Node v18
         uses: actions/setup-node@v3

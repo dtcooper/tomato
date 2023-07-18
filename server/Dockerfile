@@ -48,3 +48,9 @@ WORKDIR /app
 
 ENTRYPOINT ["/app/entrypoint.sh"]
 CMD []
+
+# Add frozen version to container
+ARG TOMATO_VERSION
+RUN if [ "$TOMATO_VERSION" ]; then \
+        echo "$TOMATO_VERSION" > .tomato_version \
+    ; fi

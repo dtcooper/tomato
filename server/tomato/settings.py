@@ -36,6 +36,13 @@ if EMAIL_EXCEPTIONS_ENABLED:
 # For development purposes only only
 HUEY_IMMEDIATE_MODE = DEBUG and env("HUEY_IMMEDIATE_MODE", default=False)
 
+# Compute version
+TOMATO_VERSION = "dev" if DEBUG else "unknown"
+if (version_file := PROJECT_DIR / ".tomato_version").exists():
+    with open(version_file, "r") as file:
+        TOMATO_VERSION = file.read().strip()
+
+
 ALLOWED_HOSTS = {"app"}
 if DEBUG:
     ALLOWED_HOSTS.add("localhost")
