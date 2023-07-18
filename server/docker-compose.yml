@@ -76,6 +76,7 @@ services:
       DOZZLE_ADDR: ":8000"
       DOZZLE_BASE: "/server-logs"
       DOZZLE_HOSTNAME: "${DOMAIN_NAME}"
+      DOZZLE_NO_ANALYTICS: "true"
 
 volumes:
   nginx_secrets:
