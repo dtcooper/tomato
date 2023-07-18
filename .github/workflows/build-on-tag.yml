@@ -21,3 +21,5 @@ jobs:
           container: server
           tag: ${{ github.ref_name }}
           no-cache: true
+          build-args: |
+            TOMATO_VERSION=${{ github.ref_name }}
