@@ -16,7 +16,7 @@ django-environ = "^0.10.0"
 django-file-form = "^3.5.2"
 django-redis = {extras = ["hiredis"], version = "^5.3.0"}
 django-user-messages = "^1.0.0"
-gunicorn = "^21.1.0"
+gunicorn = "^21.2.0"
 huey = "^2.4.5"
 psycopg = "^3.1.9"
 pybase62 = "^1.0.0"
