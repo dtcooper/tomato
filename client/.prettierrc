@@ -6,5 +6,9 @@
   "svelteStrictMode": false,
   "trailingComma": "none",
   "plugins": ["prettier-plugin-svelte", "prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"],
-  "overrides": [{ "files": ".prettierrc", "options": { "parser": "json" } }]
+  "pluginSearchDirs": false,
+  "overrides": [
+    { "files": ".prettierrc", "options": { "parser": "json" } },
+    { "files": "*.svelte", "options": { "parser": "svelte" } }
+  ]
 }
