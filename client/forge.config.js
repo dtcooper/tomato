@@ -23,14 +23,16 @@ module.exports = {
   },
   makers: [
     {
-      name: "@electron-forge/maker-zip",
-      platforms: ["darwin"]
+      name: '@electron-forge/maker-dmg',
+      config: {
+        format: "ULFO",
+      }
     },
     {
       name: "@electron-forge/maker-squirrel",
       config: {
         iconUrl: "https://raw.githubusercontent.com/dtcooper/tomato/main/client/assets/icons/tomato.ico",
-        setupIcon: "./assets/icons/tomato.ico"
+        setupIcon: "assets/icons/tomato.ico"
       }
     },
     {

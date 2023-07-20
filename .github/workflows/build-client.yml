@@ -33,8 +33,8 @@ jobs:
             os: macos-11
             arch: universal
             platform: darwin
-            out_path: zip/darwin/universal/*.zip
-            filename_suffix: macos.zip
+            out_path: "*.dmg"
+            filename_suffix: macos.dmg
           -
             title: Windows
             os: windows-2022
