@@ -2,6 +2,11 @@ import { app, BrowserWindow, powerSaveBlocker } from "electron"
 import windowStateKeeper from "electron-window-state"
 import fs from "fs"
 import path from "path"
+import { check as squirrelCheck } from "electron-squirrel-startup"
+
+if (squirrelCheck) {
+	app.quit()
+}
 
 const elgatoVendorId = 4057
 const [minWidth, minHeight, defaultWidth, defaultHeight] = [600, 480, 1000, 800]

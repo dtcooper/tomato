@@ -40,8 +40,8 @@ jobs:
             os: windows-2022
             arch: x64
             platform: win32
-            out_path: zip/win32/x64/*.zip
-            filename_suffix: windows.zip
+            out_path: squirrel.windows/x64/*.exe
+            filename_suffix: windows.exe
           -
             title: Debian/Ubuntu Linux
             os: ubuntu-22.04

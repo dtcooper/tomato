@@ -24,7 +24,14 @@ module.exports = {
   makers: [
     {
       name: "@electron-forge/maker-zip",
-      platforms: ["darwin", "win32"]
+      platforms: ["darwin"]
+    },
+    {
+      name: "@electron-forge/maker-squirrel",
+      config: {
+        iconUrl: "https://raw.githubusercontent.com/dtcooper/tomato/main/client/assets/icons/tomato.ico",
+        setupIcon: "./assets/icons/tomato.ico"
+      }
     },
     {
       name: "@electron-forge/maker-deb",

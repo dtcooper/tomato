@@ -33,6 +33,7 @@
   "devDependencies": {
     "@electron-forge/cli": "^6.2.1",
     "@electron-forge/maker-deb": "^6.2.1",
+    "@electron-forge/maker-squirrel": "^6.2.1",
     "@electron-forge/maker-zip": "^6.2.1",
     "@elgato-stream-deck/webhid": "^5.7.3",
     "autoprefixer": "^10.4.14",
@@ -43,6 +44,7 @@
     "dayjs": "^1.11.9",
     "download": "^8.0.0",
     "electron": "^25.3.1",
+    "electron-squirrel-startup": "^1.0.0",
     "electron-window-state": "^5.0.3",
     "esbuild": "^0.18.15",
     "esbuild-svelte": "^0.7.4",
