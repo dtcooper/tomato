@@ -43,7 +43,7 @@ jobs:
             out_path: zip/win32/x64/*.zip
             filename_suffix: windows.zip
           -
-            title: Debian/Ubuntu
+            title: Debian/Ubuntu Linux
             os: ubuntu-22.04
             arch: x64
             platform: linux
@@ -86,7 +86,7 @@ jobs:
 
   build-linux-arch:
     runs-on: ubuntu-22.04
-    name: Build Linux client (Arch)
+    name: Build Arch Linux
     steps:
       - name: Set variables
         shell: bash
