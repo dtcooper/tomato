@@ -11,15 +11,6 @@ stages. You can, however download [preview builds](#preview-builds) or
 
 ## Preview Builds
 
-!!! danger "Unsigned Binaries"
-    These below releases are **not signed** nor **notaraized**, which means
-    you may have to go through your operating system's security settings to be
-    able to run them.
-
-    Read more about [how to do that on macOS :simple-apple: here](https://support.apple.com/en-gb/HT202491)
-    under the section _"If you want to open an app that hasn't been notarized or
-    is from an unidentified developer."_
-
 **Development preview builds may not be safe: use them at your own risk.**
 
 Preview builds
@@ -37,6 +28,18 @@ or can be download below.
     * [:material-download: Arch :simple-archlinux: or Manjaro :simple-manjaro:](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux-x86_64.pkg.tar.zst)
     &mdash; package in `.pkg.tar.zst` format (amd64 only)
 
+!!! danger "Unsigned Binaries"
+    The above releases are **not signed** nor **notaraized**, which means
+    you may have to go through your operating system's security settings to be
+    able to run them.
+
+    Read more about [how to do that on macOS :simple-apple: here](https://support.apple.com/en-gb/HT202491)
+    under the section _"If you want to open an app that hasn't been notarized or
+    is from an unidentified developer."_
+
+    On Windows :simple-windows: you may get a message along the lines of
+    _**"Windows protected your PC"**_ in which you'll have to click _More Info >
+    Run Anyway._
 
 ## Run Development Code
 
