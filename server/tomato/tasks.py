@@ -92,7 +92,9 @@ def bulk_process_assets(assets, user=None, skip_trim=False):
             )
         except Exception:
             pass
+
     mark_models_dirty()
+
     if user is not None:
         user_messages_api.success(user, f"Finished processing {len(assets)} audio assets.")
 

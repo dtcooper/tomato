@@ -63,8 +63,9 @@ class StatusFilter(admin.SimpleListFilter):
 
 
 class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
-    # TODO use rotators_display when in readonly mode for colorization
     ROTATORS_FIELDSET = ("Rotators", {"fields": ("rotators",)})
+    NAME_AIRING_FIELDSET = (None, {"fields": ("name", "airing")})
+    ADDITIONAL_INFO_FIELDSET = ("Additional information", {"fields": ("created_at", "created_by")})
 
     add_fieldsets = (
         (None, {"fields": ("name",)}),
@@ -76,17 +77,30 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
     actions = ("enable", "disable", "add_rotator", "remove_rotator")
     date_hierarchy = "created_at"
     fieldsets = (
-        (None, {"fields": ("name", "airing")}),
+        NAME_AIRING_FIELDSET,
         ("Audio file", {"fields": ("file", "filename_display", "file_display", "duration")}),
         ROTATORS_FIELDSET,
         AiringMixin.AIRING_INFO_FIELDSET,
-        ("Additional information", {"fields": ("created_at", "created_by")}),
+        ADDITIONAL_INFO_FIELDSET,
     )
     filter_horizontal = ("rotators",)
     list_display = ("name", "airing", "air_date", "weight", "duration", "rotators_display", "created_at")
     list_filter = (AiringFilter, "rotators", "enabled", StatusFilter, ("created_by", NoNullRelatedOnlyFieldFilter))
     list_prefetch_related = "rotators"
-    readonly_fields = ("duration", "file_display", "filename_display", "airing") + TomatoModelAdminBase.readonly_fields
+    no_change_fieldsets = (
+        NAME_AIRING_FIELDSET,
+        ("Audio file", {"fields": ("filename_display", "file_display", "duration")}),
+        ("Rotators", {"fields": ("rotators_display",)}),
+        AiringMixin.AIRING_INFO_FIELDSET,
+        ADDITIONAL_INFO_FIELDSET,
+    )
+    readonly_fields = (
+        "duration",
+        "file_display",
+        "filename_display",
+        "rotators_display",
+        "airing",
+    ) + TomatoModelAdminBase.readonly_fields
 
     @admin.display(description="Filename")
     def filename_display(self, obj):

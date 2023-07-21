@@ -12,8 +12,8 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 from tomato.models import Asset, Rotator, Stopset, StopsetRotator, User
-from tomato.tasks import bulk_process_assets, process_asset
-from tomato.utils import mark_models_dirty
+from tomato.models.asset import generate_random_asset_filename
+from tomato.tasks import bulk_process_assets
 
 
 SAMPLE_DATA_URL = "https://tomato.nyc3.digitaloceanspaces.com/bmir-sample-assets.zip"
@@ -33,7 +33,6 @@ class Command(BaseCommand):
             dest="interactive",
             help="Don't prompt user when running with --delete-all",
         )
-        parser.add_argument("--tasks", action="store_true", help="Run processing task manually (useful in development)")
         parser.add_argument("--created-by", default=None, help="Username of the user to create assets with")
         parser.add_argument("--trim-if-enabled", action="store_true", help=argparse.SUPPRESS)
         parser.add_argument("zipfile", nargs="?", help="Optional path of zipfile, otherwise one will be downloaded")
@@ -118,30 +117,25 @@ class Command(BaseCommand):
                 )
 
                 for mp3_tmp_filename in rotator_dir.iterdir():
-                    mp3_filename = mp3_dir / mp3_tmp_filename.name
-                    self.stdout.write(
-                        f" * {num}/{num_audio_files} - Importing"
-                        f" {'and processing ' if options['tasks'] else ''}{mp3_filename.name}..."
-                    )
+                    # Functions the same as
+                    mp3_filename = mp3_dir / generate_random_asset_filename(mp3_tmp_filename)
+                    self.stdout.write(f" * {num}/{num_audio_files} - Importing {mp3_tmp_filename.name}...")
 
                     shutil.move(mp3_tmp_filename, mp3_filename)
-                    asset = Asset(file=f"prefill/{mp3_filename.name}", created_by=created_by)
+                    asset = Asset(
+                        name=mp3_tmp_filename.stem,
+                        file=f"prefill/{mp3_filename.name}",
+                        original_filename=mp3_tmp_filename.name,
+                        created_by=created_by,
+                    )
                     asset.clean()
-                    asset.save()
-
-                    if options["tasks"]:
-                        process_asset.call_local(
-                            asset, user=created_by, skip_trim=not options["trim_if_enabled"], mark_dirty=False
-                        )
+                    asset.save(dont_overwrite_original_filename=True)
 
                     asset.rotators.add(rotator)
                     assets.append(asset)
                     num += 1
 
-            if options["tasks"]:
-                mark_models_dirty()
-            else:
-                bulk_process_assets(assets, user=created_by, skip_trim=not options["trim_if_enabled"])
+            bulk_process_assets(assets, user=created_by, skip_trim=not options["trim_if_enabled"])
 
         for stopset_name, rotator_names in metadata["stopsets"].items():
             self.stdout.write(f"Creating stop set {stopset_name} with {len(rotator_names)} rotators...")

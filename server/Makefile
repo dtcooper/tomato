@@ -11,6 +11,10 @@ build:
 shell:
 	$(COMPOSE) run --rm --service-ports --use-aliases $(CONTAINER) bash || true
 
+.PHONY: shell-nohuey
+shell-nohuey:
+	$(COMPOSE) run --rm --service-ports --use-aliases -e HUEY_IMMEDIATE_MODE=1 $(CONTAINER) bash || true
+
 .PHONY: shell-nodeps
 shell-nodeps:
 	$(COMPOSE) run --rm --no-deps --entrypoint bash $(CONTAINER) || true

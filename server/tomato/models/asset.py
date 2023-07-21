@@ -26,8 +26,13 @@ class AssetEligibleToAirQuerySet(EligibleToAirQuerySet):
         return models.Q(status=Asset.Status.READY) & super()._get_currently_airing_Q(now)
 
 
+def generate_random_asset_filename(original_filename):
+    return f"{str(uuid.uuid4()).replace('-', '')}{Path(original_filename).suffix}"
+
+
 def asset_upload_to(instance, filename):
-    return f"{uuid.uuid4()}{Path(filename).suffix}"
+    # Should work the same as in prefill_sample_data.py
+    return generate_random_asset_filename(filename)
 
 
 class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):

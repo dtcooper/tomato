@@ -119,6 +119,7 @@ class TomatoModelAdminBase(ListPrefetchRelatedMixin, SaveCreatedByMixin, admin.M
     add_fieldsets = None
     list_max_show_all = 2500
     list_per_page = 250
+    no_change_fieldsets = None
     readonly_fields = ("created_by", "created_at")
     save_on_top = True
     search_fields = ("name",)
@@ -126,6 +127,8 @@ class TomatoModelAdminBase(ListPrefetchRelatedMixin, SaveCreatedByMixin, admin.M
     def get_fieldsets(self, request, obj=None):
         if obj is None and self.add_fieldsets is not None:
             return self.add_fieldsets
+        if obj is not None and not self.has_change_permission(request, obj) and self.no_change_fieldsets is not None:
+            return self.no_change_fieldsets
         return super().get_fieldsets(request, obj)
 
     def has_view_permission(self, request, obj=None):
