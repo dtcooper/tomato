@@ -1,7 +1,8 @@
 import datetime
 import hashlib
 from pathlib import Path
-import uuid
+import random
+import string
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -27,7 +28,8 @@ class AssetEligibleToAirQuerySet(EligibleToAirQuerySet):
 
 
 def generate_random_asset_filename(original_filename):
-    return f"{str(uuid.uuid4()).replace('-', '')}{Path(original_filename).suffix}"
+    stem = "".join(random.choice(string.ascii_letters + string.digits) for _ in range(32))
+    return f"{stem}{Path(original_filename).suffix}"
 
 
 def asset_upload_to(instance, filename):

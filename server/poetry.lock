@@ -834,16 +834,6 @@ files = [
 tests = ["pytest"]
 
 [[package]]
-name = "pybase62"
-version = "1.0.0"
-description = "Python module for base62 encoding"
-optional = false
-python-versions = "*"
-files = [
-    {file = "pybase62-1.0.0-py3-none-any.whl", hash = "sha256:60539ad956ec9e9de091bc7ae88c9550bc2fa17f503050cf34d021b75e73cb27"},
-]
-
-[[package]]
 name = "pycodestyle"
 version = "2.10.0"
 description = "Python style guide checker"
@@ -1327,4 +1317,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "c8acc6fc6ad4d820e84e1cc91f15a693cc40b16b2ddd23926d515b55d0924562"
+content-hash = "f03066701d8b1160c50f23fd7e722907d3926151c5a2fc2e937ea89f3f183c8a"

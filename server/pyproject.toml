@@ -19,7 +19,6 @@ django-user-messages = "^1.0.0"
 gunicorn = "^21.2.0"
 huey = "^2.4.5"
 psycopg = "^3.1.9"
-pybase62 = "^1.0.0"
 python-dotenv = "^1.0.0"
 starlette = "^0.30.0"
 uvicorn = {extras = ["standard"], version = "^0.23.1"}

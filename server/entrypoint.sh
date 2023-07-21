@@ -17,7 +17,7 @@ wait-for-it --timeout 0 --service db:5432 --service redis:6379
 if [ -z "$__RUN_HUEY" -a -z "$__RUN_API" ]; then
     if [ "$NO_SECRET_KEY" ]; then
         echo 'Generating SECRET_KEY...'
-        python -c 'import base62 as b, dotenv as d, secrets as s; d.set_key("/.env", "SECRET_KEY", b.encodebytes(s.token_bytes(40)))'
+        python -c 'import string as s, random as r; print("".join(r.choice(s.ascii_letters + s.digits) for _ in range(54)))'
         . /.env
     fi
 
