@@ -6,7 +6,8 @@
     "played_stopset",
     "skipped_asset",
     "skipped_stopset",
-    "waited"
+    "waited",
+    "unspecified"
   ],
   "colors": [
     { "name": "red", "value": "#ff1744", "content": "#ffd1da" },

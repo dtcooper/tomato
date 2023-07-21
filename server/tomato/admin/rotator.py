@@ -8,7 +8,7 @@ from .base import NoNullRelatedOnlyFieldFilter, NumAssetsMixin, TomatoModelAdmin
 
 class RotatorAdmin(NumAssetsMixin, TomatoModelAdminBase):
     list_display = ("name", "color_display", "stopsets_display", "num_assets")
-    list_prefetch_related = "stopsets"
+    list_prefetch_related = ("stopsets",)
     add_fieldsets = (
         (None, {"fields": ("name",)}),
         ("Color", {"fields": ("color", "color_preview")}),

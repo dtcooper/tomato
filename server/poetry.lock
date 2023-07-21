@@ -214,7 +214,7 @@ redis = ["redis"]
 type = "git"
 url = "https://github.com/jazzband/django-constance.git"
 reference = "HEAD"
-resolved_reference = "831707089041e6143a8734a28c6e81241886397f"
+resolved_reference = "554dac04731e28fa22e657d80dc617ca578ac5c0"
 
 [[package]]
 name = "django-debug-toolbar"

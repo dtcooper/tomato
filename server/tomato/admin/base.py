@@ -46,7 +46,7 @@ class ListPrefetchRelatedMixin:
         # For performance https://code.djangoproject.com/ticket/29985#comment:3
         queryset = super().get_queryset(request)
         if self.list_prefetch_related and request.resolver_match.view_name.endswith("changelist"):
-            queryset = queryset.prefetch_related(self.list_prefetch_related)
+            queryset = queryset.prefetch_related(*self.list_prefetch_related)
         return queryset
 
 

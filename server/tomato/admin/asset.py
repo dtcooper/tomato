@@ -86,7 +86,7 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
     filter_horizontal = ("rotators",)
     list_display = ("name", "airing", "air_date", "weight", "duration", "rotators_display", "created_at")
     list_filter = (AiringFilter, "rotators", "enabled", StatusFilter, ("created_by", NoNullRelatedOnlyFieldFilter))
-    list_prefetch_related = "rotators"
+    list_prefetch_related = ("rotators",)
     no_change_fieldsets = (
         NAME_AIRING_FIELDSET,
         ("Audio file", {"fields": ("filename_display", "file_display", "duration")}),
