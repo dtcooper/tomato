@@ -42,6 +42,7 @@ module.exports = {
   },
   daisyui: {
     darkMode: false,
+    logs: false,
     themes: [
       {
         default: {
