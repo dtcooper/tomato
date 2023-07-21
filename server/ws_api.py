@@ -69,10 +69,13 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
             await self.on_recieve_authenticated(websocket, data)
 
     async def process_log(self, data):
-        uuid = data.pop("id")
-        data["created_by"] = self.user
-        _, created = await ClientLogEntry.objects.aupdate_or_create(id=uuid, defaults=data)
-        return {"success": True, "updated_existing": not created}
+        if self.user.enable_client_logs:
+            uuid = data.pop("id")
+            data["created_by"] = self.user
+            _, created = await ClientLogEntry.objects.aupdate_or_create(id=uuid, defaults=data)
+            return {"success": True, "updated_existing": not created, "ignored": False}
+        else:
+            return {"success": True, "updated_existing": False, "ignored": True}
 
     async def on_recieve_authenticated(self, websocket, data):
         message_type = data.get("type")
