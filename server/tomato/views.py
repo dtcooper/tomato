@@ -9,7 +9,7 @@ from user_messages.models import Message
 
 
 def server_logs(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser and settings.DEBUG_LOGS_PORT is not None:
         if settings.DEBUG and not request.is_secure():
             domain, _ = split_domain_port(request.get_host())
             return HttpResponseRedirect(f"http://{domain}:{settings.DEBUG_LOGS_PORT}/server-logs/")

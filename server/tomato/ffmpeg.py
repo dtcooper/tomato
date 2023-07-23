@@ -6,18 +6,20 @@ import math
 import shlex
 import subprocess
 
+from django.conf import settings
+
 from constance import config
 
 
 logger = logging.getLogger(__name__)
 FFProbe = namedtuple("FFProbe", ("format", "duration", "title"))
 
-
-FILE_FORMATS = {
-    "mp3": {"format": "mp3", "ext": "mp3", "encode_args": ("-ac", "2", "-a:b", "192k")},
-    "ogg/vorbis (128kbit)": {"format": "flac", "ext": "flac"},
-    "ogg (192kpbs)": {"format": "ogg", "ext": "mp3", "encode_args": ("-ac", "2", "-a:b", "192k")},
-}
+if settings.STANDALONE:
+    FFMPEG_PATH = "ffmpeg"  # TODO from nodejs
+    FFPROBE_PATH = "ffprobe"  # TODO from nodejs
+else:
+    FFMPEG_PATH = "ffmpeg"
+    FFPROBE_PATH = "ffprobe"
 
 
 def run_command(args):
@@ -29,7 +31,7 @@ def ffprobe(infile):
     # We want at least one audio channel
     cmd = run_command(
         (
-            "ffprobe",
+            FFPROBE_PATH,
             "-i",
             infile,
             "-print_format",
@@ -76,7 +78,7 @@ def ffmpeg_convert(infile, outfile):
 
     ARGS_INFILE_INDEX = 3
     base_args = [
-        "ffmpeg",
+        FFMPEG_PATH,
         "-y",
         "-i",
         infile,
@@ -94,7 +96,7 @@ def ffmpeg_convert(infile, outfile):
         ]
     )
 
-    if config.TRIM_SILENCE:
+    if not settings.STANDALONE and config.TRIM_SILENCE:
         trimmed_wav_file = outfile.with_suffix(".wav")
         untrimmed_wav_file = trimmed_wav_file.with_stem(f"{outfile.stem}-untrimmed")
 
@@ -132,7 +134,7 @@ def ffmpeg_convert(infile, outfile):
     if cmd.returncode != 0:
         logger.error(f"ffmpeg (final) returned {cmd.returncode}: {cmd.stderr}")
 
-    if config.TRIM_SILENCE:
+    if not settings.STANDALONE and config.TRIM_SILENCE:
         trimmed_wav_file.unlink(missing_ok=True)
 
     return cmd.returncode == 0

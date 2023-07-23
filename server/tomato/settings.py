@@ -7,48 +7,69 @@ from django.utils.safestring import mark_safe
 
 import environ
 
-
-env = environ.Env()
-env.read_env("/.env")
-
 BASE_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = BASE_DIR.parent
 
-DEBUG = env.bool("DEBUG", default=False)
+env = environ.Env()
+STANDALONE = env.bool("TOMATO_STANDALONE", default=False)
+if STANDALONE:
+    DEBUG = False
 
-DOMAIN_NAME = env("DOMAIN_NAME", default=None)
-REQUIRE_STRONG_PASSWORDS = env("REQUIRE_STRONG_PASSWORDS", default=not DEBUG)
-SECRET_KEY = env("SECRET_KEY")
-TIME_ZONE = env("TIMEZONE", default="US/Pacific")
+    DOMAIN_NAME = "localhost"
+    REQUIRE_STRONG_PASSWORDS = False
+    SECRET_KEY = "standalone-8QwiMlTXhUGEIKNkOqT7xle4HF7PPMLeLP9VHKmOr8W"
+    TIME_ZONE = env("TIMEZONE", default="US/Pacific")
 
-DEBUG_LOGS_PORT = env.int("DEBUG_LOGS_PORT", default=8002)
+    DEBUG_LOGS_PORT = None
 
-EMAIL_EXCEPTIONS_ENABLED = env.bool("EMAIL_EXCEPTIONS_ENABLED", default=True)
-if EMAIL_EXCEPTIONS_ENABLED:
-    EMAIL_ADMIN_ADDRESS = env("EMAIL_ADMIN_ADDRESS")
-    EMAIL_HOST = env("EMAIL_HOST")
-    EMAIL_HOST_USER = env("EMAIL_USERNAME")
-    EMAIL_HOST_PASSWORD = env("EMAIL_PASSWORD")
-    EMAIL_PORT = env.int("EMAIL_PORT", default=587)
-    EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=(EMAIL_PORT == 587))
-    DEFAULT_FROM_EMAIL = SERVER_EMAIL = env("EMAIL_FROM_ADDRESS")
+    EMAIL_EXCEPTIONS_ENABLED = False
+    HUEY_IMMEDIATE_MODE = False
+    TOMATO_VERSION = "standalone"
 
-# For development purposes only only
-HUEY_IMMEDIATE_MODE = DEBUG and env("HUEY_IMMEDIATE_MODE", default=False)
+else:
+    env.read_env("/.env")
 
-# Compute version
-TOMATO_VERSION = "dev" if DEBUG else "unknown"
-if (version_file := PROJECT_DIR / ".tomato_version").exists():
-    with open(version_file, "r") as file:
-        TOMATO_VERSION = file.read().strip()
+    BASE_DIR = Path(__file__).resolve().parent
+    PROJECT_DIR = BASE_DIR.parent
+
+    DEBUG = env.bool("DEBUG", default=False)
+
+    DOMAIN_NAME = env("DOMAIN_NAME", default=None)
+    REQUIRE_STRONG_PASSWORDS = env("REQUIRE_STRONG_PASSWORDS", default=not DEBUG)
+    SECRET_KEY = env("SECRET_KEY")
+    TIME_ZONE = env("TIMEZONE", default="US/Pacific")
+
+    DEBUG_LOGS_PORT = env.int("DEBUG_LOGS_PORT", default=8002)
+
+    EMAIL_EXCEPTIONS_ENABLED = env.bool("EMAIL_EXCEPTIONS_ENABLED", default=True)
+    if EMAIL_EXCEPTIONS_ENABLED:
+        EMAIL_ADMIN_ADDRESS = env("EMAIL_ADMIN_ADDRESS")
+        EMAIL_HOST = env("EMAIL_HOST")
+        EMAIL_HOST_USER = env("EMAIL_USERNAME")
+        EMAIL_HOST_PASSWORD = env("EMAIL_PASSWORD")
+        EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+        EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=(EMAIL_PORT == 587))
+        DEFAULT_FROM_EMAIL = SERVER_EMAIL = env("EMAIL_FROM_ADDRESS")
+
+    # For development purposes only only
+    HUEY_IMMEDIATE_MODE = DEBUG and env("HUEY_IMMEDIATE_MODE", default=False)
+
+    # Compute version
+    TOMATO_VERSION = "dev" if DEBUG else "unknown"
+    if (version_file := PROJECT_DIR / ".tomato_version").exists():
+        with open(version_file, "r") as file:
+            TOMATO_VERSION = file.read().strip()
 
 
-ALLOWED_HOSTS = {"app"}
-if DEBUG:
-    ALLOWED_HOSTS.add("localhost")
-if DOMAIN_NAME:
-    ALLOWED_HOSTS.add(DOMAIN_NAME)
-ALLOWED_HOSTS = list(ALLOWED_HOSTS)
+if STANDALONE:
+    ALLOWED_HOSTS = ["localhost"]
+else:
+    ALLOWED_HOSTS = {"app"}
+    if DEBUG:
+        ALLOWED_HOSTS.add("localhost")
+    if DOMAIN_NAME:
+        ALLOWED_HOSTS.add(DOMAIN_NAME)
+    ALLOWED_HOSTS = list(ALLOWED_HOSTS)
 
 if DEBUG:
     # For django debug framework
@@ -127,16 +148,24 @@ SILENCED_SYSTEM_CHECKS = ("admin.E404",)  # Needed for django-user-messages
 WSGI_APPLICATION = "tomato.wsgi.application"
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "postgres",
-        "USER": "postgres",
-        "PASSWORD": "postgres",
-        "HOST": "db",
-        "PORT": 5432,
+if STANDALONE:
+    DATABASES = {
+        "default":  {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "db.sqlite3",  # TODO get user data path from node
+    }}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": "postgres",
+            "USER": "postgres",
+            "PASSWORD": "postgres",
+            "HOST": "db",
+            "PORT": 5432,
+        }
     }
-}
+
 
 CACHES = {
     "default": {
@@ -151,6 +180,11 @@ CACHES = {
         "KEY_PREFIX": "cache",
     }
 }
+if STANDALONE:
+    CACHES["default"]["LOCATION"] = "redis://localhost"  # TODO get port from node
+    del CACHES["default"]["OPTIONS"]["CONNECTION_POOL_KWARGS"]
+    del CACHES["default"]["OPTIONS"]["PARSER_CLASS"]
+
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
@@ -161,14 +195,25 @@ HUEY = {
     "name": "tomato",
 }
 
+if STANDALONE:
+    HUEY.update({
+        "huey_class": "huey.SqliteHuey",
+        "filename": "huey.sqlite3"
+    })
+
 LANGUAGE_CODE = "en-us"
 USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
-STATIC_ROOT = "/serve/static"
 MEDIA_URL = "/assets/"
-MEDIA_ROOT = "/serve/assets"
+if STANDALONE:
+    STATIC_ROOT = PROJECT_DIR / "serve/static"
+    MEDIA_ROOT = PROJECT_DIR / "serve/media"
+else:
+    STATIC_ROOT = "/serve/static"
+    MEDIA_ROOT = "/serve/assets"
+
 FILE_FORM_MUST_LOGIN = True
 FILE_FORM_UPLOAD_DIR = "_temp_uploads"
 
@@ -245,7 +290,11 @@ def validate_no_more_than_three(value):
 MIGRATION_MODULES = {"constance": None}  # Ignore constance models
 CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
 CONSTANCE_SUPERUSER_ONLY = False
-CONSTANCE_REDIS_CONNECTION = "redis://redis"
+if STANDALONE:
+    CONSTANCE_REDIS_CONNECTION = "redis://localhost"  # TODO get port from node
+else:
+    CONSTANCE_REDIS_CONNECTION = "redis://redis"
+
 CONSTANCE_ADDITIONAL_FIELDS = {
     "zero_seconds_to_five_hours": (
         "django.forms.DecimalField",
@@ -357,14 +406,7 @@ CONSTANCE_CONFIG = {
             "number of stop sets played per hour will be more consistent at the expense of a DJs air time."
         ),
     ),
-    "TRIM_SILENCE": (
-        True,
-        mark_safe(
-            "Trim silence from the beginning and end of audio files. Since this processing is done on the server, it's"
-            " applied <strong>only</strong> at the time an audio file is uploaded. This means files will have silence"
-            " trimmed (or not) according to this setting at the time of upload."
-        ),
-    ),
+
     "PREVENT_DUPLICATES": (
         True,
         (
@@ -393,7 +435,6 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
                 "BROADCAST_COMPRESSION",
                 "EXTRACT_METADATA_FROM_FILE",
                 "AUDIO_BITRATE",
-                "TRIM_SILENCE",
                 "PREVENT_DUPLICATES",
             ),
         ),
@@ -410,6 +451,20 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
         ),
     )
 )
+
+if STANDALONE:
+    CONSTANCE_ADDITIONAL_FIELDS["station_name"][1]["disabled"] = True
+else:
+    CONSTANCE_CONFIG["TRIM_SILENCE"] = (
+        True,
+        mark_safe(
+            "Trim silence from the beginning and end of audio files. Since this processing is done on the server, it's"
+            " applied <strong>only</strong> at the time an audio file is uploaded. This means files will have silence"
+            " trimmed (or not) according to this setting at the time of upload."
+        ),
+    )
+    CONSTANCE_CONFIG_FIELDSETS["Audio Options"] += ("TRIM_SILENCE",)
+
 
 SHELL_PLUS_IMPORTS = [
     "from constance import config",

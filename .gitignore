@@ -7,6 +7,7 @@
 
 # client
 /client/.npmrc
+/client/libs/
 /client/dist/
 /client/node_modules/
 /client/out/

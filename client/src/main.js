@@ -1,7 +1,9 @@
-import { app, BrowserWindow, powerSaveBlocker } from "electron"
+import { app, BrowserWindow, powerSaveBlocker, ipcMain } from "electron"
 import windowStateKeeper from "electron-window-state"
 import fs from "fs"
 import path from "path"
+import child_process from "child_process"
+import os from "os"
 import { check as squirrelCheck } from "electron-squirrel-startup"
 
 if (squirrelCheck) {
@@ -10,6 +12,9 @@ if (squirrelCheck) {
 
 const elgatoVendorId = 4057
 const [minWidth, minHeight, defaultWidth, defaultHeight] = [600, 480, 1000, 800]
+const basePath = path.normalize(path.resolve(path.join(__dirname, "..")))
+const libsPath = path.resolve(basePath, "libs", os.platform())
+const pythonPath = path.resolve(libsPath, `python-${os.arch()}/bin/python3`)
 
 const userDataDir = path.join(path.dirname(app.getPath("userData")), "tomato-radio-automation")
 fs.mkdirSync(userDataDir, { recursive: true, permission: 0o700 })
@@ -21,7 +26,7 @@ app.setAboutPanelOptions({
   applicationName: "Tomato Radio Automation\n(Desktop App)",
   copyright: `\u00A9 2019-${new Date().getFullYear()} David Cooper & BMIR.\nAll rights reserved.`,
   website: "https://github.com/dtcooper/tomato",
-  iconPath: path.resolve(path.join(__dirname, "../assets/icons/tomato.png"))
+  iconPath: path.join(basePath, "assets/icons/tomato.png")
 })
 
 function createWindow() {
@@ -43,7 +48,7 @@ function createWindow() {
     minHeight,
     fullscreen: false,
     fullscreenable: false,
-    icon: path.resolve(path.join(__dirname, "../assets/icons/tomato.png")),
+    icon: path.join(basePath, "assets/icons/tomato.png"),
     webPreferences: {
       devTools: !app.isPackaged,
       contextIsolation: false,
@@ -82,7 +87,7 @@ function createWindow() {
 
   const queryString = "userDataDir=" + encodeURIComponent(userDataDir)
   const url = app.isPackaged
-    ? `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
+    ? `file://${path.normalize(basePath, "..", "index.html")}`
     : "http://localhost:3000/"
   win.loadURL(`${url}?${queryString}`)
   if (!app.isPackaged) {
@@ -97,4 +102,10 @@ app.whenReady().then(async () => {
 
 app.on("window-all-closed", () => {
   app.quit()
+})
+
+let djangoProcess = null, redisProcess = null, hueyProcess = null
+
+ipcMain.handle('start-embedded-server', () => {
+  console.log(pythonPath)
 })

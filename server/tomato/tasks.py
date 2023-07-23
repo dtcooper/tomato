@@ -5,6 +5,7 @@ import tempfile
 from huey import crontab
 
 from django.core.files import File
+from django.conf import settings
 
 from constance import config
 from django_file_form.models import TemporaryUploadedFile
@@ -53,7 +54,7 @@ def process_asset(
                 asset.name = ffprobe_data.title
 
         infile = asset.file.real_path
-        if ffprobe_data.format != "mp3" or (config.TRIM_SILENCE and not skip_trim):
+        if ffprobe_data.format != "mp3" or (not settings.STANDALONE and config.TRIM_SILENCE and not skip_trim):
             with tempfile.TemporaryDirectory() as temp_dir:
                 outfile = Path(temp_dir) / "out.mp3"
                 if not ffmpeg_convert(infile, outfile):

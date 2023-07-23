@@ -35,10 +35,10 @@ ENV PATH="/root/.local/bin:${PATH}"
 
 COPY constants.json pyproject.toml poetry.lock /app/
 WORKDIR /app
-RUN poetry install $([ -z "$DEBUG" -o "$DEBUG" = '0' ] && echo '--without=dev') \
+RUN poetry install --without=standalone $([ -z "$DEBUG" -o "$DEBUG" = '0' ] && echo '--without=dev') \
     && if [ "$DEBUG" -a "$DEBUG" != 0 ]; then \
         # Download relevant verion's bash completion (in dev only)
-        wget -qO /etc/bash_completion.d/django_bash_completion \
+        curl -sSLo /etc/bash_completion.d/django_bash_completion \
             "https://raw.githubusercontent.com/django/django/$(python -c 'import django; print(".".join(map(str, django.VERSION[:2])))')/extras/django_bash_completion" \
     ; fi
 
