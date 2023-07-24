@@ -5,6 +5,7 @@ description = "Tomato Radio Automation Server"
 authors = ["David Cooper <david.cooper@burningman.org>"]
 license = "MIT"
 
+# NOTE: Binary dependencies break client standalone builds
 [tool.poetry.dependencies]
 python = "^3.11"
 django = "^4.2.3"

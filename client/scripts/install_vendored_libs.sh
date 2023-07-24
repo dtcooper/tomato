@@ -1,30 +1,80 @@
 #!/bin/sh
 
+set -e
+
+ARCH=x64
+PYTHON_ARCH=x86_64
 case "$OSTYPE" in
     darwin*)
         PLATFORM=darwin
-        case "$(uname -m)" in
-            x86_64) ARCH=x64 ;;
-            arm64) ARCH=arm64 ;;
-            *)
-                echo 'Unknown macOS architecture.'
-                exit 1
-            ;;
-        esac
+        PYTHON_DIST=apple-darwin
+        if [ "$(uname -m)" = arm64 ]; then
+            ARCH=arm64
+        fi
     ;;
-    linux*) PLATFORM=linux ;;
-    msys*) PLATFORM=win32 ;;
+    linux*)
+        PLATFORM=linux
+        PYTHON_ARCH=x86_64_v2
+        PYTHON_DIST=unknown-linux-gnu
+    ;;
+    msys*)
+        PLATFORM=win32
+        PYTHON_DIST=pc-windows-msvc-shared
+    ;;
     *)
         echo "Unrecognized OS: $OSTYPE"
         exit 1
     ;;
 esac
 
+POETRY_VERSION='1.5.1'
+PYTHON_RELEASE_DATE=20230507
+PYTHON_VERSION='3.11.3'
+PYTHON_STANDLONE_REPO='indygreg/python-build-standalone'
+PYTHON_URL_PREFIX="https://github.com/${PYTHON_STANDLONE_REPO}/releases/download/${PYTHON_RELEASE_DATE}"
+FFMPEG_MINIREDIS_URL="https://tomato.nyc3.digitaloceanspaces.com/ffmpeg-miniredis-${PLATFORM}.zip"
+
+echo "Installing vendored libraries for $PLATFORM"
+
+get_python_url () {
+    __PYTHON_ARCH="$PYTHON_ARCH"
+    if [ "$1" ]; then
+        __PYTHON_ARCH="$1"
+    fi
+    echo "${PYTHON_URL_PREFIX}/cpython-${PYTHON_VERSION}+${PYTHON_RELEASE_DATE}-${__PYTHON_ARCH}-${PYTHON_DIST}-install_only.tar.gz"
+}
+
 cd "$(dirname "$0")/.."
 rm -rf vendored
 mkdir vendored
 cd vendored
 
-curl -Lo ffmpeg-miniredis.zip "https://tomato.nyc3.digitaloceanspaces.com/ffmpeg-miniredis-$PLATFORM.zip"
-unzip ffmpeg-miniredis.zip
-rm ffmpeg-miniredis.zip
+mkdir python-x64
+curl -L "$(get_python_url)" | tar xz -C python-x64 --strip-components=1
+
+if [ "$PLATFORM" = darwin ]; then
+    mkdir python-arm64
+    curl -L "$(get_python_url aarch64)" | tar xz -C python-arm64 --strip-components=1
+fi
+
+PYTHON_BIN="python-${ARCH}/bin/python3"
+if [ "$PLATFORM" = win32 ]; then
+    PYTHON_BIN="python-${ARCH}/python.exe"
+fi
+PYTHON_BIN="$(realpath "$PYTHON_BIN")"
+
+TEMP_DIR="$(mktemp -d)"
+POETRY_DIR="${TEMP_DIR}/poetry"
+REQUIREMENTS="${TEMP_DIR}/requirements.txt"
+"$PYTHON_BIN" -m pip install --isolated --no-compile --target "$POETRY_DIR" "poetry==${POETRY_VERSION}"
+
+cd ../../server
+PYTHONPATH="$POETRY_DIR" "$PYTHON_BIN" -m poetry export --with=standalone --without-hashes -o "$REQUIREMENTS"
+cd ../client/vendored
+"$PYTHON_BIN" -m pip install --isolated --no-compile --target pylibs -r "$REQUIREMENTS"
+rm -rf pylibs/bin
+
+curl -Lo "${TEMP_DIR}/ffmpeg-miniredis.zip" "https://tomato.nyc3.digitaloceanspaces.com/ffmpeg-miniredis-$PLATFORM.zip"
+unzip "${TEMP_DIR}/ffmpeg-miniredis.zip"
+
+rm -rf "$TEMP_DIR"
