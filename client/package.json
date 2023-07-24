@@ -5,7 +5,9 @@
   "description": "Tomato Radio Automation (Desktop App)",
   "main": "dist/main.js",
   "scripts": {
-    "build": "node scripts/build.js",
+    "build:script": "node scripts/build.js",
+    "build:vendor": "[ ! -d vendor ] && ./scripts/install_vendored_libs.sh || true",
+    "build": "npm-run-all -p build:*",
     "clean": "rm -rf dist out",
     "distclean": "rm -rf dist out node_modules vendor",
     "dev": "NODE_ENV=development npm-run-all clean -p -r build dev:electron",
