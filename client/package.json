@@ -55,6 +55,7 @@
     "prettier-plugin-organize-imports": "^3.2.3",
     "prettier-plugin-svelte": "^2.10.1",
     "prettier-plugin-tailwindcss": "^0.4.1",
+    "reconnecting-websocket": "^4.4.0",
     "run-script-os": "^1.1.6",
     "svelte": "^4.1.1",
     "svelte-devtools-standalone": "github:RedHatter/svelte-devtools-standalone",

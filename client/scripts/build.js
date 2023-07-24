@@ -36,13 +36,14 @@ const runBuild = async () => {
       `node ${nodeVersion || "unknown"}${watch ? ", watching" : ""}...`
   )
 
+  const NODE_ENV = `"${process.env.NODE_ENV}"`
   const defaults = {
     bundle: true,
     logLevel: "info",
     minify: !isDev,
     platform: "node",
     sourcemap: true,
-    define: { "process.env.NODE_ENV": `"${process.env.NODE_ENV}"` }
+    define: { NODE_ENV, "process.env.NODE_ENV": NODE_ENV, IS_DEV: isDev ? "true" : "false" }
   }
 
   if (nodeVersion) {

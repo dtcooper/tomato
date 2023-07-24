@@ -47,8 +47,8 @@ async def retry_on_failure(coro, sleep_time_on_failure=1, *args, **kwargs):
             await asyncio.sleep(sleep_time_on_failure)
 
 
-def failure(reason):
-    return {"success": False, "error": reason}
+def failure(reason, **kwargs):
+    return {"success": False, "error": reason, **kwargs}
 
 
 class APIWebSocketEndpoint(WebSocketEndpoint):
@@ -86,24 +86,24 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
         await websocket.send_json(response)
 
     async def on_recieve_unauthenticated(self, websocket, data):
-        if set(data.keys()) == {"username", "password", "protocol_version"}:
-            protocol_version = data.pop("protocol_version")
-            if protocol_version == PROTOCOL_VERSION:
+        protocol_version = data.pop("protocol_version", None)
+        if protocol_version == PROTOCOL_VERSION:
+            if set(data.keys()) == {"username", "password"}:
                 self.user = await sync_to_async(authenticate)(**data)
+            if self.user is not None:
+                logger.info(f"Accepted login credentials for {self.user}")
+                await websocket.send_json({"success": True})
+                self.authenticated = True
+                await self.broadcast_data_change(single_websocket=websocket)
+                self.subscribers[websocket] = self
             else:
-                logger.info(f"Client expected protocol {protocol_version}, but we are on {PROTOCOL_VERSION}.")
-                await websocket.send_json(failure("Invalid client protocol version. Please update your client."))
+                logger.info("Invalid login credentials")
+                await websocket.send_json(failure("Invalid username or password. Please try again.", field="username"))
                 await websocket.close()
 
-        if self.user is not None:
-            logger.info(f"Accepted login credentials for {self.user}")
-            await websocket.send_json({"success": True})
-            self.authenticated = True
-            await self.broadcast_data_change(single_websocket=websocket)
-            self.subscribers[websocket] = self
         else:
-            logger.info("Invalid login credentials")
-            await websocket.send_json(failure("Invalid username or password."))
+            logger.info(f"Client sent protocol_version = {protocol_version!r}, but we are on {PROTOCOL_VERSION!r}.")
+            await websocket.send_json(failure("Invalid protocol version. Try updating your client?"))
             await websocket.close()
 
     @classmethod

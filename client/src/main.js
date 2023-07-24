@@ -1,11 +1,11 @@
 import { app, BrowserWindow, powerSaveBlocker } from "electron"
+import { check as squirrelCheck } from "electron-squirrel-startup"
 import windowStateKeeper from "electron-window-state"
 import fs from "fs"
 import path from "path"
-import { check as squirrelCheck } from "electron-squirrel-startup"
 
 if (squirrelCheck) {
-	app.quit()
+  app.quit()
 }
 
 const elgatoVendorId = 4057

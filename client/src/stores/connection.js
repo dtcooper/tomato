@@ -1,97 +1,108 @@
-import { writable as persistentWritable } from "svelte-local-storage-store"
-import { get, writable } from "svelte/store"
+import ReconnectingWebSocket from "reconnecting-websocket"
+import { persisted } from "svelte-local-storage-store"
+import { derived, get } from "svelte/store"
+import { protocol_version } from "../../../server/constants.json"
 
-export const accessToken = persistentWritable("accessToken", "")
-export const address = persistentWritable("address", "")
-export const connected = persistentWritable("connected", false)
-export const username = persistentWritable("username", "")
-export const online = writable(navigator.onLine)
+const auth = persisted("auth", { username: "", password: "", host: "", authenticated: false, connecting: false })
+export const authenticated = derived(auth, ($auth) => $auth.authenticated)
+export const connecting = derived(auth, ($auth) => $auth.connecting)
+let ws = null
+
+export const logout = () => {
+  if (ws) {
+    ws.close()
+  }
+  auth.update(($auth) => {
+    return { ...$auth, authenticated: false }
+  })
+}
+
+export const login = (username, password, host) => {
+  return new Promise(async (resolve, reject) => {
+    let sentAuth = false
+    let gotAuthResponse = false
+    let connTimeout
+    let url
+
+    // Didn't pass in any arguments, ie logging back in when app restarted when authenticated = false
+    if (username !== undefined) {
+      // Convert http[s]:// to ws[s]://
+      if (["http", "https"].some((proto) => host.toLowerCase().startsWith(`${proto}://`))) {
+        host = host.replace(/^http/i, "ws")
+        // If not prefixed with ws[s]://, prefix it
+      } else if (["ws", "wss"].every((proto) => !host.toLowerCase().startsWith(`${proto}://`))) {
+        host = `wss://${host}`
+      }
+
+      try {
+        url = new URL(host)
+      } catch {
+        reject({ type: "host", message: "Invalid server address. Please try another." })
+        return
+      }
+
+      url.pathname = `${url.pathname}api/`
+      host = url.toString()
+    } else {
+      ;({ username, password, host } = get(auth))
+    }
+
+    ws = new ReconnectingWebSocket(host)
+    auth.update(($auth) => {
+      return { ...$auth, connecting: true }
+    })
+    ws.onerror = (e) => {
+      console.error("Websocket error", e)
+      if (sentAuth) {
+        reject({ type: "host", message: "todo" })
+      } else {
+        reject({ type: "host", message: "Invalid handshake. Are you sure this address is correct?" })
+      }
+      ws.close()
+    }
+    ws.onclose = () => {
+      auth.update(($auth) => {
+        return { ...$auth, connecting: false }
+      })
+      if (!sentAuth || !gotAuthResponse) {
+        ws.close()
+      }
+    }
+    ws.onmessage = (e) => {
+      const message = JSON.parse(e.data)
+      if (sentAuth && !gotAuthResponse) {
+        gotAuthResponse = true
+        if (message.success) {
+          auth.update(($auth) => {
+            return { ...$auth, authenticated: true, connecting: false, username, password, host }
+          })
+          clearTimeout(connTimeout)
+          console.log("Succesfully authenticated!")
+          resolve()
+        } else {
+          auth.update(($auth) => {
+            return { ...$auth, authenticated: false }
+          })
+          reject({ type: message.field || "host", message: message.error })
+          ws.close()
+        }
+      }
+    }
+    ws.onopen = () => {
+      sentAuth = gotAuthResponse = false
+      ws.send(JSON.stringify({ username, password, protocol_version }))
+      connTimeout = setTimeout(() => {
+        ws.close()
+        reject({ type: "host", message: "Connection to server timed out. Try again." })
+      }, 25000)
+      sentAuth = true
+    }
+  })
+}
+
 window.addEventListener("offline", () => {
   online.set(false)
 })
 window.addEventListener("online", () => {
   online.set(true)
 })
-
-const ping = async () => {
-  let data, response
-  const headers = {}
-
-  if (accessToken) {
-    headers["X-Access-Token"] = get(accessToken)
-  }
-
-  try {
-    response = await fetch(`${get(address)}ping/`, { headers })
-    data = await response.json()
-  } catch (error) {
-    console.error(error)
-    return { success: false, error: "Invalid handshake. Are you sure this address is correct?" }
-  }
-
-  return data
-}
-
-const authenticate = async (password) => {
-  let response, data
-
-  try {
-    response = await fetch(`${get(address)}auth/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: get(username), password })
-    })
-    data = await response.json()
-  } catch (error) {
-    console.error(error)
-    return { success: false, error: "Server error while logging in" }
-  }
-
-  return data
-}
-
-export const login = async (password) => {
-  let addressUrl
-
-  const error = (error, errorType = "address") => {
-    return { success: false, error, errorType }
-  }
-
-  try {
-    addressUrl = new URL(get(address))
-  } catch {
-    try {
-      addressUrl = new URL(`https://${get(address)}`)
-    } catch {
-      return error("Invalid server address")
-    }
-  }
-
-  if (!["https:", "http:"].includes(addressUrl.protocol)) {
-    return error("Server must being with http:// or https://")
-  }
-
-  if (!addressUrl.pathname.endsWith("/")) {
-    addressUrl.pathname += "/"
-  }
-  address.set(addressUrl.toString())
-
-  const pong = await ping()
-  if (!pong.success) {
-    return error(pong.error)
-  }
-
-  const auth = await authenticate(password)
-  if (!auth.success) {
-    return error(auth.error, "auth")
-  }
-
-  accessToken.set(auth.access_token)
-  return { success: true }
-}
-
-export const logout = () => {
-  connected.set(false)
-  accessToken.set("")
-  window.location.reload()
-}
