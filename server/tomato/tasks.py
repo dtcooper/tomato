@@ -4,8 +4,8 @@ import tempfile
 
 from huey import crontab
 
-from django.core.files import File
 from django.conf import settings
+from django.core.files import File
 
 from constance import config
 from django_file_form.models import TemporaryUploadedFile

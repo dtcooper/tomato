@@ -1,6 +1,7 @@
 import urllib.parse
 
 from django import forms
+from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.helpers import ActionForm
 from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
@@ -11,7 +12,6 @@ from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
-from django.conf import settings
 
 from django_file_form.forms import FileFormMixin, MultipleUploadedFileField
 from django_file_form.model_admin import FileFormAdminMixin

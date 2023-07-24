@@ -7,6 +7,7 @@ from django.utils.safestring import mark_safe
 
 import environ
 
+
 BASE_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = BASE_DIR.parent
 
@@ -150,10 +151,11 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 if STANDALONE:
     DATABASES = {
-        "default":  {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": "db.sqlite3",  # TODO get user data path from node
-    }}
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": "db.sqlite3",  # TODO get user data path from node
+        }
+    }
 else:
     DATABASES = {
         "default": {
@@ -196,10 +198,7 @@ HUEY = {
 }
 
 if STANDALONE:
-    HUEY.update({
-        "huey_class": "huey.SqliteHuey",
-        "filename": "huey.sqlite3"
-    })
+    HUEY.update({"huey_class": "huey.SqliteHuey", "filename": "huey.sqlite3"})
 
 LANGUAGE_CODE = "en-us"
 USE_I18N = True
@@ -208,11 +207,12 @@ USE_TZ = True
 STATIC_URL = "/static/"
 MEDIA_URL = "/assets/"
 if STANDALONE:
-    STATIC_ROOT = PROJECT_DIR / "serve/static"
-    MEDIA_ROOT = PROJECT_DIR / "serve/media"
+    STATIC_ROOT = PROJECT_DIR / "serve/static"  # TODO passed from nodejs
+    MEDIA_ROOT = PROJECT_DIR / "serve/assets"  # TODO passed from nodejs
 else:
     STATIC_ROOT = "/serve/static"
-    MEDIA_ROOT = "/serve/media"
+    MEDIA_ROOT = "/serve/assets"
+
 
 FILE_FORM_MUST_LOGIN = True
 FILE_FORM_UPLOAD_DIR = "_temp_uploads"
@@ -289,7 +289,7 @@ def validate_no_more_than_three(value):
 
 CONSTANCE_SUPERUSER_ONLY = False
 if STANDALONE:
-    CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+    CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 else:
     MIGRATION_MODULES = {"constance": None}  # Ignore constance models
     CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
@@ -407,7 +407,6 @@ CONSTANCE_CONFIG = {
             "number of stop sets played per hour will be more consistent at the expense of a DJs air time."
         ),
     ),
-
     "PREVENT_DUPLICATES": (
         True,
         (

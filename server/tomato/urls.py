@@ -1,5 +1,6 @@
+import re
+
 from django.conf import settings
-from django.conf.urls.static import static
 from django.urls import include, path, re_path
 from django.views.static import serve
 
@@ -15,10 +16,15 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns.append(path("__debug__/", include("debug_toolbar.urls")))
-    urlpatterns.extend(static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT))
 
-if settings.STANDALONE:
-    urlpatterns.append(re_path(r'^assets/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}))
+if settings.DEBUG or settings.STANDALONE:
+    urlpatterns.append(
+        re_path(
+            r"^%s(?P<path>.*)$" % re.escape(settings.MEDIA_URL.lstrip("/")),
+            serve,
+            {"document_root": settings.MEDIA_ROOT},
+        )
+    )
 
 # Catch-all in admin, so it should be last
 urlpatterns.append(path("", admin_site.urls))
