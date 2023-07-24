@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -e
+set -ex
 
 ARCH=x64
 PYTHON_ARCH=x86_64
@@ -45,9 +45,9 @@ get_python_url () {
 }
 
 cd "$(dirname "$0")/.."
-rm -rf vendored
-mkdir vendored
-cd vendored
+rm -rf vendor
+mkdir vendor
+cd vendor
 
 mkdir python-x64
 curl -L "$(get_python_url)" | tar xz -C python-x64 --strip-components=1
@@ -70,9 +70,9 @@ REQUIREMENTS="${TEMP_DIR}/requirements.txt"
 
 cd ../../server
 PYTHONPATH="$POETRY_DIR" "$PYTHON_BIN" -m poetry export --with=standalone --without-hashes -o "$REQUIREMENTS"
-cd ../client/vendored
-"$PYTHON_BIN" -m pip install --isolated --no-compile --target pylibs -r "$REQUIREMENTS"
-rm -rf pylibs/bin
+cd ../client/vendor
+"$PYTHON_BIN" -m pip install --isolated --no-compile --target pypackages -r "$REQUIREMENTS"
+rm -rf pypackages/bin
 
 curl -Lo "${TEMP_DIR}/ffmpeg-miniredis.zip" "https://tomato.nyc3.digitaloceanspaces.com/ffmpeg-miniredis-$PLATFORM.zip"
 unzip "${TEMP_DIR}/ffmpeg-miniredis.zip"

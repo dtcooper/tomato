@@ -2,7 +2,7 @@
 
 # Should only be run on Linux, but generates for all three platforms
 
-set -e
+set -ex
 
 RUST_VERSION='1.71.0'
 RUST_DARWIN_BUILDER="joseluisq/rust-linux-darwin-builder:${RUST_VERSION}"

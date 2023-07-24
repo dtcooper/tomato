@@ -14,7 +14,7 @@
 /client/scripts/arch/pkg/
 /client/scripts/arch/src/
 /client/scripts/libs/
-/client/vendored/
+/client/vendor/
 
 # server
 __pycache__/

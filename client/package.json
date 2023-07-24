@@ -7,6 +7,7 @@
   "scripts": {
     "build": "node scripts/build.js",
     "clean": "rm -rf dist out",
+    "distclean": "rm -rf dist out node_modules vendor",
     "dev": "NODE_ENV=development npm-run-all clean -p -r build dev:electron",
     "svelte-dev": "SVELTE_DEVTOOLS=1 npm run dev",
     "dev:electron": "npm-run-all dev:electron:wait dev:electron:run",
