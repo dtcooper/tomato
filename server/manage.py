@@ -16,7 +16,12 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
-    RunserverCommand.default_addr = "0.0.0.0"
+
+    is_standalone = os.environ.get("TOMATO_STANDALONE")
+    is_standalone = bool(is_standalone) if is_standalone != "0" else False
+
+    if not is_standalone:
+        RunserverCommand.default_addr = "0.0.0.0"
     execute_from_command_line(sys.argv)
 
 

@@ -11,6 +11,7 @@ from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
+from django.conf import settings
 
 from django_file_form.forms import FileFormMixin, MultipleUploadedFileField
 from django_file_form.model_admin import FileFormAdminMixin
@@ -104,9 +105,8 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
 
     @admin.display(description="Filename")
     def filename_display(self, obj):
-        return format_html(
-            '<a href="{}" target="_blank">{}</a>', reverse("admin:tomato_asset_download", args=(obj.id,)), obj.filename
-        )
+        url = obj.file.url if settings.STANDALONE else reverse("admin:tomato_asset_download", args=(obj.id,))
+        return format_html('<a href="{}" target="_blank">{}</a>', url, obj.filename)
 
     @admin.display(description="Player")
     def file_display(self, obj):

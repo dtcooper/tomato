@@ -212,7 +212,7 @@ if STANDALONE:
     MEDIA_ROOT = PROJECT_DIR / "serve/media"
 else:
     STATIC_ROOT = "/serve/static"
-    MEDIA_ROOT = "/serve/assets"
+    MEDIA_ROOT = "/serve/media"
 
 FILE_FORM_MUST_LOGIN = True
 FILE_FORM_UPLOAD_DIR = "_temp_uploads"
@@ -287,13 +287,14 @@ def validate_no_more_than_three(value):
         raise ValidationError("Pick a maximum of three choices.")
 
 
-MIGRATION_MODULES = {"constance": None}  # Ignore constance models
-CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
 CONSTANCE_SUPERUSER_ONLY = False
 if STANDALONE:
-    CONSTANCE_REDIS_CONNECTION = "redis://localhost"  # TODO get port from node
+    CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 else:
+    MIGRATION_MODULES = {"constance": None}  # Ignore constance models
+    CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
     CONSTANCE_REDIS_CONNECTION = "redis://redis"
+
 
 CONSTANCE_ADDITIONAL_FIELDS = {
     "zero_seconds_to_five_hours": (

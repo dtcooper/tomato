@@ -10,7 +10,7 @@ python = "^3.11"
 django = "^4.2.3"
 django-cleanup = "^8.0.0"
 # For error messages at top of page, once constance > 2.9.1, can pin again
-django-constance = {git = "https://github.com/jazzband/django-constance.git"}
+django-constance = {git = "https://github.com/jazzband/django-constance.git", rev = "554dac04"}
 django-environ = "^0.10.0"
 django-dirtyfields = "^1.9.2"
 django-file-form = "^3.5.2"

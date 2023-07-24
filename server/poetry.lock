@@ -213,7 +213,7 @@ redis = ["redis"]
 [package.source]
 type = "git"
 url = "https://github.com/jazzband/django-constance.git"
-reference = "HEAD"
+reference = "554dac04"
 resolved_reference = "554dac04731e28fa22e657d80dc617ca578ac5c0"
 
 [[package]]
@@ -1317,4 +1317,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "21f31f238eeae728ab2ab27246b848bc22d1e4f3489f65466f3024db78b670aa"
+content-hash = "2ca45bdc8a80543cd426f082419a578ad70b3fc5447562b83d4f38c75c2635f4"

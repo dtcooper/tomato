@@ -7,13 +7,14 @@
 
 # client
 /client/.npmrc
-/client/libs/
 /client/dist/
 /client/node_modules/
 /client/out/
 /client/scripts/arch/*.pkg.tar.zst
 /client/scripts/arch/pkg/
 /client/scripts/arch/src/
+/client/scripts/libs/
+/client/vendored/
 
 # server
 __pycache__/
