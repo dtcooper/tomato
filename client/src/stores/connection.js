@@ -1,25 +1,33 @@
 import ReconnectingWebSocket from "reconnecting-websocket"
 import { persisted } from "svelte-local-storage-store"
-import { derived, get } from "svelte/store"
+import { derived, get, readonly } from "svelte/store"
 import { protocol_version } from "../../../server/constants.json"
 
-const auth = persisted("auth", { username: "", password: "", host: "", authenticated: false, connecting: false })
+const auth = persisted("auth", {
+  username: "",
+  password: "",
+  host: "",
+  authenticated: false,
+  connecting: false,
+  connected: false
+})
+const readonlyAuth = readonly(auth)
+export { readonlyAuth as auth }
 export const authenticated = derived(auth, ($auth) => $auth.authenticated)
 export const connecting = derived(auth, ($auth) => $auth.connecting)
 let ws = null
 
 export const logout = () => {
+  auth.update(($auth) => {
+    return { ...$auth, authenticated: false, connected: false }
+  })
   if (ws) {
     ws.close()
   }
-  auth.update(($auth) => {
-    return { ...$auth, authenticated: false }
-  })
 }
 
 export const login = (username, password, host) => {
   return new Promise(async (resolve, reject) => {
-    let sentAuth = false
     let gotAuthResponse = false
     let connTimeout
     let url
@@ -53,28 +61,33 @@ export const login = (username, password, host) => {
     })
     ws.onerror = (e) => {
       console.error("Websocket error", e)
-      if (sentAuth) {
-        reject({ type: "host", message: "todo" })
-      } else {
+      // If we've never been authenticated before, close connection (otherwise automatica reconnect)
+      if (!get(auth).authenticated) {
         reject({ type: "host", message: "Invalid handshake. Are you sure this address is correct?" })
+        ws.close()
       }
-      ws.close()
     }
     ws.onclose = () => {
       auth.update(($auth) => {
-        return { ...$auth, connecting: false }
+        return { ...$auth, connected: false }
       })
-      if (!sentAuth || !gotAuthResponse) {
-        ws.close()
+      // If we've never been authenticated before, close connection
+      if (!get(auth).authenticated) {
+        auth.update(($auth) => {
+          return { ...$auth, connecting: false }
+        })
+        if (!sentAuth || !gotAuthResponse) {
+          ws.close()
+        }
       }
     }
     ws.onmessage = (e) => {
       const message = JSON.parse(e.data)
-      if (sentAuth && !gotAuthResponse) {
+      if (!gotAuthResponse) {
         gotAuthResponse = true
         if (message.success) {
           auth.update(($auth) => {
-            return { ...$auth, authenticated: true, connecting: false, username, password, host }
+            return { ...$auth, authenticated: true, connecting: false, connected: true, username, password, host }
           })
           clearTimeout(connTimeout)
           console.log("Succesfully authenticated!")
@@ -86,16 +99,20 @@ export const login = (username, password, host) => {
           reject({ type: message.field || "host", message: message.error })
           ws.close()
         }
+      } else if (get(auth).authenticated) {
+        console.log("Authenticated server message:", message)
       }
     }
     ws.onopen = () => {
-      sentAuth = gotAuthResponse = false
+      gotAuthResponse = false
+      auth.update(($auth) => {
+        return { ...$auth, connected: false, connecting: true }
+      })
       ws.send(JSON.stringify({ username, password, protocol_version }))
       connTimeout = setTimeout(() => {
         ws.close()
         reject({ type: "host", message: "Connection to server timed out. Try again." })
       }, 25000)
-      sentAuth = true
     }
   })
 }
