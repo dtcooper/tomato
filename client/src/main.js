@@ -1,8 +1,8 @@
-import { app, BrowserWindow, powerSaveBlocker } from "electron"
-import { check as squirrelCheck } from "electron-squirrel-startup"
-import windowStateKeeper from "electron-window-state"
-import fs from "fs"
-import path from "path"
+const { app, BrowserWindow, powerSaveBlocker } = require("electron")
+const windowStateKeeper = require("electron-window-state")
+const fs = require("fs")
+const path = require("path")
+const { check: squirrelCheck } = require("electron-squirrel-startup")
 
 if (squirrelCheck) {
   app.quit()
