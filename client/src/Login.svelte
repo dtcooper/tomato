@@ -13,14 +13,20 @@
   let host = persisted("login-host", "")
   let error = { type: "", message: "" }
 
-  const clearError = () => (error.type = "")
+  const clearError = () => {
+    error = { type: "", message: "" }
+  }
 
   const submit = async () => {
-    try {
-      await login($username, password, $host)
-    } catch (e) {
-      error = e
-      console.log(e)
+    if (demoMode) {
+      error = { type: "host", message: "Demo mode not yet enabled." }
+    } else {
+      try {
+        await login($username, password, $host)
+      } catch (e) {
+        error = e
+        console.log(e)
+      }
     }
   }
 </script>
@@ -45,7 +51,7 @@
               Enable demo mode
             {/if}
           </span>
-          <input type="checkbox" class="toggle" />
+          <input type="checkbox" class="toggle" bind:checked={demoMode} />
         </label>
       </div>
       <div class="form-control">
@@ -57,6 +63,8 @@
         </div>
         <input
           disabled={demoMode}
+          on:input={clearError}
+          class:input-error={error.type == "host"}
           bind:value={$host}
           class="input input-bordered"
           placeholder="tomato.example.org"
@@ -70,12 +78,14 @@
           </div>
           <input
             disabled={demoMode}
+            on:input={clearError}
             bind:value={$username}
+            class:input-error={error.type == "userpass"}
             class="input input-bordered"
             type="text"
             placeholder="Enter username..."
           />
-          {#if error.type === "username"}
+          {#if error.type === "userpass"}
             <div class="label">
               <span class="label-text-alt font-bold text-error">{error.message}</span>
             </div>
@@ -89,6 +99,8 @@
             <input
               disabled={demoMode}
               bind:value={password}
+              on:input={clearError}
+              class:input-error={error.type == "userpass"}
               class="input input-bordered"
               placeholder="Enter password..."
               type="text"
@@ -100,6 +112,8 @@
             <input
               disabled={demoMode}
               bind:value={password}
+              on:input={clearError}
+              class:input-error={error.type == "userpass"}
               class:tracking-wider={(!showPassword || demoMode) && password.length > 0}
               class="input input-bordered"
               placeholder="Enter password..."
@@ -118,7 +132,9 @@
         </div>
       </div>
       <div class="form-control mt-6">
-        <button class="btn btn-primary" type="submit">Login</button>
+        <button class="btn btn-primary" type="submit"
+          >{#if demoMode}Try Demo{:else}Login{/if}</button
+        >
       </div>
     </form>
   </div>

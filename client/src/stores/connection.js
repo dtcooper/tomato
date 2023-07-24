@@ -19,7 +19,7 @@ let ws = null
 
 export const logout = () => {
   auth.update(($auth) => {
-    return { ...$auth, authenticated: false, connected: false }
+    return { ...$auth, authenticated: false, connected: false, connecting: false }
   })
   if (ws) {
     ws.close()
@@ -63,7 +63,7 @@ export const login = (username, password, host) => {
       console.error("Websocket error", e)
       // If we've never been authenticated before, close connection (otherwise automatica reconnect)
       if (!get(auth).authenticated) {
-        reject({ type: "host", message: "Invalid handshake. Are you sure this address is correct?" })
+        reject({ type: "host", message: "Invalid handshake. Are you sure this server address is correct?" })
         ws.close()
       }
     }

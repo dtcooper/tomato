@@ -98,7 +98,7 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
                 self.subscribers[websocket] = self
             else:
                 logger.info("Invalid login credentials")
-                await websocket.send_json(failure("Invalid username or password. Please try again.", field="username"))
+                await websocket.send_json(failure("Invalid username or password. Please try again.", field="userpass"))
                 await websocket.close()
 
         else:
