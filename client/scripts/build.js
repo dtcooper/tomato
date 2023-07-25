@@ -36,13 +36,14 @@ const runBuild = async () => {
       `node ${nodeVersion || "unknown"}${watch ? ", watching" : ""}...`
   )
 
+  const NODE_ENV = `"${process.env.NODE_ENV}"`
   const defaults = {
     bundle: true,
     logLevel: "info",
     minify: !isDev,
     platform: "node",
     sourcemap: true,
-    define: { "process.env.NODE_ENV": `"${process.env.NODE_ENV}"` }
+    define: { NODE_ENV, "process.env.NODE_ENV": NODE_ENV, IS_DEV: isDev ? "true" : "false" }
   }
 
   if (nodeVersion) {
@@ -57,20 +58,19 @@ const runBuild = async () => {
       ...options
     }
 
+    if (!options.bundle && options.external) {
+      options.external = undefined
+    }
+
     if (watch) {
-      const ctx = await esbuildContext({
-        entryPoints: [path.join(srcDir, infile)],
-        outfile: path.join(distDir, infile),
-        ...defaults,
-        ...options
-      })
+      const ctx = await esbuildContext(options)
       ctx.watch()
     } else {
       esbuild(options)
     }
   }
 
-  build("main.js", { external: ["electron", "svelte-devtools-standalone"] })
+  build("main.js", { bundle: !isDev, external: ["electron", "svelte-devtools-standalone"] })
   build("app.js", {
     external: ["./assets/fonts/*"],
     format: "esm",

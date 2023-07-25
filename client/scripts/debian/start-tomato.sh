@@ -2,7 +2,11 @@
 
 # Run locally for development
 if [ "$npm_command" = 'run-script' ]; then
-    CMD='electron-forge start --'
+    CMD='electron-forge start'
+    if [ "$DEV_EXTRA_FORGE_FLAGS" ]; then
+        CMD="$CMD $DEV_EXTRA_FORGE_FLAGS"
+    fi
+    CMD="$CMD --"
 else
     CMD='/usr/lib/tomato/tomato'
 fi

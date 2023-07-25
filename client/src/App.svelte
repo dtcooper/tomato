@@ -1,20 +1,21 @@
-<script context="module">
-  import initializeStreamDeck from "./streamdeck"
-
-  initializeStreamDeck()
-</script>
-
 <script>
-  import { connected } from "./stores/connection"
+  import { authenticated, logout, login, auth } from "./stores/connection"
 
   import Login from "./Login.svelte"
-  import Main from "./Main.svelte"
+
+  if ($authenticated) {
+    login()
+  }
 </script>
 
-{#if !$connected}
+<pre class="absolute pl-4 pt-2 text-sm">{JSON.stringify($auth, Object.keys($auth).sort(), 2)}</pre>
+{#if !$authenticated}
   <Login />
 {:else}
-  <Main />
+  <div class="flex h-screen flex-col items-center justify-center">
+    <h1 class="p-6 text-xl italic">Logged in!</h1>
+    <div><button class="btn btn-primary" on:click={logout}>Logout</button></div>
+  </div>
 {/if}
 
 <style global lang="postcss">
