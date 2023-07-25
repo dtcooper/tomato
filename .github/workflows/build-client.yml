@@ -70,7 +70,7 @@ jobs:
           echo "Building Tomato for ${{ matrix.title }}"
           cd client
           if [ "${{ matrix.name }}" = "windows" ]; then
-            npm config set --location=project script-shell $(which bash)
+            npm config set script-shell $(which bash)
           fi
           npm clean-install
           npm run build

@@ -51,7 +51,6 @@ get_python_url () {
     echo "${PYTHON_URL_PREFIX}/cpython-${PYTHON_VERSION}+${PYTHON_RELEASE_DATE}-${__PYTHON_ARCH}-${PYTHON_DIST}-install_only.tar.gz"
 }
 
-cd "$(dirname "$0")/.."
 rm -rf vendor
 mkdir vendor
 cd vendor
