@@ -11,13 +11,7 @@ const path = require("path")
 const os = require("os")
 const { promises: fs } = require("fs")
 
-let dataDir
-if (process.platform === "darwin") {
-  // Common on macOS to store this stuff in ~/Library/Preferences
-  dataDir = path.join(os.homedir(), "Library", "Preferences", "tomato-radio-automation", "assets")
-} else {
-  dataDir = path.join(new URLSearchParams(window.location.search).get("userDataDir"), "tomato-assets")
-}
+let dataDir = path.join(new URLSearchParams(window.location.search).get("userDataDir"), "assets")
 
 export const syncing = writable(false)
 export const progress = writable(false)
