@@ -19,7 +19,8 @@ module.exports = {
     ignore: ["^/src$", "^/scripts$", "^/forge.config.js$", "^/tailwind.config.js$", "^/vendor$"],
     executableName: "tomato",
     icon: "assets/icons/tomato",
-    extraResource: ["./../server", "./vendor"]
+    extraResource: ["./../server", "./vendor"],
+    afterExtract
   },
   makers: [
     {
