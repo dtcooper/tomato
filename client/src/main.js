@@ -1,8 +1,10 @@
 const { app, BrowserWindow, powerSaveBlocker } = require("electron")
 const windowStateKeeper = require("electron-window-state")
 const fs = require("fs")
+const fsExtra = require('fs-extra')
 const path = require("path")
 const { check: squirrelCheck } = require("electron-squirrel-startup")
+const { protocol_version } = require("../../server/constants.json")
 
 if (squirrelCheck) {
   app.quit()
@@ -11,12 +13,26 @@ if (squirrelCheck) {
 const elgatoVendorId = 4057
 const [minWidth, minHeight, defaultWidth, defaultHeight] = [600, 480, 1000, 800]
 
-const userDataDir = path.join(path.dirname(app.getPath("userData")), "tomato-radio-automation")
+const appDataDir = app.getPath("appData")
+const userDataDir = path.join(app.getPath("appData"), `tomato-radio-automation-p${protocol_version}`)
 fs.mkdirSync(userDataDir, { recursive: true, permission: 0o700 })
 app.setPath("userData", userDataDir)
 
-app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors")
+// Migrate when there's a protocol version bump
+for (let i = 0; i < protocol_version; i++) {
+  const oldUserDataDir = path.join(appDataDir, `tomato-radio-automation-p${i}`)
+  const oldAssetsDir = path.join(oldUserDataDir, "assets")
+  if (fs.existsSync(oldUserDataDir)) {
+    // Copy over old assets to new folder
+    if (fs.existsSync(oldAssetsDir)) {
+      console.log(`Migrating old data dir ${oldUserDataDir} => ${userDataDir}`)
+      fsExtra.copySync(oldAssetsDir, path.join(userDataDir, "assets"), { overwrite: false })
+    }
+    fsExtra.removeSync(oldUserDataDir)
+  }
+}
 
+app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors")
 app.setAboutPanelOptions({
   applicationName: "Tomato Radio Automation\n(Desktop App)",
   copyright: `\u00A9 2019-${new Date().getFullYear()} David Cooper & BMIR.\nAll rights reserved.`,

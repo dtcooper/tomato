@@ -32,7 +32,6 @@ export const login = (username, password, host) => {
     let connTimeout
     let url
 
-    // Didn't pass in any arguments, ie logging back in when app restarted when authenticated = false
     if (username !== undefined) {
       // Convert http[s]:// to ws[s]://
       if (["http", "https"].some((proto) => host.toLowerCase().startsWith(`${proto}://`))) {
@@ -52,10 +51,11 @@ export const login = (username, password, host) => {
       url.pathname = `${url.pathname}api/`
       host = url.toString()
     } else {
-      ;({ username, password, host } = get(auth))
+      // Called with no args = logging back in on first load
+      ({ username, password, host } = get(auth))
     }
 
-    ws = new ReconnectingWebSocket(host)
+    ws = new ReconnectingWebSocket(host, undefined, {maxEnqueuedMessages: 0, reconnectionDelayGrowFactor: 1, debug: true})
     auth.update(($auth) => {
       return { ...$auth, connecting: true }
     })
@@ -63,7 +63,7 @@ export const login = (username, password, host) => {
       console.error("Websocket error", e)
       // If we've never been authenticated before, close connection (otherwise automatica reconnect)
       if (!get(auth).authenticated) {
-        reject({ type: "host", message: "Invalid handshake. Are you sure this server address is correct?" })
+        reject({ type: "host", message: "Failed to shake hands with server. Are this address is correct?" })
         ws.close()
       }
     }
@@ -116,10 +116,3 @@ export const login = (username, password, host) => {
     }
   })
 }
-
-window.addEventListener("offline", () => {
-  online.set(false)
-})
-window.addEventListener("online", () => {
-  online.set(true)
-})
