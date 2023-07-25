@@ -13,13 +13,6 @@ logger = logging.getLogger(__name__)
 FFProbe = namedtuple("FFProbe", ("format", "duration", "title"))
 
 
-FILE_FORMATS = {
-    "mp3": {"format": "mp3", "ext": "mp3", "encode_args": ("-ac", "2", "-a:b", "192k")},
-    "ogg/vorbis (128kbit)": {"format": "flac", "ext": "flac"},
-    "ogg (192kpbs)": {"format": "ogg", "ext": "mp3", "encode_args": ("-ac", "2", "-a:b", "192k")},
-}
-
-
 def run_command(args):
     logger.info(f"Executing: {shlex.join(map(str, args))}")
     return subprocess.run(args, text=True, capture_output=True)
