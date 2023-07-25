@@ -146,6 +146,7 @@ const spawnPromise = async (...args) => {
 
 const startEmbeddedDjangoServer = async () => {
   fs.mkdirSync(path.join(userDataDir, "embedded-tomato-server"), { recursive: true, permission: 0o700 })
+  const execOpts = { windowsHide: true, stdio: app.isPackaged && os.platform() === "win32" ? "ignore" : "inherit" }
 
   const djangoPort = await getFreePort({ host: "127.0.0.1", port: 9152 })
   const miniRedisPort = await getFreePort({ host: "127.0.0.1", port: 9162 })
@@ -154,7 +155,7 @@ const startEmbeddedDjangoServer = async () => {
     func = asPromise ? spawnPromise : child_process.spawn
     console.log("Executing:", pythonPath, ...cmd)
     return func(pythonPath, cmd, {
-      stdio: "inherit",
+      ...execOpts,
       env: {
         ...process.env,
         TOMATO_STANDALONE: "1",
@@ -174,10 +175,11 @@ const startEmbeddedDjangoServer = async () => {
     DJANGO_SUPERUSER_PASSWORD: "tomato"
   })
 
-  console.log(`running mini redis @ ${miniRedisPort}`)
-  miniRedisProcess = child_process.spawn(path.join(vendorLibsPath, "mini-redis-server"), ["--port", miniRedisPort], {
-    stdio: "inherit"
-  })
+  console.log("Executing", path.join(vendorLibsPath, "mini-redis-server"))
+  const miniRedisPath = path.join(vendorLibsPath, "mini-redis-server")
+  const miniRedisArgs = ["--port", miniRedisPort]
+  console.log("Executing:", miniRedisPath, ...miniRedisArgs)
+  miniRedisProcess = child_process.spawn(miniRedisPath, miniRedisArgs, execOpts)
   djangoProcess = pyRun([managePath, "runserver", "--noreload", "--insecure", `127.0.0.1:${djangoPort}`])
   hueyProcess = pyRun([managePath, "run_huey", "--workers", "4", "--flush-locks"])
   wsApiProcess = pyRun(
