@@ -118,6 +118,7 @@ jobs:
   tag:
     runs-on: ubuntu-22.04
     name: Tag release
+    if: github.ref_type == 'tag' || github.ref_name == 'main'
     needs: [build, build-linux-arch]
     steps:
       -
