@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-"""Django's command-line utility for administrative tasks."""
+
 import os
 import sys
 
 
 def main():
-    """Run administrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tomato.settings")
+
     try:
         from django.core.management import execute_from_command_line
         from django.core.management.commands.runserver import Command as RunserverCommand
@@ -17,11 +17,9 @@ def main():
             "forget to activate a virtual environment?"
         ) from exc
 
-    is_standalone = os.environ.get("TOMATO_STANDALONE")
-    is_standalone = bool(is_standalone) if is_standalone != "0" else False
-
-    if not is_standalone:
+    if os.path.exists("/.dockerenv"):
         RunserverCommand.default_addr = "0.0.0.0"
+
     execute_from_command_line(sys.argv)
 
 

@@ -26,6 +26,9 @@ if STANDALONE:
     EMAIL_EXCEPTIONS_ENABLED = False
     HUEY_IMMEDIATE_MODE = False
     TOMATO_VERSION = "standalone"
+    STANDALONE_USERDATA_DIR = Path(env("TOMATO_STANDALONE_USERDATA_DIR"))
+    STANDALONE_FFMPEG_DIR = Path(env("TOMATO_STANDALONE_FFMPEG_DIR"))
+    STANDALONE_MINI_REDIS_PORT = env.int("TOMATO_STANDALONE_MINI_REDIS_PORT")
 
 else:
     env.read_env("/.env")
@@ -63,7 +66,7 @@ else:
 
 
 if STANDALONE:
-    ALLOWED_HOSTS = ["localhost"]
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 else:
     ALLOWED_HOSTS = {"app"}
     if DEBUG:
@@ -153,7 +156,7 @@ if STANDALONE:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": "db.sqlite3",  # TODO get user data path from node
+            "NAME": STANDALONE_USERDATA_DIR / "db.sqlite3",
         }
     }
 else:
@@ -169,24 +172,35 @@ else:
     }
 
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "CONNECTION_POOL_KWARGS": {"max_connections": 50},
-            "PICKLE_VERSION": -1,
-            "PARSER_CLASS": "redis.connection.HiredisParser",
-        },
-        "KEY_PREFIX": "cache",
-    }
-}
 if STANDALONE:
-    CACHES["default"]["LOCATION"] = "redis://localhost"  # TODO get port from node
-    del CACHES["default"]["OPTIONS"]["CONNECTION_POOL_KWARGS"]
-    del CACHES["default"]["OPTIONS"]["PARSER_CLASS"]
-
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+            "LOCATION": STANDALONE_USERDATA_DIR / "cache",
+        },
+        "ws_api": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": f"redis://localhost:{STANDALONE_MINI_REDIS_PORT}",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "PICKLE_VERSION": -1,
+            },
+        },
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": "redis://redis",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "CONNECTION_POOL_KWARGS": {"max_connections": 50},
+                "PICKLE_VERSION": -1,
+                "PARSER_CLASS": "redis.connection.HiredisParser",
+            },
+            "KEY_PREFIX": "cache",
+        }
+    }
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
@@ -198,7 +212,7 @@ HUEY = {
 }
 
 if STANDALONE:
-    HUEY.update({"huey_class": "huey.SqliteHuey", "filename": "huey.sqlite3"})
+    HUEY.update({"huey_class": "huey.SqliteHuey", "filename": STANDALONE_USERDATA_DIR / "huey.sqlite3"})
 
 LANGUAGE_CODE = "en-us"
 USE_I18N = True
@@ -207,8 +221,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 MEDIA_URL = "/assets/"
 if STANDALONE:
-    STATIC_ROOT = PROJECT_DIR / "serve/static"  # TODO passed from nodejs
-    MEDIA_ROOT = PROJECT_DIR / "serve/assets"  # TODO passed from nodejs
+    MEDIA_ROOT = STANDALONE_USERDATA_DIR / "serve/assets"
 else:
     STATIC_ROOT = "/serve/static"
     MEDIA_ROOT = "/serve/assets"

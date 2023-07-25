@@ -15,8 +15,8 @@ logger = logging.getLogger(__name__)
 FFProbe = namedtuple("FFProbe", ("format", "duration", "title"))
 
 if settings.STANDALONE:
-    FFMPEG_PATH = "ffmpeg"  # TODO from nodejs
-    FFPROBE_PATH = "ffprobe"  # TODO from nodejs
+    FFMPEG_PATH = settings.STANDALONE_FFMPEG_DIR / "ffmpeg"
+    FFPROBE_PATH = settings.STANDALONE_FFMPEG_DIR / "ffprobe"
 else:
     FFMPEG_PATH = "ffmpeg"
     FFPROBE_PATH = "ffprobe"

@@ -16,10 +16,10 @@ if (process.platform === "linux") {
 
 module.exports = {
   packagerConfig: {
-    ignore: ["^/src$", "^/scripts$", "^/forge.config.js$", "^/tailwind.config.js$"],
+    ignore: ["^/src$", "^/scripts$", "^/forge.config.js$", "^/tailwind.config.js$", "^/vendor$"],
     executableName: "tomato",
     icon: "assets/icons/tomato",
-    afterExtract
+    extraResource: ["./../server", "./vendor"]
   },
   makers: [
     {

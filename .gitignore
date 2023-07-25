@@ -13,7 +13,7 @@
 /client/scripts/arch/*.pkg.tar.zst
 /client/scripts/arch/pkg/
 /client/scripts/arch/src/
-/client/scripts/libs/
+/client/scripts/ffmpeg-miniredis-libs/
 /client/vendor/
 
 # server

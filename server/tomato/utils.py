@@ -2,6 +2,7 @@ import datetime
 import json
 
 from huey import PriorityRedisHuey
+from django.conf import settings
 
 from django_redis import get_redis_connection
 
@@ -23,7 +24,7 @@ def once_at_startup(crontab):
 
 
 def send_redis_message(message_type, data):
-    conn = get_redis_connection()
+    conn = get_redis_connection(alias="ws_api" if settings.STANDALONE else "default")
     conn.publish(REDIS_PUBSUB_KEY, json.dumps({"type": message_type, "data": data}))
 
 

@@ -135,7 +135,11 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
 
 
 async def background_subscriber():
-    conn = redis.Redis(host="redis")
+    if settings.STANDALONE:
+        conn_kwargs = {"host": "127.0.0.1", "port": settings.STANDALONE_MINI_REDIS_PORT}
+    else:
+        conn_kwargs = {"host": "redis"}
+    conn = redis.Redis(**conn_kwargs)
     logger.info("Connected to redis.")
 
     async def update_from_api_and_broadcast():

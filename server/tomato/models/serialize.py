@@ -1,5 +1,7 @@
 import pickle
 
+from asgiref.sync import sync_to_async
+
 from django.conf import settings
 from django.db.models import Prefetch
 
@@ -12,6 +14,9 @@ from .stopset import Stopset
 
 CONSTANCE_KEYS = dir(constance_config)
 CONSTANCE_DEFAULTS = {key: settings.CONSTANCE_CONFIG[key][0] for key in CONSTANCE_KEYS}
+
+def get_constance_config_for_standalone():
+    return {key: getattr(constance_config, key) for key in CONSTANCE_KEYS}
 
 
 async def serialize_for_api(async_redis_conn=None):
@@ -33,12 +38,16 @@ async def serialize_for_api(async_redis_conn=None):
         Prefetch("rotators", prefetch_qs.order_by("stopsetrotator__id"))
     ).order_by("id")
 
-    # Manually get constance values asynchronously
-    constance_values = await async_redis_conn.mget(*CONSTANCE_KEYS)
-    config = {
-        key: pickle.loads(value) if value is not None else CONSTANCE_DEFAULTS[key]
-        for key, value in zip(CONSTANCE_KEYS, constance_values)
-    }
+    if settings.STANDALONE:
+        config = await sync_to_async(get_constance_config_for_standalone)()
+    else:
+        # Manually get constance values asynchronously
+        constance_values = await async_redis_conn.mget(*CONSTANCE_KEYS)
+        config = {
+            key: pickle.loads(value) if value is not None else CONSTANCE_DEFAULTS[key]
+            for key, value in zip(CONSTANCE_KEYS, constance_values)
+        }
+
     config["SINGLE_PLAY_ROTATORS"] = sorted(set(map(int, config["SINGLE_PLAY_ROTATORS"])) & set(rotator_ids))
 
     return {

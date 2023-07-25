@@ -19,7 +19,7 @@ MACOS_X64_FFPROBE_URL='https://www.osxexperts.net/ffprobe6intel.zip'
 
 cd "$(dirname "$0")"
 
-LIBS_DIR="$(realpath .)/libs"
+LIBS_DIR="$(realpath .)/ffmpeg-miniredis-libs"
 rm -rf "${LIBS_DIR}"
 TEMP_DIR="$(mktemp -d)"
 
@@ -111,4 +111,4 @@ zip -9 "${LIBS_DIR}/ffmpeg-miniredis-win32.zip" *
 
 cd "$LIBS_DIR"
 rm -rf "$TEMP_DIR"
-echo 'Done.'
+echo "Done. ffmpeg/miniredis libraries: $LIBS_DIR"

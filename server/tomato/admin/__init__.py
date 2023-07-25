@@ -72,4 +72,6 @@ admin_site.register(ClientLogEntry, ClientLogEntryAdmin)
 admin_site.register([Config], ConfigAdmin)
 admin_site.register(Rotator, RotatorAdmin)
 admin_site.register(Stopset, StopsetAdmin)
-admin_site.register(User, UserAdmin)
+
+if not settings.STANDALONE:
+    admin_site.register(User, UserAdmin)

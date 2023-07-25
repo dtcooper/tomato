@@ -3,8 +3,13 @@ const windowStateKeeper = require("electron-window-state")
 const fs = require("fs")
 const fsExtra = require('fs-extra')
 const path = require("path")
+const child_process = require("child_process")
+const os = require("os")
+const util = require("util")
+const { getPortPromise: getFreePort } = require('portfinder')
 const { check: squirrelCheck } = require("electron-squirrel-startup")
 const { protocol_version } = require("../../server/constants.json")
+const { resourceLimits } = require("worker_threads")
 
 if (squirrelCheck) {
   app.quit()
@@ -18,15 +23,32 @@ const userDataDir = path.join(app.getPath("appData"), `tomato-radio-automation-p
 fs.mkdirSync(userDataDir, { recursive: true, permission: 0o700 })
 app.setPath("userData", userDataDir)
 
+let serverPath, vendorLibsPath, pythonPath
+
+if (app.isPackaged) {
+  serverPath = path.join(process.resourcesPath, "server")
+  vendorLibsPath = path.join(process.resourcesPath, "vendor")
+} else {
+  serverPath = path.resolve(path.join(__dirname, "../../server"))
+  vendorLibsPath = path.resolve(path.join(__dirname, "../vendor"))
+}
+
+if (os.platform() === "win32") {
+  throw new Error("Fix for windows!")
+} else {
+  pythonPath = path.resolve(vendorLibsPath, `python-${os.arch()}/bin/python3`)
+}
+
 // Migrate when there's a protocol version bump
 for (let i = 0; i < protocol_version; i++) {
   const oldUserDataDir = path.join(appDataDir, `tomato-radio-automation-p${i}`)
-  const oldAssetsDir = path.join(oldUserDataDir, "assets")
   if (fs.existsSync(oldUserDataDir)) {
-    // Copy over old assets to new folder
-    if (fs.existsSync(oldAssetsDir)) {
-      console.log(`Migrating old data dir ${oldUserDataDir} => ${userDataDir}`)
-      fsExtra.copySync(oldAssetsDir, path.join(userDataDir, "assets"), { overwrite: false })
+    for (let oldDirToMove of ["assets", "embedded-tomato-server"]) {
+      const oldDirToMovePath = path.join(oldUserDataDir, oldDirToMove)
+      if (fs.existsSync(oldDirToMovePath)) {
+        console.log(`Migrating old data dir ${oldDirToMove} => ${userDataDir}`)
+        fsExtra.copySync(oldDirToMovePath, path.join(userDataDir, oldDirToMove), { overwrite: false })
+      }
     }
     fsExtra.removeSync(oldUserDataDir)
   }
@@ -106,11 +128,85 @@ function createWindow() {
   }
 }
 
+let djangoProcess = null, miniRedisProcess = null, hueyProcess = null, wsApiProcess = null
+
+const spawnPromise = async (...args) => {
+  let stdout, stderr
+  try {
+    ({ stdout, stderr } = await util.promisify(child_process.execFile)(...args))
+  } catch (e) {
+    ({ stdout, stderr } = e)
+  }
+  if (stdout)
+    console.log(stdout)
+  if (stderr)
+    console.error(stderr)
+}
+
+const startEmbeddedDjangoServer = async () => {
+  fs.mkdirSync(path.join(userDataDir, "embedded-tomato-server"), { recursive: true, permission: 0o700 })
+
+  const djangoPort = await getFreePort({host: "127.0.0.1", port: 9152})
+  const miniRedisPort = await getFreePort({host: "127.0.0.1", port: 9162})
+  const wsApiPort = await getFreePort({host: "127.0.0.1", port: 9172})
+  const pyRun = (cmd, asPromise = false, env = {}) => {
+    func = asPromise ? spawnPromise : child_process.spawn
+    console.log("Executing:", pythonPath, ...cmd)
+    return func(pythonPath, cmd, {stdio: "inherit", env: {
+      ...process.env,
+      TOMATO_STANDALONE: "1",
+      TOMATO_STANDALONE_USERDATA_DIR: path.join(userDataDir, "embedded-tomato-server"),
+      TOMATO_STANDALONE_FFMPEG_DIR: vendorLibsPath,
+      TOMATO_STANDALONE_MINI_REDIS_PORT: miniRedisPort,
+      TIMEZONE: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      PYTHONPATH: path.join(vendorLibsPath, "pypackages"),
+      ...env
+    }})
+  }
+
+  const managePath = path.join(serverPath, "manage.py")
+  await pyRun([managePath, "migrate"], true)
+  await pyRun(["createsuperuser", "--noinput", "--username", "tomato"], true, { DJANGO_SUPERUSER_PASSWORD: "tomato" })
+
+  const djangoArgs = [managePath, "runserver", "--insecure"]
+  const wsApiArgs = ["-m", "uvicorn", "--port", wsApiPort, "--host", "127.0.0.1", "--workers", "1", "--app-dir", serverPath]
+  if (IS_DEV) {
+    wsApiArgs.push("--reload")
+  } else {
+    djangoArgs.push("--noreload")
+  }
+  djangoArgs.push(`127.0.0.1:${djangoPort}`)
+  wsApiArgs.push("ws_api:app")
+
+  console.log(`running mini redis @ ${miniRedisPort}`)
+  miniRedisProcess = child_process.spawn(path.join(vendorLibsPath, "mini-redis-server"), ["--port", miniRedisPort], {stdio: "inherit"})
+  djangoProcess = pyRun(djangoArgs)
+  hueyProcess = pyRun([managePath, "run_huey", "--workers", "4", "--flush-locks"])
+  wsApiProcess = pyRun(wsApiArgs, false, { DJANGO_SETTINGS_MODULE: "tomato.settings" })
+  return djangoPort
+}
+
 app.whenReady().then(async () => {
   powerSaveBlocker.start("prevent-display-sleep")
   createWindow()
+  try {
+    await startEmbeddedDjangoServer()
+  } catch (e) {
+    console.error(e)
+    console.log("Error starting Django server")
+  }
 })
 
 app.on("window-all-closed", () => {
   app.quit()
+})
+
+app.on('before-quit', () => {
+  const processes = [djangoProcess, miniRedisProcess, hueyProcess, wsApiProcess]
+  for (let process of processes) {
+    if (process) {
+      console.log("Killing:", ...process.spawnargs)
+      process.kill("SIGINT")
+    }
+  }
 })
