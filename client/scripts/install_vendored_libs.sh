@@ -72,6 +72,8 @@ PYTHON_BIN="${PWD}/${PYTHON_BIN}"
 TEMP_DIR="$(mktemp -d)"
 POETRY_DIR="${TEMP_DIR}/poetry"
 REQUIREMENTS="${TEMP_DIR}/requirements.txt"
+
+export PYTHONDONTWRITEBYTECODE=1
 "$PYTHON_BIN" -m pip install --isolated --no-compile --target "$POETRY_DIR" "poetry==${POETRY_VERSION}"
 
 cd ../../server
