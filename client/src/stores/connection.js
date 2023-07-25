@@ -52,10 +52,14 @@ export const login = (username, password, host) => {
       host = url.toString()
     } else {
       // Called with no args = logging back in on first load
-      ({ username, password, host } = get(auth))
+      ;({ username, password, host } = get(auth))
     }
 
-    ws = new ReconnectingWebSocket(host, undefined, {maxEnqueuedMessages: 0, reconnectionDelayGrowFactor: 1, debug: true})
+    ws = new ReconnectingWebSocket(host, undefined, {
+      maxEnqueuedMessages: 0,
+      reconnectionDelayGrowFactor: 1,
+      debug: true
+    })
     auth.update(($auth) => {
       return { ...$auth, connecting: true }
     })

@@ -20,7 +20,7 @@ module.exports = {
     executableName: "tomato",
     icon: "assets/icons/tomato",
     extraResource: ["./../server", "./vendor"],
-    osxUniversal: { x64ArchFiles: 'Contents/Resources/vendor/**' },
+    osxUniversal: { x64ArchFiles: "Contents/Resources/vendor/**" },
     afterExtract
   },
   makers: [

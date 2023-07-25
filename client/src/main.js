@@ -1,12 +1,12 @@
 const { app, BrowserWindow, powerSaveBlocker } = require("electron")
 const windowStateKeeper = require("electron-window-state")
 const fs = require("fs")
-const fsExtra = require('fs-extra')
+const fsExtra = require("fs-extra")
 const path = require("path")
 const child_process = require("child_process")
 const os = require("os")
 const util = require("util")
-const { getPortPromise: getFreePort } = require('portfinder')
+const { getPortPromise: getFreePort } = require("portfinder")
 const { check: squirrelCheck } = require("electron-squirrel-startup")
 const { protocol_version } = require("../../server/constants.json")
 const { resourceLimits } = require("worker_threads")
@@ -128,51 +128,75 @@ function createWindow() {
   }
 }
 
-let djangoProcess = null, miniRedisProcess = null, hueyProcess = null, wsApiProcess = null
+let djangoProcess = null,
+  miniRedisProcess = null,
+  hueyProcess = null,
+  wsApiProcess = null
 
 const spawnPromise = async (...args) => {
   let stdout, stderr
   try {
-    ({ stdout, stderr } = await util.promisify(child_process.execFile)(...args))
+    ;({ stdout, stderr } = await util.promisify(child_process.execFile)(...args))
   } catch (e) {
-    ({ stdout, stderr } = e)
+    ;({ stdout, stderr } = e)
   }
-  if (stdout)
-    console.log(stdout)
-  if (stderr)
-    console.error(stderr)
+  if (stdout) console.log(stdout)
+  if (stderr) console.error(stderr)
 }
 
 const startEmbeddedDjangoServer = async () => {
   fs.mkdirSync(path.join(userDataDir, "embedded-tomato-server"), { recursive: true, permission: 0o700 })
 
-  const djangoPort = await getFreePort({host: "127.0.0.1", port: 9152})
-  const miniRedisPort = await getFreePort({host: "127.0.0.1", port: 9162})
-  const wsApiPort = await getFreePort({host: "127.0.0.1", port: 9172})
+  const djangoPort = await getFreePort({ host: "127.0.0.1", port: 9152 })
+  const miniRedisPort = await getFreePort({ host: "127.0.0.1", port: 9162 })
+  const wsApiPort = await getFreePort({ host: "127.0.0.1", port: 9172 })
   const pyRun = (cmd, asPromise = false, env = {}) => {
     func = asPromise ? spawnPromise : child_process.spawn
     console.log("Executing:", pythonPath, ...cmd)
-    return func(pythonPath, cmd, {stdio: "inherit", env: {
-      ...process.env,
-      TOMATO_STANDALONE: "1",
-      TOMATO_STANDALONE_USERDATA_DIR: path.join(userDataDir, "embedded-tomato-server"),
-      TOMATO_STANDALONE_FFMPEG_DIR: vendorLibsPath,
-      TOMATO_STANDALONE_MINI_REDIS_PORT: miniRedisPort,
-      TIMEZONE: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      PYTHONPATH: path.join(vendorLibsPath, "pypackages"),
-      ...env
-    }})
+    return func(pythonPath, cmd, {
+      stdio: "inherit",
+      env: {
+        ...process.env,
+        TOMATO_STANDALONE: "1",
+        TOMATO_STANDALONE_USERDATA_DIR: path.join(userDataDir, "embedded-tomato-server"),
+        TOMATO_STANDALONE_FFMPEG_DIR: vendorLibsPath,
+        TOMATO_STANDALONE_MINI_REDIS_PORT: miniRedisPort,
+        TIMEZONE: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        PYTHONPATH: path.join(vendorLibsPath, "pypackages"),
+        ...env
+      }
+    })
   }
 
   const managePath = path.join(serverPath, "manage.py")
   await pyRun([managePath, "migrate"], true)
-  await pyRun([managePath, "createsuperuser", "--noinput", "--username", "tomato"], true, { DJANGO_SUPERUSER_PASSWORD: "tomato" })
+  await pyRun([managePath, "createsuperuser", "--noinput", "--username", "tomato"], true, {
+    DJANGO_SUPERUSER_PASSWORD: "tomato"
+  })
 
   console.log(`running mini redis @ ${miniRedisPort}`)
-  miniRedisProcess = child_process.spawn(path.join(vendorLibsPath, "mini-redis-server"), ["--port", miniRedisPort], {stdio: "inherit"})
+  miniRedisProcess = child_process.spawn(path.join(vendorLibsPath, "mini-redis-server"), ["--port", miniRedisPort], {
+    stdio: "inherit"
+  })
   djangoProcess = pyRun([managePath, "runserver", "--noreload", "--insecure", `127.0.0.1:${djangoPort}`])
   hueyProcess = pyRun([managePath, "run_huey", "--workers", "4", "--flush-locks"])
-  wsApiProcess = pyRun(["-m", "uvicorn", "--port", wsApiPort, "--host", "127.0.0.1", "--workers", "1", "--app-dir", serverPath, "ws_api:app"], false, { DJANGO_SETTINGS_MODULE: "tomato.settings" })
+  wsApiProcess = pyRun(
+    [
+      "-m",
+      "uvicorn",
+      "--port",
+      wsApiPort,
+      "--host",
+      "127.0.0.1",
+      "--workers",
+      "1",
+      "--app-dir",
+      serverPath,
+      "ws_api:app"
+    ],
+    false,
+    { DJANGO_SETTINGS_MODULE: "tomato.settings" }
+  )
   return djangoPort
 }
 
@@ -191,7 +215,7 @@ app.on("window-all-closed", () => {
   app.quit()
 })
 
-app.on('before-quit', () => {
+app.on("before-quit", () => {
   const processes = [djangoProcess, miniRedisProcess, hueyProcess, wsApiProcess]
   for (let process of processes) {
     if (process) {
