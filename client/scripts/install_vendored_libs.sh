@@ -67,7 +67,7 @@ PYTHON_BIN="python-${ARCH}/bin/python3"
 if [ "$PLATFORM" = win32 ]; then
     PYTHON_BIN="python-${ARCH}/python.exe"
 fi
-PYTHON_BIN="$(realpath "$PYTHON_BIN")"
+PYTHON_BIN="$(readlink -f -- "$PYTHON_BIN")"
 
 TEMP_DIR="$(mktemp -d)"
 POETRY_DIR="${TEMP_DIR}/poetry"
