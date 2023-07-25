@@ -26,9 +26,7 @@ module.exports = {
   makers: [
     {
       name: "@electron-forge/maker-dmg",
-      config: {
-        format: "ULFO"
-      }
+      config: { format: "ULFO" }
     },
     {
       name: "@electron-forge/maker-squirrel",

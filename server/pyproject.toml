@@ -39,6 +39,7 @@ watchdog = {extras = ["watchmedo"], version = "^3.0.0"}
 [tool.poetry.group.standalone.dependencies]
 django-redis = "^5.3.0"
 uvicorn = "^0.23.1"
+websockets = "^11.0.3"
 
 [build-system]
 requires = ["poetry-core"]

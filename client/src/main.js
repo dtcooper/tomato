@@ -168,23 +168,11 @@ const startEmbeddedDjangoServer = async () => {
   await pyRun([managePath, "migrate"], true)
   await pyRun([managePath, "createsuperuser", "--noinput", "--username", "tomato"], true, { DJANGO_SUPERUSER_PASSWORD: "tomato" })
 
-  const djangoArgs = [managePath, "runserver", "--insecure"]
-  const wsApiArgs = ["-m", "uvicorn", "--port", wsApiPort, "--host", "127.0.0.1", "--workers", "1", "--app-dir", serverPath]
-  
-  // reload busted on windows
-  if (IS_DEV && os.platform() !== "win32") {
-    wsApiArgs.push("--reload")
-  } else {
-    djangoArgs.push("--noreload")
-  }
-  djangoArgs.push(`127.0.0.1:${djangoPort}`)
-  wsApiArgs.push("ws_api:app")
-
   console.log(`running mini redis @ ${miniRedisPort}`)
   miniRedisProcess = child_process.spawn(path.join(vendorLibsPath, "mini-redis-server"), ["--port", miniRedisPort], {stdio: "inherit"})
-  djangoProcess = pyRun(djangoArgs)
+  djangoProcess = pyRun([managePath, "runserver", "--noreload", "--insecure", `127.0.0.1:${djangoPort}`])
   hueyProcess = pyRun([managePath, "run_huey", "--workers", "4", "--flush-locks"])
-  wsApiProcess = pyRun(wsApiArgs, false, { DJANGO_SETTINGS_MODULE: "tomato.settings" })
+  wsApiProcess = pyRun(["-m", "uvicorn", "--port", wsApiPort, "--host", "127.0.0.1", "--workers", "1", "--app-dir", serverPath, "ws_api:app"], false, { DJANGO_SETTINGS_MODULE: "tomato.settings" })
   return djangoPort
 }
 
