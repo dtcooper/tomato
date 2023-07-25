@@ -6,7 +6,7 @@ url="https://github.com/dtcooper/tomato"
 license=('MIT')
 # Probably need more, but minimum required to get running
 depends=('gtk3' 'nss' 'alsa-lib' 'libxcrypt-compat')
-makedepends=('nodejs' 'npm' 'git' 'dpkg')
+makedepends=('nodejs' 'npm' 'git' 'dpkg' 'unzip')
 options=('!strip')
 
 pkgver() {
