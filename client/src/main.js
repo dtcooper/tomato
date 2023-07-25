@@ -34,7 +34,7 @@ if (app.isPackaged) {
 }
 
 if (os.platform() === "win32") {
-  throw new Error("Fix for windows!")
+  pythonPath = path.resolve(vendorLibsPath, `python-${os.arch()}/python`)
 } else {
   pythonPath = path.resolve(vendorLibsPath, `python-${os.arch()}/bin/python3`)
 }
@@ -166,11 +166,13 @@ const startEmbeddedDjangoServer = async () => {
 
   const managePath = path.join(serverPath, "manage.py")
   await pyRun([managePath, "migrate"], true)
-  await pyRun(["createsuperuser", "--noinput", "--username", "tomato"], true, { DJANGO_SUPERUSER_PASSWORD: "tomato" })
+  await pyRun([managePath, "createsuperuser", "--noinput", "--username", "tomato"], true, { DJANGO_SUPERUSER_PASSWORD: "tomato" })
 
   const djangoArgs = [managePath, "runserver", "--insecure"]
   const wsApiArgs = ["-m", "uvicorn", "--port", wsApiPort, "--host", "127.0.0.1", "--workers", "1", "--app-dir", serverPath]
-  if (IS_DEV) {
+  
+  // reload busted on windows
+  if (IS_DEV && os.platform() !== "win32") {
     wsApiArgs.push("--reload")
   } else {
     djangoArgs.push("--noreload")

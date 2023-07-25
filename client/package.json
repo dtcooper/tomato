@@ -6,7 +6,7 @@
   "main": "dist/main.js",
   "scripts": {
     "build:script": "node scripts/build.js",
-    "build:vendor": "[ ! -d vendor ] && ./scripts/install_vendored_libs.sh || true",
+    "build:vendor": "./scripts/install_vendored_libs.sh",
     "build": "npm-run-all -p build:*",
     "clean": "rm -rf dist out",
     "distclean": "rm -rf dist out node_modules vendor",

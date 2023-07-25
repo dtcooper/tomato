@@ -1,5 +1,12 @@
 #!/bin/bash
 
+cd "$(dirname "$0")/.."
+
+if [ "$1" != "--force" -a -d vendor ]; then
+    echo "Vendored libs already installed. Use --force to reinstall"
+    exit 0
+fi
+
 set -ex
 
 ARCH=x64
