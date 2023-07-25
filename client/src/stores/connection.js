@@ -80,9 +80,7 @@ export const login = (username, password, host) => {
         auth.update(($auth) => {
           return { ...$auth, connecting: false }
         })
-        if (!sentAuth || !gotAuthResponse) {
-          ws.close()
-        }
+        ws.close()
       }
     }
     ws.onmessage = (e) => {
