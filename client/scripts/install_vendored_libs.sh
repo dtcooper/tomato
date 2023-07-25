@@ -72,14 +72,14 @@ PYTHON_BIN="${PWD}/${PYTHON_BIN}"
 TEMP_DIR="$(mktemp -d)"
 POETRY_DIR="${TEMP_DIR}/poetry"
 REQUIREMENTS="${TEMP_DIR}/requirements.txt"
-
 export PYTHONDONTWRITEBYTECODE=1
-"$PYTHON_BIN" -m pip install --isolated --no-compile --target "$POETRY_DIR" "poetry==${POETRY_VERSION}"
+
+"$PYTHON_BIN" -B -m pip install --isolated --no-compile --target "$POETRY_DIR" "poetry==${POETRY_VERSION}"
 
 cd ../../server
-PYTHONPATH="$POETRY_DIR" "$PYTHON_BIN" -m poetry export --with=standalone --without-hashes -o "$REQUIREMENTS"
+PYTHONPATH="$POETRY_DIR" "$PYTHON_BIN" -B -m poetry export --with=standalone --without-hashes -o "$REQUIREMENTS"
 cd ../client/vendor
-"$PYTHON_BIN" -m pip install --isolated --no-compile --target pypackages -r "$REQUIREMENTS"
+"$PYTHON_BIN" -B -m pip install --isolated --no-compile --target pypackages -r "$REQUIREMENTS"
 rm -rf pypackages/bin
 
 curl -Lo "${TEMP_DIR}/ffmpeg-miniredis.zip" "https://tomato.nyc3.digitaloceanspaces.com/ffmpeg-miniredis-$PLATFORM.zip"
