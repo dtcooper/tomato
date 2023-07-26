@@ -22,7 +22,8 @@ The backend server is written in [Python](https://www.python.org/)'s
 The desktop app is a native, cross-platform [Svelte](https://svelte.dev/) +
 [Electron](https://www.electronjs.org/) app and optionally uses the
 [Elgato Stream Deck](https://www.elgato.com/en/stream-deck) as a physical control
-pad.
+pad. It communicates withs the backend via a websocket and supports intermittant
+connectivity loss.
 
 ## Running the Code
 
@@ -69,9 +70,10 @@ Head over to <http://localhost:8888/> in your web browser.
     and [esbuild](https://esbuild.github.io/).
 * Server &mdash; [Python](https://www.python.org/)
   * Libraries: [Django](https://www.djangoproject.com/), [huey](https://huey.readthedocs.io/en/latest/),
-    and [Constance](https://django-constance.readthedocs.io/en/latest/)
+    [Constance](https://django-constance.readthedocs.io/en/latest/), and [Starlette](https://www.starlette.io/)
   * Tools, Databases, and Containers: [PostgreSQL](https://www.postgresql.org/),
-    [Redis](https://redis.io/), [NGINX](https://www.nginx.com/),
+    [Redis](https://redis.io/),
+    [docker-nginx-certbot]([https://www.nginx.com/](https://github.com/JonasAlfredsson/docker-nginx-certbot)),
     and [Dozzle](https://dozzle.dev/).
 * Documentation
   * [MkDocs](https://www.mkdocs.org/) and [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/)
@@ -89,18 +91,18 @@ Head over to <http://localhost:8888/> in your web browser.
   - [x] Backend done as `SINGLE_PLAY_ROTATORS`
 - [ ] Idiot mode, easy mode, advanced mode
 - [ ] ~~Timeout on fetch?~~ (websockets makes this unneeded, except for downloading files)
-- [ ] Prevent duplicate assets from playing within a certain time period
+- [ ] Attempt to prevent duplicate assets from playing within a certain time period
 - [ ] Start/end time for assets in client are based on "is likely to play at" time
 - [ ] Empty rotators are warned on (based on feature flag)
 - [ ] Compression and selecting output device using a bridge to
       [the web audio API](https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createMediaElementSource).
 - [ ] Any custom django admin pages can [follow this guide](https://dev.to/daiquiri_team/creating-a-custom-page-in-django-admin-4pbd)
+- [ ] Client "Demo mode", requiring no backend with demo assets.
 
 ### Future Versions
 
 - [ ] "Island Mode" with either embedded
-      [embedded standalone Python distribution](https://python-build-standalone.readthedocs.io/en/latest/),
-      or preloaded sample JSON/assets downloaded from S3
+      [standalone Python distribution](https://python-build-standalone.readthedocs.io/en/latest/)
 - [ ] Login interstitial to populate with demo data
 - [ ] Integrated Twilio call board
 - [ ] Single app client lock (ie only ONE client per username/password)'
