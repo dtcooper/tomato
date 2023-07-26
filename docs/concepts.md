@@ -12,8 +12,8 @@ Below is a list of concepts and an explanation of how they're used in Tomato.
 Tomato's audio entities are a core concept, and they're defined below.
 
 ### Audio Asset
-**An <u>audio asset</u> is a short individual audio track** (also referred to as just
-an asset). Think individual advertisements, individual public service
+**An <u>audio asset</u> is a short individual audio track** (called **an asset**
+for short). Think individual advertisements, individual public service
 announcements, or individual station IDs.
 
 Assets always have a name and underlying audio file (like an mp3) but they can
@@ -128,7 +128,7 @@ station ID jingles at the start and end of a stop set, as in the example below.
 
 ### Relationship Diagram
 
-Hhere's a simple relationship diagram for the entities described above.
+Here's a simple relationship diagram for the entities described above.
 
 ```mermaid
 flowchart RL

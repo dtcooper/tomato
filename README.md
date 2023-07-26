@@ -101,8 +101,7 @@ Head over to <http://localhost:8888/> in your web browser.
 
 ### Future Versions
 
-- [ ] "Island Mode" with either embedded
-      [standalone Python distribution](https://python-build-standalone.readthedocs.io/en/latest/)
+- [ ] "Island Mode" with an embedded [standalone Python distribution](https://python-build-standalone.readthedocs.io/en/latest/)
 - [ ] Login interstitial to populate with demo data
 - [ ] Integrated Twilio call board
 - [ ] Single app client lock (ie only ONE client per username/password)'

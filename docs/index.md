@@ -39,14 +39,21 @@ flowchart RL
             stopset --> wait
             wait -- user manually\ntriggers stop set --> stopset
     end
-    CLIENT_SERVER -- app syncs\nwith server --> STOPSET
+    CLIENT_SERVER -- app syncs\nwith server <---> STOPSET
 ```
 
 
 ## Features
 
-* Client and server relationship
-* ... and more
+* Client and server relationship.
+* Client
+    * Supports periods of intermittent connectivity and runs offline. It syncs
+      with the server when it can.
+    * Can be used in "demo mode," for end-users to try out the software without
+      needing to set up a server or connect to a production environment.
+* Server accepts a [wide range of audio formats](https://ffmpeg.org/ffmpeg-codecs.html)
+  and normalizes them to mp3.
+* _...and more!_
 
 ### Non-Features (What Tomato is **<u>Not</u>**)
 
