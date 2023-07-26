@@ -73,7 +73,7 @@ Head over to <http://localhost:8888/> in your web browser.
     [Constance](https://django-constance.readthedocs.io/en/latest/), and [Starlette](https://www.starlette.io/)
   * Tools, Databases, and Containers: [PostgreSQL](https://www.postgresql.org/),
     [Redis](https://redis.io/),
-    [docker-nginx-certbot]([https://www.nginx.com/](https://github.com/JonasAlfredsson/docker-nginx-certbot)),
+    [docker-nginx-certbot](https://github.com/JonasAlfredsson/docker-nginx-certbot),
     and [Dozzle](https://dozzle.dev/).
 * Documentation
   * [MkDocs](https://www.mkdocs.org/) and [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/)
