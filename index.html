@@ -528,11 +528,20 @@ that are not yet available. <em>Beware!</em></p>
             stopset --&gt; wait
             wait -- user manually\ntriggers stop set --&gt; stopset
     end
-    CLIENT_SERVER -- app syncs\nwith server --&gt; STOPSET</code></pre>
+    CLIENT_SERVER -- app syncs\nwith server &lt;---&gt; STOPSET</code></pre>
 <h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">←</a></h2>
 <ul>
-<li>Client and server relationship</li>
-<li>... and more</li>
+<li>Client and server relationship.</li>
+<li>Client<ul>
+<li>Supports periods of intermittent connectivity and runs offline. It syncs
+  with the server when it can.</li>
+<li>Can be used in "demo mode," for end-users to try out the software without
+  needing to set up a server or connect to a production environment.</li>
+</ul>
+</li>
+<li>Server accepts a <a href="https://ffmpeg.org/ffmpeg-codecs.html">wide range of audio formats</a>
+  and normalizes them to mp3.</li>
+<li><em>...and more!</em></li>
 </ul>
 <h3 id="non-features-what-tomato-is-not">Non-Features (What Tomato is <strong><u>Not</u></strong>)<a class="headerlink" href="#non-features-what-tomato-is-not" title="Permanent link">←</a></h3>
 <p>Tomato is not full automation software, it only automates the playing of
