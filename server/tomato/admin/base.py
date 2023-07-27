@@ -1,4 +1,5 @@
 from django.contrib import admin, messages
+from django.db.models.functions import Coalesce
 from django.template.defaultfilters import pluralize
 from django.templatetags.static import static
 from django.utils import timezone
@@ -60,14 +61,14 @@ class SaveCreatedByMixin:
 class AiringMixin:
     AIRING_INFO_FIELDSET = ("Airing Information", {"fields": ("enabled", "weight", "begin", "end")})
 
-    @admin.display(description="Air date")
+    @admin.display(description="Air date", ordering=Coalesce("begin", "end"))
     def air_date(self, obj):
         if obj.begin and obj.end:
             return f"{format_datetime(obj.begin)} to {format_datetime(obj.end)}"
         elif obj.begin:
             return format_html("<strong>Starts</strong> at {}", format_datetime(obj.begin))
         elif obj.end:
-            return format_html("<strong>Ends</strong> on {}", format_datetime(obj.begin))
+            return format_html("<strong>Ends</strong> on {}", format_datetime(obj.end))
         else:
             return "Can air any time"
 
@@ -118,7 +119,7 @@ class NumAssetsMixin:
 class TomatoModelAdminBase(ListPrefetchRelatedMixin, SaveCreatedByMixin, admin.ModelAdmin):
     add_fieldsets = None
     list_max_show_all = 2500
-    list_per_page = 250
+    list_per_page = 200
     no_change_fieldsets = None
     readonly_fields = ("created_by", "created_at")
     save_on_top = True
