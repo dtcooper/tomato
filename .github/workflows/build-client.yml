@@ -8,8 +8,9 @@ on:
       - .github/workflows/build-client.yml
       - client/**
       - server/constants.json
-    tags:
-      - 'v*'
+    # Keep this uncommented until we're ready to start releasing client on a tag
+    # tags:
+    #   - 'v*'
   workflow_dispatch:
 
 env:
