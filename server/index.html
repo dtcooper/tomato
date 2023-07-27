@@ -577,6 +577,8 @@ Take action on the following,</p>
    SMTP server</li>
 <li><code>DOMAIN_NAME</code> is set to a domain name that resolves to a publicly
    accessible IP address of the server.</li>
+<li>Set <code>TOMATO_VERSION</code> to the specific release tag you want to use, ie
+   <code>v0.0.4</code>.</li>
 </ol>
 <div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">With Included Nginx Container</label><label for="__tabbed_3_2">Reverse Proxying Yourself</label></div>
 <div class="tabbed-content">
@@ -688,8 +690,10 @@ configure it appropriately.</p>
 </div>
 </div>
 </div>
-<p>Pull the containers (or build them by instead executing <code class="highlight">docker<span class="w"> </span>compose<span class="w"> </span>build</code>),</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>pull
+<p>Checkout the release tag you want to use and pull the containers (or build
+them by instead executing <code class="highlight">docker<span class="w"> </span>compose<span class="w"> </span>build</code>),</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>git<span class="w"> </span>checkout<span class="w"> </span>v0.0.4
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>docker<span class="w"> </span>compose<span class="w"> </span>pull
 </code></pre></div>
 <p>Create an admin user by following the instructions after typing this at the
 command line,</p>
