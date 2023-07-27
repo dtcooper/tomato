@@ -48,8 +48,10 @@
             <div class="form-row" id="form_row_{{ field.name }}">
               {{ field.errors }}
               {{ field.label_tag }}
-              <div>{{ field }}</div>
+              {% if field.name != "rotators" %}<div>{{ field }}</div>{% endif %}
               <div class="help">{{ field.help_text }}</div>
+              {# Help text renders better on top of rotators #}
+              {% if field.name == "rotators" %}<br><div>{{ field }}</div>{% endif %}
             </div>
           {% endif %}
         {% endfor %}
