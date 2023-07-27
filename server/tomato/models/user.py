@@ -6,10 +6,10 @@ class User(AbstractUser):
     created_at = models.DateTimeField("created at", auto_now_add=True, db_index=True)
     created_by = models.ForeignKey("User", verbose_name="created by", on_delete=models.SET_NULL, null=True)
     enable_client_logs = models.BooleanField(
-        "client logs entries enabled",
+        "Write client logs",
         default=True,
         help_text=(
-            "Disable client logging for this account. In general you'll want to keep this enabled, but for test"
+            "Use this to enable or disable client logging for this account. In general you'll want to keep this enabled, but for test"
             " accounts you may not want to pollute the client logs."
         ),
     )
