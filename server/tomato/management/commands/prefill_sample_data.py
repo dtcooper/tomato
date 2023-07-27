@@ -125,7 +125,7 @@ class Command(BaseCommand):
                     asset = Asset(
                         name=mp3_tmp_filename.stem,
                         file=f"prefill/{mp3_filename.name}",
-                        original_filename=mp3_tmp_filename.with_suffix('').name,
+                        original_filename=mp3_tmp_filename.with_suffix("").name,
                         created_by=created_by,
                     )
                     asset.clean()

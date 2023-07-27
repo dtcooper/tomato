@@ -216,7 +216,9 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
                     except forms.ValidationError as validation_error:
                         for field, error_list in validation_error:
                             for error in error_list:
-                                form.add_error("files" if field == "file" else "__all__", format_html("{}: {}", audio_file, error))
+                                form.add_error(
+                                    "files" if field == "file" else "__all__", format_html("{}: {}", audio_file, error)
+                                )
 
             # If no errors where added
             if form.is_valid():

@@ -31,7 +31,13 @@ class UserAdmin(ListPrefetchRelatedMixin, DjangoUserAdmin):
     )
     filter_horizontal = ("groups",)
     list_display = ("username", "is_active", "groups_display", "enable_client_logs")
-    list_filter = ("is_superuser", "is_active", "groups", ("created_by", NoNullRelatedOnlyFieldFilter), "enable_client_logs")
+    list_filter = (
+        "is_superuser",
+        "is_active",
+        "groups",
+        ("created_by", NoNullRelatedOnlyFieldFilter),
+        "enable_client_logs",
+    )
     list_prefetch_related = ("groups",)
     readonly_fields = ("last_login", "created_at", "created_by")
     save_on_top = True

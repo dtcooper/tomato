@@ -9,8 +9,8 @@ class User(AbstractUser):
         "Write client logs",
         default=True,
         help_text=(
-            "Use this to enable or disable client logging for this account. In general you'll want to keep this enabled, but for test"
-            " accounts you may not want to pollute the client logs."
+            "Use this to enable or disable client logging for this account. In general you'll want to keep this"
+            " enabled, but for test accounts you may not want to pollute the client logs."
         ),
     )
     is_staff = True
