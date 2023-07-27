@@ -213,7 +213,7 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
                     assets.append(asset)
 
                     try:
-                        asset.full_clean()
+                        asset.full_clean(exclude={"original_filename"})
                     except forms.ValidationError as validation_error:
                         for field, error_list in validation_error:
                             for error in error_list:
