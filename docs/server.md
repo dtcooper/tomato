@@ -94,6 +94,8 @@ cp .env.sample .env
        SMTP server
     3. `DOMAIN_NAME` is set to a domain name that resolves to a publicly
        accessible IP address of the server.
+    4. Set `TOMATO_VERSION` to the specific release tag you want to use, ie
+       `v0.0.4`.
 
     === "With Included Nginx Container"
 
@@ -208,9 +210,11 @@ cp .env.sample .env
             in this regard, but if you're using another web server, take care to
             configure it appropriately.
 
-    Pull the containers (or build them by instead executing `#!bash docker compose build`),
+    Checkout the release tag you want to use and pull the containers (or build
+    them by instead executing `#!bash docker compose build`),
 
     ```bash
+    git checkout v0.0.4
     docker compose pull
     ```
 
