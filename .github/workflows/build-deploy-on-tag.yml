@@ -1,4 +1,4 @@
-name: Release and deploy server container (tag)
+name: Release & deploy server container (tag)
 
 on:
   push:
