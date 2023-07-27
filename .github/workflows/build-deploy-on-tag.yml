@@ -1,45 +1,28 @@
-name: Build & deploy server container (test)
+name: Release and deploy server container (tag)
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - .github/actions/docker-build-push/action.yml
-      - .github/workflows/build-deploy-on-push.yml
-      - server/**
-  workflow_dispatch:
-
-concurrency:
-  group: docker-build
-  cancel-in-progress: true
+    tags:
+      - 'v*'
 
 jobs:
   build:
     runs-on: ubuntu-22.04
     name: Build container
-    strategy:
-      matrix:
-        tag: [dev, latest]
     steps:
       -
         name: Checkout
         uses: actions/checkout@v3
-      -
-        name: Set variables
-        shell: bash
-        run: |
-          echo "SHA_SHORT=$(git rev-parse --short=8 HEAD)" >> "$GITHUB_ENV"
       -
         name: Build container
         uses: ./.github/actions/docker-build-push
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           container: server
-          tag: ${{ matrix.tag }}
+          tag: ${{ github.ref_name }}
+          no-cache: true
           build-args: |
-            DEBUG=${{ matrix.tag == 'dev' && '1' || '0' }}
-            TOMATO_VERSION=${{ env.SHA_SHORT }}
+            TOMATO_VERSION=${{ github.ref_name }}
 
   deploy:
     runs-on: ubuntu-22.04
@@ -52,10 +35,13 @@ jobs:
       -
         name: Deploy containers
         uses: appleboy/ssh-action@master
+        env:
+          TOMATO_TAG: ${{ github.ref_name }}
         with:
           host: ${{ secrets.SSH_HOST }}
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           fingerprint: ${{ secrets.SSH_FINGERPRINT }}
-          script: ${{ secrets.DEPLOY_TEST_SCRIPT_PATH }}
+          envs: TOMATO_TAG
+          script: ${{ secrets.DEPLOY_PROD_SCRIPT_PATH }}
