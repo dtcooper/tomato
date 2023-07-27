@@ -33,6 +33,10 @@ if EMAIL_EXCEPTIONS_ENABLED:
     EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=(EMAIL_PORT == 587))
     DEFAULT_FROM_EMAIL = SERVER_EMAIL = env("EMAIL_FROM_ADDRESS")
 
+ADMIN_NOTICE_TEXT = env("ADMIN_NOTICE_TEXT", default=None)
+ADMIN_NOTICE_TEXT_COLOR = env("ADMIN_NOTICE_TEXT_COLOR", default='#ffffff')
+ADMIN_NOTICE_BACKGROUND = env("ADMIN_NOTICE_BACKGROUND", default='#ff0000')
+
 # For development purposes only only
 HUEY_IMMEDIATE_MODE = DEBUG and env("HUEY_IMMEDIATE_MODE", default=False)
 
@@ -59,6 +63,7 @@ if DEBUG:
 
 INSTALLED_APPS = [
     # Django
+    "admin_notice", # Third-party, but needs to come before admin
     "django.contrib.admin.apps.SimpleAdminConfig",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -117,6 +122,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 # django-user-messages: Swap out django.contrib.messages.context_processors.messages
                 "user_messages.context_processors.messages",
+                "admin_notice.context_processors.notice",
             ],
         },
     },

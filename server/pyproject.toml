@@ -23,6 +23,7 @@ python-dotenv = "^1.0.0"
 starlette = "^0.31.0"
 uvicorn = {extras = ["standard"], version = "^0.23.1"}
 wait-for-it = "^2.2.2"
+django-admin-notice = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"

@@ -185,6 +185,20 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
+name = "django-admin-notice"
+version = "2.0.0"
+description = "Show a floating notice banner above the Django admon interface"
+optional = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "django_admin_notice-2.0.0-py3-none-any.whl", hash = "sha256:c5974e441fa453c52d912047586484b4c278bca386e3d7c0ad8eebe54ff0f47e"},
+    {file = "django_admin_notice-2.0.0.tar.gz", hash = "sha256:bb0fb062456b13826b9a703e8845c1f903c41ed657b362c06a2d3e43605d851d"},
+]
+
+[package.dependencies]
+django = ">=2.2"
+
+[[package]]
 name = "django-cleanup"
 version = "8.0.0"
 description = "Deletes old files."
@@ -1317,4 +1331,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "b7bbddc1012b2288e2680d9f77113e91cc37c4ef21a9263d4518ce2a22de9ce3"
+content-hash = "ec1d807a066d40c4449e48c0703b79a191808f63e7b7ad2fb9a79381944ff7b7"
