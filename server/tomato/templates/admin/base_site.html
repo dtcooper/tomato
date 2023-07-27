@@ -9,8 +9,8 @@
   {{ block.super }}
   {# TODO space mono fonts here? #}
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #0aa0e1;
@@ -96,7 +96,7 @@
               body: data,
               credentials: 'same-origin',
           })
-          dismissLink.parentElement.remove()
+          dismissLink.parentElement.parentElement.remove()
         })
       })
     })
@@ -110,7 +110,7 @@
         {{ message|capfirst }}
         {% if message.deliver_once is not None and not message.deliver_once %}
           <span>
-            [<a href="#" class="dismiss-message" data-message-id="{{ message.id }}"><strong>Dismiss alert</strong></a>]
+            [<a href="#" class="dismiss-message" data-message-id="{{ message.id }}"><strong>Dismiss sticky alert</strong></a>]
           </span>
         {% endif %}
       </li>
