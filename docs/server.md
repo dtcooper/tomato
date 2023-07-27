@@ -134,7 +134,7 @@ cp .env.sample .env
           api:
             ports:
               # Replace 7777 with any port you like (api server)
-              - 127.0.0.1:7777:8000"
+              - 127.0.0.1:7777:8000
           app:
             ports:
               # Replace 8888 with any port you like (app server)
