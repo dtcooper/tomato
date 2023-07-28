@@ -12,7 +12,9 @@ strict: true
 nav:
   - index.md
   - client.md
-  - server.md
+  - Server:
+    - server/index.md
+    - server/installation.md
   - concepts.md
   - license.md
 

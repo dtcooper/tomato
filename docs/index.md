@@ -18,7 +18,7 @@ specific use case of [Burning Man Information Radio](https://bmir.org).
 ## Quickstart
 
 You'll probably want to either read about the [desktop app](client.md) and
-[backend server](server.md).
+[backend server](server/index.md).
 
 ## Use Case
 
@@ -77,4 +77,4 @@ Mr. Annoying, and Kitty Poopoo. His breed: _domestic street urchin._
 ## What's Next?
 
 First, familiarize yourself with some [core concepts](concepts.md), then read
-about how to use the [desktop app](client.md) and [backend server](server.md).
+about how to use the [desktop app](client.md) and [backend server](server/index.md).

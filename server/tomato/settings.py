@@ -266,7 +266,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
     "ui_modes": (
         "django.forms.MultipleChoiceField",
         {
-            "choices": (("idiot", "Idiot mode"), ("easy", "Easy mode"), ("advanced", "Advanced mode")),
+            "choices": (("simple", "Simple view"), ("standard", "Standard view"), ("advanced", "Advanced view")),
             "widget": "django.forms.widgets.CheckboxSelectMultiple",
             "required": True,
         },
@@ -387,7 +387,7 @@ CONSTANCE_CONFIG = {
         ),
         "audio_bitrate",
     ),
-    "UI_MODES": (["idiot", "easy"], "What user interface modes are available to the desktop app.", "ui_modes"),
+    "UI_MODES": (["simple", "standard"], "What user interface modes are available to the desktop app.", "ui_modes"),
     "WARN_ON_EMPTY_ROTATORS": (True, "Warn when a rotator has no eligible assets to choose from. (Desktop app only)"),
 }
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
