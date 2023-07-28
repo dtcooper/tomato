@@ -324,7 +324,7 @@ CONSTANCE_CONFIG = {
         False,
         mark_safe(
             "Enable broadcast compression, smoothing out dynamic range in audio output.<br><strong>NOTE:</strong> "
-            "compression is applied at the time you play an audio asset and performed on-the-fly in the desktop client."
+            "compression is applied at the time you play an audio asset and performed on-the-fly in the desktop app."
         ),
     ),
     "EXTRACT_METADATA_FROM_FILE": (
@@ -388,7 +388,7 @@ CONSTANCE_CONFIG = {
         "audio_bitrate",
     ),
     "UI_MODES": (["idiot", "easy"], "What user interface modes are available to the desktop app.", "ui_modes"),
-    "WARN_ON_EMPTY_ROTATORS": (True, "Warn when a rotator has no eligible assets to choose from."),
+    "WARN_ON_EMPTY_ROTATORS": (True, "Warn when a rotator has no eligible assets to choose from. (Desktop app only)"),
 }
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
     (
