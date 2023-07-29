@@ -53,6 +53,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         help_text="Optional name, if left empty, we'll automatically choose one for you.",
     )
     file = AudioFileField("audio file", upload_to=asset_upload_to)
+    # Original filename WITHOUT a suffix (stem only)
     original_filename = models.CharField(max_length=FILE_MAX_LENGTH)
     pre_process_md5sum = models.BinaryField(max_length=16, null=True, default=None)
     md5sum = models.BinaryField(max_length=16, null=True, default=None)
@@ -134,7 +135,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
     def clean(self):
         super().clean()
         if not self.name.strip():
-            self.name = Path(self.file.name).stem
+            self.name = self.original_filename
 
 
 Asset.rotators.through.__str__ = lambda self: f"{self.asset.name} in {self.rotator.name}"
