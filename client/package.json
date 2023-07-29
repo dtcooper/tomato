@@ -30,7 +30,7 @@
   "bugs": {
     "url": "https://github.com/dtcooper/tomato/issues"
   },
-  "homepage": "https://github.com/dtcooper/tomato#readme",
+  "homepage": "https://dtcooper.github.io/tomato/",
   "devDependencies": {
     "@electron-forge/cli": "^6.2.1",
     "@electron-forge/maker-deb": "^6.2.1",
