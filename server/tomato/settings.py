@@ -105,6 +105,7 @@ MIDDLEWARE.extend(
         "django.contrib.auth.middleware.AuthenticationMiddleware",
         "django.contrib.messages.middleware.MessageMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
+        "tomato.middleware.DirtyModelsToRedisMiddleware",
     ]
 )
 
@@ -346,7 +347,7 @@ CONSTANCE_CONFIG = {
         ),
         "zero_seconds_to_five_hours",
     ),
-    "ALLOW_DUPLICATES_IN_STOPSET": (
+    "ALLOW_REPEATS_IN_STOPSET": (
         False,
         (
             "The randomization algorithm will try its absolute best to avoid duplicates. However, when that's not"
@@ -369,7 +370,7 @@ CONSTANCE_CONFIG = {
             " trimmed (or not) according to this setting at the time of upload."
         ),
     ),
-    "PREVENT_DUPLICATES": (
+    "PREVENT_DUPLICATE_ASSETS": (
         True,
         (
             "Prevent duplicate audio assets from being uploaded when set. If not set, you may have multiple audio"
@@ -398,7 +399,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
                 "EXTRACT_METADATA_FROM_FILE",
                 "AUDIO_BITRATE",
                 "TRIM_SILENCE",
-                "PREVENT_DUPLICATES",
+                "PREVENT_DUPLICATE_ASSETS",
             ),
         ),
         (
@@ -409,7 +410,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
                 "SINGLE_PLAY_ROTATORS",
                 "END_DATE_PRIORITY_WEIGHT_MULTIPLIER",
                 "NO_REPEAT_ASSETS_TIME",
-                "ALLOW_DUPLICATES_IN_STOPSET",
+                "ALLOW_REPEATS_IN_STOPSET",
             ),
         ),
     )

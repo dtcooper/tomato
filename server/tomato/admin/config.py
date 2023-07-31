@@ -11,9 +11,13 @@ ConstanceConfig.verbose_name = "Settings"
 
 
 class ConfigForm(ConstanceForm):
+    def __init__(self, initial, request=None, *args, **kwargs):
+        self.request = request
+        super().__init__(initial, request, *args, **kwargs)
+
     def save(self):
         super().save()
-        mark_models_dirty()
+        mark_models_dirty(self.request)
 
 
 class ConfigAdmin(ConstanceConfigAdmin):

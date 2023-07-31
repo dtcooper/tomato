@@ -10,7 +10,7 @@ from .base import AiringFilter, AiringMixin, NoNullRelatedOnlyFieldFilter, NumAs
 
 class StopsetRotatorInline(admin.TabularInline):
     can_delete = True
-    extra = 0
+    extra = 1
     min_num = 1
     model = StopsetRotator
     show_change_link = True

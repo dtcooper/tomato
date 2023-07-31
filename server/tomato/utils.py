@@ -27,8 +27,11 @@ def send_redis_message(message_type, data):
     conn.publish(REDIS_PUBSUB_KEY, json.dumps({"type": message_type, "data": data}))
 
 
-def mark_models_dirty():
-    send_redis_message("update", datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"))
+def mark_models_dirty(request=None):
+    if request is not None:
+        request._models_dirty = True
+    else:
+        send_redis_message("update", datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"))
 
 
 def mark_logged_out_users(user_ids):

@@ -175,7 +175,7 @@ class Rotator extends HydratableObject {
     const softIgnoredAssets = hardIgnoredAssets.filter((a) => !softIgnoreIds.has(a.id))
 
     const tries = [softIgnoredAssets, hardIgnoredAssets]
-    if (get(config).ALLOW_DUPLICATES_IN_STOPSET) {
+    if (get(config).ALLOW_REPEATS_IN_STOPSET) {
       tries.push(activeAssets)
     }
 
@@ -185,7 +185,7 @@ class Rotator extends HydratableObject {
       asset = pickRandomItemByWeight(hardIgnoredAssets)
       if (!asset) {
         console.log(`Failed to pick an asset from hard ignores [rotator = ${this.name}]`)
-        if (get(config).ALLOW_DUPLICATES_IN_STOPSET) {
+        if (get(config).ALLOW_REPEATS_IN_STOPSET) {
           asset = pickRandomItemByWeight(activeAssets)
         }
       }
@@ -207,7 +207,34 @@ class RotatorsMap extends Map {
   }
 }
 
-class Stopset extends AssetStopsetHydratableObject {}
+class Stopset extends AssetStopsetHydratableObject {
+  generate() {
+    const hardIgnoreIds = new Set()
+    let softIgnoreIds = undefined
+
+    const NO_REPEAT_ASSETS_TIME = parseInt(get(config).NO_REPEAT_ASSETS_TIME) // XXXX no parseint
+    if (NO_REPEAT_ASSETS_TIME > 0) {
+      // Purge _playTimes if their outside time bounds
+      DB._playTimes = new Map(
+        Array.from(DB._playTimes.entries()).filter(([, ts]) => ts + NO_REPEAT_ASSETS_TIME >= timestamp())
+      )
+      DB._savePlayTimes()
+      softIgnoreIds = new Set(DB._playTimes.keys())
+    }
+
+    const assets = []
+    for (const rotator of this.rotators) {
+      const asset = rotator.getAsset(softIgnoreIds, hardIgnoreIds)
+      if (asset) {
+        hardIgnoreIds.add(asset.id)
+        DB.markPlayed(asset)
+      }
+      assets.push({ rotator, asset })
+    }
+
+    return assets
+  }
+}
 
 class DB {
   static _nonGarbageCollectedAssets = new WeakRefSet()
@@ -271,33 +298,10 @@ class DB {
 
   generateStopset() {
     const stopset = pickRandomItemByWeight(filterItemsByActive(this.stopsets))
-    const hardIgnoreIds = new Set()
-    let softIgnoreIds = undefined
-
-    const NO_REPEAT_ASSETS_TIME = parseInt(get(config).NO_REPEAT_ASSETS_TIME) // XXXX no parseint
-    if (NO_REPEAT_ASSETS_TIME > 0) {
-      // Purge _playTimes if their outside time bounds
-      DB._playTimes = new Map(
-        Array.from(DB._playTimes.entries()).filter(([, ts]) => ts + NO_REPEAT_ASSETS_TIME >= timestamp())
-      )
-      DB._savePlayTimes()
-      softIgnoreIds = new Set(DB._playTimes.keys())
-    }
-
-    const assets = []
     if (stopset) {
-      console.log(stopset.rotators)
-      for (const rotator of stopset.rotators) {
-        const asset = rotator.getAsset(softIgnoreIds, hardIgnoreIds)
-        if (asset) {
-          hardIgnoreIds.add(asset.id)
-          DB.markPlayed(asset)
-        }
-        assets.push({ rotator, asset })
-      }
+      return { stopset, assets: stopset.generate() }
     }
-
-    return { stopset, assets }
+    return null
   }
 }
 

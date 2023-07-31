@@ -84,14 +84,14 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         permissions = [("immediate_play_asset", "Can immediately play audio assets")]
 
     def save(self, dont_overwrite_original_filename=False, *args, **kwargs):
-        self.name = self.name[:NAME_MAX_LENGTH].strip() or "Untitled"
         if not dont_overwrite_original_filename and "file" in self.get_dirty_fields():
             self.original_filename = Path(self.file.name).with_suffix("").name
+        self.name = self.name[:NAME_MAX_LENGTH].strip() or self.original_filename[:NAME_MAX_LENGTH].strip() or "Untitled"
         super().save(*args, **kwargs)
 
     def full_clean(self, *args, **kwargs):
         super().full_clean(*args, **kwargs)
-        if config.PREVENT_DUPLICATES and self.file and "file" in self.get_dirty_fields():
+        if config.PREVENT_DUPLICATE_ASSETS and self.file and "file" in self.get_dirty_fields():
             qs = Asset.objects.filter(pre_process_md5sum=self.generate_md5sum())
             if self.id is not None:
                 qs = qs.exclude(id=self.id)
