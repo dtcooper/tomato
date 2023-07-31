@@ -1,5 +1,7 @@
 import dayjs from "dayjs"
 import duration from "dayjs/plugin/duration"
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter"
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore"
 import download from "download"
 import md5File from "md5-file"
 import { WeakRefSet } from "weak-ref-collections"
@@ -13,8 +15,10 @@ const path = require("path")
 const fs = require("fs/promises")
 
 dayjs.extend(duration)
+dayjs.extend(isSameOrAfter)
+dayjs.extend(isSameOrBefore)
 
-let assetsDir = path.join(new URLSearchParams(window.location.search).get("userDataDir"), "assets")
+const assetsDir = path.join(new URLSearchParams(window.location.search).get("userDataDir"), "assets")
 
 const syncInfo = writable({
   syncing: false,
@@ -23,6 +27,8 @@ const syncInfo = writable({
   percent: 0,
   assetName: ""
 })
+
+const timestamp = () => Math.floor(Date.now() / 1000)
 
 const fileExists = async (filename) => {
   try {
@@ -72,7 +78,7 @@ class AssetStopsetHydratableObject extends HydratableObject {
     this.end = this.end && dayjs(this.end)
   }
   get rotators() {
-    return this._rotators.map((id) => this.db.rotators.get(id))
+    return this._rotators.map((id) => this._db.rotators.get(id))
   }
 }
 
@@ -94,6 +100,7 @@ class Asset extends AssetStopsetHydratableObject {
       tmpBasename: path.basename(tmpPath)
     }
     this.duration = dayjs.duration(this.duration, "seconds")
+    // TODO: override weight via END_DATE_PRIORITY_WEIGHT_MULTIPLIER
   }
 
   async download() {
@@ -148,29 +155,49 @@ const pickRandomItemByWeight = (objects) => {
   return null
 }
 
+const filterItemsByActive = (obj, dt = null) => {
+  if (!dt) {
+    dt = dayjs()
+  }
+
+  return obj.filter((o) => o.enabled && (!o.begin || o.begin.isSameOrBefore(dt)) && (!o.end || o.end.isSameOrAfter(dt)))
+}
+
 class Rotator extends HydratableObject {
   constructor(data, db) {
     super(data, db)
     this.assets = db.assets.filter((a) => a._rotators.includes(this.id))
   }
 
-  getAsset(softIgnoreIds = [], hardIgnoreIds = []) {
-    let hardIgnoredAssets = this.assets.filter((a) => !hardIgnoreIds.includes(a.id))
-    let softIgnoredAssets = hardIgnoredAssets.filter((a) => !softIgnoreIds.includes(a.id))
+  getAsset(softIgnoreIds = new Set(), hardIgnoreIds = new Set()) {
+    const activeAssets = filterItemsByActive(this.assets)
+    const hardIgnoredAssets = activeAssets.filter((a) => !hardIgnoreIds.has(a.id))
+    const softIgnoredAssets = hardIgnoredAssets.filter((a) => !softIgnoreIds.has(a.id))
 
     const tries = [softIgnoredAssets, hardIgnoredAssets]
     if (get(config).ALLOW_DUPLICATES_IN_STOPSET) {
-      tries.push(this.assets)
+      tries.push(activeAssets)
     }
 
-    for (const assetsTry of tries) {
-      const asset = pickRandomItemByWeight(assetsTry)
-      if (asset) {
-        return asset
+    let asset = pickRandomItemByWeight(softIgnoredAssets)
+    if (!asset) {
+      console.log(`Failed to get an asset form soft ignores [rotator = ${this.name}]`)
+      asset = pickRandomItemByWeight(hardIgnoredAssets)
+      if (!asset) {
+        console.log(`Failed to pick an asset from hard ignores [rotator = ${this.name}]`)
+        if (get(config).ALLOW_DUPLICATES_IN_STOPSET) {
+          asset = pickRandomItemByWeight(activeAssets)
+        }
       }
     }
 
-    return null
+    if (asset) {
+      console.log(`Picked asset ${asset.id} [rotator = ${this.name}]`)
+    } else {
+      console.log(`Failed to pick an asset entirely! [rotator = ${this.name}]`)
+    }
+
+    return asset
   }
 }
 
@@ -184,6 +211,7 @@ class Stopset extends AssetStopsetHydratableObject {}
 
 class DB {
   static _nonGarbageCollectedAssets = new WeakRefSet()
+  static _playTimes = new Map()
 
   constructor({ assets, rotators, stopsets } = { assets: [], rotators: [], stopsets: [] }) {
     this.assets = assets.map((data) => new Asset(data, this))
@@ -201,6 +229,24 @@ class DB {
       this._host = url.toString().slice(0, -1) // remove trailing slash
     }
     return this._host
+  }
+
+  static _savePlayTimes() {
+    window.localStorage.setItem("soft-ignored", JSON.stringify(Array.from(this._playTimes.entries()), null, ""))
+  }
+
+  static _loadPlayTimes() {
+    try {
+      this._playTimes = new Map(JSON.parse(window.localStorage.getItem("soft-ignored")))
+    } catch {}
+  }
+
+  static markPlayed(asset) {
+    if (parseInt(get(config).NO_REPEAT_ASSETS_TIME) > 0) {
+      // XXX no parseInt
+      this._playTimes.set(asset.id, timestamp())
+      this._savePlayTimes()
+    }
   }
 
   static async cleanup() {
@@ -222,10 +268,43 @@ class DB {
       console.log("Skipping cleanup due to ready=false")
     }
   }
+
+  generateStopset() {
+    const stopset = pickRandomItemByWeight(filterItemsByActive(this.stopsets))
+    const hardIgnoreIds = new Set()
+    let softIgnoreIds = undefined
+
+    const NO_REPEAT_ASSETS_TIME = parseInt(get(config).NO_REPEAT_ASSETS_TIME) // XXXX no parseint
+    if (NO_REPEAT_ASSETS_TIME > 0) {
+      // Purge _playTimes if their outside time bounds
+      DB._playTimes = new Map(
+        Array.from(DB._playTimes.entries()).filter(([, ts]) => ts + NO_REPEAT_ASSETS_TIME >= timestamp())
+      )
+      DB._savePlayTimes()
+      softIgnoreIds = new Set(DB._playTimes.keys())
+    }
+
+    const assets = []
+    if (stopset) {
+      console.log(stopset.rotators)
+      for (const rotator of stopset.rotators) {
+        const asset = rotator.getAsset(softIgnoreIds, hardIgnoreIds)
+        if (asset) {
+          hardIgnoreIds.add(asset.id)
+          DB.markPlayed(asset)
+        }
+        assets.push({ rotator, asset })
+      }
+    }
+
+    return { stopset, assets }
+  }
 }
 
+DB._loadPlayTimes()
 const emptyDB = new DB()
 let db = emptyDB
+window.DB = DB
 
 const runOnceAndQueueLastCall = (func) => {
   let running = false

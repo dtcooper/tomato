@@ -350,8 +350,8 @@ CONSTANCE_CONFIG = {
         False,
         (
             "The randomization algorithm will try its absolute best to avoid duplicates. However, when that's not"
-            " possible (for example because of a nearly rotator), do you want assets to repeat, or for the rotator to"
-            " be ignored in a given stop set?"
+            " possible (for example because of a nearly empty rotator), do you want assets to repeat, or for the"
+            " rotator to be ignored in a given stop set?"
         ),
     ),
     "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME": (

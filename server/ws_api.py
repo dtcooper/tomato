@@ -115,6 +115,7 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
             await asyncio.sleep(0.5)
 
         subscribers = cls.subscribers.keys() if single_websocket is None else (single_websocket,)
+        # TODO: convert numeric types to ints or floats
         json_data = json.dumps({"type": "data", "data": app.state.data}, cls=DjangoJSONEncoder)
         num_broadcasted_to = 0
 
