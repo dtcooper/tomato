@@ -20,14 +20,14 @@ class HydratableObject {
 }
 
 class AssetStopsetHydratableObject extends HydratableObject {
-  constructor({ rotators, ...data}, db) {
+  constructor({ rotators, ...data }, db) {
     super(data, db)
     this._rotators = rotators
     this.begin = this.begin && dayjs(this.begin)
     this.end = this.end && dayjs(this.end)
   }
   get rotators() {
-    return this._rotators.map(id => this.db.rotators.get(id))
+    return this._rotators.map((id) => this.db.rotators.get(id))
   }
 }
 
@@ -55,12 +55,12 @@ const pickRandomItemByWeight = (objects) => {
 class Rotator extends HydratableObject {
   constructor(data, db) {
     super(data, db)
-    this.assets = db.assets.filter(a => a._rotators.includes(this.id))
+    this.assets = db.assets.filter((a) => a._rotators.includes(this.id))
   }
 
   getAsset(softIgnoreIds = [], hardIgnoreIds = []) {
-    let hardIgnoredAssets = this.assets.filter(a => !hardIgnoreIds.includes(a.id))
-    let softIgnoredAssets = hardIgnoredAssets.filter(a => !softIgnoreIds.includes(a.id))
+    let hardIgnoredAssets = this.assets.filter((a) => !hardIgnoreIds.includes(a.id))
+    let softIgnoredAssets = hardIgnoredAssets.filter((a) => !softIgnoreIds.includes(a.id))
 
     const tries = [softIgnoredAssets, hardIgnoredAssets]
     if (get(config).ALLOW_DUPLICATES_IN_STOPSET) {
@@ -84,24 +84,43 @@ class RotatorsMap extends Map {
   }
 }
 
-class Stopset extends AssetStopsetHydratableObject {
-}
+class Stopset extends AssetStopsetHydratableObject {}
 
 class DB {
-  constructor({assets, rotators, stopsets} = {assets: [], rotators: [], stopsets: []}) {
-    this.assets = assets.map(data => new Asset(data, this))
+  constructor({ assets, rotators, stopsets } = { assets: [], rotators: [], stopsets: [] }) {
+    this.assets = assets.map((data) => new Asset(data, this))
     this.rotators = new RotatorsMap(rotators, this)
-    this.stopsets = stopsets.map(data => new Stopset(data, this))
+    this.stopsets = stopsets.map((data) => new Stopset(data, this))
   }
 }
 
 const emptyDB = new DB()
 let db = emptyDB
 
-export const syncData = async (jsonData) => {
-  window.localStorage.setItem("last-db-data", JSON.stringify(jsonData, null, ''))
-  const replacementDB = window.db = new DB(jsonData)
+const forceRunOnlyOnceQueuingMostRecentCall = (func) => {
+  let running = false
+  let pendingCall = null
+
+  return async (...args) => {
+    if (running) {
+      pendingCall = args
+    } else {
+      running = true
+      await func(...args)
+      running = false
+      if (pendingCall) {
+        const args = pendingCall
+        pendingCall = null
+        await func(...args)
+      }
+    }
+  }
 }
+
+export const syncData = forceRunOnlyOnceQueuingMostRecentCall(async (jsonData) => {
+  window.localStorage.setItem("last-db-data", JSON.stringify(jsonData, null, ""))
+  const replacementDB = (window.db = new DB(jsonData))
+})
 
 export const clearData = () => {
   db = emptyDB

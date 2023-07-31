@@ -11,7 +11,6 @@
   }
 
   if ($ready) {
-
   }
 </script>
 
