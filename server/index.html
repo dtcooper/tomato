@@ -626,8 +626,13 @@ heavily leveraging its automatic admin interface.</p>
 </dd>
 <dt><code>NO_REPEAT_ASSETS_TIME</code> --- <strong>Type: Numeric</strong></dt>
 <dd>
-<p>The time (in seconds) required to elapse for the client to attempt to not repeat any assets. Set to 0 to disable and allow potential repetition in the randomization algorithm.</p>
+<p>The time (in seconds) required to elapse for the client to attempt to not repeat any assets. Set to 0 to disable and allow potential repetition in the randomization algorithm. If there are not enough assets in a rotator to respect this setting, it will be ignored.</p>
 <p>Default: <code>0</code></p>
+</dd>
+<dt><code>ALLOW_DUPLICATES_IN_STOPSET</code> --- <strong>Type: Boolean (true or false)</strong></dt>
+<dd>
+<p>The randomization algorithm will try its absolute best to avoid duplicates. However, when that's not possible (for example because of a nearly rotator), do you want assets to repeat, or for the rotator to be ignored in a given stop set?</p>
+<p>Default: <code>False</code></p>
 </dd>
 </dl>
 </div>
