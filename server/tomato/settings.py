@@ -289,16 +289,6 @@ CONSTANCE_ADDITIONAL_FIELDS = {
             "widget_kwargs": {"attrs": {"size": 8}},
         },
     ),
-    "sync_interval": (
-        "django.forms.DecimalField",
-        {
-            "decimal_places": 2,
-            "max_value": 60 * 60,  # 1 hour
-            "min_value": 1,
-            "widget": "django.forms.TextInput",
-            "widget_kwargs": {"attrs": {"size": 8}},
-        },
-    ),
     "audio_bitrate": (
         "django.forms.ChoiceField",
         {
@@ -357,7 +347,13 @@ CONSTANCE_CONFIG = {
         "zero_seconds_to_five_hours",
     ),
     "ALLOW_DUPLICATES_IN_STOPSET": (
-        False, "The randomization algorithm will try its absolute best to avoid duplicates. However, when that's not possible (for example because of a nearly rotator), do you want assets to repeat, or for the rotator to be ignored in a given stop set?"),    "SYNC_INTERVAL": (Decimal(5 * 20), "Time between client-server syncs (in seconds).", "sync_interval"),
+        False,
+        (
+            "The randomization algorithm will try its absolute best to avoid duplicates. However, when that's not"
+            " possible (for example because of a nearly rotator), do you want assets to repeat, or for the rotator to"
+            " be ignored in a given stop set?"
+        ),
+    ),
     "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME": (
         False,
         (
@@ -410,7 +406,6 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
             (
                 "WAIT_INTERVAL",
                 "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME",
-                "SYNC_INTERVAL",
                 "SINGLE_PLAY_ROTATORS",
                 "END_DATE_PRIORITY_WEIGHT_MULTIPLIER",
                 "NO_REPEAT_ASSETS_TIME",
