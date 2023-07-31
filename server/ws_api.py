@@ -73,17 +73,18 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
             uuid = data.pop("id")
             data["created_by"] = self.user
             _, created = await ClientLogEntry.objects.aupdate_or_create(id=uuid, defaults=data)
-            return {"success": True, "updated_existing": not created, "ignored": False}
+            return {"success": True, "id": uuid, "updated_existing": not created, "ignored": False}
         else:
-            return {"success": True, "updated_existing": False, "ignored": True}
+            return {"success": True, "id": uuid, "updated_existing": False, "ignored": True}
 
     async def on_recieve_authenticated(self, websocket, data):
         message_type = data.get("type")
         if message_type == "log":
             response = await self.process_log(data["data"])
         else:
-            response = failure(f"Invalid message type: {json.dumps(message_type)}")
-        await websocket.send_json(response)
+            message_type = "error"
+            response = {"message": f"Invalid message type: {json.dumps(message_type)}"}
+        await websocket.send_json({"type": message_type, "data": response})
 
     async def on_recieve_unauthenticated(self, websocket, data):
         protocol_version = data.pop("protocol_version", None)
