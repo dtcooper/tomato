@@ -1,6 +1,5 @@
 from asgiref.sync import sync_to_async
 
-from django.conf import settings
 from django.db.models import Prefetch
 
 from constance import config as constance_config

@@ -122,8 +122,12 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
 
     def serialize(self):
         return {
-            "file": {"filename": self.file.name, "url": self.file.url, "size": self.filesize},
-            "md5sum": self.md5sum.hex(),
+            "file": {
+                "filename": self.file.name,
+                "url": self.file.url,
+                "size": self.filesize,
+                "md5sum": self.md5sum.hex(),
+            },
             "duration": round(self.duration.total_seconds()),
             "rotators": [rotator.id for rotator in self.rotators.all()],
             **super().serialize(),

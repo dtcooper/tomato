@@ -88,6 +88,7 @@ class Asset extends AssetStopsetHydratableObject {
       path: filePath,
       basename,
       size: file.size,
+      md5sum: file.md5sum,
       dirname,
       tmpPath,
       tmpBasename: path.basename(tmpPath)
@@ -96,7 +97,7 @@ class Asset extends AssetStopsetHydratableObject {
   }
 
   async download() {
-    const { url, path, basename, size, dirname, tmpPath, tmpBasename } = this.file
+    const { url, path, size, md5sum, dirname, tmpPath, tmpBasename } = this.file
 
     try {
       let exists = await fileExists(path)
@@ -112,9 +113,9 @@ class Asset extends AssetStopsetHydratableObject {
       if (!exists) {
         console.log(`Downloading: ${url}`)
         await download(url, dirname, { filename: tmpBasename })
-        const md5sum = await md5File(tmpPath)
-        if (md5sum !== this.md5sum) {
-          throw new Error(`MD5 sum mismatch. Actual=${md5sum} Expected=${this.md5sum}`)
+        const actualMd5sum = await md5File(tmpPath)
+        if (actualMd5sum !== md5sum) {
+          throw new Error(`MD5 sum mismatch. Actual=${actualMd5sum} Expected=${md5sum}`)
         }
         fs.rename(tmpPath, path)
       }
