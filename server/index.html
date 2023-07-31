@@ -589,7 +589,7 @@ heavily leveraging its automatic admin interface.</p>
 <p>Trim silence from the beginning and end of audio files. Since this processing is done on the server, it's applied <strong>only</strong> at the time an audio file is uploaded. This means files will have silence trimmed (or not) according to this setting at the time of upload.</p>
 <p>Default: <code>True</code></p>
 </dd>
-<dt><code>PREVENT_DUPLICATES</code> --- <strong>Type: Boolean (true or false)</strong></dt>
+<dt><code>PREVENT_DUPLICATE_ASSETS</code> --- <strong>Type: Boolean (true or false)</strong></dt>
 <dd>
 <p>Prevent duplicate audio assets from being uploaded when set. If not set, you may have multiple audio assets with the same underlying audio file.</p>
 <p>Default: <code>True</code></p>
@@ -624,7 +624,7 @@ heavily leveraging its automatic admin interface.</p>
 <p>The time (in seconds) required to elapse for the client to attempt to not repeat any assets. Set to 0 to disable and allow potential repetition in the randomization algorithm. If there are not enough assets in a rotator to respect this setting, it will be ignored.</p>
 <p>Default: <code>0</code></p>
 </dd>
-<dt><code>ALLOW_DUPLICATES_IN_STOPSET</code> --- <strong>Type: Boolean (true or false)</strong></dt>
+<dt><code>ALLOW_REPEATS_IN_STOPSET</code> --- <strong>Type: Boolean (true or false)</strong></dt>
 <dd>
 <p>The randomization algorithm will try its absolute best to avoid duplicates. However, when that's not possible (for example because of a nearly empty rotator), do you want assets to repeat, or for the rotator to be ignored in a given stop set?</p>
 <p>Default: <code>False</code></p>
