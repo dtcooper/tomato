@@ -10,8 +10,8 @@ python = "^3.11"
 django = "^4.2.3"
 django-admin-notice = "^2.0.0"
 django-cleanup = "^8.0.0"
-# For error messages at top of page, once constance > 2.9.1, can pin again
-django-constance = {git = "https://github.com/jazzband/django-constance.git"}
+# For error messages at top of page, once constance > 2.9.1 released to pypi, can pin again
+django-constance = {git = "https://github.com/jazzband/django-constance.git", rev = "3.0.0"}
 django-dirtyfields = "^1.9.2"
 django-environ = "^0.10.0"
 django-file-form = "^3.5.2"
@@ -22,14 +22,14 @@ huey = "^2.4.5"
 psycopg = "^3.1.9"
 python-dotenv = "^1.0.0"
 starlette = "^0.31.0"
-uvicorn = {extras = ["standard"], version = "^0.23.1"}
+uvicorn = {extras = ["standard"], version = "^0.23.2"}
 wait-for-it = "^2.2.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.7.0"
 django-debug-toolbar = "^4.1.0"
 django-extensions = "^3.2.3"
-flake8 = "^6.0.0"
+flake8 = "^6.1.0"
 ipdb = "^0.13.13"
 ipython = "^8.14.0"
 isort = "^5.12.0"
