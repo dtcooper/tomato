@@ -351,11 +351,13 @@ CONSTANCE_CONFIG = {
         Decimal(0),
         (
             "The time (in seconds) required to elapse for the client to attempt to not repeat any assets. Set to 0 to"
-            " disable and allow potential repetition in the randomization algorithm."
+            " disable and allow potential repetition in the randomization algorithm. If there are not enough assets in"
+            " a rotator to respect this setting, it will be ignored."
         ),
         "zero_seconds_to_five_hours",
     ),
-    "SYNC_INTERVAL": (Decimal(5 * 20), "Time between client-server syncs (in seconds).", "sync_interval"),
+    "ALLOW_DUPLICATES_IN_STOPSET": (
+        False, "The randomization algorithm will try its absolute best to avoid duplicates. However, when that's not possible (for example because of a nearly rotator), do you want assets to repeat, or for the rotator to be ignored in a given stop set?"),    "SYNC_INTERVAL": (Decimal(5 * 20), "Time between client-server syncs (in seconds).", "sync_interval"),
     "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME": (
         False,
         (
@@ -412,6 +414,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
                 "SINGLE_PLAY_ROTATORS",
                 "END_DATE_PRIORITY_WEIGHT_MULTIPLIER",
                 "NO_REPEAT_ASSETS_TIME",
+                "ALLOW_DUPLICATES_IN_STOPSET",
             ),
         ),
     )

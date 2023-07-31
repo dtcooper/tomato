@@ -2,8 +2,10 @@ import ReconnectingWebSocket from "reconnecting-websocket"
 import { persisted } from "svelte-local-storage-store"
 import { derived, get, readonly } from "svelte/store"
 import { protocol_version } from "../../../server/constants.json"
+import { syncData } from "./assets.js"
+import { setServerConfig } from "./config.js"
 
-const auth = persisted("auth", {
+const auth = persisted("conn", {
   username: "",
   password: "",
   host: "",
@@ -26,14 +28,22 @@ export const logout = () => {
   auth.update(($auth) => {
     return { ...$auth, authenticated: false, connected: false, connecting: false, didFirstSync: false }
   })
+  setServerConfig({})
+
   if (ws) {
     ws.close()
   }
 }
 
 const handleMessages = {
-  data: (data) => {
-    console.log("Got data message:", data)
+  data: async (data) => {
+    const { config, ...jsonData } = data
+    await syncData(jsonData)
+    setServerConfig(config)
+    console.log(config)
+    auth.update(($auth) => {
+      return { ...$auth, didFirstSync: true }
+    })
   }
 }
 
@@ -93,7 +103,7 @@ export const login = (username, password, host) => {
       }
     }
 
-    ws.onmessage = (e) => {
+    ws.onmessage = async (e) => {
       const message = JSON.parse(e.data)
       if (!gotAuthResponse) {
         gotAuthResponse = true
@@ -111,7 +121,7 @@ export const login = (username, password, host) => {
       } else if (get(auth).authenticated) {
         const func = handleMessages[message.type]
         if (func) {
-          func(message.data)
+          await func(message.data)
         } else {
           console.log(`Unrecognized message type: ${message.type}`)
         }

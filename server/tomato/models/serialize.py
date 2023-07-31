@@ -1,4 +1,4 @@
-import pickle
+from asgiref.sync import sync_to_async
 
 from django.conf import settings
 from django.db.models import Prefetch
@@ -10,16 +10,13 @@ from .rotator import Rotator
 from .stopset import Stopset
 
 
-CONSTANCE_KEYS = dir(constance_config)
-CONSTANCE_DEFAULTS = {key: settings.CONSTANCE_CONFIG[key][0] for key in CONSTANCE_KEYS}
+def get_constance_config(valid_rotator_ids):
+    config = {key: getattr(constance_config, key) for key in dir(constance_config)}
+    config["SINGLE_PLAY_ROTATORS"] = sorted(set(map(int, config["SINGLE_PLAY_ROTATORS"])) & set(valid_rotator_ids))
+    return config
 
 
-async def serialize_for_api(async_redis_conn=None):
-    if async_redis_conn is None:  # For testing only
-        import redis.asyncio as redis
-
-        async_redis_conn = redis.Redis(host="redis")
-
+async def serialize_for_api():
     rotators = [rotator async for rotator in Rotator.objects.order_by("id")]
     rotator_ids = [r.id for r in rotators]
     # Only select from rotators that existed at time query was made
@@ -33,17 +30,9 @@ async def serialize_for_api(async_redis_conn=None):
         Prefetch("rotators", prefetch_qs.order_by("stopsetrotator__id"))
     ).order_by("id")
 
-    # Manually get constance values asynchronously
-    constance_values = await async_redis_conn.mget(*CONSTANCE_KEYS)
-    config = {
-        key: pickle.loads(value) if value is not None else CONSTANCE_DEFAULTS[key]
-        for key, value in zip(CONSTANCE_KEYS, constance_values)
-    }
-    config["SINGLE_PLAY_ROTATORS"] = sorted(set(map(int, config["SINGLE_PLAY_ROTATORS"])) & set(rotator_ids))
-
     return {
         "assets": [a.serialize() async for a in assets],
         "rotators": [r.serialize() for r in rotators],
         "stopsets": [s.serialize() async for s in stopsets],
-        "config": config,
+        "config": await sync_to_async(get_constance_config)(rotator_ids),
     }

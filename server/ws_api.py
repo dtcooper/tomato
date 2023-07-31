@@ -139,7 +139,7 @@ async def background_subscriber():
     logger.info("Connected to redis.")
 
     async def update_from_api_and_broadcast():
-        data = await retry_on_failure(serialize_for_api, async_redis_conn=conn)
+        data = await retry_on_failure(serialize_for_api)
         if data != app.state.data:
             app.state.data = data
             num_broadcasted_to = await APIWebSocketEndpoint.broadcast_data_change()

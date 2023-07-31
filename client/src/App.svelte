@@ -1,14 +1,24 @@
 <script>
-  import { authenticated, logout, login, auth } from "./stores/connection"
+  import { authenticated, logout, login, auth, ready } from "./stores/connection"
+  import { restoreDBFromLocalStorage } from "./stores/assets"
+  import { config } from "./stores/config"
 
   import Login from "./Login.svelte"
 
   if ($authenticated) {
+    restoreDBFromLocalStorage()
     login()
+  }
+
+  if ($ready) {
+
   }
 </script>
 
-<pre class="absolute pl-4 pt-2 text-sm">{JSON.stringify($auth, Object.keys($auth).sort(), 2)}</pre>
+<div class="absolute pl-3 pt-2 text-xs">
+  <pre>{JSON.stringify($auth, Object.keys($auth).sort(), 2)}</pre>
+  <pre>{JSON.stringify($config, Object.keys($config).sort(), 2)}</pre>
+</div>
 {#if !$authenticated}
   <Login />
 {:else}
