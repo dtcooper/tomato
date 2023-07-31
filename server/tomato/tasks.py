@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 import tempfile
 
@@ -67,6 +68,7 @@ def process_asset(
 
         asset.duration = ffprobe_data.duration
         asset.md5sum = asset.generate_md5sum()
+        asset.filesize = os.path.getsize(asset.file.real_path)
 
         asset.status = asset.Status.READY
         asset.save(dont_overwrite_original_filename=True)

@@ -57,6 +57,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
     original_filename = models.CharField(max_length=FILE_MAX_LENGTH)
     pre_process_md5sum = models.BinaryField(max_length=16, null=True, default=None)
     md5sum = models.BinaryField(max_length=16, null=True, default=None)
+    filesize = models.BigIntegerField(default=-1)
     status = models.SmallIntegerField(
         choices=Status.choices, default=Status.PENDING, help_text="All assets will be processed after uploading."
     )
@@ -121,7 +122,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
 
     def serialize(self):
         return {
-            "file": {"filename": self.file.name, "url": self.file.url},
+            "file": {"filename": self.file.name, "url": self.file.url, "size": self.filesize},
             "md5sum": self.md5sum.hex(),
             "duration": round(self.duration.total_seconds()),
             "rotators": [rotator.id for rotator in self.rotators.all()],

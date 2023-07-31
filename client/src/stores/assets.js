@@ -1,11 +1,56 @@
 import dayjs from "dayjs"
 import duration from "dayjs/plugin/duration"
+import download from "download"
+import md5File from "md5-file"
+import { WeakRefSet } from "weak-ref-collections"
 
-import { get } from "svelte/store"
+import { get, writable } from "svelte/store"
 
 import { config } from "./config"
+import { auth, ready } from "./connection"
+
+const path = require("path")
+const fs = require("fs/promises")
 
 dayjs.extend(duration)
+
+let assetsDir = path.join(new URLSearchParams(window.location.search).get("userDataDir"), "assets")
+
+const syncInfo = writable({
+  syncing: false,
+  total: -1,
+  current: -1,
+  percent: 0,
+  assetName: ""
+})
+
+const fileExists = async (filename) => {
+  try {
+    await fs.access(filename)
+    return true
+  } catch {
+    return false
+  }
+}
+
+const fileSize = async (filename) => {
+  const { size } = await fs.stat(filename)
+  return size
+}
+
+const lsDir = async (dir, _results = []) => {
+  const files = await fs.readdir(dir)
+  for (const f of files) {
+    const filePath = path.join(dir, f)
+    const stat = await fs.stat(filePath)
+    if (stat.isDirectory()) {
+      await lsDir(filePath, _results)
+    } else {
+      _results.push(filePath)
+    }
+  }
+  return _results
+}
 
 class HydratableObject {
   constructor(data, db) {
@@ -32,9 +77,59 @@ class AssetStopsetHydratableObject extends HydratableObject {
 }
 
 class Asset extends AssetStopsetHydratableObject {
-  constructor(data, db) {
+  constructor({ file, ...data }, db) {
     super(data, db)
+    const filePath = path.join(assetsDir, file.filename)
+    const dirname = path.dirname(filePath)
+    const basename = path.basename(filePath)
+    const tmpPath = path.join(dirname, `${basename}.tmp`)
+    this.file = {
+      url: `${db.host}${file.url}`,
+      path: filePath,
+      basename,
+      size: file.size,
+      dirname,
+      tmpPath,
+      tmpBasename: path.basename(tmpPath)
+    }
     this.duration = dayjs.duration(this.duration, "seconds")
+  }
+
+  async download() {
+    const { url, path, basename, size, dirname, tmpPath, tmpBasename } = this.file
+
+    try {
+      let exists = await fileExists(path)
+
+      if (exists) {
+        // If it exists, just verify sizes match (md5sum was already checked)
+        if ((await fileSize(path)) !== size) {
+          console.error(`File size mismatch for ${this.name}. Deleting and trying again.`)
+          await fs.unlink(path)
+          exists = false
+        }
+      }
+      if (!exists) {
+        console.log(`Downloading: ${url}`)
+        await download(url, dirname, { filename: tmpBasename })
+        const md5sum = await md5File(tmpPath)
+        if (md5sum !== this.md5sum) {
+          throw new Error(`MD5 sum mismatch. Actual=${md5sum} Expected=${this.md5sum}`)
+        }
+        fs.rename(tmpPath, path)
+      }
+      return true
+    } catch (e) {
+      try {
+        if (await fileExists(tmpPath)) {
+          await fs.unlink(tmpPath)
+        }
+      } catch (e) {
+        console.error(`Error cleaning up ${tmpPath}\n`, e)
+      }
+      console.error(`Error downloading asset ${this.name} @ ${url}\n`, e)
+      return false
+    }
   }
 }
 
@@ -87,17 +182,51 @@ class RotatorsMap extends Map {
 class Stopset extends AssetStopsetHydratableObject {}
 
 class DB {
+  static _nonGarbageCollectedAssets = new WeakRefSet()
+
   constructor({ assets, rotators, stopsets } = { assets: [], rotators: [], stopsets: [] }) {
     this.assets = assets.map((data) => new Asset(data, this))
+    this.assets.forEach(this.constructor._nonGarbageCollectedAssets.add, this.constructor._nonGarbageCollectedAssets)
     this.rotators = new RotatorsMap(rotators, this)
     this.stopsets = stopsets.map((data) => new Stopset(data, this))
+    this._host = null
+  }
+
+  get host() {
+    if (!this._host) {
+      const url = new URL(get(auth).host)
+      url.protocol = url.protocol.replace(/^ws/i, "http")
+      url.pathname = ""
+      this._host = url.toString().slice(0, -1) // remove trailing slash
+    }
+    return this._host
+  }
+
+  static async cleanup() {
+    if (get(ready)) {
+      // For all non-garbage collected assets, get set of used files
+      const usedFiles = new Set(Array.from(this._nonGarbageCollectedAssets.values()).map((a) => a.file.basename))
+      let deleted = 0
+
+      // Go through all files in assetsDir and make sure their used
+      const foundFiles = await lsDir(assetsDir)
+      for (const filePath of foundFiles) {
+        if (!usedFiles.has(path.basename(filePath))) {
+          await fs.unlink(filePath)
+          deleted++
+        }
+      }
+      console.log(`Cleaned up ${deleted} files.`)
+    } else {
+      console.log("Skipping cleanup due to ready=false")
+    }
   }
 }
 
 const emptyDB = new DB()
 let db = emptyDB
 
-const forceRunOnlyOnceQueuingMostRecentCall = (func) => {
+const runOnceAndQueueLastCall = (func) => {
   let running = false
   let pendingCall = null
 
@@ -117,9 +246,28 @@ const forceRunOnlyOnceQueuingMostRecentCall = (func) => {
   }
 }
 
-export const syncData = forceRunOnlyOnceQueuingMostRecentCall(async (jsonData) => {
+export const syncData = runOnceAndQueueLastCall(async (jsonData) => {
+  const replacementDB = new DB(jsonData)
+
+  const downloadedAssetsIds = new Set()
+  const total = replacementDB.assets.length
+  console.log(`Sync'ing ${total} assets`)
+
+  for (const [current, asset] of replacementDB.assets.entries()) {
+    syncInfo.set({ syncing: true, total, current, percent: (current / total) * 100, assetName: asset.name })
+    if (await asset.download()) {
+      downloadedAssetsIds.add(asset.id)
+    }
+  }
+
+  console.log(`Sync'd ${downloadedAssetsIds.size} of ${total} assets successfully`)
+
+  // filter down DB *and* jsonData (since that's what we put in localStorage)
+  for (let data of [jsonData, replacementDB]) {
+    data.assets = data.assets.filter((asset) => downloadedAssetsIds.has(asset.id))
+  }
   window.localStorage.setItem("last-db-data", JSON.stringify(jsonData, null, ""))
-  const replacementDB = (window.db = new DB(jsonData))
+  db = window.db = replacementDB // Swap out DB
 })
 
 export const clearData = () => {
@@ -128,13 +276,17 @@ export const clearData = () => {
 }
 
 export const restoreDBFromLocalStorage = () => {
-  db = window.db = emptyDB
   try {
     const state = JSON.parse(window.localStorage.getItem("last-db-data"))
     if (state) {
       db = window.db = new DB(state)
+      return
     }
   } catch (e) {
     console.error(e)
   }
+
+  db = window.db = emptyDB
 }
+
+setInterval(() => DB.cleanup(), 45 * 60 * 60) // Clean up every 45 minutes

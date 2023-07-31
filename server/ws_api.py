@@ -10,7 +10,8 @@ from uvicorn.logging import ColourizedFormatter
 from starlette.applications import Starlette
 from starlette.endpoints import WebSocketEndpoint
 from starlette.responses import PlainTextResponse
-from starlette.routing import Route, WebSocketRoute
+from starlette.routing import Mount, Route, WebSocketRoute
+from starlette.staticfiles import StaticFiles
 
 import django
 from django.conf import settings
@@ -195,12 +196,13 @@ def init_logger():
     logger.addHandler(handler)
 
 
-app = Starlette(
-    debug=settings.DEBUG,
-    routes=[
-        Route("/", index),
-        WebSocketRoute("/api/", APIWebSocketEndpoint),
-    ],
-    on_startup=[startup],
-    on_shutdown=[shutdown],
-)
+routes = [
+    Route("/", index, name="index"),
+    WebSocketRoute("/api/", APIWebSocketEndpoint, name="api"),
+]
+
+if settings.DEBUG:
+    # For development, serve assets too
+    routes.append(Mount("/assets", StaticFiles(directory=settings.MEDIA_ROOT), name="media"))
+
+app = Starlette(debug=settings.DEBUG, routes=routes, on_startup=[startup], on_shutdown=[shutdown])
