@@ -8,22 +8,23 @@
   export let canDismiss = true
   export let open = true
 
-  const close = () => open = false
+  const close = () => (open = false)
 </script>
 
 {#if $progress.syncing}
   <svelte:element
     this={canDismiss ? "dialog" : "div"}
     class="modal"
-    class:modal-open={!canDismiss} open={canDismiss && open}
+    class:modal-open={!canDismiss}
+    open={canDismiss && open}
   >
     <svelte:element
       this={canDismiss ? "form" : "div"}
       method={canDismiss && "dialog"}
-      class="modal-box bg-secondary text-secondary-content flex flex-col items-center justify-center gap-y-2"
+      class="modal-box flex flex-col items-center justify-center gap-y-2 bg-secondary text-secondary-content"
     >
       {#if canDismiss}
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" on:click={close}>✕</button>
+        <button class="btn btn-circle btn-ghost btn-sm absolute right-2 top-2" on:click={close}>✕</button>
       {/if}
       <!-- TODO: don't use radio progress! -->
       <div class="radial-progress" style="--value: {$progress.percent}">

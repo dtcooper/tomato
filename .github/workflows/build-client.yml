@@ -59,6 +59,7 @@ jobs:
         shell: bash
         run: |
           echo "CLIENT_FILENAME=tomato-client-${{ env.TOMATO_VERSION }}-${{ matrix.filename_suffix }}" >> "$GITHUB_ENV"
+          echo "SHA_SHORT=$(git rev-parse --short=8 HEAD)" >> "$GITHUB_ENV"
       -
         name: Setup Node v18
         uses: actions/setup-node@v3
@@ -74,7 +75,7 @@ jobs:
             npm config set --location=project script-shell $(which bash)
           fi
           npm clean-install
-          npm run build
+          TOMATO_VERSION=${{ env.TOMATO_VERSION }}-${{ env.SHA_SHORT }} npm run build
           npx electron-forge make --arch ${{ matrix.arch }} --platform ${{ matrix.platform }}
           mv -v out/make/${{ matrix.out_path }} "../${{ env.CLIENT_FILENAME }}"
       -
@@ -93,6 +94,7 @@ jobs:
         shell: bash
         run: |
           echo "CLIENT_FILENAME=tomato-client-${{ env.TOMATO_VERSION }}-linux-x86_64.pkg.tar.zst" >> "$GITHUB_ENV"
+          echo "SHA_SHORT=$(git rev-parse --short=8 HEAD)" >> "$GITHUB_ENV"
       -
         name: Checkout
         uses: actions/checkout@v3
@@ -106,7 +108,8 @@ jobs:
         shell: bash
         # nodejs-lts-hydrogen = Node v18
         run: |
-          docker run --rm -v "$PWD:/build" -w /build/client/scripts/arch archlinux:base-devel sh -c 'pacman -Syu --noconfirm nodejs-lts-hydrogen && env EUID=1 makepkg -s --noconfirm'
+          docker run --rm -v "$PWD:/build" -w /build/client/scripts/arch -e "TOMATO_VERSION=${{ env.TOMATO_VERSION }}-${{ env.SHA_SHORT }}" archlinux:base-devel \
+              sh -c 'pacman -Syu --noconfirm nodejs-lts-hydrogen && env EUID=1 makepkg -s --noconfirm'
           mv client/scripts/arch/*.pkg.tar.zst "${{ env.CLIENT_FILENAME }}"
       -
         name: Upload build artifact

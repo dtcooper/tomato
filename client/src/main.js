@@ -1,4 +1,4 @@
-const { app, BrowserWindow, powerSaveBlocker } = require("electron")
+const { app, BrowserWindow, powerSaveBlocker, shell } = require("electron")
 const windowStateKeeper = require("electron-window-state")
 const fs = require("fs")
 const fsExtra = require("fs-extra")
@@ -99,11 +99,20 @@ if (squirrelCheck || !singleInstanceLock) {
       win.webContents.session.setPreloads([require.resolve("svelte-devtools-standalone")])
     }
 
-    const queryString = "userDataDir=" + encodeURIComponent(userDataDir)
-    const url = app.isPackaged
-      ? `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
-      : "http://localhost:3000/"
-    win.loadURL(`${url}?${queryString}`)
+    const url =
+      (app.isPackaged || NODE_ENV === "production"
+        ? `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
+        : "http://localhost:3000/") + `?userDataDir=${encodeURIComponent(userDataDir)}`
+
+    win.webContents.on("will-navigate", (event) => {
+      // Allow page refreshes, otherwise open URL externally (clean logout)
+      if (event.url !== url) {
+        event.preventDefault()
+        shell.openExternal(event.url)
+      }
+    })
+
+    win.loadURL(url)
     if (!app.isPackaged) {
       win.webContents.openDevTools({ mode: "detach" })
     }

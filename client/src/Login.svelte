@@ -1,4 +1,6 @@
 <script>
+  import dayjs from "dayjs"
+
   import { persisted } from "svelte-local-storage-store"
 
   import { conn, login } from "./stores/connection"
@@ -146,8 +148,19 @@
           </div>
         </div>
       </div>
-      <div class="form-control mt-6">
-        <button class="btn btn-primary" type="submit" disabled={formDisabled}>{#if demoMode}Try Demo{:else}Login{/if}</button>
+      <div class="form-control mb-1 mt-6">
+        <button class="btn btn-primary" type="submit" disabled={formDisabled}
+          >{#if demoMode}Try Demo{:else}Login{/if}</button
+        >
+      </div>
+      <div class="text-center text-xs">
+        <a class="link-hover link-secondary link" href="https://dtcooper.github.io/tomato/">Tomato Radio Automation</a>,
+        version: {TOMATO_VERSION}
+        <br />
+        Copyright &copy; 2019-{dayjs().year()}
+        <a class="link-hover link-secondary link" href="https://jew.pizza/">David Cooper</a>
+        &amp; <a class="link-hover link-secondary link" href="https://bmir.org">BMIR</a>.<br />
+        All rights reserved.
       </div>
     </form>
   </div>

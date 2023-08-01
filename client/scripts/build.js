@@ -43,7 +43,12 @@ const runBuild = async () => {
     minify: !isDev,
     platform: "node",
     sourcemap: true,
-    define: { NODE_ENV, "process.env.NODE_ENV": NODE_ENV, IS_DEV: isDev ? "true" : "false" }
+    define: {
+      NODE_ENV,
+      "process.env.NODE_ENV": NODE_ENV,
+      IS_DEV: isDev ? "true" : "false",
+      TOMATO_VERSION: isDev ? `"dev"` : `"${process.env.TOMATO_VERSION || "unknown"}"`
+    }
   }
 
   if (nodeVersion) {
@@ -70,10 +75,9 @@ const runBuild = async () => {
     }
   }
 
-  build("main.js", { bundle: !isDev, external: ["electron", "svelte-devtools-standalone"] })
+  build("main.js", { bundle: !isDev, format: "cjs", external: ["electron", "svelte-devtools-standalone"] })
   build("app.js", {
     external: ["./assets/fonts/*"],
-    format: "esm",
     loader: { ".svg": "text" },
     plugins: [
       sveltePlugin({

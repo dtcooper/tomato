@@ -10,23 +10,20 @@ const conn = persisted("conn", {
   username: "",
   password: "",
   host: "",
-  authenticated: false,  // Got at least one successful auth since login. Stays true on disconnect
-  didFirstSync: false  // Completed one whole sync
+  authenticated: false, // Got at least one successful auth since login. Stays true on disconnect
+  didFirstSync: false // Completed one whole sync
 })
-const connecting = writable(false)  // Before successful auth
-const connected = writable(false)  // Whether socket is "online" state or not (after successful auth)
+const connecting = writable(false) // Before successful auth
+const connected = writable(false) // Whether socket is "online" state or not (after successful auth)
 
-const connCombined = derived(
-  [conn, connected, connecting],
-  ([$conn, $connected, $connecting]) => ({
-    ...$conn,
-    connecting: $connecting,
-    connected: $connected,
-    ready: $conn.authenticated && $conn.didFirstSync // App ready to run, whether online or not
-  })
-)
+const connCombined = derived([conn, connected, connecting], ([$conn, $connected, $connecting]) => ({
+  ...$conn,
+  connecting: $connecting,
+  connected: $connected,
+  ready: $conn.authenticated && $conn.didFirstSync // App ready to run, whether online or not
+}))
 
-const updateConn = ({connected: $connected, connecting: $connecting, ...$connUpdates}) => {
+const updateConn = ({ connected: $connected, connecting: $connecting, ...$connUpdates }) => {
   if ($connected !== undefined) {
     connected.set($connected)
   }
@@ -34,7 +31,7 @@ const updateConn = ({connected: $connected, connecting: $connecting, ...$connUpd
     connecting.set($connecting)
   }
   if (Object.keys($connUpdates).length > 0) {
-    conn.update($conn => ({ ...$conn, ...$connUpdates}))
+    conn.update(($conn) => ({ ...$conn, ...$connUpdates }))
   }
 }
 
@@ -43,8 +40,8 @@ export { connCombined as conn }
 let ws = null
 
 export const logout = () => {
-  const hardRefresh = get(connCombined).ready  // hard refresh if app was in "ready" state
-  updateConn({authenticated: false, connected: false, connecting: false, didFirstSync: false })
+  const hardRefresh = get(connCombined).ready // hard refresh if app was in "ready" state
+  updateConn({ authenticated: false, connected: false, connecting: false, didFirstSync: false })
   setServerConfig({})
 
   if (ws) {
@@ -52,6 +49,7 @@ export const logout = () => {
   }
 
   if (hardRefresh) {
+    console.log("Doing hard refresh")
     window.location.reload()
   }
 }
@@ -62,18 +60,21 @@ const handleMessages = {
     setServerConfig(config)
     await syncData(jsonData)
     console.log(get(conn))
-    updateConn({didFirstSync: true})
+    updateConn({ didFirstSync: true })
     console.log(get(conn))
   }
 }
 
 export const login = (username, password, host) => {
-  if (get(conn).connecting) {
-    console.error("Called login twice.")
+  console.log("readyState:", ws && ws.readyState)
+  if (ws && ws.readyState !== ReconnectingWebSocket.CLOSED) {
+    console.error(
+      `Rejecting call to login(). Called with websocket in readyState = ${ws.readyState}, expected closed (${ReconnectingWebSocket.CLOSED}`
+    )
     return
   }
 
-  updateConn({connecting: true})
+  updateConn({ connecting: true })
   return new Promise(async (resolve, reject) => {
     let gotAuthResponse = false
     let connTimeout
@@ -91,7 +92,7 @@ export const login = (username, password, host) => {
       try {
         url = new URL(host)
       } catch {
-        updateConn({connecting: false})
+        updateConn({ connecting: false })
         reject({ type: "host", message: "Invalid server address. Please try another." })
         return
       }
@@ -120,7 +121,7 @@ export const login = (username, password, host) => {
     ws.onclose = () => {
       if (get(conn).authenticated) {
         // If we have authenticated, just update connection status
-        updateConn({connected: false})
+        updateConn({ connected: false })
       } else {
         // If we've never been authenticated before, completely close connection
         logout()
@@ -132,7 +133,7 @@ export const login = (username, password, host) => {
       if (!gotAuthResponse) {
         gotAuthResponse = true
         if (message.success) {
-          updateConn({authenticated: true, connecting: false, connected: true, username, password, host })
+          updateConn({ authenticated: true, connecting: false, connected: true, username, password, host })
           clearTimeout(connTimeout)
           console.log("Succesfully authenticated!")
           resolve()
@@ -151,7 +152,7 @@ export const login = (username, password, host) => {
     }
     ws.onopen = () => {
       gotAuthResponse = false
-      updateConn({connected: false, connecting: true })
+      updateConn({ connected: false, connecting: true })
       ws.send(JSON.stringify({ username, password, protocol_version }))
       connTimeout = setTimeout(() => {
         ws.close()

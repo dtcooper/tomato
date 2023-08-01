@@ -4,8 +4,12 @@ import { readonly } from "svelte/store"
 const config = persisted("config", {})
 const readonlyConfig = readonly(config)
 
-// May have setting the DB happens first so may have reference bad rotators for split second
-export const setServerConfig = (newConfig) => {
+export const setServerConfig = ({ _numeric: numeric, ...newConfig }) => {
+  if (numeric) {
+    for (const key of numeric) {
+      newConfig[key] = +newConfig[key] // Convert to numeric
+    }
+  }
   config.set(newConfig)
 }
 

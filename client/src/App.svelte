@@ -1,5 +1,5 @@
 <script>
-  import { conn, logout, login, } from "./stores/connection"
+  import { conn, logout, login } from "./stores/connection"
   import { restoreDBFromLocalStorage } from "./stores/assets"
   import { config } from "./stores/config"
 

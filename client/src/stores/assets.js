@@ -1,26 +1,18 @@
 import dayjs from "dayjs"
-import duration from "dayjs/plugin/duration"
-import isSameOrAfter from "dayjs/plugin/isSameOrAfter"
-import isSameOrBefore from "dayjs/plugin/isSameOrBefore"
 import download from "download"
+import fs from "fs/promises"
 import md5File from "md5-file"
+import path from "path"
 import { WeakRefSet } from "weak-ref-collections"
 
-import { get, writable, readonly } from "svelte/store"
+import { get, readonly, writable } from "svelte/store"
 
 import { config } from "./config"
 import { conn } from "./connection"
 
-const path = require("path")
-const fs = require("fs/promises")
-
-dayjs.extend(duration)
-dayjs.extend(isSameOrAfter)
-dayjs.extend(isSameOrBefore)
-
 const assetsDir = path.join(new URLSearchParams(window.location.search).get("userDataDir"), "assets")
 
-const emptySyncProgress = {syncing: false, total: -1, index: -1, percent: 0, item: ""}
+const emptySyncProgress = { syncing: false, total: -1, index: -1, percent: 0, item: "" }
 const syncProgress = writable(emptySyncProgress)
 const syncProgressReadonly = readonly(syncProgress)
 export { syncProgressReadonly as syncProgress }
@@ -94,7 +86,7 @@ class Asset extends AssetStopsetHydratableObject {
       md5sum: file.md5sum,
       dirname,
       tmpPath,
-      tmpBasename: path.basename(tmpPath),
+      tmpBasename: path.basename(tmpPath)
     }
     this.duration = dayjs.duration(this.duration, "seconds")
     // TODO: override weight via END_DATE_PRIORITY_WEIGHT_MULTIPLIER
