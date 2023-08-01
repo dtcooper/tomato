@@ -31,9 +31,10 @@ const runBuild = async () => {
   const distDir = "dist"
   const { node: nodeVersion } = electronReleases.find((release) => release.version === electronVersion) || {}
 
+  const TOMATO_VERSION = isDev ? `"dev"` : `"${process.env.TOMATO_VERSION || "unknown"}"`
   console.log(
-    `Building for ${isDev ? "development" : "production"}, electron ${electronVersion}, ` +
-      `node ${nodeVersion || "unknown"}${watch ? ", watching" : ""}...`
+    `Building for ${isDev ? "development" : "production"} (version: ${TOMATO_VERSION.slice(1,-1)}), ` +
+      `electron ${electronVersion}, node ${nodeVersion || "unknown"}${watch ? ", watching" : ""}...`
   )
 
   const NODE_ENV = `"${process.env.NODE_ENV}"`
@@ -43,12 +44,7 @@ const runBuild = async () => {
     minify: !isDev,
     platform: "node",
     sourcemap: true,
-    define: {
-      NODE_ENV,
-      "process.env.NODE_ENV": NODE_ENV,
-      IS_DEV: isDev ? "true" : "false",
-      TOMATO_VERSION: isDev ? `"dev"` : `"${process.env.TOMATO_VERSION || "unknown"}"`
-    }
+    define: { NODE_ENV, "process.env.NODE_ENV": NODE_ENV, IS_DEV: isDev ? "true" : "false", TOMATO_VERSION }
   }
 
   if (nodeVersion) {

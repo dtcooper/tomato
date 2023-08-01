@@ -155,6 +155,7 @@
       </div>
       <div class="text-center text-xs">
         <a class="link-hover link-secondary link" href="https://dtcooper.github.io/tomato/">Tomato Radio Automation</a>,
+        <!-- svelte-ignore missing-declaration-->
         version: {TOMATO_VERSION}
         <br />
         Copyright &copy; 2019-{dayjs().year()}
