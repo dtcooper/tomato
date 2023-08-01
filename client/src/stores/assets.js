@@ -6,10 +6,10 @@ import download from "download"
 import md5File from "md5-file"
 import { WeakRefSet } from "weak-ref-collections"
 
-import { get, writable } from "svelte/store"
+import { get, writable, readonly } from "svelte/store"
 
 import { config } from "./config"
-import { auth, ready } from "./connection"
+import { conn } from "./connection"
 
 const path = require("path")
 const fs = require("fs/promises")
@@ -20,13 +20,10 @@ dayjs.extend(isSameOrBefore)
 
 const assetsDir = path.join(new URLSearchParams(window.location.search).get("userDataDir"), "assets")
 
-const syncInfo = writable({
-  syncing: false,
-  total: -1,
-  current: -1,
-  percent: 0,
-  assetName: ""
-})
+const emptySyncProgress = {syncing: false, total: -1, index: -1, percent: 0, item: ""}
+const syncProgress = writable(emptySyncProgress)
+const syncProgressReadonly = readonly(syncProgress)
+export { syncProgressReadonly as syncProgress }
 
 const timestamp = () => Math.floor(Date.now() / 1000)
 
@@ -97,7 +94,7 @@ class Asset extends AssetStopsetHydratableObject {
       md5sum: file.md5sum,
       dirname,
       tmpPath,
-      tmpBasename: path.basename(tmpPath)
+      tmpBasename: path.basename(tmpPath),
     }
     this.duration = dayjs.duration(this.duration, "seconds")
     // TODO: override weight via END_DATE_PRIORITY_WEIGHT_MULTIPLIER
@@ -214,12 +211,12 @@ class Stopset extends AssetStopsetHydratableObject {
 
     const NO_REPEAT_ASSETS_TIME = parseInt(get(config).NO_REPEAT_ASSETS_TIME) // XXXX no parseint
     if (NO_REPEAT_ASSETS_TIME > 0) {
-      // Purge _playTimes if their outside time bounds
-      DB._playTimes = new Map(
-        Array.from(DB._playTimes.entries()).filter(([, ts]) => ts + NO_REPEAT_ASSETS_TIME >= timestamp())
+      // Purge _assetPlayTimes if their outside time bounds
+      DB._assetPlayTimes = new Map(
+        Array.from(DB._assetPlayTimes.entries()).filter(([, ts]) => ts + NO_REPEAT_ASSETS_TIME >= timestamp())
       )
-      DB._savePlayTimes()
-      softIgnoreIds = new Set(DB._playTimes.keys())
+      DB._saveAssetPlayTimes()
+      softIgnoreIds = new Set(DB._assetPlayTimes.keys())
     }
 
     const assets = []
@@ -227,7 +224,7 @@ class Stopset extends AssetStopsetHydratableObject {
       const asset = rotator.getAsset(softIgnoreIds, hardIgnoreIds)
       if (asset) {
         hardIgnoreIds.add(asset.id)
-        DB.markPlayed(asset)
+        DB.markPlayed(asset) /// XXX this should be marked by player code only
       }
       assets.push({ rotator, asset })
     }
@@ -238,7 +235,7 @@ class Stopset extends AssetStopsetHydratableObject {
 
 class DB {
   static _nonGarbageCollectedAssets = new WeakRefSet()
-  static _playTimes = new Map()
+  static _assetPlayTimes = new Map()
 
   constructor({ assets, rotators, stopsets } = { assets: [], rotators: [], stopsets: [] }) {
     this.assets = assets.map((data) => new Asset(data, this))
@@ -250,7 +247,7 @@ class DB {
 
   get host() {
     if (!this._host) {
-      const url = new URL(get(auth).host)
+      const url = new URL(get(conn).host)
       url.protocol = url.protocol.replace(/^ws/i, "http")
       url.pathname = ""
       this._host = url.toString().slice(0, -1) // remove trailing slash
@@ -258,26 +255,26 @@ class DB {
     return this._host
   }
 
-  static _savePlayTimes() {
-    window.localStorage.setItem("soft-ignored", JSON.stringify(Array.from(this._playTimes.entries()), null, ""))
+  static _saveAssetPlayTimes() {
+    window.localStorage.setItem("soft-ignored", JSON.stringify(Array.from(this._assetPlayTimes.entries()), null, ""))
   }
 
-  static _loadPlayTimes() {
+  static _loadAssetPlayTimes() {
     try {
-      this._playTimes = new Map(JSON.parse(window.localStorage.getItem("soft-ignored")))
+      this._assetPlayTimes = new Map(JSON.parse(window.localStorage.getItem("soft-ignored")))
     } catch {}
   }
 
   static markPlayed(asset) {
     if (parseInt(get(config).NO_REPEAT_ASSETS_TIME) > 0) {
       // XXX no parseInt
-      this._playTimes.set(asset.id, timestamp())
-      this._savePlayTimes()
+      this._assetPlayTimes.set(asset.id, timestamp())
+      this._saveAssetPlayTimes()
     }
   }
 
   static async cleanup() {
-    if (get(ready)) {
+    if (get(conn).ready) {
       // For all non-garbage collected assets, get set of used files
       const usedFiles = new Set(Array.from(this._nonGarbageCollectedAssets.values()).map((a) => a.file.basename))
       let deleted = 0
@@ -305,7 +302,7 @@ class DB {
   }
 }
 
-DB._loadPlayTimes()
+DB._loadAssetPlayTimes()
 const emptyDB = new DB()
 let db = emptyDB
 window.DB = DB
@@ -338,11 +335,12 @@ export const syncData = runOnceAndQueueLastCall(async (jsonData) => {
   console.log(`Sync'ing ${total} assets`)
 
   for (const [current, asset] of replacementDB.assets.entries()) {
-    syncInfo.set({ syncing: true, total, current, percent: (current / total) * 100, assetName: asset.name })
+    syncProgress.set({ syncing: true, total, current, percent: (current / total) * 100, item: asset.name })
     if (await asset.download()) {
       downloadedAssetsIds.add(asset.id)
     }
   }
+  syncProgress.set({ syncing: true, total, current: total, percent: 100, item: "Finalizaing..." })
 
   console.log(`Sync'd ${downloadedAssetsIds.size} of ${total} assets successfully`)
 
@@ -352,6 +350,7 @@ export const syncData = runOnceAndQueueLastCall(async (jsonData) => {
   }
   window.localStorage.setItem("last-db-data", JSON.stringify(jsonData, null, ""))
   db = window.db = replacementDB // Swap out DB
+  syncProgress.set(emptySyncProgress)
 })
 
 export const clearData = () => {

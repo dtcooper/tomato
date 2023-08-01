@@ -88,7 +88,7 @@
   export const refresh = () => window.location.reload()
 </script>
 
-<div class="flex h-screen max-h-screen w-full max-w-full flex-col items-center space-y-1">
+<div class="flex h-screen max-h-screen w-full max-w-full flex-col items-center gap-y-1">
   <div class="btn-group mt-2 p-2">
     <button on:click={logout} class="btn btn-warning">Logout</button>
     <button on:click={sync} class="btn btn-primary" disabled={$syncing}>Sync</button>
@@ -105,7 +105,7 @@
     {@const { assets, stopset, duration } = generated}
     <!-- todo compontent for stopset -->
     <div class="w-full max-w-full grow overflow-y-auto p-2 font-sans">
-      <div class="flex w-full flex-col space-y-1 sm:w-2/3 lg:w-1/2">
+      <div class="flex w-full flex-col gap-y-1 sm:w-2/3 lg:w-1/2">
         <div class="divider !my-3 font-mono text-xl font-bold italic before:bg-secondary after:bg-secondary">
           {stopset.name} [{formatDuration(dayjs.duration(duration, "seconds"))}]
         </div>

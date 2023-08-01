@@ -1,10 +1,12 @@
 <script>
   import { persisted } from "svelte-local-storage-store"
 
-  import { login } from "./stores/connection"
+  import { conn, login } from "./stores/connection"
+  import { config } from "./stores/config"
 
   import tomatoIcon from "../assets/icons/tomato.svg"
-  import connectIcon from "../assets/icons/mdi-lan-connect.svg"
+
+  import SyncModal from "./ui-components/SyncModal.svelte"
 
   let showPassword = IS_DEV
   let demoMode = false
@@ -17,7 +19,14 @@
     error = { type: "", message: "" }
   }
 
+  $: formDisabled = $conn.connecting || $conn.connected
+
   const submit = async () => {
+    clearError()
+    if ($conn.connecting) {
+      return
+    }
+
     if (demoMode) {
       error = { type: "host", message: "Demo mode not yet enabled." }
     } else {
@@ -31,7 +40,11 @@
   }
 </script>
 
-<div class="mx-auto flex min-h-screen w-full max-w-2xl flex-col items-center justify-center space-y-3">
+{#if $conn.connected}
+  <SyncModal title={`Connecting to ${$config.STATION_NAME}`} canDismiss={false} />
+{/if}
+
+<div class="mx-auto flex min-h-screen w-full max-w-2xl flex-col items-center justify-center gap-y-3">
   <div class="flex w-full items-center justify-evenly">
     <div class="tomato-svg">{@html tomatoIcon}</div>
     <div class="flex flex-col items-center space-y-1 font-mono font-bold">
@@ -42,18 +55,20 @@
   </div>
   <div class="card relative w-full bg-base-300 shadow-2xl">
     <form class="card-body" on:submit|preventDefault={submit}>
-      <div class="form-control items-end">
-        <label class="label cursor-pointer space-x-3 pr-0">
-          <span class="label-text">
-            {#if demoMode}
-              <span class="font-bold text-success">Demo mode enabled</span>
-            {:else}
-              Enable demo mode
-            {/if}
-          </span>
-          <input type="checkbox" class="toggle" bind:checked={demoMode} />
-        </label>
-      </div>
+      <!-- For demo mode
+        <div class="form-control items-end">
+          <label class="label cursor-pointer space-x-3 pr-0">
+            <span class="label-text">
+              {#if demoMode}
+                <span class="font-bold text-success">Demo mode enabled</span>
+              {:else}
+                Enable demo mode
+              {/if}
+            </span>
+            <input type="checkbox" class="toggle" bind:checked={demoMode} />
+          </label>
+        </div>
+      -->
       <div class="form-control">
         <div class="label">
           <span class="label-text">Server address</span>
@@ -62,7 +77,7 @@
           {/if}
         </div>
         <input
-          disabled={demoMode}
+          disabled={formDisabled}
           on:input={clearError}
           class:input-error={error.type == "host"}
           bind:value={$host}
@@ -77,7 +92,7 @@
             <span class="label-text">Username</span>
           </div>
           <input
-            disabled={demoMode}
+            disabled={formDisabled}
             on:input={clearError}
             bind:value={$username}
             class:input-error={error.type == "userpass"}
@@ -97,7 +112,7 @@
           </div>
           {#if showPassword && !demoMode}
             <input
-              disabled={demoMode}
+              disabled={formDisabled}
               bind:value={password}
               on:input={clearError}
               class:input-error={error.type == "userpass"}
@@ -110,7 +125,7 @@
             />
           {:else}
             <input
-              disabled={demoMode}
+              disabled={formDisabled}
               bind:value={password}
               on:input={clearError}
               class:input-error={error.type == "userpass"}
@@ -124,17 +139,15 @@
             />
           {/if}
           <div class="form-control items-end">
-            <label class="label cursor-pointer space-x-3 pr-0">
+            <label class="label cursor-pointer gap-x-3 pr-0">
               <span class="label-text">{showPassword ? "Hide" : "Reveal"} password</span>
-              <input disabled={demoMode} type="checkbox" class="checkbox" bind:checked={showPassword} />
+              <input disabled={formDisabled} type="checkbox" class="checkbox" bind:checked={showPassword} />
             </label>
           </div>
         </div>
       </div>
       <div class="form-control mt-6">
-        <button class="btn btn-primary" type="submit"
-          >{#if demoMode}Try Demo{:else}Login{/if}</button
-        >
+        <button class="btn btn-primary" type="submit" disabled={formDisabled}>{#if demoMode}Try Demo{:else}Login{/if}</button>
       </div>
     </form>
   </div>
@@ -144,7 +157,4 @@
   .tomato-svg > :global(svg) {
     @apply h-20 w-20;
   }
-  /* .connect-svg > :global(svg) {
-    @apply mr-1.5 h-10 w-10;
-  } */
 </style>

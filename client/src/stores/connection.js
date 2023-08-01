@@ -1,53 +1,79 @@
 import ReconnectingWebSocket from "reconnecting-websocket"
 import { persisted } from "svelte-local-storage-store"
-import { derived, get, readonly } from "svelte/store"
+import { derived, get, writable } from "svelte/store"
 import { protocol_version } from "../../../server/constants.json"
 import { syncData } from "./assets.js"
 import { setServerConfig } from "./config.js"
 
-const auth = persisted("conn", {
+// TODO this is a mess, connecting + connected SHOULD NOT be persisted, they are ephemeral
+const conn = persisted("conn", {
   username: "",
   password: "",
   host: "",
-  authenticated: false,
-  connecting: false,
-  connected: false,
-  didFirstSync: false
+  authenticated: false,  // Got at least one successful auth since login. Stays true on disconnect
+  didFirstSync: false  // Completed one whole sync
 })
-const readonlyAuth = readonly(auth)
+const connecting = writable(false)  // Before successful auth
+const connected = writable(false)  // Whether socket is "online" state or not (after successful auth)
 
-export { readonlyAuth as auth }
-export const authenticated = derived(auth, ($auth) => $auth.authenticated)
-export const connecting = derived(auth, ($auth) => $auth.connecting)
-export const connected = derived(auth, ($auth) => $auth.connected)
-export const ready = derived(auth, ($auth) => $auth.authenticated && $auth.didFirstSync)
+const connCombined = derived(
+  [conn, connected, connecting],
+  ([$conn, $connected, $connecting]) => ({
+    ...$conn,
+    connecting: $connecting,
+    connected: $connected,
+    ready: $conn.authenticated && $conn.didFirstSync // App ready to run, whether online or not
+  })
+)
+
+const updateConn = ({connected: $connected, connecting: $connecting, ...$connUpdates}) => {
+  if ($connected !== undefined) {
+    connected.set($connected)
+  }
+  if ($connecting !== undefined) {
+    connecting.set($connecting)
+  }
+  if (Object.keys($connUpdates).length > 0) {
+    conn.update($conn => ({ ...$conn, ...$connUpdates}))
+  }
+}
+
+export { connCombined as conn }
 
 let ws = null
 
 export const logout = () => {
-  auth.update(($auth) => {
-    return { ...$auth, authenticated: false, connected: false, connecting: false, didFirstSync: false }
-  })
+  const hardRefresh = get(connCombined).ready  // hard refresh if app was in "ready" state
+  updateConn({authenticated: false, connected: false, connecting: false, didFirstSync: false })
   setServerConfig({})
 
   if (ws) {
     ws.close()
+  }
+
+  if (hardRefresh) {
+    window.location.reload()
   }
 }
 
 const handleMessages = {
   data: async (data) => {
     const { config, ...jsonData } = data
-    await syncData(jsonData)
     setServerConfig(config)
-    console.log(config)
-    auth.update(($auth) => {
-      return { ...$auth, didFirstSync: true }
-    })
+    await syncData(jsonData)
+    console.log(get(conn))
+    updateConn({didFirstSync: true})
+    console.log(get(conn))
   }
 }
 
 export const login = (username, password, host) => {
+  if (get(conn).connecting) {
+    console.error("Called login twice.")
+    return
+  }
+
+  updateConn({connecting: true})
   return new Promise(async (resolve, reject) => {
     let gotAuthResponse = false
     let connTimeout
@@ -65,6 +91,7 @@ export const login = (username, password, host) => {
       try {
         url = new URL(host)
       } catch {
+        updateConn({connecting: false})
         reject({ type: "host", message: "Invalid server address. Please try another." })
         return
       }
@@ -73,30 +100,27 @@ export const login = (username, password, host) => {
       host = url.toString()
     } else {
       // Called with no args = logging back in on first load
-      ;({ username, password, host } = get(auth))
+      ;({ username, password, host } = get(conn))
     }
 
     ws = new ReconnectingWebSocket(host, undefined, {
       maxEnqueuedMessages: 0,
       reconnectionDelayGrowFactor: 1
     })
-    auth.update(($auth) => {
-      return { ...$auth, connecting: true }
-    })
+
     ws.onerror = (e) => {
       console.error("Websocket error", e)
       // If we've never been authenticated before
-      if (!get(auth).authenticated) {
+      if (!get(conn).authenticated) {
         reject({ type: "host", message: "Failed to shake hands with server. Are this address is correct?" })
         logout()
       }
     }
+
     ws.onclose = () => {
-      if (get(auth).authenticated) {
+      if (get(conn).authenticated) {
         // If we have authenticated, just update connection status
-        auth.update(($auth) => {
-          return { ...$auth, connected: false }
-        })
+        updateConn({connected: false})
       } else {
         // If we've never been authenticated before, completely close connection
         logout()
@@ -108,9 +132,7 @@ export const login = (username, password, host) => {
       if (!gotAuthResponse) {
         gotAuthResponse = true
         if (message.success) {
-          auth.update(($auth) => {
-            return { ...$auth, authenticated: true, connecting: false, connected: true, username, password, host }
-          })
+          updateConn({authenticated: true, connecting: false, connected: true, username, password, host })
           clearTimeout(connTimeout)
           console.log("Succesfully authenticated!")
           resolve()
@@ -118,7 +140,7 @@ export const login = (username, password, host) => {
           logout()
           reject({ type: message.field || "host", message: message.error })
         }
-      } else if (get(auth).authenticated) {
+      } else if (get(conn).authenticated) {
         const func = handleMessages[message.type]
         if (func) {
           await func(message.data)
@@ -129,13 +151,8 @@ export const login = (username, password, host) => {
     }
     ws.onopen = () => {
       gotAuthResponse = false
-
-      auth.update(($auth) => {
-        return { ...$auth, connected: false, connecting: true }
-      })
-
+      updateConn({connected: false, connecting: true })
       ws.send(JSON.stringify({ username, password, protocol_version }))
-
       connTimeout = setTimeout(() => {
         ws.close()
         reject({ type: "host", message: "Connection to server timed out. Try again." })

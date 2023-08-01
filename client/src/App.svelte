@@ -1,24 +1,22 @@
 <script>
-  import { authenticated, logout, login, auth, ready } from "./stores/connection"
+  import { conn, logout, login, } from "./stores/connection"
   import { restoreDBFromLocalStorage } from "./stores/assets"
   import { config } from "./stores/config"
 
   import Login from "./Login.svelte"
 
-  if ($authenticated) {
+  if ($conn.ready) {
     restoreDBFromLocalStorage()
     login()
-  }
-
-  if ($ready) {
   }
 </script>
 
 <div class="absolute pl-3 pt-2 text-xs">
-  <pre>{JSON.stringify($auth, Object.keys($auth).sort(), 2)}</pre>
+  <pre>{JSON.stringify($conn, Object.keys($conn).sort(), 2)}</pre>
   <pre>{JSON.stringify($config, Object.keys($config).sort(), 2)}</pre>
 </div>
-{#if !$authenticated}
+
+{#if !$conn.ready}
   <Login />
 {:else}
   <div class="flex h-screen flex-col items-center justify-center">
@@ -51,5 +49,9 @@
 
   :root {
     font-size: 0.9em;
+  }
+
+  svg {
+    @apply h-16 w-16;
   }
 </style>
