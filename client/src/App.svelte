@@ -16,13 +16,15 @@
   <pre>{JSON.stringify($config, Object.keys($config).sort(), 2)}</pre>
 </div>
 
-{#if !$conn.ready}
-  <Login />
-{:else}
-  <div class="flex h-screen flex-col items-center justify-center">
-    <h1 class="p-6 text-xl italic">Logged in!</h1>
-    <div><button class="btn btn-primary" on:click={logout}>Logout</button></div>
-  </div>
+{#if !$conn.reloading}
+  {#if !$conn.ready}
+    <Login />
+  {:else}
+    <div class="flex h-screen flex-col items-center justify-center">
+      <h1 class="p-6 text-xl italic">Logged in!</h1>
+      <div><button class="btn btn-primary" on:click={logout}>Logout</button></div>
+    </div>
+  {/if}
 {/if}
 
 <style global lang="postcss">

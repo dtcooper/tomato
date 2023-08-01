@@ -2,8 +2,9 @@ import ReconnectingWebSocket from "reconnecting-websocket"
 import { persisted } from "svelte-local-storage-store"
 import { derived, get, writable } from "svelte/store"
 import { protocol_version } from "../../../server/constants.json"
-import { syncData } from "./assets.js"
-import { setServerConfig } from "./config.js"
+import { syncData } from "./assets"
+import { acknowledgeLog, log, sendPendingLogs } from "./client-logs"
+import { setServerConfig } from "./config"
 
 // TODO this is a mess, connecting + connected SHOULD NOT be persisted, they are ephemeral
 const conn = persisted("conn", {
@@ -15,13 +16,18 @@ const conn = persisted("conn", {
 })
 const connecting = writable(false) // Before successful auth
 const connected = writable(false) // Whether socket is "online" state or not (after successful auth)
+const reloading = writable(false) // Whether the whole app is in the reloading process
 
-const connCombined = derived([conn, connected, connecting], ([$conn, $connected, $connecting]) => ({
-  ...$conn,
-  connecting: $connecting,
-  connected: $connected,
-  ready: $conn.authenticated && $conn.didFirstSync // App ready to run, whether online or not
-}))
+const connCombined = derived(
+  [conn, connected, connecting, reloading],
+  ([$conn, $connected, $connecting, $reloading]) => ({
+    ...$conn,
+    connecting: $connecting,
+    connected: $connected,
+    ready: $conn.authenticated && $conn.didFirstSync, // App ready to run, whether online or not
+    reloading: $reloading
+  })
+)
 
 const updateConn = ({ connected: $connected, connecting: $connecting, ...$connUpdates }) => {
   if ($connected !== undefined) {
@@ -40,20 +46,25 @@ export { connCombined as conn }
 let ws = null
 
 export const logout = () => {
-  const hardRefresh = get(connCombined).ready // hard refresh if app was in "ready" state
+  const wasInReadyState = get(connCombined).ready // hard refresh if app was in "ready" state
+
+  // Send off pending logs before logout
+  log("logout")
+  sendPendingLogs(true)
+
   updateConn({ authenticated: false, connected: false, connecting: false, didFirstSync: false })
   setServerConfig({})
 
-  if (ws) {
+  if (wasInReadyState) {
+    reloading.set(true)
+    console.log("Was in ready state. Doing hard refresh in 1.5 seconds to attempt to wait for logs to purge.")
+    setTimeout(() => window.location.reload(), 1500)
+  } else {
     ws.close()
-  }
-
-  if (hardRefresh) {
-    console.log("Doing hard refresh")
-    window.location.reload()
   }
 }
 
+// Functions defined for various message types we get from server after authentication
 const handleMessages = {
   data: async (data) => {
     const { config, ...jsonData } = data
@@ -62,6 +73,28 @@ const handleMessages = {
     console.log(get(conn))
     updateConn({ didFirstSync: true })
     console.log(get(conn))
+  },
+  log: (data) => {
+    const { success, id } = data
+    if (success) {
+      console.log(`Acknowledged log ${id}`)
+      acknowledgeLog(id)
+    }
+  }
+}
+
+export const messageServer = (type, data) => {
+  if (ws) {
+    try {
+      ws.send(JSON.stringify({ type, data }, null, ""))
+      return true
+    } catch (e) {
+      console.error(`Error sending ${type} message to websocket`)
+      return false
+    }
+  } else {
+    console.error("Tried to send a message when websocket wasn't created")
+    return false
   }
 }
 
@@ -104,11 +137,7 @@ export const login = (username, password, host) => {
       ;({ username, password, host } = get(conn))
     }
 
-    ws = new ReconnectingWebSocket(host, undefined, {
-      maxEnqueuedMessages: 0,
-      reconnectionDelayGrowFactor: 1
-    })
-
+    ws = new ReconnectingWebSocket(host)
     ws.onerror = (e) => {
       console.error("Websocket error", e)
       // If we've never been authenticated before
@@ -135,6 +164,7 @@ export const login = (username, password, host) => {
         if (message.success) {
           updateConn({ authenticated: true, connecting: false, connected: true, username, password, host })
           clearTimeout(connTimeout)
+          log("login")
           console.log("Succesfully authenticated!")
           resolve()
         } else {

@@ -86,7 +86,9 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
     def save(self, dont_overwrite_original_filename=False, *args, **kwargs):
         if not dont_overwrite_original_filename and "file" in self.get_dirty_fields():
             self.original_filename = Path(self.file.name).with_suffix("").name
-        self.name = self.name[:NAME_MAX_LENGTH].strip() or self.original_filename[:NAME_MAX_LENGTH].strip() or "Untitled"
+        self.name = (
+            self.name[:NAME_MAX_LENGTH].strip() or self.original_filename[:NAME_MAX_LENGTH].strip() or "Untitled"
+        )
         super().save(*args, **kwargs)
 
     def full_clean(self, *args, **kwargs):

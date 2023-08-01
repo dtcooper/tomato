@@ -33,7 +33,7 @@ const runBuild = async () => {
 
   const TOMATO_VERSION = isDev ? `"dev"` : `"${process.env.TOMATO_VERSION || "unknown"}"`
   console.log(
-    `Building for ${isDev ? "development" : "production"} (version: ${TOMATO_VERSION.slice(1,-1)}), ` +
+    `Building for ${isDev ? "development" : "production"} (version: ${TOMATO_VERSION.slice(1, -1)}), ` +
       `electron ${electronVersion}, node ${nodeVersion || "unknown"}${watch ? ", watching" : ""}...`
   )
 
