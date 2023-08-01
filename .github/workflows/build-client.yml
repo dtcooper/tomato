@@ -90,16 +90,17 @@ jobs:
     runs-on: ubuntu-22.04
     name: Build Arch Linux
     steps:
-      - name: Set variables
-        shell: bash
-        run: |
-          echo "CLIENT_FILENAME=tomato-client-${{ env.TOMATO_VERSION }}-linux-x86_64.pkg.tar.zst" >> "$GITHUB_ENV"
-          echo "SHA_SHORT=$(git rev-parse --short=8 HEAD)" >> "$GITHUB_ENV"
       -
         name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      -
+        name: Set variables
+        shell: bash
+        run: |
+          echo "CLIENT_FILENAME=tomato-client-${{ env.TOMATO_VERSION }}-linux-x86_64.pkg.tar.zst" >> "$GITHUB_ENV"
+          echo "SHA_SHORT=$(git rev-parse --short=8 HEAD)" >> "$GITHUB_ENV"
       -
         name: Setup rootless Docker
         uses: ScribeMD/rootless-docker@0.2.2
