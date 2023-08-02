@@ -43,9 +43,10 @@ if (squirrelCheck || !singleInstanceLock) {
     iconPath: path.resolve(path.join(__dirname, "../assets/icons/tomato.png"))
   })
 
-  const url =(app.isPackaged || NODE_ENV === "production"
+  const baseUrl = app.isPackaged || NODE_ENV === "production"
     ? `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
-    : "http://localhost:3000/") + `?userDataDir=${encodeURIComponent(userDataDir)}`
+    : "http://localhost:3000/"
+  const url = `${baseUrl}?userDataDir=${encodeURIComponent(userDataDir)}`
 
   function createWindow() {
     const { screen } = require("electron")
@@ -104,8 +105,9 @@ if (squirrelCheck || !singleInstanceLock) {
     }
 
     win.webContents.on("will-navigate", (event) => {
-      // Allow page refreshes, otherwise open URL externally (clean logout)
-      if (!event.url.startsWith(url)) {
+      // Allow niave page refreshes in dev only, when baseURL is matched (ie browser-sync)
+      // Actual refresh uses "refresh" ipc message
+      if (!IS_DEV || !event.url.startsWith(baseUrl)) {
         event.preventDefault()
         shell.openExternal(event.url)
       }

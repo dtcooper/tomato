@@ -14,6 +14,7 @@
     "dev:electron:wait": "wait-on -l dist/app.css dist/app.js dist/main.js http://localhost:3000/",
     "dev:electron:run": "run-script-os",
     "dev:electron:run:linux": "./scripts/debian/start-tomato.sh",
+    "dev:electron:run:windows": " ELECTRON_ENABLE_LOGGING=true electron-forge start $DEV_EXTRA_FORGE_FLAGS",
     "dev:electron:run:default": "electron-forge start $DEV_EXTRA_FORGE_FLAGS",
     "make": "NODE_ENV=production npm-run-all clean build make:forge",
     "package": "NODE_ENV=production npm-run-all clean build package:forge",
