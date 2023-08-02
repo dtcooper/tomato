@@ -8,7 +8,7 @@ import { acknowledgeLog, log, sendPendingLogs } from "./client-logs"
 import { setServerConfig } from "./config"
 
 // TODO this is a mess, connecting + connected SHOULD NOT be persisted, they are ephemeral
-const conn = persisted("conn", {
+const connPersisted = persisted("conn", {
   username: "",
   password: "",
   host: "",
@@ -19,46 +19,45 @@ const connecting = writable(false) // Before successful auth
 const connected = writable(false) // Whether socket is "online" state or not (after successful auth)
 const reloading = writable(false) // Whether the whole app is in the reloading process
 
-const connCombined = derived(
-  [conn, connected, connecting, reloading],
-  ([$conn, $connected, $connecting, $reloading]) => ({
-    ...$conn,
+export const conn = derived(
+  [connPersisted, connected, connecting, reloading],
+  ([$connPersisted, $connected, $connecting, $reloading]) => ({
+    ...$connPersisted,
     connecting: $connecting,
     connected: $connected,
-    ready: $conn.authenticated && $conn.didFirstSync, // App ready to run, whether online or not
+    ready: $connPersisted.authenticated && $connPersisted.didFirstSync, // App ready to run, whether online or not
     reloading: $reloading
   })
 )
 
-const updateConn = ({ connected: $connected, connecting: $connecting, ...$connUpdates }) => {
+const updateConn = ({ connected: $connected, connecting: $connecting, ...$conn }) => {
   if ($connected !== undefined) {
     connected.set($connected)
   }
   if ($connecting !== undefined) {
     connecting.set($connecting)
   }
-  if (Object.keys($connUpdates).length > 0) {
-    conn.update(($conn) => ({ ...$conn, ...$connUpdates }))
+  if (Object.keys($conn).length > 0) {
+    connPersisted.update(($connPersisted) => ({ ...$connPersisted, ...$conn }))
   }
 }
-
-export { connCombined as conn }
 
 let ws = window.ws = null
 
 export const logout = (error) => {
-  const wasInReadyState = get(connCombined).ready // hard refresh if app was in "ready" state
+  const wasInReadyState = get(conn).ready // hard refresh if app was in "ready" state
 
   // Send off pending logs before logout
   log("logout")
   sendPendingLogs(true)
   updateConn({ authenticated: false, connected: false, connecting: false, didFirstSync: false })
   clearAssetsDB()
-  clearSoftIgnoredAssets()
+  clearSoftIgnoredAssets()  // Do I want this cleared?
   setServerConfig({})
 
   if (wasInReadyState) {
     reloading.set(true)
+    // Give some time for purge of pending logs to take effect
     setTimeout(() => ipcRenderer.invoke("refresh", error), 1500)
   } else {
     ipcRenderer.invoke("refresh", error)
@@ -71,9 +70,7 @@ const handleMessages = {
     const { config, ...jsonData } = data
     setServerConfig(config)
     await syncAssetsDB(jsonData)
-    console.log(get(conn))
     updateConn({ didFirstSync: true })
-    console.log(get(conn))
   },
   log: (data) => {
     const { success, id } = data
@@ -100,19 +97,19 @@ export const messageServer = (type, data) => {
 }
 
 export const login = (username, password, host) => {
-  if (ws && ws.readyState !== ReconnectingWebSocket.CLOSED) {
-    console.error(
-      `Rejecting call to login(). Called with websocket in readyState = ${ws.readyState}, expected closed (${ReconnectingWebSocket.CLOSED}`
-    )
-    return
-  }
-
-  updateConn({ connecting: true })
   return new Promise(async (resolve, reject) => {
     let gotAuthResponse = false
     let connTimeout
     let url
 
+    if (ws && ws.readyState !== ReconnectingWebSocket.CLOSED) {
+      console.error(
+        `Rejecting call to login(). Called with websocket in readyState = ${ws.readyState}, expected closed (${ReconnectingWebSocket.CLOSED}`
+      )
+      reject({ type: "host", message: "A connection was in progress." })
+    }
+
+    updateConn({ connecting: true })
     if (username !== undefined) {
       // Convert http[s]:// to ws[s]://
       if (["http", "https"].some((proto) => host.toLowerCase().startsWith(`${proto}://`))) {
@@ -146,7 +143,7 @@ export const login = (username, password, host) => {
     ws = window.ws = new ReconnectingWebSocket(host)
     ws.onerror = (e) => {
       console.error("Websocket error", e)
-      const { ready, authenticated } = get(connCombined)
+      const { ready, authenticated } = get(conn)
       // If we've never been authenticated before
       if (ready) {
         updateConn({ connected: false })
@@ -158,7 +155,7 @@ export const login = (username, password, host) => {
     }
 
     ws.onclose = () => {
-      const { ready } = get(connCombined)
+      const { ready } = get(conn)
       if (ready) {
         // If we are in ready state, just update connection status, this is intermittent downtime
         updateConn({ connected: false })

@@ -7,9 +7,8 @@
   import { onDestroy } from "svelte"
 
   onDestroy(() => {
-    // When login sync modal is destroyed, don't show it
+    // When login sync modal is destroyed, don't show it on recreation
     store.update($store => ({...$store, show: false}))
-    console.log("Destroyed")
   })
 
 </script>

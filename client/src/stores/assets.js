@@ -110,7 +110,8 @@ class Asset extends AssetStopsetHydratableObject {
       }
       if (!exists) {
         console.log(`Downloading: ${url}`)
-        await download(url, dirname, { filename: tmpBasename })
+        // Accept any certificate during local development (ie, self-signed ones)
+        await download(url, dirname, { filename: tmpBasename, rejectUnauthorized: !IS_DEV })
         const actualMd5sum = await md5File(tmpPath)
         if (actualMd5sum !== md5sum) {
           throw new Error(`MD5 sum mismatch. Actual=${actualMd5sum} Expected=${md5sum}`)

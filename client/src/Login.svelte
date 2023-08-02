@@ -19,14 +19,11 @@
 
   let error = { type: "", message: "" }
   const searchParams = Object.fromEntries((new URLSearchParams(window.location.search)).entries())
-  console.log(searchParams)
   if (searchParams.errorType && searchParams.errorMessage) {
     error = { type: searchParams.errorType, message: searchParams.errorMessage}
   }
 
-  const clearError = () => {
-    error = { type: "", message: "" }
-  }
+  const clearError = () => error = { type: "", message: "" }
 
   $: formDisabled = $conn.connecting || $conn.connected
 
