@@ -15,6 +15,7 @@ class ClientLogEntry(models.Model):
         SKIPPED_ASSET = "skipped_asset", "Skipped playing an audio asset"
         SKIPPED_STOPSET = "skipped_stopset", "Skipped playing an entire stop set"
         WAITED = "waited", "Waited"
+        STOPSET_OVERDUE = "stopset_overdue", "Playing of stop set overdue"
         LOGGED_IN = "login", "Logged in"
         LOGGED_OUT = "logout", "Logged out"
         UNSPECIFIED = "unspecified", "Unspecified"

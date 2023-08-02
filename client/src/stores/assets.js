@@ -132,19 +132,6 @@ class Asset extends AssetStopsetHydratableObject {
   }
 }
 
-class PlayableAsset {
-  constructor(asset, chosenRotator) {
-    this._asset = asset // Need to keep a reference to this to avoid garbage collection and file deletion
-    this.rotator = chosenRotator
-    Object.assign(this, asset)
-    this.loadAudio()
-  }
-
-  loadAudio() {
-    console.log(`Would load ${this.file.localUrl} for asset ${this.name}`)
-  }
-}
-
 const pickRandomItemByWeight = (objects) => {
   const totalWeight = objects.reduce((weight, obj) => weight + obj.weight, 0)
   const randomWeight = Math.random() * totalWeight
@@ -232,7 +219,6 @@ class Stopset extends AssetStopsetHydratableObject {
       if (asset) {
         hardIgnoreIds.add(asset.id)
         DB.markPlayed(asset) /// XXX this should be marked by player code only
-        asset = new PlayableAsset(asset, rotator)
       }
       assets.push({ rotator, asset })
     }
@@ -265,12 +251,12 @@ class DB {
   }
 
   static _saveAssetPlayTimes() {
-    window.localStorage.setItem("soft-ignored", JSON.stringify(Array.from(this._assetPlayTimes.entries()), null, ""))
+    window.localStorage.setItem("soft-ignored-ids", JSON.stringify(Array.from(this._assetPlayTimes.entries()), null, ""))
   }
 
   static _loadAssetPlayTimes() {
     try {
-      this._assetPlayTimes = new Map(JSON.parse(window.localStorage.getItem("soft-ignored")))
+      this._assetPlayTimes = new Map(JSON.parse(window.localStorage.getItem("soft-ignored-ids")))
     } catch {}
   }
 
@@ -389,6 +375,7 @@ export const restoreAssetsDBFromLocalStorage = () => {
   db = window.db = emptyDB
 }
 
-export const generateStopset = (window.generateStopset = (startTime) => db.generateStopset(startTime))
+export const generateStopset = window.generateStopset = (startTime) => db.generateStopset(startTime)
+export const clearSoftIgnoredAssets = () => window.localStorage.removeItem("soft-ignored-ids")
 
 setInterval(() => DB.cleanup(), 45 * 60 * 60) // Clean up every 45 minutes

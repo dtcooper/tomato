@@ -301,7 +301,11 @@ CONSTANCE_ADDITIONAL_FIELDS = {
     ),
     "station_name": (
         "django.forms.CharField",
-        {"max_length": 50, "widget": "django.forms.TextInput", "widget_kwargs": {"attrs": {"size": 40}}},
+        {"max_length": 50, "widget": "django.forms.TextInput", "widget_kwargs": {"attrs": {"size": 40}}, "required": True},
+    ),
+    "stopset_overdue_message": (
+        "django.forms.CharField",
+        {"max_length": 250, "widget": "django.forms.TextInput", "widget_kwargs": {"attrs": {"size": 80}}, "required": True},
     ),
 }
 CONSTANCE_CONFIG = {
@@ -329,7 +333,7 @@ CONSTANCE_CONFIG = {
         Decimal(0),
         mark_safe(
             "Multiply an asset's weight by this number if it has an end date <strong>and</strong> the current date is"
-            " the end date. Set to 0 to disable this feature."
+            " the end date. Set to 0 to disable this feature. <span style=\"color: red\">(Currently not implemented.)</span>"
         ),
         "asset_end_date_priority_weight_multiplier",
     ),
@@ -341,11 +345,18 @@ CONSTANCE_CONFIG = {
     "NO_REPEAT_ASSETS_TIME": (
         Decimal(0),
         (
-            "The time (in seconds) required to elapse for the client to attempt to not repeat any assets. Set to 0 to"
+            "The time (in seconds) required to elapse for the dkestop app to attempt to not repeat any assets. Set to 0 to"
             " disable and allow potential repetition in the randomization algorithm. If there are not enough assets in"
             " a rotator to respect this setting, it will be ignored."
         ),
         "zero_seconds_to_five_hours",
+    ),
+    "STOPSET_OVERDUE_TIME": (
+        Decimal(0), mark_safe('The time (in seconds) after the <code>WAIT_INTERVAL</code> after which an "overdue" message will flash. Set to 0 disable.')),
+    "STOPSET_OVERDUE_MESSAGE": (
+        "You're overdue to play the next stopset. Please play it as soon as possible.",
+        mark_safe('The overdue message to be displayed when <code>STOPSET_OVERDUE_TIME</code>'),
+        "stopset_overdue_message",
     ),
     "ALLOW_REPEATS_IN_STOPSET": (
         False,
@@ -391,15 +402,24 @@ CONSTANCE_CONFIG = {
 }
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
     (
-        ("User Interface Options", ("STATION_NAME", "UI_MODES", "WARN_ON_EMPTY_ROTATORS")),
+        (
+            "User Interface Options",
+            (
+                "STATION_NAME",
+                "STOPSET_OVERDUE_TIME",
+                "STOPSET_OVERDUE_MESSAGE",
+                "UI_MODES",
+                "WARN_ON_EMPTY_ROTATORS",
+            ),
+        ),
         (
             "Audio Options",
             (
+                "AUDIO_BITRATE",
                 "BROADCAST_COMPRESSION",
                 "EXTRACT_METADATA_FROM_FILE",
-                "AUDIO_BITRATE",
-                "TRIM_SILENCE",
                 "PREVENT_DUPLICATE_ASSETS",
+                "TRIM_SILENCE",
             ),
         ),
         (
@@ -407,10 +427,10 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
             (
                 "WAIT_INTERVAL",
                 "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME",
-                "SINGLE_PLAY_ROTATORS",
-                "END_DATE_PRIORITY_WEIGHT_MULTIPLIER",
                 "NO_REPEAT_ASSETS_TIME",
                 "ALLOW_REPEATS_IN_STOPSET",
+                "SINGLE_PLAY_ROTATORS",
+                "END_DATE_PRIORITY_WEIGHT_MULTIPLIER",
             ),
         ),
     )

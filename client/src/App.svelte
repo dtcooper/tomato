@@ -4,26 +4,24 @@
   import { config } from "./stores/config"
 
   import Login from "./Login.svelte"
+  import Player from "./Player.svelte"
+  import SyncModal from "./SyncModal.svelte"
 
   if ($conn.ready) {
+    // Restore if app is loaded in "ready" state
     restoreAssetsDBFromLocalStorage()
     login()
   }
+
 </script>
 
-<div class="absolute pl-3 pt-2 text-xs">
-  <pre>{JSON.stringify($conn, Object.keys($conn).sort(), 2)}</pre>
-  <pre>{JSON.stringify($config, Object.keys($config).sort(), 2)}</pre>
-</div>
-
-{#if !$conn.reloading}
+{#if $conn.reloading}
+  <div class="h-screen w-screen flex items-center justify-center text-5xl italic">Logging out...</div>
+{:else}
   {#if !$conn.ready}
     <Login />
   {:else}
-    <div class="flex h-screen flex-col items-center justify-center">
-      <h1 class="p-6 text-xl italic">Logged in!</h1>
-      <div><button class="btn btn-primary" on:click={logout}>Logout</button></div>
-    </div>
+    <Player />
   {/if}
 {/if}
 

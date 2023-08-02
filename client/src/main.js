@@ -1,4 +1,4 @@
-const { app, BrowserWindow, powerSaveBlocker, shell } = require("electron")
+const { app, BrowserWindow, powerSaveBlocker, shell, ipcMain } = require("electron")
 const windowStateKeeper = require("electron-window-state")
 const fs = require("fs")
 const fsExtra = require("fs-extra")
@@ -42,6 +42,10 @@ if (squirrelCheck || !singleInstanceLock) {
     website: "https://github.com/dtcooper/tomato",
     iconPath: path.resolve(path.join(__dirname, "../assets/icons/tomato.png"))
   })
+
+  const url =(app.isPackaged || NODE_ENV === "production"
+    ? `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
+    : "http://localhost:3000/") + `?userDataDir=${encodeURIComponent(userDataDir)}`
 
   function createWindow() {
     const { screen } = require("electron")
@@ -99,14 +103,9 @@ if (squirrelCheck || !singleInstanceLock) {
       win.webContents.session.setPreloads([require.resolve("svelte-devtools-standalone")])
     }
 
-    const url =
-      (app.isPackaged || NODE_ENV === "production"
-        ? `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
-        : "http://localhost:3000/") + `?userDataDir=${encodeURIComponent(userDataDir)}`
-
     win.webContents.on("will-navigate", (event) => {
       // Allow page refreshes, otherwise open URL externally (clean logout)
-      if (event.url !== url) {
+      if (!event.url.startsWith(url)) {
         event.preventDefault()
         shell.openExternal(event.url)
       }
@@ -123,6 +122,17 @@ if (squirrelCheck || !singleInstanceLock) {
   app.whenReady().then(async () => {
     powerSaveBlocker.start("prevent-display-sleep")
     window = createWindow()
+  })
+
+  ipcMain.handle("refresh", (event, params) => {
+    if (window) {
+      let extra = ''
+      if (params) {
+        const urlParams = { errorType: params.type || "host", errorMessage: params.message }
+        extra = '&' + (new URLSearchParams(urlParams)).toString()
+      }
+      window.loadURL(`${url}${extra}`)
+    }
   })
 
   app.on("second-instance", () => {

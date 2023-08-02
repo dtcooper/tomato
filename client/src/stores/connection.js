@@ -1,8 +1,9 @@
 import ReconnectingWebSocket from "reconnecting-websocket"
+import { ipcRenderer } from "electron"
 import { persisted } from "svelte-local-storage-store"
 import { derived, get, writable } from "svelte/store"
 import { protocol_version } from "../../../server/constants.json"
-import { clearAssetsDB, syncAssetsDB } from "./assets"
+import { clearAssetsDB, clearSoftIgnoredAssets, syncAssetsDB } from "./assets"
 import { acknowledgeLog, log, sendPendingLogs } from "./client-logs"
 import { setServerConfig } from "./config"
 
@@ -43,9 +44,9 @@ const updateConn = ({ connected: $connected, connecting: $connecting, ...$connUp
 
 export { connCombined as conn }
 
-let ws = null
+let ws = window.ws = null
 
-export const logout = () => {
+export const logout = (error) => {
   const wasInReadyState = get(connCombined).ready // hard refresh if app was in "ready" state
 
   // Send off pending logs before logout
@@ -53,14 +54,14 @@ export const logout = () => {
   sendPendingLogs(true)
   updateConn({ authenticated: false, connected: false, connecting: false, didFirstSync: false })
   clearAssetsDB()
+  clearSoftIgnoredAssets()
   setServerConfig({})
 
   if (wasInReadyState) {
     reloading.set(true)
-    console.log("Was in ready state. Doing hard refresh in a second in an attempt to wait for logs to purge.")
-    setTimeout(() => window.location.reload(), 1000)
+    setTimeout(() => ipcRenderer.invoke("refresh", error), 1500)
   } else {
-    ws.close()
+    ipcRenderer.invoke("refresh", error)
   }
 }
 
@@ -99,7 +100,6 @@ export const messageServer = (type, data) => {
 }
 
 export const login = (username, password, host) => {
-  console.log("readyState:", ws && ws.readyState)
   if (ws && ws.readyState !== ReconnectingWebSocket.CLOSED) {
     console.error(
       `Rejecting call to login(). Called with websocket in readyState = ${ws.readyState}, expected closed (${ReconnectingWebSocket.CLOSED}`
@@ -137,23 +137,34 @@ export const login = (username, password, host) => {
       ;({ username, password, host } = get(conn))
     }
 
-    ws = new ReconnectingWebSocket(host)
+    if (!username || !password) {
+      updateConn({ connecting: false })
+      reject({ type: "userpass", message: "You must specify a username and password."})
+      return
+    }
+
+    ws = window.ws = new ReconnectingWebSocket(host)
     ws.onerror = (e) => {
       console.error("Websocket error", e)
+      const { ready, authenticated } = get(connCombined)
       // If we've never been authenticated before
-      if (!get(conn).authenticated) {
-        reject({ type: "host", message: "Failed to shake hands with server. Are this address is correct?" })
-        logout()
+      if (ready) {
+        updateConn({ connected: false })
+      } else if (authenticated) {
+        logout({ type: "host", message: "A connect error occurred with the server. Please try again."})
+      } else {
+        logout({ type: "host", message: "Failed to shake hands with server. You're sure this address is correct?" })
       }
     }
 
     ws.onclose = () => {
-      if (get(conn).authenticated) {
-        // If we have authenticated, just update connection status
+      const { ready } = get(connCombined)
+      if (ready) {
+        // If we are in ready state, just update connection status, this is intermittent downtime
         updateConn({ connected: false })
-      } else {
-        // If we've never been authenticated before, completely close connection
-        logout()
+      } else  {
+        // If we've not in ready state, reload application (clean login)
+        logout({ type: "host", message: "A connect error occurred with the server. Please try again."})
       }
     }
 
@@ -168,8 +179,7 @@ export const login = (username, password, host) => {
           console.log("Succesfully authenticated!")
           resolve()
         } else {
-          logout()
-          reject({ type: message.field || "host", message: message.error })
+          logout({ type: message.field || "host", message: message.error })
         }
       } else if (get(conn).authenticated) {
         const func = handleMessages[message.type]
@@ -184,10 +194,7 @@ export const login = (username, password, host) => {
       gotAuthResponse = false
       updateConn({ connected: false, connecting: true })
       ws.send(JSON.stringify({ username, password, protocol_version }))
-      connTimeout = setTimeout(() => {
-        ws.close()
-        reject({ type: "host", message: "Connection to server timed out. Try again." })
-      }, 25000)
+      connTimeout = setTimeout(() => ws.close(), 15000)
     }
   })
 }

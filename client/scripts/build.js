@@ -73,7 +73,7 @@ const runBuild = async () => {
 
   build("main.js", { bundle: !isDev, format: "cjs", external: ["electron", "svelte-devtools-standalone"] })
   build("app.js", {
-    external: ["./assets/fonts/*"],
+    external: ["electron", "./assets/fonts/*"],
     loader: { ".svg": "text" },
     plugins: [
       sveltePlugin({

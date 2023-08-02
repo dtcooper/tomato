@@ -10,6 +10,7 @@ export const setServerConfig = ({ _numeric: numeric, ...newConfig }) => {
       newConfig[key] = +newConfig[key] // Convert to numeric
     }
   }
+  console.log("Got new config", newConfig)
   config.set(newConfig)
 }
 
