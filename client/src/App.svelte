@@ -4,7 +4,6 @@
   import { config } from "./stores/config"
 
   import Login from "./Login.svelte"
-  import Player from "./ui-components/Player.svelte"
 
   if ($conn.ready) {
     restoreAssetsDBFromLocalStorage()

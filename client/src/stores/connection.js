@@ -57,8 +57,8 @@ export const logout = () => {
 
   if (wasInReadyState) {
     reloading.set(true)
-    console.log("Was in ready state. Doing hard refresh in 1.5 seconds to attempt to wait for logs to purge.")
-    setTimeout(() => window.location.reload(), 1500)
+    console.log("Was in ready state. Doing hard refresh in a second in an attempt to wait for logs to purge.")
+    setTimeout(() => window.location.reload(), 1000)
   } else {
     ws.close()
   }

@@ -1,9 +1,9 @@
 import dayjs from "dayjs"
 import download from "download"
 import fs from "fs/promises"
-import { pathToFileURL } from "url"
 import md5File from "md5-file"
 import path from "path"
+import { pathToFileURL } from "url"
 import { WeakRefSet } from "weak-ref-collections"
 
 import { get, readonly, writable } from "svelte/store"
@@ -132,6 +132,19 @@ class Asset extends AssetStopsetHydratableObject {
   }
 }
 
+class PlayableAsset {
+  constructor(asset, chosenRotator) {
+    this._asset = asset // Need to keep a reference to this to avoid garbage collection and file deletion
+    this.rotator = chosenRotator
+    Object.assign(this, asset)
+    this.loadAudio()
+  }
+
+  loadAudio() {
+    console.log(`Would load ${this.file.localUrl} for asset ${this.name}`)
+  }
+}
+
 const pickRandomItemByWeight = (objects) => {
   const totalWeight = objects.reduce((weight, obj) => weight + obj.weight, 0)
   const randomWeight = Math.random() * totalWeight
@@ -215,10 +228,11 @@ class Stopset extends AssetStopsetHydratableObject {
 
     const assets = []
     for (const rotator of this.rotators) {
-      const asset = rotator.getAsset(softIgnoreIds, hardIgnoreIds, startTime)
+      let asset = rotator.getAsset(softIgnoreIds, hardIgnoreIds, startTime)
       if (asset) {
         hardIgnoreIds.add(asset.id)
         DB.markPlayed(asset) /// XXX this should be marked by player code only
+        asset = new PlayableAsset(asset, rotator)
       }
       assets.push({ rotator, asset })
     }
@@ -229,6 +243,7 @@ class Stopset extends AssetStopsetHydratableObject {
 
 class DB {
   static _nonGarbageCollectedAssets = new WeakRefSet()
+  static _filesToCleanup = new Set()
   static _assetPlayTimes = new Map()
 
   constructor({ assets, rotators, stopsets } = { assets: [], rotators: [], stopsets: [] }) {
@@ -272,16 +287,24 @@ class DB {
       // For all non-garbage collected assets, get set of used files
       const usedFiles = new Set(Array.from(this._nonGarbageCollectedAssets.values()).map((a) => a.file.basename))
       let deleted = 0
+      const newFilesToCleanup = new Set()
 
-      // Go through all files in assetsDir and make sure their used
+      // Go through all files in assetsDir and make sure they'e used
       const foundFiles = await lsDir(assetsDir)
       for (const filePath of foundFiles) {
         if (!usedFiles.has(path.basename(filePath))) {
-          await fs.unlink(filePath)
-          deleted++
+          // Wait until _next_ cleanup to delete the files
+          if (this._filesToCleanup.has(filePath)) {
+            await fs.unlink(filePath)
+            deleted++
+            this._filesToCleanup.delete(filePath)
+          } else {
+            newFilesToCleanup.add(filePath)
+          }
         }
       }
-      console.log(`Cleaned up ${deleted} files.`)
+      this._filesToCleanup = newFilesToCleanup
+      console.log(`Cleaned up ${deleted} files. ${this._filesToCleanup.size} pending deletion.`)
     } else {
       console.log("Skipping cleanup due to ready=false")
     }
@@ -366,6 +389,6 @@ export const restoreAssetsDBFromLocalStorage = () => {
   db = window.db = emptyDB
 }
 
-export const generateStopset = (startTime) => db.generateStopset(startTime)
+export const generateStopset = (window.generateStopset = (startTime) => db.generateStopset(startTime))
 
 setInterval(() => DB.cleanup(), 45 * 60 * 60) // Clean up every 45 minutes

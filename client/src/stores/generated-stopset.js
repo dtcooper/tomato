@@ -3,7 +3,7 @@ export class GeneratedStopset {
     this.name = name
     console.log(assets)
 
-    this.assets = assets.map(({rotator, asset}) => {
+    this.assets = assets.map(({ rotator, asset }) => {
       let audio = null
       if (asset) {
         audio = new Audio()
@@ -12,7 +12,7 @@ export class GeneratedStopset {
         audio.preload = "auto"
         audio.load()
       }
-      return {rotator, asset, audio}
+      return { rotator, asset, audio }
     })
   }
 }
