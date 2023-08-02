@@ -1,12 +1,13 @@
 <script>
   import { conn, logout, login } from "./stores/connection"
-  import { restoreDBFromLocalStorage } from "./stores/assets"
+  import { restoreAssetsDBFromLocalStorage } from "./stores/assets"
   import { config } from "./stores/config"
 
   import Login from "./Login.svelte"
+  import Player from "./ui-components/Player.svelte"
 
   if ($conn.ready) {
-    restoreDBFromLocalStorage()
+    restoreAssetsDBFromLocalStorage()
     login()
   }
 </script>

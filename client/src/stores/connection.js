@@ -2,7 +2,7 @@ import ReconnectingWebSocket from "reconnecting-websocket"
 import { persisted } from "svelte-local-storage-store"
 import { derived, get, writable } from "svelte/store"
 import { protocol_version } from "../../../server/constants.json"
-import { syncData } from "./assets"
+import { clearAssetsDB, syncAssetsDB } from "./assets"
 import { acknowledgeLog, log, sendPendingLogs } from "./client-logs"
 import { setServerConfig } from "./config"
 
@@ -51,8 +51,8 @@ export const logout = () => {
   // Send off pending logs before logout
   log("logout")
   sendPendingLogs(true)
-
   updateConn({ authenticated: false, connected: false, connecting: false, didFirstSync: false })
+  clearAssetsDB()
   setServerConfig({})
 
   if (wasInReadyState) {
@@ -69,7 +69,7 @@ const handleMessages = {
   data: async (data) => {
     const { config, ...jsonData } = data
     setServerConfig(config)
-    await syncData(jsonData)
+    await syncAssetsDB(jsonData)
     console.log(get(conn))
     updateConn({ didFirstSync: true })
     console.log(get(conn))

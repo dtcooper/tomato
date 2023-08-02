@@ -1,6 +1,7 @@
 import dayjs from "dayjs"
 import download from "download"
 import fs from "fs/promises"
+import { pathToFileURL } from "url"
 import md5File from "md5-file"
 import path from "path"
 import { WeakRefSet } from "weak-ref-collections"
@@ -9,6 +10,7 @@ import { get, readonly, writable } from "svelte/store"
 
 import { config } from "./config"
 import { conn } from "./connection"
+import { GeneratedStopset } from "./generated-stopset"
 
 const assetsDir = path.join(new URLSearchParams(window.location.search).get("userDataDir"), "assets")
 
@@ -49,9 +51,8 @@ const lsDir = async (dir, _results = []) => {
 
 class HydratableObject {
   constructor(data, db) {
-    this._data = data
     this._db = db
-    Object.assign(this, this._data)
+    Object.assign(this, data)
   }
 
   toString() {
@@ -60,11 +61,11 @@ class HydratableObject {
 }
 
 class AssetStopsetHydratableObject extends HydratableObject {
-  constructor({ rotators, ...data }, db) {
+  constructor({ begin, end, rotators, ...data }, db) {
     super(data, db)
     this._rotators = rotators
-    this.begin = this.begin && dayjs(this.begin)
-    this.end = this.end && dayjs(this.end)
+    this.begin = begin && dayjs(begin)
+    this.end = end && dayjs(end)
   }
   get rotators() {
     return this._rotators.map((id) => this._db.rotators.get(id))
@@ -80,6 +81,7 @@ class Asset extends AssetStopsetHydratableObject {
     const tmpPath = path.join(dirname, `${basename}.tmp`)
     this.file = {
       url: `${db.host}${file.url}`,
+      localUrl: pathToFileURL(filePath),
       path: filePath,
       basename,
       size: file.size,
@@ -158,8 +160,8 @@ class Rotator extends HydratableObject {
     this.assets = db.assets.filter((a) => a._rotators.includes(this.id))
   }
 
-  getAsset(softIgnoreIds = new Set(), hardIgnoreIds = new Set()) {
-    const activeAssets = filterItemsByActive(this.assets)
+  getAsset(softIgnoreIds = new Set(), hardIgnoreIds = new Set(), startTime) {
+    const activeAssets = filterItemsByActive(this.assets, startTime)
     const hardIgnoredAssets = activeAssets.filter((a) => !hardIgnoreIds.has(a.id))
     const softIgnoredAssets = hardIgnoredAssets.filter((a) => !softIgnoreIds.has(a.id))
 
@@ -197,7 +199,7 @@ class RotatorsMap extends Map {
 }
 
 class Stopset extends AssetStopsetHydratableObject {
-  generate() {
+  generate(startTime) {
     const hardIgnoreIds = new Set()
     let softIgnoreIds = undefined
 
@@ -213,7 +215,7 @@ class Stopset extends AssetStopsetHydratableObject {
 
     const assets = []
     for (const rotator of this.rotators) {
-      const asset = rotator.getAsset(softIgnoreIds, hardIgnoreIds)
+      const asset = rotator.getAsset(softIgnoreIds, hardIgnoreIds, startTime)
       if (asset) {
         hardIgnoreIds.add(asset.id)
         DB.markPlayed(asset) /// XXX this should be marked by player code only
@@ -285,10 +287,10 @@ class DB {
     }
   }
 
-  generateStopset() {
-    const stopset = pickRandomItemByWeight(filterItemsByActive(this.stopsets))
+  generateStopset(startTime) {
+    const stopset = pickRandomItemByWeight(filterItemsByActive(this.stopsets, startTime))
     if (stopset) {
-      return { stopset, assets: stopset.generate() }
+      return new GeneratedStopset(stopset.name, stopset.generate(startTime))
     }
     return null
   }
@@ -319,7 +321,7 @@ const runOnceAndQueueLastCall = (func) => {
   }
 }
 
-export const syncData = runOnceAndQueueLastCall(async (jsonData) => {
+export const syncAssetsDB = runOnceAndQueueLastCall(async (jsonData) => {
   const replacementDB = new DB(jsonData)
 
   const downloadedAssetsIds = new Set()
@@ -345,12 +347,12 @@ export const syncData = runOnceAndQueueLastCall(async (jsonData) => {
   syncProgress.set(emptySyncProgress)
 })
 
-export const clearData = () => {
+export const clearAssetsDB = () => {
   db = emptyDB
   window.localStorage.removeItem("last-db-data")
 }
 
-export const restoreDBFromLocalStorage = () => {
+export const restoreAssetsDBFromLocalStorage = () => {
   try {
     const state = JSON.parse(window.localStorage.getItem("last-db-data"))
     if (state) {
@@ -363,5 +365,7 @@ export const restoreDBFromLocalStorage = () => {
 
   db = window.db = emptyDB
 }
+
+export const generateStopset = (startTime) => db.generateStopset(startTime)
 
 setInterval(() => DB.cleanup(), 45 * 60 * 60) // Clean up every 45 minutes
