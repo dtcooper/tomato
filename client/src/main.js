@@ -73,7 +73,8 @@ if (squirrelCheck || !singleInstanceLock) {
         contextIsolation: false,
         nodeIntegration: true,
         webSecurity: false,
-        spellcheck: false
+        spellcheck: false,
+        backgroundThrottling: false
       }
     })
     win.webContents.setVisualZoomLevelLimits(1, 1)
