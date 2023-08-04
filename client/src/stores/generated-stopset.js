@@ -1,41 +1,87 @@
-class PlayableAsset {
-  static _reusableAudioObjects = new Map()
+import dayjs from "dayjs"
 
-  constructor(asset, rotator, index) {
+
+class GeneratedStopsetAssetBase {
+  constructor(rotator, generatedStopset, index) {
+    this.rotator = rotator
+    this.generatedStopset = generatedStopset
+    this.index = index
+    this.finished = false
+  }
+
+  done(error) {
+    this.finished = true
+    if (error) {
+      console.log(`An error occurred while playing ${this.name}`, error)
+    }
+    this.generatedStopset.donePlaying(this.index)
+  }
+}
+
+
+class PlayableAsset extends GeneratedStopsetAssetBase {
+  static _reusableAudioObjects = []
+
+  constructor({duration, ...asset}, ...args) {
+    super(...args)
     // Assigns asset._db, which holds a reference to the underlying asset object
     // therefore a reference to the _original_ asset is held and it won't be garbage
     // collected and cleaned  up yet
     Object.assign(this, asset)
-    this.rotator = rotator
+    this._duration = duration
     this.playable = true
-    this.playing = false
-    this.index = index
+    this.audio = null
+  }
+
+  get duration() {
+    // Go based on real time if possible
+    if (this.audio && !isNaN(this.audio.duration) && isFinite(this.audio.duration)) {
+      return dayjs.duration(Math.ceil(this.audio.duration), "seconds")
+    } else {
+      return this._duration
+    }
+  }
+
+  get currentTime() {
+    if (this.finished) {
+      return this.duration
+    } else {
+      return dayjs.duration(Math.round(this.audio ? this.audio.currentTime : 0), "seconds")
+    }
+  }
+
+  getAudioObject() {
+    const i = PlayableAsset._reusableAudioObjects.find(audio => audio._used)
+    let audio
+    if (i > -1) {
+      audio = PlayableAsset._reusableAudioObjects[i]
+    } else {
+      audio = new Audio()
+      PlayableAsset._reusableAudioObjects.push(audio)
+    }
+    audio._used = true
+
+    if (PlayableAsset._reusableAudioObjects.length > 50) {
+      console.warn("Length of PlayableAsset._reusuableAudioObjects exceeds > 50, something may be very wrong.")
+    }
+
+    return audio
   }
 
   loadAudio() {
-    this.audio = PlayableAsset._reusableAudioObjects.get(this.index)
-    if (!this.audio) {
-      this.audio = new Audio()
-      PlayableAsset._reusableAudioObjects.set(this.index, this.audio)
-    }
+    const audio = this.audio = this.getAudioObject()
 
-    this.audio.onerror = this.audio.onabort = (e) => {
-      console.error(`An error occured while loading ${this.name}`, e)
-      this.playable = false
-    }
-
-    this.audio.src = this.file.localUrl
     console.log(`Loading ${this.file.localUrl}`)
+    audio.ondurationchange = audio.ontimeupdate = (event) => {
+      this.generatedStopset.update()
+    }
+    audio.onended = audio.onerror = audio.onabort = audio.reject = () => this.done()
+    audio.src = this.file.localUrl
   }
 
   play() {
-    return new Promise(async (resolve, reject) => {
-      console.log(`Playing ${this.name}`)
-      this.audio.play().catch(reject)
-      this.audio.onended = resolve
-      this.audio.onerror = this.audio.onabort = reject
-      this.audio.onpause
-    })
+    console.log(`Playing ${this.name}`)
+    this.audio.play().catch(() => this.done())
   }
 
   toString() {
@@ -43,52 +89,67 @@ class PlayableAsset {
   }
 }
 
-class NonPlayableAsset {
-  constructor(rotator, index) {
+class NonPlayableAsset extends GeneratedStopsetAssetBase{
+  constructor(...args) {
+    super(...args)
+    this.name = "Non-playable asset"
     this.playable = false
-    this.rotator = rotator
-    this.index = index
+  }
+
+  play() {
+    done()
   }
 }
 
 export class GeneratedStopset {
-  constructor(name, items) {
-    this.name = name
-    this.items = items.map(({ rotator, asset }, index) => {
-      return asset ? new PlayableAsset(asset, rotator, index) : new NonPlayableAsset(rotator, index)
+  constructor(stopset, rotatorsAndAssets, update) {
+    Object.assign(this, stopset)
+    this.update = update || (() => {})  // UI update function (or no-op)
+    this.items = rotatorsAndAssets.map(({ rotator, asset }, index) => {
+      const args = [rotator, this, index]
+      return asset ? new PlayableAsset(asset, ...args) : new NonPlayableAsset(...args)
     })
+    this.current = 0
     this.loaded = false
   }
 
   loadAudio() {
-    this.items.forEach(item => item.playable && item.loadAudio())
-    this.loaded = true
+    if (!this.loaded) {
+      this.items.forEach(item => item.playable && item.loadAudio())
+      this.loaded = true
+    }
   }
 
-  async play() {
+  unloadAudio() {
     if (!this.loaded) {
-      this.loadAudio()
-    }
 
-    // Keep track of playing index, so it can be skipped elsewhere
-    for (const item of this.items) {
-      if (item.playable) {
-        try {
-          await item.play()
-        } catch (e) {
-          console.error(`Failed to play ${item.name}`, e)
-        }
-      } else {
-        console.error(`Skipped rotator ${item.rotator.name}`)
-      }
+      this.loaded = false
     }
+  }
+
+  donePlaying(index) {
+    this.current++
+    this.update()
+    if (this.current < this.items.length) {
+      this.play()
+    } else {
+      this.done()
+    }
+    this.update()
+  }
+
+  done() {
+    this.items.filter(item => item.playable).forEach(this.item.audio._used = false)
+  }
+
+  play() {
+    this.loadAudio()
+    this.items[this.current].play()
+    this.update()
   }
 
   pause() {
-
-  }
-
-  stop() {
-    this.items.forEach(item => item.playable && item.audio.pause())
+    this.items[this.current].pause()
+    this.update()
   }
 }

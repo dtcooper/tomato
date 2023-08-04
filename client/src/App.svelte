@@ -1,11 +1,9 @@
 <script>
-  import { conn, logout, login } from "./stores/connection"
+  import { conn, login } from "./stores/connection"
   import { restoreAssetsDBFromLocalStorage } from "./stores/assets"
-  import { config } from "./stores/config"
 
   import Login from "./Login.svelte"
-  import Player from "./Player.svelte"
-  import SyncModal from "./SyncModal.svelte"
+  import Main from "./main/Main.svelte"
 
   if ($conn.ready) {
     // Restore if app is loaded in "ready" state
@@ -16,12 +14,12 @@
 </script>
 
 {#if $conn.reloading}
-  <div class="h-screen w-screen flex items-center justify-center text-5xl italic">Logging out...</div>
+  <div class="h-screen w-screen flex items-center justify-center text-5xl italic cursor-wait">Logging out...</div>
 {:else}
   {#if !$conn.ready}
     <Login />
   {:else}
-    <Player />
+    <Main />
   {/if}
 {/if}
 

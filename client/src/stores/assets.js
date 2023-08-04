@@ -200,7 +200,7 @@ class RotatorsMap extends Map {
 }
 
 class Stopset extends AssetStopsetHydratableObject {
-  generate(startTime) {
+  generate(startTime, rerender) {
     const hardIgnoreIds = new Set()
     let softIgnoreIds = undefined
 
@@ -214,17 +214,19 @@ class Stopset extends AssetStopsetHydratableObject {
       softIgnoreIds = new Set(DB._assetPlayTimes.keys())
     }
 
-    const assets = []
+    const items = []
     for (const rotator of this.rotators) {
-      let asset = rotator.getAsset(softIgnoreIds, hardIgnoreIds, startTime)
+      const asset = rotator.getAsset(softIgnoreIds, hardIgnoreIds, startTime)
       if (asset) {
         hardIgnoreIds.add(asset.id)
-        DB.markPlayed(asset) /// XXX this should be marked by player code only
+        /// XXX should this be marked by player code only?
+        /// Except then the next stopset may include it, so maybe this _is_ the stop for marking
+        DB.markPlayed(asset)
       }
-      assets.push({ rotator, asset })
+      items.push({ rotator, asset })
     }
 
-    return assets
+    return new GeneratedStopset(this, items, rerender)
   }
 }
 
@@ -280,7 +282,7 @@ class DB {
       const foundFiles = await lsDir(assetsDir)
       for (const filePath of foundFiles) {
         if (!usedFiles.has(path.basename(filePath))) {
-          // Wait until _next_ cleanup to delete the files
+          // Wait until _next_ cleanup to delete the files (just to be on the safe side)
           if (this._filesToCleanup.has(filePath)) {
             await fs.unlink(filePath)
             deleted++
@@ -297,10 +299,10 @@ class DB {
     }
   }
 
-  generateStopset(startTime) {
+  generateStopset(startTime, rerender) {
     const stopset = pickRandomItemByWeight(filterItemsByActive(this.stopsets, startTime))
     if (stopset) {
-      return new GeneratedStopset(stopset.name, stopset.generate(startTime))
+      return stopset.generate(null, rerender)
     }
     return null
   }
@@ -308,8 +310,12 @@ class DB {
 
 DB._loadAssetPlayTimes()
 const emptyDB = new DB()
-let db = emptyDB
 window.DB = DB
+const dbStore = writable(emptyDB)
+let db = emptyDB
+const dbReadonly = readonly(dbStore)
+export { dbReadonly as db }
+
 
 const runOnceAndQueueLastCall = (func) => {
   let running = false
@@ -353,11 +359,15 @@ export const syncAssetsDB = runOnceAndQueueLastCall(async (jsonData) => {
     data.assets = data.assets.filter((asset) => downloadedAssetsIds.has(asset.id))
   }
   window.localStorage.setItem("last-db-data", JSON.stringify(jsonData, null, ""))
-  db = window.db = replacementDB // Swap out DB
+  window.db = replacementDB // Swap out DB
+  dbStore.set(replacementDB)
+  db = replacementDB
   syncProgress.set(emptySyncProgress)
 })
 
 export const clearAssetsDB = () => {
+  window.db = emptyDB
+  dbStore.set(emptyDB)
   db = emptyDB
   window.localStorage.removeItem("last-db-data")
 }
@@ -366,17 +376,20 @@ export const restoreAssetsDBFromLocalStorage = () => {
   try {
     const state = JSON.parse(window.localStorage.getItem("last-db-data"))
     if (state) {
-      db = window.db = new DB(state)
+      const loadedDb = window.db = new DB(state)
+      dbStore.set(loadedDb)
+      db = loadedDb
       return
     }
   } catch (e) {
     console.error(e)
   }
 
-  db = window.db = emptyDB
+  window.db = emptyDB
+  dbStore.set(emptyDB)
+  db = emptyDB
 }
 
-export const generateStopset = window.generateStopset = (startTime) => db.generateStopset(startTime)
 export const clearSoftIgnoredAssets = () => window.localStorage.removeItem("soft-ignored-ids")
 
 setInterval(() => DB.cleanup(), 45 * 60 * 60) // Clean up every 45 minutes

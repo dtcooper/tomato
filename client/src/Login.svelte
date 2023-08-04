@@ -5,17 +5,18 @@
 
   import { conn, login } from "./stores/connection"
   import { config } from "./stores/config"
-  import { showSyncModal, closeSyncModal } from "./stores/sync-modal"
 
   import tomatoIcon from "../assets/icons/tomato.svg"
 
-  import SyncModal from "./SyncModal.svelte"
+  import SyncModal from "./main/SyncModal.svelte"
 
   let showPassword = IS_DEV
   let demoMode = false
   let password = ""
   let username = persisted("login-username", "")
   let host = persisted("login-host", "")
+  let showSyncModal
+  let syncModalTitle
 
   let error = { type: "", message: "" }
   const searchParams = Object.fromEntries((new URLSearchParams(window.location.search)).entries())
@@ -26,13 +27,7 @@
   const clearError = () => error = { type: "", message: "" }
 
   $: formDisabled = $conn.connecting || $conn.connected
-
-  $: if (!$conn.ready && $conn.connected) {
-    console.log("Showing modal")
-    showSyncModal(`Connecting to ${$config.STATION_NAME}`, false)
-  } else {
-    closeSyncModal()
-  }
+  $: showSyncModal =!$conn.ready && $conn.connected
 
   const submit = async () => {
     clearError()
@@ -52,9 +47,9 @@
   }
 </script>
 
-<SyncModal/>
+<SyncModal title={`Connecting to ${$config.STATION_NAME}`} canDismiss={false} show={showSyncModal} />
 
-<div class="mx-auto flex min-h-screen w-full max-w-2xl flex-col items-center justify-center gap-y-3">
+<div class="mx-auto flex min-h-screen w-full max-w-2xl flex-col items-center justify-center gap-y-3" class:cursor-wait={$conn.connecting}>
   <div class="flex w-full items-center justify-evenly">
     <div class="tomato-svg">{@html tomatoIcon}</div>
     <div class="flex flex-col items-center space-y-1 font-mono font-bold">
