@@ -252,6 +252,7 @@ def validate_no_more_than_three(value):
 MIGRATION_MODULES = {"constance": None}  # Ignore constance models
 CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
 CONSTANCE_SUPERUSER_ONLY = False
+CONSTANCE_IGNORE_ADMIN_VERSION_CHECK = True
 CONSTANCE_REDIS_CONNECTION = "redis://redis"
 CONSTANCE_ADDITIONAL_FIELDS = {
     "zero_seconds_to_five_hours": (
