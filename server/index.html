@@ -554,25 +554,10 @@ heavily leveraging its automatic admin interface.</p>
 <p>The name of your station.</p>
 <p>Default: <code>'Tomato Radio Automation'</code></p>
 </dd>
-<dt><code>STOPSET_OVERDUE_TIME</code> --- <strong>Type: Numeric</strong></dt>
-<dd>
-<p>The time (in seconds) after the <code>WAIT_INTERVAL</code> after which an "overdue" message will flash. Set to 0 disable.</p>
-<p>Default: <code>0</code></p>
-</dd>
-<dt><code>STOPSET_OVERDUE_MESSAGE</code> --- <strong>Type: String</strong></dt>
-<dd>
-<p>The overdue message to be displayed when <code>STOPSET_OVERDUE_TIME</code></p>
-<p>Default: <code>"You're overdue to play the next stopset. Please play it as soon as possible."</code></p>
-</dd>
 <dt><code>UI_MODES</code> --- <strong>Type: Choice of: Simple view, Standard view or Advanced view</strong></dt>
 <dd>
 <p>What user interface modes are available to the desktop app.</p>
 <p>Default: <code>['simple', 'standard']</code></p>
-</dd>
-<dt><code>WARN_ON_EMPTY_ROTATORS</code> --- <strong>Type: Boolean (true or false)</strong></dt>
-<dd>
-<p>Warn when a rotator has no eligible assets to choose from. (Desktop app only)</p>
-<p>Default: <code>True</code></p>
 </dd>
 </dl>
 </div>
@@ -583,11 +568,6 @@ heavily leveraging its automatic admin interface.</p>
 <dd>
 <p>The audio bitrate to convert an asset to, if <strong>and only if</strong> processing is required.<br><strong>NOTE:</strong> processing is required when a file that is uploaded is <strong>not</strong> a valid MP3 file or <strong>TRIM_SILENCE</strong> is on.</p>
 <p>Default: <code>192kbps</code></p>
-</dd>
-<dt><code>BROADCAST_COMPRESSION</code> --- <strong>Type: Boolean (true or false)</strong></dt>
-<dd>
-<p>Enable broadcast compression, smoothing out dynamic range in audio output.<br><strong>NOTE:</strong> compression is applied at the time you play an audio asset and performed on-the-fly in the desktop app.</p>
-<p>Default: <code>False</code></p>
 </dd>
 <dt><code>EXTRACT_METADATA_FROM_FILE</code> --- <strong>Type: Boolean (true or false)</strong></dt>
 <dd>
@@ -619,6 +599,21 @@ heavily leveraging its automatic admin interface.</p>
 <p>Wait time subtracts the playtime of a stop set in minutes. This will provide more even results, ie the number of stop sets played per hour will be more consistent at the expense of a DJs air time.</p>
 <p>Default: <code>False</code></p>
 </dd>
+<dt><code>WARN_ON_EMPTY_ROTATORS</code> --- <strong>Type: Boolean (true or false)</strong></dt>
+<dd>
+<p>Warn when a rotator has no eligible assets to choose from. (Desktop app only)</p>
+<p>Default: <code>True</code></p>
+</dd>
+<dt><code>STOPSET_OVERDUE_TIME</code> --- <strong>Type: Numeric</strong></dt>
+<dd>
+<p>The time (in seconds) after the <code>WAIT_INTERVAL</code> after which an "overdue" message will flash. Set to 0 disable.</p>
+<p>Default: <code>0</code></p>
+</dd>
+<dt><code>STOPSET_OVERDUE_MESSAGE</code> --- <strong>Type: String</strong></dt>
+<dd>
+<p>The overdue message to be displayed when <code>STOPSET_OVERDUE_TIME</code></p>
+<p>Default: <code>"You're overdue to play the next stopset. Please play it as soon as possible."</code></p>
+</dd>
 <dt><code>NO_REPEAT_ASSETS_TIME</code> --- <strong>Type: Numeric</strong></dt>
 <dd>
 <p>The time (in seconds) required to elapse for the dkestop app to attempt to not repeat any assets. Set to 0 to disable and allow potential repetition in the randomization algorithm. If there are not enough assets in a rotator to respect this setting, it will be ignored.</p>
@@ -638,6 +633,11 @@ heavily leveraging its automatic admin interface.</p>
 <dd>
 <p>Multiply an asset's weight by this number if it has an end date <strong>and</strong> the current date is the end date. Set to 0 to disable this feature. <span style="color: red">(Currently not implemented.)</span></p>
 <p>Default: <code>0</code></p>
+</dd>
+<dt><code>BROADCAST_COMPRESSION</code> --- <strong>Type: Boolean (true or false)</strong></dt>
+<dd>
+<p>Enable broadcast compression, smoothing out dynamic range in audio output.<br><strong>NOTE:</strong> compression is applied at the time you play an audio asset and performed on-the-fly in the desktop app.</p>
+<p>Default: <code>False</code></p>
 </dd>
 </dl>
 </div>
