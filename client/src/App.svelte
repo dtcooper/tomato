@@ -1,6 +1,6 @@
 <script>
   import { conn, login } from "./stores/connection"
-  import { restoreAssetsDBFromLocalStorage } from "./stores/assets"
+  import { restoreAssetsDBFromLocalStorage } from "./stores/db"
 
   import Login from "./Login.svelte"
   import Main from "./main/Main.svelte"
@@ -49,7 +49,7 @@
     font-size: 0.9em;
   }
 
-  svg {
+  :global(svg) {
     @apply h-16 w-16;
   }
 </style>

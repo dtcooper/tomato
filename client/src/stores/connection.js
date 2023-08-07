@@ -3,7 +3,7 @@ import { ipcRenderer } from "electron"
 import { persisted } from "svelte-local-storage-store"
 import { derived, get, writable } from "svelte/store"
 import { protocol_version } from "../../../server/constants.json"
-import { clearAssetsDB, clearSoftIgnoredAssets, syncAssetsDB } from "./assets"
+import { clearAssetsDB, clearSoftIgnoredAssets, syncAssetsDB } from "./db"
 import { acknowledgeLog, log, sendPendingLogs } from "./client-logs"
 import { setServerConfig } from "./config"
 

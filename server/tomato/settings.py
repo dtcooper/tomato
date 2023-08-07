@@ -268,7 +268,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
     "ui_modes": (
         "django.forms.MultipleChoiceField",
         {
-            "choices": (("simple", "Simple view"), ("standard", "Standard view"), ("advanced", "Advanced view")),
+            "choices": (("0", "Simple view"), ("1", "Standard view"), ("2", "Advanced view")),
             "widget": "django.forms.widgets.CheckboxSelectMultiple",
             "required": True,
         },
@@ -407,17 +407,13 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
             "User Interface Options",
             (
                 "STATION_NAME",
-                "STOPSET_OVERDUE_TIME",
-                "STOPSET_OVERDUE_MESSAGE",
                 "UI_MODES",
-                "WARN_ON_EMPTY_ROTATORS",
             ),
         ),
         (
             "Audio Options",
             (
                 "AUDIO_BITRATE",
-                "BROADCAST_COMPRESSION",
                 "EXTRACT_METADATA_FROM_FILE",
                 "PREVENT_DUPLICATE_ASSETS",
                 "TRIM_SILENCE",
@@ -428,10 +424,14 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
             (
                 "WAIT_INTERVAL",
                 "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME",
+                "WARN_ON_EMPTY_ROTATORS",
+                "STOPSET_OVERDUE_TIME",
+                "STOPSET_OVERDUE_MESSAGE",
                 "NO_REPEAT_ASSETS_TIME",
                 "ALLOW_REPEATS_IN_STOPSET",
                 "SINGLE_PLAY_ROTATORS",
                 "END_DATE_PRIORITY_WEIGHT_MULTIPLIER",
+                "BROADCAST_COMPRESSION",
             ),
         ),
     )

@@ -8,6 +8,7 @@ import { WeakRefSet } from "weak-ref-collections"
 
 import { get, readonly, writable } from "svelte/store"
 
+import { colors } from "../../../server/constants.json"
 import { config } from "./config"
 import { conn } from "./connection"
 import { GeneratedStopset } from "./generated-stopset"
@@ -90,7 +91,6 @@ class Asset extends AssetStopsetHydratableObject {
       tmpPath,
       tmpBasename: path.basename(tmpPath)
     }
-    this.duration = dayjs.duration(this.duration, "seconds")
     // TODO: override weight via END_DATE_PRIORITY_WEIGHT_MULTIPLIER
   }
 
@@ -156,9 +156,10 @@ const filterItemsByActive = (obj, dt = null) => {
 }
 
 class Rotator extends HydratableObject {
-  constructor(data, db) {
+  constructor({color, ...data}, db) {
     super(data, db)
     this.assets = db.assets.filter((a) => a._rotators.includes(this.id))
+    this.color = colors.find((c) => c.name === color)
   }
 
   getAsset(softIgnoreIds = new Set(), hardIgnoreIds = new Set(), startTime) {
@@ -200,7 +201,7 @@ class RotatorsMap extends Map {
 }
 
 class Stopset extends AssetStopsetHydratableObject {
-  generate(startTime, rerender) {
+  generate(startTime, updateCallback) {
     const hardIgnoreIds = new Set()
     let softIgnoreIds = undefined
 
@@ -226,7 +227,7 @@ class Stopset extends AssetStopsetHydratableObject {
       items.push({ rotator, asset })
     }
 
-    return new GeneratedStopset(this, items, rerender)
+    return new GeneratedStopset(this, items, updateCallback)
   }
 }
 
@@ -299,10 +300,10 @@ class DB {
     }
   }
 
-  generateStopset(startTime, rerender) {
+  generateStopset(startTime, updateCallback) {
     const stopset = pickRandomItemByWeight(filterItemsByActive(this.stopsets, startTime))
     if (stopset) {
-      return stopset.generate(null, rerender)
+      return stopset.generate(null, updateCallback)
     }
     return null
   }

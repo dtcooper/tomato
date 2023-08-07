@@ -16,7 +16,6 @@
   let username = persisted("login-username", "")
   let host = persisted("login-host", "")
   let showSyncModal
-  let syncModalTitle
 
   let error = { type: "", message: "" }
   const searchParams = Object.fromEntries((new URLSearchParams(window.location.search)).entries())

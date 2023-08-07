@@ -22,32 +22,16 @@ class GeneratedStopsetAssetBase {
 class PlayableAsset extends GeneratedStopsetAssetBase {
   static _reusableAudioObjects = []
 
-  constructor({duration, ...asset}, ...args) {
+  constructor({...asset}, ...args) {
     super(...args)
     // Assigns asset._db, which holds a reference to the underlying asset object
     // therefore a reference to the _original_ asset is held and it won't be garbage
     // collected and cleaned  up yet
     Object.assign(this, asset)
-    this._duration = duration
+    this.elapsed = this.elapsedFull = 0
     this.playable = true
     this.audio = null
-  }
-
-  get duration() {
-    // Go based on real time if possible
-    if (this.audio && !isNaN(this.audio.duration) && isFinite(this.audio.duration)) {
-      return dayjs.duration(Math.ceil(this.audio.duration), "seconds")
-    } else {
-      return this._duration
-    }
-  }
-
-  get currentTime() {
-    if (this.finished) {
-      return this.duration
-    } else {
-      return dayjs.duration(Math.round(this.audio ? this.audio.currentTime : 0), "seconds")
-    }
+    this.durationFull = this.duration
   }
 
   getAudioObject() {
@@ -69,14 +53,25 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   }
 
   loadAudio() {
-    const audio = this.audio = this.getAudioObject()
+    this.audio = this.getAudioObject()
 
     console.log(`Loading ${this.file.localUrl}`)
-    audio.ondurationchange = audio.ontimeupdate = (event) => {
+    this.audio.ondurationchange = () => {
+      this.durationFull = this.audio.duration
+      this.duration = Math.ceil(this.audio.duration)
       this.generatedStopset.update()
     }
-    audio.onended = audio.onerror = audio.onabort = audio.reject = () => this.done()
-    audio.src = this.file.localUrl
+    this.audio.ontimeupdate = () => {
+      this.elapsedFull = this.audio.currentTime
+      this.elapsed = Math.round(this.audio.currentTime)
+      this.generatedStopset.update()
+    }
+    this.audio.onended = this.audio.onerror = this.audio.onabort = () => this.done()
+    this.audio.src = this.file.localUrl
+  }
+
+  get remaining() {
+    return this.duration - this.elapsed
   }
 
   play() {
@@ -102,15 +97,35 @@ class NonPlayableAsset extends GeneratedStopsetAssetBase{
 }
 
 export class GeneratedStopset {
-  constructor(stopset, rotatorsAndAssets, update) {
+  constructor(stopset, rotatorsAndAssets, updateCallback) {
     Object.assign(this, stopset)
-    this.update = update || (() => {})  // UI update function (or no-op)
+    this.update = updateCallback || (() => {})  // UI update function (or no-op)
     this.items = rotatorsAndAssets.map(({ rotator, asset }, index) => {
       const args = [rotator, this, index]
       return asset ? new PlayableAsset(asset, ...args) : new NonPlayableAsset(...args)
     })
     this.current = 0
     this.loaded = false
+  }
+
+  get durationFull() {
+    return this.playableItems.reduce((s, item) => s + item.durationFull, 0)
+  }
+  get elapsedFull() {
+    return this.playableItems.reduce((s, item) => s + item.elapsedFull, 0)
+  }
+  get duration() {
+    return this.playableItems.reduce((s, item) => s + item.duration, 0)
+  }
+  get elapsed() {
+    return this.playableItems.reduce((s, item) => s + item.elapsed, 0)
+  }
+  get remaining() {
+    return this.duration - this.elapsed
+  }
+
+  get playableItems() {
+    return this.items.filter(item => item.playable)
   }
 
   loadAudio() {
