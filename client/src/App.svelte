@@ -10,17 +10,14 @@
     restoreAssetsDBFromLocalStorage()
     login()
   }
-
 </script>
 
 {#if $conn.reloading}
-  <div class="h-screen w-screen flex items-center justify-center text-5xl italic cursor-wait">Logging out...</div>
+  <div class="flex h-screen w-screen cursor-wait items-center justify-center text-5xl italic">Logging out...</div>
+{:else if !$conn.ready}
+  <Login />
 {:else}
-  {#if !$conn.ready}
-    <Login />
-  {:else}
-    <Main />
-  {/if}
+  <Main />
 {/if}
 
 <style global lang="postcss">

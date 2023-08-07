@@ -9,18 +9,18 @@
 
   // Object automatically updates on change
   let items = []
-  const updateUI = () => items = items // Callback for force re-render
+  const updateUI = () => (items = items) // Callback for force re-render
 
   if ($config.WAIT_INTERVAL) {
-    items.push({type: "wait", duration: $config.WAIT_INTERVAL, elapsed: 0, expires: null})
+    items.push({ type: "wait", duration: $config.WAIT_INTERVAL, elapsed: 0, expires: null })
   }
 
-  const hasOneStopset = () => items.some(item => item.type === "stopset")
+  const hasOneStopset = () => items.some((item) => item.type === "stopset")
   const addStopset = () => {
     let wait = null
     // If previous item is not a wait interval
     if ($config.WAIT_INTERVAL && items.length > 0 && items[items.length - 1].type !== "wait") {
-      wait = {type: "wait", duration: $config.WAIT_INTERVAL, elapsed: 0, expires: null}
+      wait = { type: "wait", duration: $config.WAIT_INTERVAL, elapsed: 0, expires: null }
     }
 
     let generatedStopset = $db.generateStopset(null, updateUI)
@@ -28,18 +28,16 @@
     if (generatedStopset) {
       // If it's the only stopset, process it
       if (!hasOneStopset()) {
-        generatedStopset.loadAudio()  // Preload audio
+        generatedStopset.loadAudio() // Preload audio
         //generatedStopset.play()
       }
       if (wait) {
         items.push(wait)
       }
-      items.push({type: "stopset", stopset: generatedStopset})
+      items.push({ type: "stopset", stopset: generatedStopset })
     }
     updateUI()
   }
-
-
 
   const processNextItem = () => {
     if (items.length === 0) {
@@ -82,12 +80,12 @@
   })
 </script>
 
-<div class="flex w-full max-w-4xl mx-auto mt-3 flex-1 overflow-y-auto bg-base-100">
+<div class="mx-auto mt-3 flex w-full max-w-4xl flex-1 overflow-y-auto bg-base-100">
   <div class="w-full">
     {#if items.length > 0}
       <PlayBar item={items[0]} />
 
-      <div class="flex justify-center mt-4 gap-3">
+      <div class="mt-4 flex justify-center gap-3">
         <button class="btn btn-success" disabled={!hasOneStopset()}>Play</button>
         <button class="btn btn-warning" disabled={!hasOneStopset()}>Pause</button>
         {#if $userConfig.uiMode >= 1}
@@ -95,11 +93,12 @@
         {/if}
       </div>
     {:else}
-      <div class="italic text-error text-3xl text-full text-center mt-3">Can't generate a stopset. You're sure the server has data?</div>
+      <div class="text-full mt-3 text-center text-3xl italic text-error">
+        Can't generate a stopset. You're sure the server has data?
+      </div>
     {/if}
   </div>
 </div>
-
 
 <!-- <div class="pt-5 pl-5">
   {#if items.length > 0}

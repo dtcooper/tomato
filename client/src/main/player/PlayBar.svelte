@@ -10,13 +10,11 @@
     remaining = item.stopset.duration - item.stopset.elapsed
   }
 
-  $: console.log('item', item)
-
+  $: console.log("item", item)
 </script>
 
-
-<div class="flex justify-center my-3">
-  <div class="font-bold text-xl">
+<div class="my-3 flex justify-center">
+  <div class="text-xl font-bold">
     <span class="font-mono">{prettyDuration(remaining)}</span>
     remaining
     {#if item.type === "wait"}
@@ -30,15 +28,13 @@
 {#if item.type === "wait"}
   <div class="flex items-center gap-2">
     <div class="font-mono">{prettyDuration(item.elapsed, item.duration)}</div>
-    <progress class="progress flex-1 h-6" value={item.elapsed} max={item.duration}></progress>
+    <progress class="progress h-6 flex-1" value={item.elapsed} max={item.duration} />
     <div class="font-mono">{prettyDuration(item.duration)}</div>
   </div>
 {:else if item.type === "stopset"}
   <div
-    class="grid h-6 bg-base-300 rounded-xl gap-2 overflow-hidden relative"
-    style:grid-template-columns={
-      item.stopset.playableItems.map(item => `${item.durationFull}fr`).join(' ')
-    }
+    class="relative grid h-6 gap-2 overflow-hidden rounded-xl bg-base-300"
+    style:grid-template-columns={item.stopset.playableItems.map((item) => `${item.durationFull}fr`).join(" ")}
   >
     {#each item.stopset.playableItems as asset}
       <div
@@ -50,7 +46,8 @@
       </div>
     {/each}
     <div
-      class="absolute h-full w-[0.3rem] bg-black" style:left={`calc(${item.stopset.elapsedFull / item.stopset.durationFull * 100}% - 0.15rem)`}
+      class="absolute h-full w-[0.3rem] bg-black"
+      style:left={`calc(${(item.stopset.elapsedFull / item.stopset.durationFull) * 100}% - 0.15rem)`}
     />
   </div>
 {/if}

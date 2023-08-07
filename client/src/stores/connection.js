@@ -1,11 +1,11 @@
-import ReconnectingWebSocket from "reconnecting-websocket"
 import { ipcRenderer } from "electron"
+import ReconnectingWebSocket from "reconnecting-websocket"
 import { persisted } from "svelte-local-storage-store"
 import { derived, get, writable } from "svelte/store"
 import { protocol_version } from "../../../server/constants.json"
-import { clearAssetsDB, clearSoftIgnoredAssets, syncAssetsDB } from "./db"
 import { acknowledgeLog, log, sendPendingLogs } from "./client-logs"
-import { setServerConfig, userConfig, defaultTheme } from "./config"
+import { defaultTheme, setServerConfig, userConfig } from "./config"
+import { clearAssetsDB, clearSoftIgnoredAssets, syncAssetsDB } from "./db"
 
 // TODO this is a mess, connecting + connected SHOULD NOT be persisted, they are ephemeral
 const connPersisted = persisted("conn", {
@@ -42,7 +42,7 @@ const updateConn = ({ connected: $connected, connecting: $connecting, ...$conn }
   }
 }
 
-let ws = window.ws = null
+let ws = (window.ws = null)
 
 export const logout = (error) => {
   const wasInReadyState = get(conn).ready // hard refresh if app was in "ready" state
@@ -52,9 +52,9 @@ export const logout = (error) => {
   sendPendingLogs(true)
   updateConn({ authenticated: false, connected: false, connecting: false, didFirstSync: false })
   clearAssetsDB()
-  clearSoftIgnoredAssets()  // Do I want this cleared?
+  clearSoftIgnoredAssets() // Do I want this cleared?
   setServerConfig({})
-  userConfig.update($userConfig => ({...$userConfig, theme: defaultTheme}))  // Reset theme at last possible moment
+  userConfig.update(($userConfig) => ({ ...$userConfig, theme: defaultTheme })) // Reset theme at last possible moment
 
   if (wasInReadyState) {
     reloading.set(true)
@@ -137,7 +137,7 @@ export const login = (username, password, host) => {
 
     if (!username || !password) {
       updateConn({ connecting: false })
-      reject({ type: "userpass", message: "You must specify a username and password."})
+      reject({ type: "userpass", message: "You must specify a username and password." })
       return
     }
 
@@ -149,7 +149,7 @@ export const login = (username, password, host) => {
       if (ready) {
         updateConn({ connected: false })
       } else if (authenticated) {
-        logout({ type: "host", message: "A connect error occurred with the server. Please try again."})
+        logout({ type: "host", message: "A connect error occurred with the server. Please try again." })
       } else {
         logout({ type: "host", message: "Failed to shake hands with server. You're sure this address is correct?" })
       }
@@ -160,9 +160,9 @@ export const login = (username, password, host) => {
       if (ready) {
         // If we are in ready state, just update connection status, this is intermittent downtime
         updateConn({ connected: false })
-      } else  {
+      } else {
         // If we've not in ready state, reload application (clean login)
-        logout({ type: "host", message: "A connect error occurred with the server. Please try again."})
+        logout({ type: "host", message: "A connect error occurred with the server. Please try again." })
       }
     }
 

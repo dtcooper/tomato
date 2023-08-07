@@ -13,10 +13,12 @@ from .stopset import Stopset
 
 def get_constance_config(valid_rotator_ids):
     config = {key: getattr(constance_config, key) for key in dir(constance_config)}
-    config.update({
-        "SINGLE_PLAY_ROTATORS": sorted(set(map(int, config["SINGLE_PLAY_ROTATORS"])) & set(valid_rotator_ids)),
-        "UI_MODES": list(map(int, config["UI_MODES"])),
-    })
+    config.update(
+        {
+            "SINGLE_PLAY_ROTATORS": sorted(set(map(int, config["SINGLE_PLAY_ROTATORS"])) & set(valid_rotator_ids)),
+            "UI_MODES": list(map(int, config["UI_MODES"])),
+        }
+    )
     config["_numeric"] = [key for key, value in config.items() if isinstance(value, decimal.Decimal)]
     return config
 

@@ -1,6 +1,3 @@
-import dayjs from "dayjs"
-
-
 class GeneratedStopsetAssetBase {
   constructor(rotator, generatedStopset, index) {
     this.rotator = rotator
@@ -18,11 +15,10 @@ class GeneratedStopsetAssetBase {
   }
 }
 
-
 class PlayableAsset extends GeneratedStopsetAssetBase {
   static _reusableAudioObjects = []
 
-  constructor({...asset}, ...args) {
+  constructor({ ...asset }, ...args) {
     super(...args)
     // Assigns asset._db, which holds a reference to the underlying asset object
     // therefore a reference to the _original_ asset is held and it won't be garbage
@@ -35,7 +31,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   }
 
   getAudioObject() {
-    const i = PlayableAsset._reusableAudioObjects.find(audio => audio._used)
+    const i = PlayableAsset._reusableAudioObjects.find((audio) => audio._used)
     let audio
     if (i > -1) {
       audio = PlayableAsset._reusableAudioObjects[i]
@@ -84,7 +80,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   }
 }
 
-class NonPlayableAsset extends GeneratedStopsetAssetBase{
+class NonPlayableAsset extends GeneratedStopsetAssetBase {
   constructor(...args) {
     super(...args)
     this.name = "Non-playable asset"
@@ -99,7 +95,7 @@ class NonPlayableAsset extends GeneratedStopsetAssetBase{
 export class GeneratedStopset {
   constructor(stopset, rotatorsAndAssets, updateCallback) {
     Object.assign(this, stopset)
-    this.update = updateCallback || (() => {})  // UI update function (or no-op)
+    this.update = updateCallback || (() => {}) // UI update function (or no-op)
     this.items = rotatorsAndAssets.map(({ rotator, asset }, index) => {
       const args = [rotator, this, index]
       return asset ? new PlayableAsset(asset, ...args) : new NonPlayableAsset(...args)
@@ -125,19 +121,18 @@ export class GeneratedStopset {
   }
 
   get playableItems() {
-    return this.items.filter(item => item.playable)
+    return this.items.filter((item) => item.playable)
   }
 
   loadAudio() {
     if (!this.loaded) {
-      this.items.forEach(item => item.playable && item.loadAudio())
+      this.items.forEach((item) => item.playable && item.loadAudio())
       this.loaded = true
     }
   }
 
   unloadAudio() {
     if (!this.loaded) {
-
       this.loaded = false
     }
   }
@@ -154,7 +149,7 @@ export class GeneratedStopset {
   }
 
   done() {
-    this.items.filter(item => item.playable).forEach(this.item.audio._used = false)
+    this.items.filter((item) => item.playable).forEach((this.item.audio._used = false))
   }
 
   play() {

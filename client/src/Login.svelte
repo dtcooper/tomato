@@ -18,12 +18,12 @@
   let showSyncModal
 
   let error = { type: "", message: "" }
-  const searchParams = Object.fromEntries((new URLSearchParams(window.location.search)).entries())
+  const searchParams = Object.fromEntries(new URLSearchParams(window.location.search).entries())
   if (searchParams.errorType && searchParams.errorMessage) {
-    error = { type: searchParams.errorType, message: searchParams.errorMessage}
+    error = { type: searchParams.errorType, message: searchParams.errorMessage }
   }
 
-  const clearError = () => error = { type: "", message: "" }
+  const clearError = () => (error = { type: "", message: "" })
 
   $: formDisabled = $conn.connecting || $conn.connected
   $: showSyncModal = !$conn.ready && $conn.connected
@@ -46,9 +46,12 @@
   }
 </script>
 
-<SyncModal title={`Connecting to ${$config.STATION_NAME || 'server'}`} canDismiss={false} show={showSyncModal} />
+<SyncModal title={`Connecting to ${$config.STATION_NAME || "server"}`} canDismiss={false} show={showSyncModal} />
 
-<div class="mx-auto flex min-h-screen w-full max-w-2xl flex-col items-center justify-center gap-y-3" class:cursor-wait={$conn.connecting}>
+<div
+  class="mx-auto flex min-h-screen w-full max-w-2xl flex-col items-center justify-center gap-y-3"
+  class:cursor-wait={$conn.connecting}
+>
   <div class="flex w-full items-center justify-evenly">
     <div class="tomato-svg">{@html tomatoIcon}</div>
     <div class="flex flex-col items-center space-y-1 font-mono font-bold">

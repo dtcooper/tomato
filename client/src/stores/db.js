@@ -156,7 +156,7 @@ const filterItemsByActive = (obj, dt = null) => {
 }
 
 class Rotator extends HydratableObject {
-  constructor({color, ...data}, db) {
+  constructor({ color, ...data }, db) {
     super(data, db)
     this.assets = db.assets.filter((a) => a._rotators.includes(this.id))
     this.color = colors.find((c) => c.name === color)
@@ -255,7 +255,10 @@ class DB {
   }
 
   static _saveAssetPlayTimes() {
-    window.localStorage.setItem("soft-ignored-ids", JSON.stringify(Array.from(this._assetPlayTimes.entries()), null, ""))
+    window.localStorage.setItem(
+      "soft-ignored-ids",
+      JSON.stringify(Array.from(this._assetPlayTimes.entries()), null, "")
+    )
   }
 
   static _loadAssetPlayTimes() {
@@ -317,7 +320,6 @@ let db = emptyDB
 const dbReadonly = readonly(dbStore)
 export { dbReadonly as db }
 
-
 const runOnceAndQueueLastCall = (func) => {
   let running = false
   let pendingCall = null
@@ -377,7 +379,7 @@ export const restoreAssetsDBFromLocalStorage = () => {
   try {
     const state = JSON.parse(window.localStorage.getItem("last-db-data"))
     if (state) {
-      const loadedDb = window.db = new DB(state)
+      const loadedDb = (window.db = new DB(state))
       dbStore.set(loadedDb)
       db = loadedDb
       return

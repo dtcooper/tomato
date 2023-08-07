@@ -43,9 +43,10 @@ if (squirrelCheck || !singleInstanceLock) {
     iconPath: path.resolve(path.join(__dirname, "../assets/icons/tomato.png"))
   })
 
-  const baseUrl = app.isPackaged || NODE_ENV === "production"
-    ? `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
-    : "http://localhost:3000/"
+  const baseUrl =
+    app.isPackaged || NODE_ENV === "production"
+      ? `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
+      : "http://localhost:3000/"
   const url = `${baseUrl}?userDataDir=${encodeURIComponent(userDataDir)}`
 
   function createWindow() {
@@ -129,10 +130,10 @@ if (squirrelCheck || !singleInstanceLock) {
 
   ipcMain.handle("refresh", (event, params) => {
     if (window) {
-      let extra = ''
+      let extra = ""
       if (params) {
         const urlParams = { errorType: params.type || "host", errorMessage: params.message }
-        extra = '&' + (new URLSearchParams(urlParams)).toString()
+        extra = "&" + new URLSearchParams(urlParams).toString()
       }
       window.loadURL(`${url}${extra}`)
     }

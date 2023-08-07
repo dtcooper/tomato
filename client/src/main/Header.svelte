@@ -13,21 +13,21 @@
 </script>
 
 <div class="col-span-3 flex flex-col gap-6">
-  <div class="py-2 px-5 flex bg-base-200 justify-between items-center">
-    <div class="text-3xl flex items-center gap-2 tomato">
+  <div class="flex items-center justify-between bg-base-200 px-5 py-2">
+    <div class="tomato flex items-center gap-2 text-3xl">
       {@html tomatoIcon}
       {$config.STATION_NAME}
     </div>
     <div class="icons flex items-center gap-3">
       {#if $userConfig.uiMode >= 1}
-        <button class="btn btn-secondary" on:click={() => $userConfig.uiMode = 0}>← Back to simple view</button>
+        <button class="btn btn-secondary" on:click={() => ($userConfig.uiMode = 0)}>← Back to simple view</button>
       {/if}
       <button
         class="btn btn-circle btn-ghost"
         class:text-error={!$conn.connected}
         class:text-success={$conn.connected && !$syncProgress.syncing}
         class:text-info={$conn.connected && $syncProgress.syncing}
-        on:click={() => showSyncModal = true}
+        on:click={() => (showSyncModal = true)}
       >
         {#if !$conn.connected}
           {@html lanDisonnectIcon}
@@ -37,7 +37,7 @@
           {@html lanConnectIcon}
         {/if}
       </button>
-      <button class="btn btn-circle btn-ghost" on:click={() => showSettingsModal = true}>
+      <button class="btn btn-circle btn-ghost" on:click={() => (showSettingsModal = true)}>
         {@html cogOutline}
       </button>
     </div>
