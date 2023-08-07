@@ -46,7 +46,7 @@
   }
 </script>
 
-<SyncModal title={`Connecting to ${$config.STATION_NAME || "server"}`} canDismiss={false} show={showSyncModal} />
+<SyncModal title={`Connecting`} canDismiss={false} show={showSyncModal} />
 
 <div
   class="mx-auto flex min-h-screen w-full max-w-2xl flex-col items-center justify-center gap-y-3"

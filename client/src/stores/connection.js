@@ -54,12 +54,12 @@ export const logout = (error) => {
   clearAssetsDB()
   clearSoftIgnoredAssets() // Do I want this cleared?
   setServerConfig({})
-  userConfig.update(($userConfig) => ({ ...$userConfig, theme: defaultTheme })) // Reset theme at last possible moment
+  userConfig.update(($userConfig) => ({ ...$userConfig, theme: defaultTheme }))
 
   if (wasInReadyState) {
     reloading.set(true)
     // Give some time for purge of pending logs to take effect
-    setTimeout(() => ipcRenderer.invoke("refresh", error), 1500)
+    setTimeout(() => ipcRenderer.invoke("refresh", error), 2500)
   } else {
     ipcRenderer.invoke("refresh", error)
   }

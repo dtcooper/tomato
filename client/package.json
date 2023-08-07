@@ -65,6 +65,7 @@
     "svelte-local-storage-store": "^0.5.0",
     "svelte-preprocess": "^5.0.4",
     "tailwindcss": "^3.3.3",
+    "trap-focus-svelte": "^1.0.1",
     "uuid": "^9.0.0",
     "wait-on": "^7.0.1",
     "weak-ref-collections": "^1.2.4"

@@ -142,9 +142,9 @@ async def background_subscriber():
     conn = redis.Redis(host="redis")
     logger.info("Connected to redis.")
 
-    async def update_from_api_and_broadcast():
+    async def update_from_api_and_broadcast(force=False):
         data = await retry_on_failure(serialize_for_api)
-        if data != app.state.data:
+        if force or data != app.state.data:
             app.state.data = data
             num_broadcasted_to = await APIWebSocketEndpoint.broadcast_data_change()
             if num_broadcasted_to > 0:
@@ -167,8 +167,8 @@ async def background_subscriber():
             if message is not None:
                 message = json.loads(message["data"])
                 logger.debug(f"Got message: {message}")
-                if message["type"] == "update":
-                    await update_from_api_and_broadcast()
+                if message["type"] in ("update", "force-update"):  # force-update for testing
+                    await update_from_api_and_broadcast(force=message["type"] == "force-update")
                 elif message["type"] == "logout":
                     await APIWebSocketEndpoint.logout_users(message["data"])
             elif got_first_none:

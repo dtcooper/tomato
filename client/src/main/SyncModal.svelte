@@ -1,19 +1,55 @@
 <script>
+  import Modal from "./components/Modal.svelte"
+
   import { syncProgress as progress } from "../stores/db"
-  import { conn } from "../stores/connection"
-  import { config } from "../stores/config"
+  import { conn, logout } from "../stores/connection"
 
   import autorenewIcon from "../../assets/icons/mdi-autorenew.svg"
   import lanConnectIcon from "../../assets/icons/mdi-lan-connect.svg"
 
   export let show = true
   export let canDismiss = true
-  export let title = `Sync status with ${$config.STATION_NAME}...`
-
-  const close = () => (show = false)
+  export let title = `Sync status`
 </script>
 
-{#if show}
+
+<Modal bind:show bind:canDismiss>
+  <div
+    slot="icon"
+    class:animate-[spin_2s_linear_infinite]={$progress.syncing}
+    class:animate-pulse={!$progress.syncing && !$conn.connected}
+  >
+    {#if $progress.syncing}{@html autorenewIcon}{:else}{@html lanConnectIcon}{/if}
+  </div>
+  <svelte:fragment slot="title">{title}</svelte:fragment>
+  <svelte:fragment slot="content">
+    {#if $progress.syncing}
+      <span>
+        Downloading file <span class="font-mono">{$progress.current}</span>
+        of <span class="font-mono">{$progress.total}</span>
+      </span>
+      <progress class="progress progress-primary w-full" value={$progress.percent} max="100" />
+      <span class="max-w-md truncate font-mono text-sm italic">{$progress.item}</span>
+    {:else if $conn.connected}
+      {#if $conn.ready}
+        <h2 class="text-xl italic text-success">You are fully up-to-date with the server!</h2>
+      {:else}
+        <h2 class="text-xl italic">Connecting...</h2>
+      {/if}
+    {:else}
+      <h2 class="text-xl italic text-error">
+        You are currently disconnected from the server. Tomato is attempting to reconnect.
+      </h2>
+    {/if}
+  </svelte:fragment>
+  <svelte:fragment slot="extra-buttons">
+    {#if !canDismiss}
+      <button type="button" class="btn btn-error" on:click|preventDefault={() => logout()} tabindex="-1">Cancel &amp; Logout</button>
+    {/if}
+  </svelte:fragment>
+</Modal>
+
+<!-- {#if show}
   <svelte:element
     this={canDismiss ? "dialog" : "div"}
     class="modal bg-black bg-opacity-50"
@@ -23,7 +59,7 @@
     <svelte:element
       this={canDismiss ? "form" : "div"}
       method={canDismiss && "dialog"}
-      class="modal-box flex max-w-2xl flex-col items-center justify-center gap-y-4"
+      class="flex modal-box max-w-2xl flex-col items-center justify-center gap-y-4"
     >
       {#if canDismiss}
         <button class="btn btn-circle btn-ghost btn-sm absolute right-2 top-2 text-xl" on:click|preventDefault={close}
@@ -66,4 +102,4 @@
       </form>
     {/if}
   </svelte:element>
-{/if}
+{/if} -->
