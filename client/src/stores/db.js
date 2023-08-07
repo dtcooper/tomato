@@ -306,7 +306,7 @@ class DB {
   generateStopset(startTime, doneCallback, updateCallback) {
     const stopset = pickRandomItemByWeight(filterItemsByActive(this.stopsets, startTime))
     if (stopset) {
-      return stopset.generate(null, doneCallback, updateCallback)
+      return stopset.generate(startTime, doneCallback, updateCallback)
     }
     return null
   }
