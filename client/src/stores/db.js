@@ -201,7 +201,7 @@ class RotatorsMap extends Map {
 }
 
 class Stopset extends AssetStopsetHydratableObject {
-  generate(startTime, updateCallback) {
+  generate(startTime, doneCallback, updateCallback) {
     const hardIgnoreIds = new Set()
     let softIgnoreIds = undefined
 
@@ -227,7 +227,7 @@ class Stopset extends AssetStopsetHydratableObject {
       items.push({ rotator, asset })
     }
 
-    return new GeneratedStopset(this, items, updateCallback)
+    return new GeneratedStopset(this, items, doneCallback, updateCallback)
   }
 }
 
@@ -303,10 +303,10 @@ class DB {
     }
   }
 
-  generateStopset(startTime, updateCallback) {
+  generateStopset(startTime, doneCallback, updateCallback) {
     const stopset = pickRandomItemByWeight(filterItemsByActive(this.stopsets, startTime))
     if (stopset) {
-      return stopset.generate(null, updateCallback)
+      return stopset.generate(null, doneCallback, updateCallback)
     }
     return null
   }

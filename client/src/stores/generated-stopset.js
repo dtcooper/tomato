@@ -1,9 +1,11 @@
+import { noop } from "svelte/internal"
+
 class GeneratedStopsetAssetBase {
   constructor(rotator, generatedStopset, index) {
     this.rotator = rotator
     this.generatedStopset = generatedStopset
     this.index = index
-    this.finished = false
+    this.error = false
   }
 
   done(error) {
@@ -55,15 +57,23 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
     this.audio.ondurationchange = () => {
       this.durationFull = this.audio.duration
       this.duration = Math.ceil(this.audio.duration)
-      this.generatedStopset.update()
+      this.generatedStopset.updateCallback()
     }
     this.audio.ontimeupdate = () => {
       this.elapsedFull = this.audio.currentTime
       this.elapsed = Math.round(this.audio.currentTime)
-      this.generatedStopset.update()
+      this.generatedStopset.updateCallback()
     }
-    this.audio.onended = this.audio.onerror = this.audio.onabort = () => this.done()
+    this.audio.onended = () => this.done()
+    this.audio.onerror = this.audio.onabort = () => {
+      this.error = true
+      this.done()
+    }
     this.audio.src = this.file.localUrl
+  }
+
+  unloadAudio() {
+    this.audio._used = false
   }
 
   get remaining() {
@@ -93,9 +103,10 @@ class NonPlayableAsset extends GeneratedStopsetAssetBase {
 }
 
 export class GeneratedStopset {
-  constructor(stopset, rotatorsAndAssets, updateCallback) {
+  constructor(stopset, rotatorsAndAssets, doneCallback, updateCallback) {
     Object.assign(this, stopset)
-    this.update = updateCallback || (() => {}) // UI update function (or no-op)
+    this.updateCallback = updateCallback || noop // UI update function
+    this.doneCallback = doneCallback || noop
     this.items = rotatorsAndAssets.map(({ rotator, asset }, index) => {
       const args = [rotator, this, index]
       return asset ? new PlayableAsset(asset, ...args) : new NonPlayableAsset(...args)
@@ -105,19 +116,24 @@ export class GeneratedStopset {
   }
 
   get durationFull() {
-    return this.playableItems.reduce((s, item) => s + item.durationFull, 0)
+    return this.playableNonErrorItems.reduce((s, item) => s + item.durationFull, 0)
   }
   get elapsedFull() {
-    return this.playableItems.reduce((s, item) => s + item.elapsedFull, 0)
+    return this.playableNonErrorItems.reduce((s, item) => s + item.elapsedFull, 0)
   }
   get duration() {
-    return this.playableItems.reduce((s, item) => s + item.duration, 0)
+    return this.playableNonErrorItems.reduce((s, item) => s + item.duration, 0)
   }
   get elapsed() {
-    return this.playableItems.reduce((s, item) => s + item.elapsed, 0)
+    return this.playableNonErrorItems.reduce((s, item) => s + item.elapsed, 0)
   }
   get remaining() {
     return this.duration - this.elapsed
+  }
+
+  //TODO: may want to change this to playableNonErrorItems
+  get playableNonErrorItems() {
+    return this.items.filter((item) => item.playable && !item.error)
   }
 
   get playableItems() {
@@ -126,7 +142,8 @@ export class GeneratedStopset {
 
   loadAudio() {
     if (!this.loaded) {
-      this.items.forEach((item) => item.playable && item.loadAudio())
+      this.items.filter((item) => item.playable)
+      this.playableNonErrorItems.forEach((item) => item.loadAudio())
       this.loaded = true
     }
   }
@@ -134,32 +151,34 @@ export class GeneratedStopset {
   unloadAudio() {
     if (!this.loaded) {
       this.loaded = false
+      this.items.filter((item) => item.playable).forEach((item) => item.unloadAudio())
     }
   }
 
   donePlaying(index) {
     this.current++
-    this.update()
+    this.updateCallback()
     if (this.current < this.items.length) {
       this.play()
     } else {
       this.done()
     }
-    this.update()
+    this.updateCallback()
   }
 
   done() {
-    this.items.filter((item) => item.playable).forEach((this.item.audio._used = false))
+    this.unloadAudio()
+    this.doneCallback()
   }
 
   play() {
     this.loadAudio()
     this.items[this.current].play()
-    this.update()
+    this.updateCallback()
   }
 
   pause() {
     this.items[this.current].pause()
-    this.update()
+    this.updateCallback()
   }
 }

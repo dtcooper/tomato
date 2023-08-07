@@ -7,7 +7,7 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-django = "^4.2.3"
+django = "^4.2.4"
 django-admin-notice = "^2.0.0"
 django-cleanup = "^8.0.0"
 # For error messages at top of page, once constance > 2.9.1 released to pypi, can pin again
@@ -19,7 +19,7 @@ django-redis = {extras = ["hiredis"], version = "^5.3.0"}
 django-user-messages = "^1.0.0"
 gunicorn = "^21.2.0"
 huey = "^2.4.5"
-psycopg = "^3.1.9"
+psycopg = "^3.1.10"
 python-dotenv = "^1.0.0"
 starlette = "^0.31.0"
 uvicorn = {extras = ["standard"], version = "^0.23.2"}

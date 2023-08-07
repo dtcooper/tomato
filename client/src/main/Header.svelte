@@ -23,7 +23,7 @@
         <button class="btn btn-secondary" on:click={() => ($userConfig.uiMode = 0)}>← Back to simple view</button>
       {/if}
       <button
-        class="btn btn-circle btn-ghost"
+        class="btn btn-circle btn-ghost overflow-hidden"
         class:text-error={!$conn.connected}
         class:text-success={$conn.connected && !$syncProgress.syncing}
         class:text-info={$conn.connected && $syncProgress.syncing}
@@ -32,7 +32,7 @@
         {#if !$conn.connected}
           {@html lanDisonnectIcon}
         {:else if $syncProgress.syncing}
-          {@html autorenewIcon}
+          <span class="animate-[spin_2s_linear_infinite]">{@html autorenewIcon}</span>
         {:else}
           {@html lanConnectIcon}
         {/if}

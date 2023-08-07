@@ -9,8 +9,6 @@
   } else if (item.type === "stopset") {
     remaining = item.stopset.duration - item.stopset.elapsed
   }
-
-  $: console.log("item", item)
 </script>
 
 <div class="my-3 flex justify-center">
@@ -34,9 +32,9 @@
 {:else if item.type === "stopset"}
   <div
     class="relative grid h-6 gap-2 overflow-hidden rounded-xl bg-base-300"
-    style:grid-template-columns={item.stopset.playableItems.map((item) => `${item.durationFull}fr`).join(" ")}
+    style:grid-template-columns={item.stopset.playableNonErrorItems.map((item) => `${item.durationFull}fr`).join(" ")}
   >
-    {#each item.stopset.playableItems as asset}
+    {#each item.stopset.playableNonErrorItems as asset}
       <div
         class="flex flex-col items-center justify-center font-mono text-xs leading-none"
         style:background-color={asset.rotator.color.value}

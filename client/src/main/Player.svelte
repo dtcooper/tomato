@@ -23,7 +23,7 @@
       wait = { type: "wait", duration: $config.WAIT_INTERVAL, elapsed: 0, expires: null }
     }
 
-    let generatedStopset = $db.generateStopset(null, updateUI)
+    let generatedStopset = $db.generateStopset(null, () => console.log("executed done callback!"), updateUI)
 
     if (generatedStopset) {
       // If it's the only stopset, process it
