@@ -99,6 +99,27 @@
           dismissLink.parentElement.parentElement.remove()
         })
       })
+
+
+
+      if (window.DateTimeShortcuts) {
+        window.DateTimeShortcuts.clockHours.default_ = [];
+        for (let hour = 0; hour < 24; hour += 2) {
+          let verboseName
+          if (hour === 0) {
+            verboseName = "midnight"
+          } else if (hour === 12) {
+            verboseName = "noon"
+          } else {
+            verboseName = new Date(1970, 1, 1, hour, 0, 0).strftime('%I:%M %p').toLowerCase()
+            if (verboseName.charAt(0) === "0") {
+              verboseName = verboseName.slice(1)
+            }
+          }
+          window.DateTimeShortcuts.clockHours.default_.push([verboseName, hour])
+        }
+      }
+
     })
   </script>
 {% endblock %}
