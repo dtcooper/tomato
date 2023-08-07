@@ -97,6 +97,7 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
                 await websocket.send_json({"success": True})
                 self.authenticated = True
                 await self.broadcast_data_change(single_websocket=websocket)
+                logger.info(f"Sent hello of initial data to {self.user}")
                 self.subscribers[websocket] = self
             else:
                 logger.info("Invalid login credentials")

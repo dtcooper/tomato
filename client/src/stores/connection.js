@@ -5,7 +5,7 @@ import { derived, get, writable } from "svelte/store"
 import { protocol_version } from "../../../server/constants.json"
 import { clearAssetsDB, clearSoftIgnoredAssets, syncAssetsDB } from "./db"
 import { acknowledgeLog, log, sendPendingLogs } from "./client-logs"
-import { setServerConfig } from "./config"
+import { setServerConfig, userConfig, defaultTheme } from "./config"
 
 // TODO this is a mess, connecting + connected SHOULD NOT be persisted, they are ephemeral
 const connPersisted = persisted("conn", {
@@ -54,6 +54,7 @@ export const logout = (error) => {
   clearAssetsDB()
   clearSoftIgnoredAssets()  // Do I want this cleared?
   setServerConfig({})
+  userConfig.update($userConfig => ({...$userConfig, theme: defaultTheme}))  // Reset theme at last possible moment
 
   if (wasInReadyState) {
     reloading.set(true)

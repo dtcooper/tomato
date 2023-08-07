@@ -46,7 +46,7 @@
 
 <style lang="postcss">
   .tomato > :global(svg) {
-    @apply h-10 w-10;
+    @apply h-12 w-12;
   }
   .icons :global(svg) {
     @apply h-8 w-8;

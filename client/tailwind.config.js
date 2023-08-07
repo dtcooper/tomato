@@ -41,18 +41,8 @@ module.exports = {
     }
   },
   daisyui: {
-    darkMode: false,
     logs: false,
-    themes: ["light"
-      // {
-      //   default: {
-      //     ...synthwaveTheme,
-      //     primary: "#fc49ab",
-      //     secondary: "#5fe8ff",
-      //     accent: "#c07eec"
-      //   }
-      // }
-    ]
+    themes: true
   },
   plugins: [require("daisyui")]
 }

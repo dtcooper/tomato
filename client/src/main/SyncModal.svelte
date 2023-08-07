@@ -23,13 +23,13 @@
     <svelte:element
       this={canDismiss ? "form" : "div"}
       method={canDismiss && "dialog"}
-      class="modal-box max-w-2xl flex flex-col items-center justify-center gap-y-2"
+      class="modal-box max-w-2xl flex flex-col items-center justify-center gap-y-4"
     >
       {#if canDismiss}
-        <button class="btn btn-circle btn-ghost btn-sm absolute right-2 top-2" on:click|preventDefault={close}>✕</button>
+        <button class="btn btn-circle btn-ghost btn-sm text-xl absolute right-2 top-2" on:click|preventDefault={close}>✕</button>
       {/if}
       <div class="flex items-center gap-x-3">
-        <div class:animate-[spin_2s_linear_infinite]={$progress.syncing}>
+        <div class:animate-[spin_2s_linear_infinite]={$progress.syncing} class:animate-pulse={!$progress.syncing && !$conn.connected}>
           {#if $progress.syncing}{@html autorenewIcon}{:else}{@html lanConnectIcon}{/if}
         </div>
         <h2 class="text-3xl">{title}</h2>
@@ -39,9 +39,18 @@
         <progress class="progress progress-primary w-full" value={$progress.percent} max="100"></progress>
         <span class="max-w-md truncate font-mono text-sm">{$progress.item}</span>
       {:else if $conn.connected}
-        <h2 class="text-xl italic text-success">You are fully up-to-date with the server!</h2>
+        {#if $conn.ready}
+          <h2 class="text-xl italic text-success">You are fully up-to-date with the server!</h2>
+        {:else}
+          <h2 class="text-xl italic">Connecting...</h2>
+        {/if}
       {:else}
         <h2 class="text-xl italic text-error">You are currently disconnected from the server. Tomato is attempting to reconnect.</h2>
+      {/if}
+      {#if canDismiss}
+        <div class="w-full text-right">
+          <button class="btn btn-lg btn-primary" on:click|preventDefault={close}>Close</button>
+        </div>
       {/if}
     </svelte:element>
     {#if canDismiss}

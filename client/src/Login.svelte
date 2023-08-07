@@ -26,7 +26,7 @@
   const clearError = () => error = { type: "", message: "" }
 
   $: formDisabled = $conn.connecting || $conn.connected
-  $: showSyncModal =!$conn.ready && $conn.connected
+  $: showSyncModal = !$conn.ready && $conn.connected
 
   const submit = async () => {
     clearError()
@@ -46,7 +46,7 @@
   }
 </script>
 
-<SyncModal title={`Connecting to ${$config.STATION_NAME}`} canDismiss={false} show={showSyncModal} />
+<SyncModal title={`Connecting to ${$config.STATION_NAME || 'server'}`} canDismiss={false} show={showSyncModal} />
 
 <div class="mx-auto flex min-h-screen w-full max-w-2xl flex-col items-center justify-center gap-y-3" class:cursor-wait={$conn.connecting}>
   <div class="flex w-full items-center justify-evenly">
