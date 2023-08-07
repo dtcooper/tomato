@@ -1,10 +1,11 @@
 <script>
-  import { tick } from 'svelte'
+  import { tick } from "svelte"
 
-  import Modal from "./components/Modal.svelte"
+  import Modal from "../components/Modal.svelte"
 
   import cogOutline from "../../assets/icons/mdi-cog-outline.svg"
   import { themeOrder as daisyThemes } from "daisyui/src/theming/themeDefaults"
+  import { db } from "../stores/db"
   import { logout } from "../stores/connection"
 
   import { config, userConfig } from "../stores/config"
@@ -17,7 +18,7 @@
   const confirmLogout = () => {
     show = showLogoutError = false
     showLogout = true
-    logoutStationName = ''
+    logoutStationName = ""
   }
 
   const focus = async (el) => {
@@ -31,9 +32,9 @@
       if ($config.STATION_NAME.trim().toLowerCase() === stationName) {
         logout()
       } else {
-        logoutStationName = ''
+        logoutStationName = ""
         showLogoutError = true
-        document.getElementById('logout-confirm-input').focus()
+        document.getElementById("logout-confirm-input").focus()
       }
     }
   }
@@ -46,11 +47,11 @@
   <svelte:fragment slot="content">
     <div class="grid w-full grid-cols-[max-content_1fr] gap-3">
       <div class="flex items-center text-right text-lg font-bold">User Interface mode:</div>
-      <select class="select select-bordered select-lg" on:change={(e) => ($userConfig.uiMode = e.target.value)}>
+      <select class="select select-bordered select-lg" on:change={(e) => ($userConfig.uiMode = +e.target.value)}>
         {#each ["Simple", "Standard", "Advanced"] as uiMode, index}
-          <option value={index} selected={index === $userConfig.uiMode}>
-            {uiMode}
-          </option>
+          {#if $config.UI_MODES.indexOf(index) !== -1}
+            <option value={index} selected={index === $userConfig.uiMode}>{uiMode}</option>
+          {/if}
         {/each}
       </select>
 
@@ -62,28 +63,33 @@
           </option>
         {/each}
       </select>
+
+      {#if $userConfig.uiMode > 0}
+        <div class="flex items-center text-right text-lg font-bold">Station Admin:</div>
+        <a class="link-hover link-primary link text-lg" href={$db.host}>Open in your web browser</a>
+      {/if}
     </div>
 
     <div class="col-span-2">
-      <button type="button" class="btn btn-error" on:click|preventDefault={confirmLogout}>DANGER: Log out of server</button>
+      <button type="button" class="btn btn-error" on:click|preventDefault={confirmLogout}
+        >DANGER: Log out of server</button
+      >
     </div>
   </svelte:fragment>
 </Modal>
 
-<Modal bind:show={showLogout} class="max-w-xl">
-  <svelte:fragment slot="title"><span class="text-error font-bold">DANGER:</span> Logging out</svelte:fragment>
+<Modal bind:show={showLogout}>
+  <svelte:fragment slot="title"><span class="font-bold text-error">DANGER:</span> Logging out</svelte:fragment>
   <svelte:fragment slot="close-text">Cancel &amp; remain logged in</svelte:fragment>
   <div slot="content" class="flex flex-col gap-2">
     <p>
       Are you <span class="font-bold">100% sure</span> you want to
-      <span class="font-bold underline text-error">COMPLETELY LOG OUT</span>
+      <span class="font-bold text-error underline">COMPLETELY LOG OUT</span>
       of the server <span class="italic">"{$config.STATION_NAME}?"</span>
     </p>
-    <p>
-      If you are, please enter the name of the station exactly as it appears here:
-    </p>
-    <p class="ml-8 my-2">
-      <span class="text-base-100 bg-base-content font-mono p-2">{$config.STATION_NAME}</span>
+    <p>If you are, please enter the name of the station exactly as it appears here:</p>
+    <p class="my-2 ml-8">
+      <span class="bg-base-content p-2 font-mono text-base-100">{$config.STATION_NAME}</span>
     </p>
     <p class="mb-5">...and then press the logout button below.</p>
     {#if showLogoutError}
@@ -93,7 +99,7 @@
       use:focus
       id="logout-confirm-input"
       bind:value={logoutStationName}
-      on:input={() => showLogoutError = false}
+      on:input={() => (showLogoutError = false)}
       type="text"
       placeholder="Enter station name"
       class:input-error={showLogoutError}

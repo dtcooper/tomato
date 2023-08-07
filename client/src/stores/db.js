@@ -241,6 +241,7 @@ class DB {
     this.assets.forEach(this.constructor._nonGarbageCollectedAssets.add, this.constructor._nonGarbageCollectedAssets)
     this.rotators = new RotatorsMap(rotators, this)
     this.stopsets = stopsets.map((data) => new Stopset(data, this))
+    this.lastSync = null
     this._host = null
   }
 
@@ -356,6 +357,7 @@ export const syncAssetsDB = runOnceAndQueueLastCall(async (jsonData) => {
   syncProgress.set({ syncing: true, total, current: total, percent: 100, item: "Finalizaing..." })
 
   console.log(`Sync'd ${downloadedAssetsIds.size} of ${total} assets successfully`)
+  replacementDB.lastSync = dayjs()
 
   // filter down DB *and* jsonData (since that's what we put in localStorage)
   for (let data of [jsonData, replacementDB]) {

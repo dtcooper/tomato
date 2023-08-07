@@ -6,8 +6,9 @@
   import { conn, login } from "./stores/connection"
   import { config } from "./stores/config"
 
-  import tomatoIcon from "../assets/icons/tomato.svg"
+  import { tomatoIcon } from "./utils"
 
+  import Icon from "./components/Icon.svelte"
   import SyncModal from "./main/SyncModal.svelte"
 
   let showPassword = IS_DEV
@@ -53,12 +54,12 @@
   class:cursor-wait={$conn.connecting}
 >
   <div class="flex w-full items-center justify-evenly">
-    <div class="tomato-svg">{@html tomatoIcon}</div>
+    <Icon icon={tomatoIcon} class="w-20 h-20" shape-rendering="crispEdges" viewBox="0 -.5 16 16" />
     <div class="flex flex-col items-center space-y-1 font-mono font-bold">
       <h1 class="text-4xl">Tomato</h1>
       <h2 class="text-2xl italic">Radio Automation</h2>
     </div>
-    <div class="tomato-svg">{@html tomatoIcon}</div>
+    <Icon icon={tomatoIcon} class="w-20 h-20" shape-rendering="crispEdges" viewBox="0 -.5 16 16" />
   </div>
   <div class="card relative w-full bg-base-300 shadow-2xl">
     <form class="card-body" on:submit|preventDefault={submit}>
@@ -171,9 +172,3 @@
     </form>
   </div>
 </div>
-
-<style lang="postcss">
-  .tomato-svg > :global(svg) {
-    @apply h-20 w-20;
-  }
-</style>

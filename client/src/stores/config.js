@@ -4,11 +4,9 @@ import { get, readonly } from "svelte/store"
 const config = persisted("config", {})
 const readonlyConfig = readonly(config)
 
-export const defaultTheme = "synthwave"
-export const userConfig = persisted("user-config", {
-  uiMode: 0, // 0 = simple, 1 = standard, 2 = advanced
-  theme: defaultTheme
-})
+const defaultUserConfig = { uiMode: 0, theme: "synthwave" }
+export const userConfig = persisted("user-config", defaultUserConfig)
+export const resetUserConfig = () => userConfig.set(defaultUserConfig)
 
 export const setServerConfig = ({ _numeric: numeric, ...newConfig }) => {
   if (numeric) {
@@ -18,9 +16,8 @@ export const setServerConfig = ({ _numeric: numeric, ...newConfig }) => {
   }
   console.log("Got new config", newConfig)
 
-  if (!newConfig.UI_MODES) {
-    userConfig.update(($userConfig) => ({ ...$userConfig, uiMode: 0 }))
-  } else if (newConfig.UI_MODES.indexOf(get(userConfig).uiMode) === -1) {
+  if (newConfig.UI_MODES && newConfig.UI_MODES.indexOf(get(userConfig).uiMode) === -1) {
+    console.log(get(userConfig).uiMode)
     userConfig.update(($userConfig) => {
       return { ...$userConfig, uiMode: Math.min(newConfig.UI_MODES) }
     })

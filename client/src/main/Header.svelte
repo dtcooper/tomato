@@ -1,9 +1,11 @@
 <script>
-  import tomatoIcon from "../../assets/icons/tomato.svg"
-  import lanConnectIcon from "../../assets/icons/mdi-lan-connect.svg"
-  import lanDisonnectIcon from "../../assets/icons/mdi-lan-disconnect.svg"
-  import autorenewIcon from "../../assets/icons/mdi-autorenew.svg"
-  import cogOutline from "../../assets/icons/mdi-cog-outline.svg"
+  import Icon from "../components/Icon.svelte"
+
+  import { tomatoIcon } from "../utils"
+  import lanConnect from "@iconify/icons-mdi/lan-connect"
+  import lanDisconnect from "@iconify/icons-mdi/lan-disconnect"
+  import autorenew from "@iconify/icons-mdi/autorenew"
+  import cogOutline from "@iconify/icons-mdi/cog-outline"
   import { conn } from "../stores/connection"
   import { config, userConfig } from "../stores/config"
   import { syncProgress } from "../stores/db"
@@ -14,41 +16,31 @@
 
 <div class="col-span-3 flex flex-col gap-6">
   <div class="flex items-center justify-between bg-base-200 px-5 py-2">
-    <div class="tomato flex items-center gap-2 text-3xl">
-      {@html tomatoIcon}
+    <div class="flex items-center gap-3 text-3xl">
+      <Icon icon={tomatoIcon} class="h-12 w-12" shape-rendering="crispEdges" viewBox="0 -.5 16 16" />
       {$config.STATION_NAME}
     </div>
-    <div class="icons flex items-center gap-3">
+    <div class="flex items-center gap-3">
       {#if $userConfig.uiMode >= 1}
         <button class="btn btn-secondary" on:click={() => ($userConfig.uiMode = 0)}>← Back to simple view</button>
       {/if}
       <button
-        class="btn btn-circle btn-ghost overflow-hidden"
-        class:text-error={!$conn.connected}
-        class:text-success={$conn.connected && !$syncProgress.syncing}
-        class:text-info={$conn.connected && $syncProgress.syncing}
+        class="btn btn-circle btn-ghost flex items-center justify-center overflow-hidden"
         on:click={() => (showSyncModal = true)}
+        class:!bg-transparent={$userConfig.uiMode === 0}
+        disabled={$userConfig.uiMode === 0}
       >
         {#if !$conn.connected}
-          {@html lanDisonnectIcon}
+          <Icon icon={lanDisconnect} class="h-8 w-8 text-error" />
         {:else if $syncProgress.syncing}
-          <span class="animate-[spin_2s_linear_infinite]">{@html autorenewIcon}</span>
+          <Icon icon={autorenew} class="h-8 w-8 animate-[spin_2s_linear_infinite] text-info" />
         {:else}
-          {@html lanConnectIcon}
+          <Icon icon={lanConnect} class="h-8 w-8 text-success" />
         {/if}
       </button>
       <button class="btn btn-circle btn-ghost" on:click={() => (showSettingsModal = true)}>
-        {@html cogOutline}
+        <Icon icon={cogOutline} class="h-8 w-8" />
       </button>
     </div>
   </div>
 </div>
-
-<style lang="postcss">
-  .tomato > :global(svg) {
-    @apply h-12 w-12;
-  }
-  .icons :global(svg) {
-    @apply h-8 w-8;
-  }
-</style>

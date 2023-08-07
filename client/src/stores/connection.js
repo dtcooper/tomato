@@ -4,7 +4,7 @@ import { persisted } from "svelte-local-storage-store"
 import { derived, get, writable } from "svelte/store"
 import { protocol_version } from "../../../server/constants.json"
 import { acknowledgeLog, log, sendPendingLogs } from "./client-logs"
-import { defaultTheme, setServerConfig, userConfig } from "./config"
+import { resetUserConfig, setServerConfig } from "./config"
 import { clearAssetsDB, clearSoftIgnoredAssets, syncAssetsDB } from "./db"
 
 // TODO this is a mess, connecting + connected SHOULD NOT be persisted, they are ephemeral
@@ -54,7 +54,7 @@ export const logout = (error) => {
   clearAssetsDB()
   clearSoftIgnoredAssets() // Do I want this cleared?
   setServerConfig({})
-  userConfig.update(($userConfig) => ({ ...$userConfig, theme: defaultTheme }))
+  resetUserConfig()
 
   if (wasInReadyState) {
     reloading.set(true)

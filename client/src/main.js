@@ -19,7 +19,7 @@ if (squirrelCheck || !singleInstanceLock) {
 } else {
   let window = null
   const elgatoVendorId = 4057
-  const [minWidth, minHeight, defaultWidth, defaultHeight] = [600, 480, 1000, 800]
+  const [minWidth, minHeight, defaultWidth, defaultHeight] = [800, 600, 1000, 800]
 
   // Migrate when there's a protocol version bump
   for (let i = 0; i < protocol_version; i++) {

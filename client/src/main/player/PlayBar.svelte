@@ -1,4 +1,5 @@
 <script>
+  import { tick } from "svelte"
   import { prettyDuration } from "../../utils"
 
   export let item
@@ -8,6 +9,11 @@
     remaining = item.duration - item.elapsed
   } else if (item.type === "stopset") {
     remaining = item.stopset.duration - item.stopset.elapsed
+  }
+
+  const hideDurationIfSmall = async (el) => {
+    await tick()
+    console.log('width:', el.clientWidth)
   }
 </script>
 
@@ -31,12 +37,13 @@
   </div>
 {:else if item.type === "stopset"}
   <div
-    class="relative grid h-6 gap-2 overflow-hidden rounded-xl bg-base-300"
+    class="relative grid h-8 gap-2 overflow-hidden rounded-xl border-4 border-base-300 bg-base-300"
     style:grid-template-columns={item.stopset.playableNonErrorItems.map((item) => `${item.durationFull}fr`).join(" ")}
   >
     {#each item.stopset.playableNonErrorItems as asset}
       <div
         class="flex flex-col items-center justify-center font-mono text-xs leading-none"
+        use:hideDurationIfSmall
         style:background-color={asset.rotator.color.value}
         style:color={asset.rotator.color.content}
       >
@@ -44,8 +51,8 @@
       </div>
     {/each}
     <div
-      class="absolute h-full w-[0.3rem] bg-black"
-      style:left={`calc(${(item.stopset.elapsedFull / item.stopset.durationFull) * 100}% - 0.15rem)`}
+      class="absolute h-full w-[5px] bg-base-content"
+      style:left={`calc(${(item.stopset.elapsedFull / item.stopset.durationFull) * 100}% - 2.5px)`}
     />
   </div>
 {/if}
