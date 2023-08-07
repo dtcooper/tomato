@@ -12,6 +12,7 @@
   }
 
   const hideDurationIfSmall = async (el) => {
+    // XXX hide text if the HTML for it is small
     await tick()
     console.log('width:', el.clientWidth)
   }
@@ -56,12 +57,3 @@
     />
   </div>
 {/if}
-<!-- {if item.type === "remaining"
-<div
-  class="w-full rounded-xl bg-base-300 h-3 grid gap-2 overflow-hidden"
-  style:grid-template-columns={columns.join(' ')}
->
-  {#each columns as column}
-    <div class="h-full" class:bg-base-300={item.type === "wait"} />
-  {/each}
-</div> -->

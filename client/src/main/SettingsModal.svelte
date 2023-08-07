@@ -1,9 +1,10 @@
 <script>
   import { tick } from "svelte"
 
+  import Icon from "../components/Icon.svelte"
   import Modal from "../components/Modal.svelte"
 
-  import cogOutline from "../../assets/icons/mdi-cog-outline.svg"
+  import cogOutline from "@iconify/icons-mdi/cog-outline"
   import { themeOrder as daisyThemes } from "daisyui/src/theming/themeDefaults"
   import { db } from "../stores/db"
   import { logout } from "../stores/connection"
@@ -41,7 +42,7 @@
 </script>
 
 <Modal bind:show class="max-w-3xl">
-  <svelte:fragment slot="icon">{@html cogOutline}</svelte:fragment>
+  <svelte:fragment slot="icon"><Icon icon={cogOutline} /></svelte:fragment>
   <svelte:fragment slot="title">Settings</svelte:fragment>
   <svelte:fragment slot="close-text">Close settings</svelte:fragment>
   <svelte:fragment slot="content">

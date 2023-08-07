@@ -25,10 +25,6 @@ const colors = Object.keys(materialUIColors).reduce(
 module.exports = {
   content: ["index.html", "./src/**/*.{html,js,svelte}"],
   theme: {
-    screens: {
-      sm: "800px", // must match minimum width in electron + 1
-      lg: "1200px"
-    },
     extend: {
       minWidth: {
         sm: "600px"

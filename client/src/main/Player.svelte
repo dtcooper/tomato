@@ -35,6 +35,9 @@
         items.push(wait)
       }
       items.push({ type: "stopset", stopset: generatedStopset })
+      console.log(items)
+    } else {
+      console.warn("Couldn't generate a stopset!")
     }
     updateUI()
   }
@@ -80,23 +83,34 @@
   })
 </script>
 
-<div class="mx-auto mt-3 flex w-full max-w-4xl flex-1 overflow-y-auto bg-base-100">
-  <div class="w-full">
-    {#if items.length > 0}
-      <PlayBar item={items[0]} />
+<div class="col-span-2">
+  {#if items.length > 0}
+    <PlayBar item={items[0]} />
 
-      <div class="mt-4 flex justify-center gap-3">
-        <button class="btn btn-success" disabled={!hasOneStopset()}>Play</button>
-        <button class="btn btn-warning" disabled={!hasOneStopset()}>Pause</button>
-        {#if $userConfig.uiMode >= 1}
-          <button class="btn btn-error">Skip stop set</button>
-        {/if}
-      </div>
-    {:else}
-      <div class="text-full mt-3 text-center text-3xl italic text-error">
-        Can't generate a stopset. You're sure the server has data?
-      </div>
-    {/if}
+    <div class="mt-4 flex justify-center gap-3">
+      <button class="btn btn-success" disabled={!hasOneStopset()}>Play</button>
+      <button class="btn btn-warning" disabled={!hasOneStopset()}>Pause</button>
+      {#if $userConfig.uiMode >= 1}
+        <button class="btn btn-error">Skip stop set</button>
+      {/if}
+    </div>
+  {:else}
+    <div class="text-full mt-3 text-center text-3xl italic text-error">
+      Can't generate a stopset. You're sure the server has data?
+    </div>
+  {/if}
+</div>
+
+<div class="border-base-content min-h-full h-0 flex flex-col">
+  <div class="font-bold text-sm text-center mt-0 mb-2 divider">Playlist</div>
+  <div class="flex-1 overflow-auto" id="playlist">
+    {#each items as item}
+      {#if item.type === "stopset"}
+        {#each item.stopset.items as asset}
+          <div>{asset.rotator.name} - {asset.name}</div>
+        {/each}
+      {/if}
+    {/each}
   </div>
 </div>
 
