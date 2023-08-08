@@ -1,10 +1,8 @@
 import dayjs from "dayjs"
-import { noop } from "svelte/internal"
-import { writable, get, derived } from "svelte/store"
 import { persisted } from "svelte-local-storage-store"
+import { noop } from "svelte/internal"
+import { derived, get, writable } from "svelte/store"
 import { config } from "./config"
-import { prettyDuration } from "../utils"
-
 
 export const speaker = persisted("speaker", null)
 export const playStatusWritable = writable({
@@ -13,7 +11,10 @@ export const playStatusWritable = writable({
   paused: false,
   speakers: []
 })
-export const playStatus = derived([playStatusWritable, speaker], ([$playStatusWritable, $speaker]) => ({ speaker: $speaker, ...$playStatusWritable}))
+export const playStatus = derived([playStatusWritable, speaker], ([$playStatusWritable, $speaker]) => ({
+  speaker: $speaker,
+  ...$playStatusWritable
+}))
 
 let compressorEnabled = false
 const audioContext = new AudioContext()
@@ -24,17 +25,17 @@ inputNode.connect(audioContext.destination)
 
 // Thanks ChatGPT!
 const compressor = audioContext.createDynamicsCompressor()
-compressor.threshold.setValueAtTime(-25, audioContext.currentTime); // In dB, typically around -20 to -15 dBFS
-compressor.ratio.setValueAtTime(4, audioContext.currentTime); // Typically around 2:1 to 4:1
-compressor.attack.setValueAtTime(0.005, audioContext.currentTime); // In seconds, typically 5 ms to 20 ms
-compressor.release.setValueAtTime(0.2, audioContext.currentTime); // In seconds, typically 100 ms to 300 ms
-compressor.knee.setValueAtTime(6, audioContext.currentTime); // In dB, typically around 2 dB to 6 dB
+compressor.threshold.setValueAtTime(-25, audioContext.currentTime) // In dB, typically around -20 to -15 dBFS
+compressor.ratio.setValueAtTime(4, audioContext.currentTime) // Typically around 2:1 to 4:1
+compressor.attack.setValueAtTime(0.005, audioContext.currentTime) // In seconds, typically 5 ms to 20 ms
+compressor.release.setValueAtTime(0.2, audioContext.currentTime) // In seconds, typically 100 ms to 300 ms
+compressor.knee.setValueAtTime(6, audioContext.currentTime) // In dB, typically around 2 dB to 6 dB
 
 const limiter = audioContext.createDynamicsCompressor()
-limiter.threshold.setValueAtTime(-2, audioContext.currentTime); // In dB, to prevent clipping
-limiter.ratio.setValueAtTime(20, audioContext.currentTime); // High ratio to act as a limiter
-limiter.attack.setValueAtTime(0.001, audioContext.currentTime); // Fast attack time
-limiter.release.setValueAtTime(0.02, audioContext.currentTime); // Relatively fast release time
+limiter.threshold.setValueAtTime(-2, audioContext.currentTime) // In dB, to prevent clipping
+limiter.ratio.setValueAtTime(20, audioContext.currentTime) // High ratio to act as a limiter
+limiter.attack.setValueAtTime(0.001, audioContext.currentTime) // Fast attack time
+limiter.release.setValueAtTime(0.02, audioContext.currentTime) // Relatively fast release time
 
 compressor.connect(limiter)
 limiter.connect(audioContext.destination)
@@ -124,7 +125,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   }
 
   get percentDone() {
-    return Math.min(this.elapsed / this.duration * 100, 100)
+    return Math.min((this.elapsed / this.duration) * 100, 100)
   }
 
   get active() {
@@ -219,7 +220,8 @@ export class GeneratedStopset {
     this.updateCallback()
   }
 
-  done(skipCallback = false) {  // Must be able to be called twice
+  done(skipCallback = false) {
+    // Must be able to be called twice
     this.unloadAudio()
     this.playing = false
     if (!skipCallback) {
@@ -241,7 +243,6 @@ export class GeneratedStopset {
   }
 }
 
-
 export class Wait {
   static currentWaitInterval = 1
   static currentStopsetOverdueTime = 0
@@ -249,7 +250,7 @@ export class Wait {
   constructor(doneCallback, updateCallback) {
     this.updateCallback = updateCallback || noop
     this.doneCallback = doneCallback || noop
-    this.duration = Wait.currentWaitInterval || 1  // Should never get created if it's 0
+    this.duration = Wait.currentWaitInterval || 1 // Should never get created if it's 0
     this.name = "Wait"
     this.elapsed = 0
     this.type = "wait"
@@ -267,7 +268,7 @@ export class Wait {
   }
 
   get percentDone() {
-    return Math.min(this.elapsed / this.duration * 100, 100)
+    return Math.min((this.elapsed / this.duration) * 100, 100)
   }
 
   run() {
@@ -296,7 +297,8 @@ export class Wait {
     }
   }
 
-  done(skipCallback) {    // Must be able to be called twice
+  done(skipCallback) {
+    // Must be able to be called twice
     clearInterval(this.interval)
     clearTimeout(this.timeout)
     if (!skipCallback) {
@@ -305,7 +307,7 @@ export class Wait {
   }
 }
 
-config.subscribe($config => {
+config.subscribe(($config) => {
   Wait.currentWaitInterval = $config.WAIT_INTERVAL || 1
   Wait.currentStopsetOverdueTime = $config.STOPSET_OVERDUE_TIME || 0
 })
@@ -343,23 +345,22 @@ export const setSpeaker = (choice) => {
   speaker.set(choice === "" ? "default" : choice)
 }
 
-
 const updateSpeakers = async () => {
   let speakers = []
   try {
-    speakers = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === "audiooutput").map(d => [d.deviceId, d.label])
+    speakers = (await navigator.mediaDevices.enumerateDevices())
+      .filter((d) => d.kind === "audiooutput")
+      .map((d) => [d.deviceId, d.label])
   } catch (e) {
     console.error("Error getting speakers!")
   }
-  speakers.sort(([,a], [,b]) => {
-    if (a === "default")
-      return -1
-    if (b === "default")
-      return 1
+  speakers.sort(([, a], [, b]) => {
+    if (a === "default") return -1
+    if (b === "default") return 1
     return a.toLowerCase().localeCompare(b.toLowerCase())
   })
 
-  playStatusWritable.update($playStatus => ({...$playStatus, speakers}))
+  playStatusWritable.update(($playStatus) => ({ ...$playStatus, speakers }))
 }
 
 navigator.mediaDevices.ondevicechange = async () => {
@@ -367,10 +368,9 @@ navigator.mediaDevices.ondevicechange = async () => {
   setSpeaker(get(speaker))
 }
 
-config.subscribe($config => {
+config.subscribe(($config) => {
   setCompression($config.BROADCAST_COMPRESSION || false)
 })
-
 ;(async () => {
   setCompression(get(config).BROADCAST_COMPRESSION || false)
   await updateSpeakers()

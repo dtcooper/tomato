@@ -27,31 +27,31 @@
 
 <div class="flex items-center gap-2">
   <div class="font-mono">{prettyDuration(item.elapsed, item.duration)}</div>
-    {#if item.type === "wait"}
-      <progress class="progress h-8 flex-1" value={item.elapsed} max={item.duration} />
-    {:else if item.type === "stopset"}
-      <div class="flex flex-1 relative">
-        <div
-          class="flex-1 relative grid h-8 gap-2 overflow-hidden bg-base-300 rounded-xl"
-          style:grid-template-columns={item.playableNonErrorItems.map((item) => `${item.duration}fr`).join(" ")}
-        >
-          {#each item.playableNonErrorItems as asset}
-            <div
-              class="flex flex-col items-center justify-center font-mono text-xs leading-none overflow-hidden"
-              use:hideDurationIfSmall
-              style:background-color={asset.rotator.color.value}
-              style:color={asset.rotator.color.content}
-            >
-              <span>{prettyDuration(asset.duration)}</span>
-            </div>
-          {/each}
+  {#if item.type === "wait"}
+    <progress class="progress h-8 flex-1" value={item.elapsed} max={item.duration} />
+  {:else if item.type === "stopset"}
+    <div class="relative flex flex-1">
+      <div
+        class="relative grid h-8 flex-1 gap-2 overflow-hidden rounded-xl bg-base-300"
+        style:grid-template-columns={item.playableNonErrorItems.map((item) => `${item.duration}fr`).join(" ")}
+      >
+        {#each item.playableNonErrorItems as asset}
           <div
-            class="absolute h-full w-[5px] z-10 bg-error"
-            class:animate-pulse={!item.playing}
-            style:left={`calc(${(item.elapsed / item.duration) * 100}% - 2.5px)`}
-          />
-        </div>
+            class="flex flex-col items-center justify-center overflow-hidden font-mono text-xs leading-none"
+            use:hideDurationIfSmall
+            style:background-color={asset.rotator.color.value}
+            style:color={asset.rotator.color.content}
+          >
+            <span>{prettyDuration(asset.duration)}</span>
+          </div>
+        {/each}
+        <div
+          class="absolute z-10 h-full w-[5px] bg-error"
+          class:animate-pulse={!item.playing}
+          style:left={`calc(${(item.elapsed / item.duration) * 100}% - 2.5px)`}
+        />
       </div>
-    {/if}
+    </div>
+  {/if}
   <div class="font-mono">{prettyDuration(item.duration)}</div>
 </div>

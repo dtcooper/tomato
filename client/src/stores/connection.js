@@ -17,7 +17,7 @@ const connPersisted = persisted("conn", {
 })
 connEphemeral = writable({
   connecting: false, // Before successful auth
-  connected: false  // Whether socket is "online" state or not (after successful auth)
+  connected: false // Whether socket is "online" state or not (after successful auth)
 })
 const reloading = writable(false) // Whether the whole app is in the reloading process
 
@@ -31,7 +31,7 @@ export const conn = derived(
   })
 )
 
-const updateConn = ({connecting, connected, ...restPersisted}) => {
+const updateConn = ({ connecting, connected, ...restPersisted }) => {
   const restEphemeral = {}
   if (connected !== undefined) {
     restEphemeral.connected = connected
@@ -40,7 +40,7 @@ const updateConn = ({connecting, connected, ...restPersisted}) => {
     restEphemeral.connecting = connecting
   }
   if (Object.keys(restEphemeral).length > 0) {
-    connEphemeral.update($connEphemeral => ({ ...$connEphemeral, ...restEphemeral}))
+    connEphemeral.update(($connEphemeral) => ({ ...$connEphemeral, ...restEphemeral }))
   }
   if (Object.keys(restPersisted).length > 0) {
     connPersisted.update(($connPersisted) => ({ ...$connPersisted, ...restPersisted }))

@@ -1,10 +1,9 @@
 <script>
-
-  import { slide } from 'svelte/transition';
-  import playCircleOutlineIcon from '@iconify/icons-mdi/play-circle-outline'
-  import pauseCircleOutlineIcon from '@iconify/icons-mdi/pause-circle-outline'
-  import skipForwardOutlineIcon from '@iconify/icons-mdi/skip-forward-outline'
-  import reloadIcon from '@iconify/icons-mdi/reload'
+  import { slide } from "svelte/transition"
+  import playCircleOutlineIcon from "@iconify/icons-mdi/play-circle-outline"
+  import pauseCircleOutlineIcon from "@iconify/icons-mdi/pause-circle-outline"
+  import skipForwardOutlineIcon from "@iconify/icons-mdi/skip-forward-outline"
+  import reloadIcon from "@iconify/icons-mdi/reload"
 
   import Icon from "../components/Icon.svelte"
   import PlayBar from "./player/PlayBar.svelte"
@@ -16,7 +15,7 @@
 
   // Object automatically updates on change
   let items = []
-  const firstItem = () => items.length > 0 ? items[0] : null
+  const firstItem = () => (items.length > 0 ? items[0] : null)
   const updateUI = () => (items = items) // Callback for force re-render
 
   const hasOneStopset = () => items.some((item) => item.type === "stopset")
@@ -48,10 +47,8 @@
       console.warn(`Index ${index} out of band while processing items`)
       return
     }
-    while (index-- > 0)
-      items.shift().done(true)  // skip callback (would be recursive)
-    if (items.length === 0 || !hasOneStopset())
-      addStopset()
+    while (index-- > 0) items.shift().done(true) // skip callback (would be recursive)
+    if (items.length === 0 || !hasOneStopset()) addStopset()
     if (items.length === 0) {
       console.warn("No items to process")
       return
@@ -66,7 +63,7 @@
   }
 
   const play = () => {
-    const firstStopsetIndex = items.findIndex(item => item.type === "stopset")
+    const firstStopsetIndex = items.findIndex((item) => item.type === "stopset")
     if (firstStopsetIndex === -1) {
       throw new Error("play() SHOULD have found a first stopset")
     }
@@ -97,31 +94,32 @@
 
     <div class="mt-4 flex items-center justify-center gap-3">
       <button
-        class="btn btn-lg btn-success pl-3"
+        class="btn btn-success btn-lg pl-3"
         disabled={!hasOneStopset() || (items[0].type === "stopset" && items[0].playing)}
         on:click={play}
       >
-        <Icon icon={playCircleOutlineIcon} class="w-12 h-12" /> Play
+        <Icon icon={playCircleOutlineIcon} class="h-12 w-12" /> Play
       </button>
       {#if $userConfig.uiMode >= 1}
         <button
-          class="btn btn-lg btn-warning"
-          disabled={items[0].type !== "stopset" || !items[0].playing} on:click={pause}
+          class="btn btn-warning btn-lg"
+          disabled={items[0].type !== "stopset" || !items[0].playing}
+          on:click={pause}
         >
-          <Icon icon={pauseCircleOutlineIcon} class="w-12 h-12" /> Pause
+          <Icon icon={pauseCircleOutlineIcon} class="h-12 w-12" /> Pause
         </button>
       {/if}
       {#if $userConfig.uiMode >= 2}
-        <div class={items[0].type === "stopset" && 'tooltip tooltip-bottom tooltip-error'} data-tip="Warning: this action will be logged!">
-          <button
-            class="btn btn-error"
-            disabled={items[0].type !== "stopset"}
-          >
-            <Icon icon={skipForwardOutlineIcon} class="w-8 h-8" /> Skip stopset
+        <div
+          class={items[0].type === "stopset" && "tooltip tooltip-error tooltip-bottom"}
+          data-tip="Warning: this action will be logged!"
+        >
+          <button class="btn btn-error" disabled={items[0].type !== "stopset"}>
+            <Icon icon={skipForwardOutlineIcon} class="h-8 w-8" /> Skip stopset
           </button>
         </div>
         <button class="btn btn-warning">
-          <Icon icon={reloadIcon} class="w-8 h-8" /> Regenerate next stopset
+          <Icon icon={reloadIcon} class="h-8 w-8" /> Regenerate next stopset
         </button>
       {/if}
     </div>
@@ -133,56 +131,62 @@
 </div>
 
 <!-- col-span-2 until we have a single play rotator player -->
-<div class="border-base-content min-h-full h-0 flex flex-col col-span-2 gap-2">
-  <div class="font-bold text-sm my-0 divider text-primary">Playlist</div>
-  <div class="flex-1 overflow-y-auto flex flex-col gap-1.5" id="playlist" transition:slide|global>
+<div class="col-span-2 flex h-0 min-h-full flex-col gap-2 border-base-content">
+  <div class="divider my-0 text-sm font-bold text-primary">Playlist</div>
+  <div class="flex flex-1 flex-col gap-1.5 overflow-y-auto" id="playlist" transition:slide|global>
     {#each items as item, index}
-      <div class="my-0 divider italic" class:text-secondary={item.type === "stopset"} class:text-accent={item.type === "wait"}>{item.name}</div>
-        {#if item.type === "stopset"}
-          {#each item.items as asset}
-            <div class="pl-2 border-l-4 border-base-content">
-              <div
-                class="rounded-xl items-center flex overflow-hidden px-3 py-1 gap-3 bg-clip-text"
-                style:background={`linear-gradient(to right, ${asset.color.dark} 0%, ${asset.color.dark} ${asset.percentDone}%, ${asset.color.value} ${asset.percentDone}%, ${asset.color.value} 100%)`}
-                style:color={asset.color.content}
-              >
-                <div
-                  class="radial-progress font-mono text-sm h-20 w-20"
-                  style:--value={asset.elapsed / asset.duration * 100}
-                  style:--thickness={asset.elapsed === 0 ? '0' : '0.4rem'}
-                >
-                  {prettyDuration(asset.remaining)}
-                </div>
-                <div class="flex-1 truncate flex flex-col">
-                  <div class="text-xl">{asset.name}</div>
-                  <div class="font-bold font-mono font-sm">{asset.rotator.name}</div>
-                </div>
-                <div>timer</div>
-              </div>
-            </div>
-          {/each}
-        {:else if item.type === "wait"}
-          <div class="pl-2 border-l-4" class:border-base-content={index !== 0} class:border-success={index === 0}>
+      <div
+        class="divider my-0 italic"
+        class:text-secondary={item.type === "stopset"}
+        class:text-accent={item.type === "wait"}
+      >
+        {item.name}
+      </div>
+      {#if item.type === "stopset"}
+        {#each item.items as asset}
+          <div class="border-l-4 border-base-content pl-2">
             <div
-              class="rounded-xl items-center flex overflow-hidden px-3 py-1 gap-3"
-              style:background-image={`linear-gradient(to right, hsl(var(--b3)) 0%, hsl(var(--b3)) ${item.percentDone}%, hsl(var(--b2)) ${item.percentDone}%, hsl(var(--b2)) 100%)`}
+              class="flex items-center gap-3 overflow-hidden rounded-xl bg-clip-text px-3 py-1"
+              style:background={`linear-gradient(to right, ${asset.color.dark} 0%, ${asset.color.dark} ${asset.percentDone}%, ${asset.color.value} ${asset.percentDone}%, ${asset.color.value} 100%)`}
+              style:color={asset.color.content}
             >
               <div
-                class="radial-progress font-mono text-sm h-20 w-20"
-                style:--value={item.elapsed / item.duration * 100}
-                style:--thickness={item.elapsed === 0 ? '0' : '0.4rem'}
+                class="radial-progress h-20 w-20 font-mono text-sm"
+                style:--value={(asset.elapsed / asset.duration) * 100}
+                style:--thickness={asset.elapsed === 0 ? "0" : "0.4rem"}
               >
-                {prettyDuration(item.remaining)}
+                {prettyDuration(asset.remaining)}
               </div>
-              <div class="font-bold text-2xl flex-1">Wait for {humanDuration(item.duration)}</div>
-              <div class="font-mono text-sm self-start">{prettyDuration(item.elapsed, item.duration)} / {prettyDuration(item.duration)}</div>
+              <div class="flex flex-1 flex-col truncate">
+                <div class="text-xl">{asset.name}</div>
+                <div class="font-sm font-mono font-bold">{asset.rotator.name}</div>
+              </div>
+              <div>timer</div>
             </div>
           </div>
-        {/if}
-      {/each}
-    <div class="flex flex-col items-center">
-      Add more
-    </div>
+        {/each}
+      {:else if item.type === "wait"}
+        <div class="border-l-4 pl-2" class:border-base-content={index !== 0} class:border-success={index === 0}>
+          <div
+            class="flex items-center gap-3 overflow-hidden rounded-xl px-3 py-1"
+            style:background-image={`linear-gradient(to right, hsl(var(--b3)) 0%, hsl(var(--b3)) ${item.percentDone}%, hsl(var(--b2)) ${item.percentDone}%, hsl(var(--b2)) 100%)`}
+          >
+            <div
+              class="radial-progress h-20 w-20 font-mono text-sm"
+              style:--value={(item.elapsed / item.duration) * 100}
+              style:--thickness={item.elapsed === 0 ? "0" : "0.4rem"}
+            >
+              {prettyDuration(item.remaining)}
+            </div>
+            <div class="flex-1 text-2xl font-bold">Wait for {humanDuration(item.duration)}</div>
+            <div class="self-start font-mono text-sm">
+              {prettyDuration(item.elapsed, item.duration)} / {prettyDuration(item.duration)}
+            </div>
+          </div>
+        </div>
+      {/if}
+    {/each}
+    <div class="flex flex-col items-center">Add more</div>
   </div>
 </div>
 

@@ -5,7 +5,7 @@
   width="1em"
   height="1em"
   preserveAspectRatio="xMidYMid meet"
-  shape-rendering={$$props['shape-rendering']}
+  shape-rendering={$$props["shape-rendering"]}
 >
   {@html $$props.icon.body}
 </svg>

@@ -40,15 +40,15 @@ module.exports = {
   daisyui: {
     logs: false,
     themes: [
-       {
-         tomato: {
-           ...synthwaveTheme,
-           primary: "#fc49ab",
-           secondary: "#5fe8ff",
-           accent: "#c07eec"
-         }
-       },
-       ...daisyThemes
+      {
+        tomato: {
+          ...synthwaveTheme,
+          primary: "#fc49ab",
+          secondary: "#5fe8ff",
+          accent: "#c07eec"
+        }
+      },
+      ...daisyThemes
     ]
   },
   plugins: [require("daisyui")]

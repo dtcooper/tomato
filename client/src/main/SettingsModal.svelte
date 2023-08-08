@@ -49,7 +49,7 @@
   <svelte:fragment slot="title">Settings</svelte:fragment>
   <svelte:fragment slot="close-text">Close settings</svelte:fragment>
   <svelte:fragment slot="content">
-    <div class="grid grid-cols-[max-content_1fr] gap-3 items-baseline">
+    <div class="grid grid-cols-[max-content_1fr] items-baseline gap-3">
       <div class="flex items-center justify-end text-lg font-bold">User Interface mode:</div>
       <select class="select select-bordered select-lg" on:change={(e) => ($userConfig.uiMode = +e.target.value)}>
         {#each ["Simple", "Standard", "Advanced"] as uiMode, index}
@@ -78,16 +78,20 @@
       <!-- svelte-ignore missing-declaration -->
       {#if IS_DEV}
         <div class="flex justify-end text-lg font-bold">Autoplay (dev only):</div>
-        <div class="flex items-center justify-center font-mono font-bold text-xl gap-4">
+        <div class="flex items-center justify-center gap-4 font-mono text-xl font-bold">
           <span class:text-error={!$userConfig.autoplay}>OFF</span>
-          <input type="checkbox" class="toggle toggle-lg toggle-success" bind:checked={$userConfig.autoplay} />
+          <input type="checkbox" class="toggle toggle-success toggle-lg" bind:checked={$userConfig.autoplay} />
           <span class:text-success={$userConfig.autoplay}>ON</span>
         </div>
       {/if}
 
       {#if $userConfig.uiMode > 0}
         <div class="flex justify-end text-lg font-bold">Broadcast Compression:</div>
-        <div class="text-lg" class:text-error={!$config.BROADCAST_COMPRESSION} class:text-success={$config.BROADCAST_COMPRESSION}>
+        <div
+          class="text-lg"
+          class:text-error={!$config.BROADCAST_COMPRESSION}
+          class:text-success={$config.BROADCAST_COMPRESSION}
+        >
           {$config.BROADCAST_COMPRESSION ? "Enabled" : "Disabled"}
         </div>
 
@@ -98,7 +102,8 @@
 
     <div class="col-span-2">
       <button type="button" class="btn btn-error" on:click|preventDefault={confirmLogout}>
-        DANGER: Log out of server</button>
+        DANGER: Log out of server</button
+      >
     </div>
   </svelte:fragment>
 </Modal>
