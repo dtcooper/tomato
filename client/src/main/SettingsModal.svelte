@@ -8,8 +8,11 @@
   import { themeOrder as daisyThemes } from "daisyui/src/theming/themeDefaults"
   import { db } from "../stores/db"
   import { logout } from "../stores/connection"
+  import { playStatus, speaker, setSpeaker } from "../stores/player"
 
   import { config, userConfig } from "../stores/config"
+
+  const allowedThemes = ["tomato", ...daisyThemes]
 
   export let show = true
   let showLogout = false
@@ -46,8 +49,8 @@
   <svelte:fragment slot="title">Settings</svelte:fragment>
   <svelte:fragment slot="close-text">Close settings</svelte:fragment>
   <svelte:fragment slot="content">
-    <div class="grid w-full grid-cols-[max-content_1fr] gap-3">
-      <div class="flex items-center text-right text-lg font-bold">User Interface mode:</div>
+    <div class="grid grid-cols-[max-content_1fr] gap-3 items-baseline">
+      <div class="flex items-center justify-end text-lg font-bold">User Interface mode:</div>
       <select class="select select-bordered select-lg" on:change={(e) => ($userConfig.uiMode = +e.target.value)}>
         {#each ["Simple", "Standard", "Advanced"] as uiMode, index}
           {#if $config.UI_MODES.indexOf(index) !== -1}
@@ -56,25 +59,46 @@
         {/each}
       </select>
 
-      <div class="flex items-center text-right text-lg font-bold">Theme:</div>
+      <div class="flex justify-end text-lg font-bold">Audio Output Device:</div>
+      <select class="select select-bordered select-lg" on:change={(e) => setSpeaker(e.target.value)}>
+        {#each $playStatus.speakers as [id, name]}
+          <option value={id} selected={id === $speaker}>{name}</option>
+        {/each}
+      </select>
+
+      <div class="flex justify-end text-lg font-bold">Theme:</div>
       <select class="select select-bordered select-lg" on:change={(e) => ($userConfig.theme = e.target.value)}>
-        {#each daisyThemes as theme}
+        {#each allowedThemes as theme}
           <option value={theme} selected={$userConfig.theme === theme}>
             {theme.charAt(0).toUpperCase()}{theme.slice(1)}
           </option>
         {/each}
       </select>
 
+      <!-- svelte-ignore missing-declaration -->
+      {#if IS_DEV}
+        <div class="flex justify-end text-lg font-bold">Autoplay (dev only):</div>
+        <div class="flex items-center justify-center font-mono font-bold text-xl gap-4">
+          <span class:text-error={!$userConfig.autoplay}>OFF</span>
+          <input type="checkbox" class="toggle toggle-lg toggle-success" bind:checked={$userConfig.autoplay} />
+          <span class:text-success={$userConfig.autoplay}>ON</span>
+        </div>
+      {/if}
+
       {#if $userConfig.uiMode > 0}
-        <div class="flex items-center text-right text-lg font-bold">Station Admin:</div>
+        <div class="flex justify-end text-lg font-bold">Broadcast Compression:</div>
+        <div class="text-lg" class:text-error={!$config.BROADCAST_COMPRESSION} class:text-success={$config.BROADCAST_COMPRESSION}>
+          {$config.BROADCAST_COMPRESSION ? "Enabled" : "Disabled"}
+        </div>
+
+        <div class="flex justify-end text-lg font-bold">Station Admin:</div>
         <a class="link-hover link-primary link text-lg" href={$db.host}>Open in your web browser</a>
       {/if}
     </div>
 
     <div class="col-span-2">
-      <button type="button" class="btn btn-error" on:click|preventDefault={confirmLogout}
-        >DANGER: Log out of server</button
-      >
+      <button type="button" class="btn btn-error" on:click|preventDefault={confirmLogout}>
+        DANGER: Log out of server</button>
     </div>
   </svelte:fragment>
 </Modal>
@@ -104,7 +128,7 @@
       type="text"
       placeholder="Enter station name"
       class:input-error={showLogoutError}
-      class="input input-bordered input-lg w-full font-mono"
+      class="input input-bordered input-lg font-mono"
     />
   </div>
   <svelte:fragment slot="extra-buttons">

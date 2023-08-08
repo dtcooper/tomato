@@ -19,7 +19,7 @@
   >
     <form
       method="dialog"
-      class={`${$$props.class || "max-w-xl"} modal-box flex flex-col items-center justify-center gap-y-4`}
+      class={`${$$props.class || "max-w-xl"} modal-box flex flex-col items-center justify-center gap-y-4 p-4`}
     >
       {#if canDismiss}
         <button

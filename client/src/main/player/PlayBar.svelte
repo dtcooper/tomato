@@ -4,56 +4,54 @@
 
   export let item
 
-  let remaining
-  $: if (item.type === "wait") {
-    remaining = item.duration - item.elapsed
-  } else if (item.type === "stopset") {
-    remaining = item.stopset.duration - item.stopset.elapsed
-  }
-
   const hideDurationIfSmall = async (el) => {
-    // XXX hide text if the HTML for it is small
     await tick()
-    console.log('width:', el.clientWidth)
+    if (el.clientWidth - el.firstChild.clientWidth - 10 < 0) {
+      el.firstChild.remove()
+      console.log("too big!")
+    }
   }
 </script>
 
 <div class="my-3 flex justify-center">
-  <div class="text-xl font-bold">
-    <span class="font-mono">{prettyDuration(remaining)}</span>
+  <div class="text-2xl font-bold">
+    <span class="font-mono">{prettyDuration(item.remaining)}</span>
     remaining
     {#if item.type === "wait"}
       to wait
     {:else if item.type === "stopset"}
-      in {item.stopset.name}
+      in {item.name}
     {/if}
   </div>
 </div>
 
-{#if item.type === "wait"}
-  <div class="flex items-center gap-2">
-    <div class="font-mono">{prettyDuration(item.elapsed, item.duration)}</div>
-    <progress class="progress h-6 flex-1" value={item.elapsed} max={item.duration} />
-    <div class="font-mono">{prettyDuration(item.duration)}</div>
-  </div>
-{:else if item.type === "stopset"}
-  <div
-    class="relative grid h-8 gap-2 overflow-hidden rounded-xl border-4 border-base-300 bg-base-300"
-    style:grid-template-columns={item.stopset.playableNonErrorItems.map((item) => `${item.durationFull}fr`).join(" ")}
-  >
-    {#each item.stopset.playableNonErrorItems as asset}
-      <div
-        class="flex flex-col items-center justify-center font-mono text-xs leading-none"
-        use:hideDurationIfSmall
-        style:background-color={asset.rotator.color.value}
-        style:color={asset.rotator.color.content}
-      >
-        {prettyDuration(asset.duration)}
+<div class="flex items-center gap-2">
+  <div class="font-mono">{prettyDuration(item.elapsed, item.duration)}</div>
+    {#if item.type === "wait"}
+      <progress class="progress h-8 flex-1" value={item.elapsed} max={item.duration} />
+    {:else if item.type === "stopset"}
+      <div class="flex flex-1 relative">
+        <div
+          class="flex-1 relative grid h-8 gap-2 overflow-hidden bg-base-300 rounded-xl"
+          style:grid-template-columns={item.playableNonErrorItems.map((item) => `${item.duration}fr`).join(" ")}
+        >
+          {#each item.playableNonErrorItems as asset}
+            <div
+              class="flex flex-col items-center justify-center font-mono text-xs leading-none overflow-hidden"
+              use:hideDurationIfSmall
+              style:background-color={asset.rotator.color.value}
+              style:color={asset.rotator.color.content}
+            >
+              <span>{prettyDuration(asset.duration)}</span>
+            </div>
+          {/each}
+          <div
+            class="absolute h-full w-[5px] z-10 bg-error"
+            class:animate-pulse={!item.playing}
+            style:left={`calc(${(item.elapsed / item.duration) * 100}% - 2.5px)`}
+          />
+        </div>
       </div>
-    {/each}
-    <div
-      class="absolute h-full w-[5px] bg-base-content"
-      style:left={`calc(${(item.stopset.elapsedFull / item.stopset.durationFull) * 100}% - 2.5px)`}
-    />
-  </div>
-{/if}
+    {/if}
+  <div class="font-mono">{prettyDuration(item.duration)}</div>
+</div>

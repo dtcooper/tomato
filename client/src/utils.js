@@ -1,8 +1,8 @@
 import dayjs from "dayjs"
 
 export const prettyDuration = (item, max) => {
-  item = dayjs.duration(item, "seconds")
-  max = max ? dayjs.duration(max, "seconds") : item
+  item = dayjs.duration(Math.round(item), "seconds")
+  max = max ? dayjs.duration(Math.round(max), "seconds") : item
   if (max.hours() > 0) {
     return `${item.hours()}:${item.format("mm:ss")}`
   } else if (max.minutes() >= 10) {
@@ -10,6 +10,21 @@ export const prettyDuration = (item, max) => {
   } else {
     return item.format("m:ss")
   }
+}
+
+export const humanDuration = (item) => {
+  const seconds = item % 60
+  const minutes = Math.floor(item / 60) % 60
+  const hours = Math.floor(item / 3600)
+
+  const items = []
+  if (hours)
+    items.push(`${hours} hour${hours === 1 ? '' : 's'}`)
+  if (minutes)
+    items.push(`${minutes} minute${minutes === 1 ? '' : 's'}`)
+  if (seconds)
+    items.push(`${seconds} second${seconds === 1 ? '' : 's'}`)
+  return items.join(', ')
 }
 
 export const prettyDatetime = (datetime) => datetime.format("MMM D, YYYY @ h:mm:ssa")

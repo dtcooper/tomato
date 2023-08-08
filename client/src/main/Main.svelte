@@ -13,7 +13,7 @@
 
 <div class="max-h-screen max-w-screen h-screen w-screen flex flex-col gap-2">
   <Header bind:showSyncModal bind:showSettingsModal />
-  <div class="w-full max-w-4xl grid mx-auto flex-1 grid-cols-[2fr,1fr] grid-rows-[max-content,auto] gap-2 px-2 max-h-fit">
+  <div class="w-full max-w-4xl grid gap-5 mx-auto flex-1 grid-cols-[2fr,1fr] grid-rows-[max-content,auto] px-2 max-h-fit">
     <Player />
   </div>
 </div>

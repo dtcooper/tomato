@@ -36,6 +36,7 @@ if (squirrelCheck || !singleInstanceLock) {
   }
 
   app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors")
+  app.commandLine.appendSwitch('disable-pinch')
   app.setAboutPanelOptions({
     applicationName: "Tomato Radio Automation\n(Desktop App)",
     copyright: `\u00A9 2019-${new Date().getFullYear()} David Cooper & BMIR.\nAll rights reserved.`,
@@ -112,6 +113,13 @@ if (squirrelCheck || !singleInstanceLock) {
       if (!IS_DEV || !event.url.startsWith(baseUrl)) {
         event.preventDefault()
         shell.openExternal(event.url)
+      }
+    })
+
+    win.webContents.on("before-input-event", (event, input) => {
+      // Disable reloading and zooming in/out
+      if (!IS_DEV && input.meta && ['KeyR', 'Equal', 'Minus'].includes(input.code)) {
+          event.preventDefault()
       }
     })
 

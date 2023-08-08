@@ -11,7 +11,7 @@ import { get, readonly, writable } from "svelte/store"
 import { colors } from "../../../server/constants.json"
 import { config } from "./config"
 import { conn } from "./connection"
-import { GeneratedStopset } from "./generated-stopset"
+import { GeneratedStopset } from "./player"
 
 const assetsDir = path.join(new URLSearchParams(window.location.search).get("userDataDir"), "assets")
 
@@ -205,7 +205,7 @@ class Stopset extends AssetStopsetHydratableObject {
     const hardIgnoreIds = new Set()
     let softIgnoreIds = undefined
 
-    const NO_REPEAT_ASSETS_TIME = parseInt(get(config).NO_REPEAT_ASSETS_TIME) // XXXX no parseint
+    const NO_REPEAT_ASSETS_TIME = get(config).NO_REPEAT_ASSETS_TIME
     if (NO_REPEAT_ASSETS_TIME > 0) {
       // Purge _assetPlayTimes if their outside time bounds
       DB._assetPlayTimes = new Map(
@@ -221,7 +221,7 @@ class Stopset extends AssetStopsetHydratableObject {
       if (asset) {
         hardIgnoreIds.add(asset.id)
         /// XXX should this be marked by player code only?
-        /// Except then the next stopset may include it, so maybe this _is_ the stop for marking
+        /// Except then the next stopset may include it, so maybe this _is_ the spot for marking
         DB.markPlayed(asset)
       }
       items.push({ rotator, asset })
@@ -269,8 +269,7 @@ class DB {
   }
 
   static markPlayed(asset) {
-    if (parseInt(get(config).NO_REPEAT_ASSETS_TIME) > 0) {
-      // XXX no parseInt
+    if (get(config).NO_REPEAT_ASSETS_TIME > 0) {
       this._assetPlayTimes.set(asset.id, timestamp())
       this._saveAssetPlayTimes()
     }

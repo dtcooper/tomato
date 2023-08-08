@@ -4,7 +4,7 @@ import { get, readonly } from "svelte/store"
 const config = persisted("config", {})
 const readonlyConfig = readonly(config)
 
-const defaultUserConfig = { uiMode: 0, theme: "synthwave" }
+const defaultUserConfig = { uiMode: 0, theme: "tomato", autoplay: false }
 export const userConfig = persisted("user-config", defaultUserConfig)
 export const resetUserConfig = () => userConfig.set(defaultUserConfig)
 

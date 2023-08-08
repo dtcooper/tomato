@@ -16,7 +16,7 @@ for (let [color, values] of Object.entries(muiColors)) {
     .toLowerCase()
     .replace("grey", "gray")
   if (!filter.includes(color)) {
-    colors.push({ name: color, value: values.A400, content: contentColor(values.A400) })
+    colors.push({ name: color, value: values.A400, content: contentColor(values.A400), dark: values.A700 })
   }
 }
 

@@ -15,30 +15,35 @@ const connPersisted = persisted("conn", {
   authenticated: false, // Got at least one successful auth since login. Stays true on disconnect
   didFirstSync: false // Completed one whole sync
 })
-const connecting = writable(false) // Before successful auth
-const connected = writable(false) // Whether socket is "online" state or not (after successful auth)
+connEphemeral = writable({
+  connecting: false, // Before successful auth
+  connected: false  // Whether socket is "online" state or not (after successful auth)
+})
 const reloading = writable(false) // Whether the whole app is in the reloading process
 
 export const conn = derived(
-  [connPersisted, connected, connecting, reloading],
-  ([$connPersisted, $connected, $connecting, $reloading]) => ({
+  [connPersisted, connEphemeral, reloading],
+  ([$connPersisted, $connEphemeral, $reloading]) => ({
     ...$connPersisted,
-    connecting: $connecting,
-    connected: $connected,
+    ...$connEphemeral,
     ready: $connPersisted.authenticated && $connPersisted.didFirstSync, // App ready to run, whether online or not
     reloading: $reloading
   })
 )
 
-const updateConn = ({ connected: $connected, connecting: $connecting, ...$conn }) => {
-  if ($connected !== undefined) {
-    connected.set($connected)
+const updateConn = ({connecting, connected, ...restPersisted}) => {
+  const restEphemeral = {}
+  if (connected !== undefined) {
+    restEphemeral.connected = connected
   }
-  if ($connecting !== undefined) {
-    connecting.set($connecting)
+  if (connecting !== undefined) {
+    restEphemeral.connecting = connecting
   }
-  if (Object.keys($conn).length > 0) {
-    connPersisted.update(($connPersisted) => ({ ...$connPersisted, ...$conn }))
+  if (Object.keys(restEphemeral).length > 0) {
+    connEphemeral.update($connEphemeral => ({ ...$connEphemeral, ...restEphemeral}))
+  }
+  if (Object.keys(restPersisted).length > 0) {
+    connPersisted.update(($connPersisted) => ({ ...$connPersisted, ...restPersisted }))
   }
 }
 

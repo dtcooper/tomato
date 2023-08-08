@@ -13,21 +13,21 @@
     "unspecified"
   ],
   "colors": [
-    { "name": "red", "value": "#ff1744", "content": "#ffd1da" },
-    { "name": "pink", "value": "#f50057", "content": "#ffccde" },
-    { "name": "purple", "value": "#d500f9", "content": "#f7ccff" },
-    { "name": "deep-purple", "value": "#651fff", "content": "#e0d1ff" },
-    { "name": "indigo", "value": "#3d5afe", "content": "#d6dcff" },
-    { "name": "blue", "value": "#2979ff", "content": "#d6e5ff" },
-    { "name": "light-blue", "value": "#00b0ff", "content": "#002333" },
-    { "name": "cyan", "value": "#00e5ff", "content": "#002e33" },
-    { "name": "teal", "value": "#1de9b6", "content": "#003326" },
-    { "name": "green", "value": "#00e676", "content": "#002e18" },
-    { "name": "light-green", "value": "#76ff03", "content": "#173300" },
-    { "name": "lime", "value": "#c6ff00", "content": "#283300" },
-    { "name": "yellow", "value": "#ffea00", "content": "#332f00" },
-    { "name": "amber", "value": "#ffc400", "content": "#332700" },
-    { "name": "orange", "value": "#ff9100", "content": "#331d00" },
-    { "name": "deep-orange", "value": "#ff3d00", "content": "#ffd8cc" }
+    {"name": "red", "value": "#ff1744", "content": "#ffd1da", "dark": "#d50000"},
+    {"name": "pink", "value": "#f50057", "content": "#ffccde", "dark": "#c51162"},
+    {"name": "purple", "value": "#d500f9", "content": "#f7ccff", "dark": "#aa00ff"},
+    {"name": "deep-purple", "value": "#651fff", "content": "#e0d1ff", "dark": "#6200ea"},
+    {"name": "indigo", "value": "#3d5afe", "content": "#d6dcff", "dark": "#304ffe"},
+    {"name": "blue", "value": "#2979ff", "content": "#d6e5ff", "dark": "#2962ff"},
+    {"name": "light-blue", "value": "#00b0ff", "content": "#002333", "dark": "#0091ea"},
+    {"name": "cyan", "value": "#00e5ff", "content": "#002e33", "dark": "#00b8d4"},
+    {"name": "teal", "value": "#1de9b6", "content": "#003326", "dark": "#00bfa5"},
+    {"name": "green", "value": "#00e676", "content": "#002e18", "dark": "#00c853"},
+    {"name": "light-green", "value": "#76ff03", "content": "#173300", "dark": "#64dd17"},
+    {"name": "lime", "value": "#c6ff00", "content": "#283300", "dark": "#aeea00"},
+    {"name": "yellow", "value": "#ffea00", "content": "#332f00", "dark": "#ffd600"},
+    {"name": "amber", "value": "#ffc400", "content": "#332700", "dark": "#ffab00"},
+    {"name": "orange", "value": "#ff9100", "content": "#331d00", "dark": "#ff6d00"},
+    {"name": "deep-orange", "value": "#ff3d00", "content": "#ffd8cc", "dark": "#dd2c00"}
   ]
 }
