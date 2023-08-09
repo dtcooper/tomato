@@ -142,6 +142,11 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
     this.updateCallback()
   }
 
+  skip() {
+    this.play()
+    this.audio.currentTime = this.audio.duration
+  }
+
   pause() {
     this.playing = false
     this.audio.pause()
@@ -167,8 +172,8 @@ class NonPlayableAsset extends GeneratedStopsetAssetBase {
 }
 
 export class GeneratedStopset {
-  constructor(stopset, rotatorsAndAssets, doneCallback, updateCallback) {
-    this.generatedId = currentGeneratedId++
+  constructor(stopset, rotatorsAndAssets, doneCallback, updateCallback, generatedId) {
+    this.generatedId = generatedId === undefined ? currentGeneratedId++ : generatedId
     Object.assign(this, stopset)
     this.updateCallback = updateCallback || noop // UI update function
     this.doneCallback = doneCallback || noop
@@ -198,6 +203,10 @@ export class GeneratedStopset {
 
   get playableItems() {
     return this.items.filter((item) => item.playable)
+  }
+
+  skip() {
+    this.items[this.current].skip()
   }
 
   loadAudio() {

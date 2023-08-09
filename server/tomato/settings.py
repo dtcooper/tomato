@@ -244,8 +244,8 @@ def rotator_choices():
     return tuple(Rotator.objects.values_list("id", "name").order_by("name"))
 
 
-def validate_no_more_than_three(value):
-    if len(value) > 3:
+def validate_no_more_than_eight(value):
+    if len(value) > 8:
         raise ValidationError("Pick a maximum of three choices.")
 
 
@@ -255,16 +255,6 @@ CONSTANCE_SUPERUSER_ONLY = False
 CONSTANCE_IGNORE_ADMIN_VERSION_CHECK = True
 CONSTANCE_REDIS_CONNECTION = "redis://redis"
 CONSTANCE_ADDITIONAL_FIELDS = {
-    "zero_seconds_to_five_hours": (
-        "django.forms.DecimalField",
-        {
-            "decimal_places": 2,
-            "max_value": 5 * 60 * 60,  # 5 hours
-            "min_value": 0,
-            "widget": "django.forms.TextInput",
-            "widget_kwargs": {"attrs": {"size": 8}},
-        },
-    ),
     "ui_modes": (
         "django.forms.MultipleChoiceField",
         {
@@ -279,7 +269,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
             "choices": rotator_choices,
             "widget": "django.forms.widgets.CheckboxSelectMultiple",
             "required": False,
-            "validators": (validate_no_more_than_three,),
+            "validators": (validate_no_more_than_eight,),
         },
     ),
     "asset_end_date_priority_weight_multiplier": (
@@ -314,8 +304,24 @@ CONSTANCE_ADDITIONAL_FIELDS = {
         {
             "max_length": 250,
             "widget": "django.forms.TextInput",
-            "widget_kwargs": {"attrs": {"size": 80}},
+            "widget_kwargs": {"attrs": {"size": 60}},
             "required": True,
+        },
+    ),
+    "stopset_preload_count": (
+        "django.forms.IntegerField",
+        {
+            "widget": "django.forms.TextInput",
+            "min_value": 1,
+            "max_value": 20,
+        },
+    ),
+    "seconds": (
+        "django.forms.IntegerField",
+        {
+            "widget": "django.forms.TextInput",
+            "min_value": 0,
+            "max_value": 24 * 60 * 60,
         },
     ),
 }
@@ -350,25 +356,31 @@ CONSTANCE_CONFIG = {
         "asset_end_date_priority_weight_multiplier",
     ),
     "WAIT_INTERVAL": (
-        Decimal(20 * 60),
+        20 * 60,  # 20 minutes
         "Time to wait between stop sets (in seconds). Set to 0 to disable the wait interval entirely.",
-        "zero_seconds_to_five_hours",
+        "seconds",
     ),
     "NO_REPEAT_ASSETS_TIME": (
-        Decimal(0),
+        0,
         (
             "The time (in seconds) required to elapse for the dkestop app to attempt to not repeat any assets. Set to 0"
             " to disable and allow potential repetition in the randomization algorithm. If there are not enough assets"
             " in a rotator to respect this setting, it will be ignored."
         ),
-        "zero_seconds_to_five_hours",
+        "seconds",
+    ),
+    "STOPSET_PRELOAD_COUNT": (
+        2,
+        "Number of stopsets to preload in the UI. 2-3 is a good value for this, since new data could make preloaded ones stale.",
+        "stopset_preload_count",
     ),
     "STOPSET_OVERDUE_TIME": (
-        Decimal(0),
+        0,
         mark_safe(
             'The time (in seconds) after the <code>WAIT_INTERVAL</code> after which an "overdue" message will flash.'
             " Set to 0 disable."
         ),
+        "seconds"
     ),
     "STOPSET_OVERDUE_MESSAGE": (
         "You're overdue to play the next stopset. Please play it as soon as possible.",
@@ -441,6 +453,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
                 "WAIT_INTERVAL",
                 "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME",
                 "WARN_ON_EMPTY_ROTATORS",
+                "STOPSET_PRELOAD_COUNT",
                 "STOPSET_OVERDUE_TIME",
                 "STOPSET_OVERDUE_MESSAGE",
                 "NO_REPEAT_ASSETS_TIME",

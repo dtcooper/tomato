@@ -62,7 +62,7 @@
     }
 
     85% {
-      box-shadow: 0 0 0 10px hsl(var(--pulse-color, var(--bc)) / 0);
+      box-shadow: 0 0 0 15px hsl(var(--pulse-color, var(--bc)) / 0);
     }
 
     100% {

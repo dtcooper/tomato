@@ -21,7 +21,7 @@
       {$config.STATION_NAME}
     </div>
     <div class="flex items-center gap-3">
-      {#if $userConfig.uiMode >= 1}
+      {#if $config.UI_MODES.includes(0) && $userConfig.uiMode >= 1}
         <button class="btn btn-secondary" on:click={() => ($userConfig.uiMode = 0)}>← Back to simple view</button>
       {/if}
       <button

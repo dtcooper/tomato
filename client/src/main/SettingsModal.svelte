@@ -53,6 +53,15 @@
   <svelte:fragment slot="content">
     <div class="grid grid-cols-[max-content_1fr] items-baseline gap-3">
       <div class="flex items-center justify-end text-lg font-bold">User Interface mode:</div>
+      <div class="join join-horizontal">
+        {#each ["Simple", "Standard", "Advanced"] as uiMode, index}
+          {#if $config.UI_MODES.indexOf(index) !== -1}
+            <button class="btn join-item btn-active btn-disabled">{uiMode}</button>
+          {/if}
+        {/each}
+      </div>
+
+      <div class="flex items-center justify-end text-lg font-bold">User Interface mode:</div>
       <select class="select select-bordered select-lg" on:change={(e) => ($userConfig.uiMode = +e.target.value)}>
         {#each ["Simple", "Standard", "Advanced"] as uiMode, index}
           {#if $config.UI_MODES.indexOf(index) !== -1}

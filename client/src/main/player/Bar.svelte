@@ -16,7 +16,7 @@
 <div class="flex justify-center">
   <div class="text-2xl font-bold">
     {#if item.type === "wait" && item.overtime}
-      <span class="text-success tomato-pulse" style="--pulse-color: var(--su)">Please play next stopset</span>
+      <span class="text-success">Please play next stopset</span>
     {:else}
       <span class="font-mono">{prettyDuration(item.remaining)}</span>
       remaining
@@ -67,7 +67,7 @@
       {#if item.playing}
         <span class="text-success">Playing</span>
       {:else}
-        <span class="text-warning animate-pulse">Pause</span>
+        <span class="text-warning animate-pulse">Paused</span>
       {/if}
     {:else if item.type === "wait"}
       {#if item.overtime || item.overdue}
