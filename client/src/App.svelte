@@ -1,5 +1,6 @@
 <script>
   import { conn, login } from "./stores/connection"
+  import { userConfig } from "./stores/config"
   import { restoreAssetsDBFromLocalStorage } from "./stores/db"
 
   import Login from "./Login.svelte"
@@ -48,5 +49,24 @@
 
   :global(svg) {
     @apply h-16 w-16;
+  }
+
+  :global(.tomato-pulse) {
+    animation: tomato-pulse 1.5s infinite;
+    --pulse-color: var(--bc);
+  }
+
+  @keyframes tomato-pulse {
+    0% {
+      box-shadow: 0 0 0 0 hsl(var(--pulse-color, var(--bc)) / 0.7);
+    }
+
+    85% {
+      box-shadow: 0 0 0 10px hsl(var(--pulse-color, var(--bc)) / 0);
+    }
+
+    100% {
+      box-shadow: 0 0 0 0 hsl(var(--pulse-color, var(--bc)) / 0);
+    }
   }
 </style>

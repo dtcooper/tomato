@@ -5,16 +5,8 @@ import { derived, get, writable } from "svelte/store"
 import { config } from "./config"
 
 export const speaker = persisted("speaker", null)
-export const playStatusWritable = writable({
-  playing: false,
-  waiting: false,
-  paused: false,
-  speakers: []
-})
-export const playStatus = derived([playStatusWritable, speaker], ([$playStatusWritable, $speaker]) => ({
-  speaker: $speaker,
-  ...$playStatusWritable
-}))
+export const speakers = writable([])
+export const playStatus = derived([speaker, speakers], ([$speaker, $speakers]) => ({speaker: $speaker, speakers: $speakers}))
 
 let compressorEnabled = false
 let currentGeneratedId = 0
@@ -136,7 +128,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   }
 
   get remaining() {
-    return Math.min(this.duration - this.elapsed + 1, this.duration)
+    return this.duration - this.elapsed
   }
 
   get percentDone() {
@@ -197,7 +189,6 @@ export class GeneratedStopset {
     return this.playableNonErrorItems.reduce((s, item) => s + item.elapsed, 0)
   }
   get remaining() {
-    // Math.round?
     return this.playableNonErrorItems.reduce((s, item) => s + item.remaining, 0)
   }
 
@@ -235,6 +226,7 @@ export class GeneratedStopset {
   }
 
   done(skipCallback = false) {
+    //setPlayStatus({ playing: false })
     // Must be able to be called twice
     this.playing = false
     this.unloadAudio()
@@ -245,6 +237,7 @@ export class GeneratedStopset {
   }
 
   play() {
+    //setPlayStatus({ playing: true})
     this.loadAudio()
     this.playing = true
     this.items[this.current].play()
@@ -252,6 +245,7 @@ export class GeneratedStopset {
   }
 
   pause() {
+    //setPlayStatus({ playing: false })
     this.items[this.current].pause()
     this.playing = false
     this.updateCallback()
@@ -271,16 +265,16 @@ export class Wait {
     this.elapsed = 0
     this.type = "wait"
     this.overdue = false
-    this.waited = false
+    this.overtimeElapsed = 0
+    this.overtime = false
 
     this.expires = null
     this.interval = null
-    this.timeout = null
     this.active = false
   }
 
   get remaining() {
-    return Math.min(this.duration - this.elapsed + 1, this.duration)
+    return this.duration - this.elapsed
   }
 
   get percentDone() {
@@ -288,6 +282,7 @@ export class Wait {
   }
 
   run() {
+    //setPlayStatus({ waiting: true })
     this.active = true
     this.expires = dayjs().add(this.duration, "seconds")
     this.interval = setInterval(() => {
@@ -297,29 +292,28 @@ export class Wait {
         this.doneCountdown()
       }
       this.updateCallback()
-    }, 25)
+    }, 50)
   }
 
   doneCountdown() {
-    this.waited = true
+    this.overtime = true
     clearInterval(this.interval)
-    if (Wait.currentStopsetOverdueTime > 0) {
-      this.timeout = setTimeout(() => {
+    this.interval = setInterval(() => {
+      this.overtimeElapsed = dayjs().diff(this.expires, "ms") / 1000
+      this.updateCallback()
+      if (Wait.currentStopsetOverdueTime > 0 && this.overtimeElapsed > Wait.currentStopsetOverdueTime) {
         this.overdue = true
-        this.updateCallback()
-      }, Wait.currentStopsetOverdueTime)
-    } else {
-      this.done()
-    }
+      }
+    }, 333)
   }
 
   done(skipCallback) {
     // Must be able to be called twice
     clearInterval(this.interval)
-    clearTimeout(this.timeout)
     if (!skipCallback) {
       this.doneCallback()
     }
+    //setPlayStatus({ waiting: false})
   }
 }
 
@@ -362,21 +356,21 @@ export const setSpeaker = (choice) => {
 }
 
 const updateSpeakers = async () => {
-  let speakers = []
+  let newSpeakers = []
   try {
-    speakers = (await navigator.mediaDevices.enumerateDevices())
+    newSpeakers = (await navigator.mediaDevices.enumerateDevices())
       .filter((d) => d.kind === "audiooutput")
       .map((d) => [d.deviceId, d.label])
   } catch (e) {
     console.error("Error getting speakers!")
   }
-  speakers.sort(([, a], [, b]) => {
+  newSpeakers.sort(([, a], [, b]) => {
     if (a === "default") return -1
     if (b === "default") return 1
     return a.toLowerCase().localeCompare(b.toLowerCase())
   })
 
-  playStatusWritable.update(($playStatus) => ({ ...$playStatus, speakers }))
+  speakers.set(newSpeakers)
 }
 
 navigator.mediaDevices.ondevicechange = async () => {

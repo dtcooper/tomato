@@ -187,7 +187,7 @@ class Rotator extends HydratableObject {
     if (asset) {
       console.log(`Picked asset ${asset.id} [rotator = ${this.name}]`)
     } else {
-      console.log(`Failed to pick an asset entirely! [rotator = ${this.name}]`)
+      console.warn(`Failed to pick an asset entirely! [rotator = ${this.name}]`)
     }
 
     return asset

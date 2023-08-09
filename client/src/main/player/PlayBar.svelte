@@ -13,14 +13,18 @@
   }
 </script>
 
-<div class="mb-3 flex justify-center">
+<div class="flex justify-center">
   <div class="text-2xl font-bold">
-    <span class="font-mono">{prettyDuration(item.remaining)}</span>
-    remaining
-    {#if item.type === "wait"}
-      to wait
-    {:else if item.type === "stopset"}
-      in {item.name}
+    {#if item.type === "wait" && item.overtime}
+      <span class="text-success tomato-pulse" style="--pulse-color: var(--su)">Please play next stopset</span>
+    {:else}
+      <span class="font-mono">{prettyDuration(item.remaining)}</span>
+      remaining
+      {#if item.type === "wait"}
+        to wait
+      {:else if item.type === "stopset"}
+        in {item.name}
+      {/if}
     {/if}
   </div>
 </div>
@@ -54,4 +58,23 @@
     </div>
   {/if}
   <div class="font-mono">{prettyDuration(item.duration)}</div>
+</div>
+
+<div class="grid grid-cols-2 items-center gap-2 text-lg">
+  <div class="text-right">Status:</div>
+  <div class="font-bold font-mono italic">
+    {#if item.type === "stopset"}
+      {#if item.playing}
+        <span class="text-success">Playing</span>
+      {:else}
+        <span class="text-warning animate-pulse">Pause</span>
+      {/if}
+    {:else if item.type === "wait"}
+      {#if item.overtime || item.overdue}
+        <span class="text-success">Ready</span>
+      {:else}
+        <span class="text-warning">Waiting</span>
+      {/if}
+    {/if}
+  </div>
 </div>

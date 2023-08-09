@@ -98,20 +98,23 @@
   })
 </script>
 
-<div class="col-span-2 flex flex-col gap-2 mt-3">
+<div class="col-span-2 flex flex-col gap-5 mt-3">
   {#if items.length > 0}
+    {@const item = items[0]}
     <div class="flex items-center justify-center gap-3">
       <button
-        class="btn btn-success btn-lg pl-3"
-        disabled={!items.some((item) => item.type === "stopset") || (items[0].type === "stopset" && items[0].playing)}
+        class="btn btn-success btn-lg pl-3 relative !z-10"
+        disabled={!items.some((item) => item.type === "stopset") || (item.type === "stopset" && item.playing)}
         on:click={play}
+        class:tomato-pulse={item.type === "wait" && item.overtime}
+        style:--pulse-color="var(--su)"
       >
         <Icon icon={playCircleOutlineIcon} class="h-12 w-12" /> Play
       </button>
       {#if $userConfig.uiMode >= 1}
         <button
           class="btn btn-warning btn-lg"
-          disabled={items[0].type !== "stopset" || !items[0].playing}
+          disabled={item.type !== "stopset" || !item.playing}
           on:click={pause}
         >
           <Icon icon={pauseCircleOutlineIcon} class="h-12 w-12" /> Pause
@@ -119,10 +122,10 @@
       {/if}
       {#if $userConfig.uiMode >= 2}
         <div
-          class={items[0].type === "stopset" && "tooltip tooltip-error tooltip-bottom"}
+          class={item.type === "stopset" && "tooltip tooltip-error tooltip-bottom"}
           data-tip="Warning: this action will be logged!"
         >
-          <button class="btn btn-error" disabled={items[0].type !== "stopset"}>
+          <button class="btn btn-error" disabled={item.type !== "stopset"}>
             <Icon icon={skipForwardOutlineIcon} class="h-8 w-8" /> Skip stopset
           </button>
         </div>
@@ -131,12 +134,9 @@
         </button>
       {/if}
     </div>
-    <PlayBar item={items[0]} />
 
-    <div class="flex items items-center justify-center gap-2">
-      Status:
-      <span class="font-bold text-success font-mono">Playing</span>
-    </div>
+    <PlayBar {item} />
+
   {:else}
     <div class="mt-3 text-center text-3xl italic text-error">
       Can't generate a stopset. You're sure the server has data?
@@ -169,7 +169,7 @@
               class:border-base-300={!asset.finished && !asset.active}
             >
               <div
-                class="flex items-center gap-3 overflow-hidden rounded-xl bg-clip-text px-3 py-1"
+                class="flex items-center gap-3 overflow-hidden bg-clip-text px-3 py-1"
                 style:background={`linear-gradient(to right, ${leftColor} 0%, ${leftColor} ${asset.percentDone}%, ${rightColor} ${asset.percentDone}%, ${rightColor} 100%)`}
                 style:color={asset.color.content}
               >
@@ -202,16 +202,27 @@
               >
                 {prettyDuration(item.remaining)}
               </div>
-              <div class="flex-1 text-2xl font-bold">Wait for {humanDuration(item.duration)}</div>
-              <div class="self-start font-mono text-sm">
-                {prettyDuration(item.elapsed, item.duration)} / {prettyDuration(item.duration)}
+              <div class="flex-1 flex flex-col text-xl font-bold">
+                <div class:italic={item.overtime}>Wait{item.overtime ? 'ed' : ''} for {humanDuration(item.duration)}{item.overtime ? '!' : ''}</div>
+                {#if item.overtime}
+                  <div class="text-success animate-pulse">Play next stop set now!</div>
+                {/if}
+              </div>
+              <div class="self-start flex flex-col font-mono text-sm">
+                <div>{prettyDuration(item.elapsed, item.duration)} / {prettyDuration(item.duration)}</div>
+                {#if item.overtime}
+                  <div class="font-bold text-error animate-pulse">{prettyDuration(item.overtimeElapsed)} overdue</div>
+                  {item.overdue}
+                {/if}
               </div>
             </div>
           </div>
         {/if}
       </div>
+      <div class="flex flex-col items-center">Add more</div>
+    {:else}
+      <div class="font-error italic text-lg">No items in playlist!</div>
     {/each}
-    <div class="flex flex-col items-center">Add more</div>
   </div>
 </div>
 

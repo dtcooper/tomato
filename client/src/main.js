@@ -19,6 +19,7 @@ if (squirrelCheck || !singleInstanceLock) {
 } else {
   let window = null
   const elgatoVendorId = 4057
+  let blocker = null
   const [minWidth, minHeight, defaultWidth, defaultHeight] = [800, 600, 1000, 800]
 
   // Migrate when there's a protocol version bump
@@ -132,7 +133,6 @@ if (squirrelCheck || !singleInstanceLock) {
   }
 
   app.whenReady().then(async () => {
-    powerSaveBlocker.start("prevent-display-sleep")
     window = createWindow()
   })
 
@@ -144,6 +144,17 @@ if (squirrelCheck || !singleInstanceLock) {
         extra = "&" + new URLSearchParams(urlParams).toString()
       }
       window.loadURL(`${url}${extra}`)
+    }
+  })
+
+  ipcMain.handle("power-save-blocker", (event, on) => {
+    if (on && blocker === null) {
+      blocker = powerSaveBlocker.start("prevent-display-sleep")
+      console.log("Turning on power save blocker", blocker)
+    } else if (!on && blocker !== null) {
+      console.log("Turning off power save blocker", blocker)
+      powerSaveBlocker.stop(blocker)
+      blocker = null
     }
   })
 
