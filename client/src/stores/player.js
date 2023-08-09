@@ -17,6 +17,7 @@ export const playStatus = derived([playStatusWritable, speaker], ([$playStatusWr
 }))
 
 let compressorEnabled = false
+let currentGeneratedId = 0
 const audioContext = new AudioContext()
 
 const inputNode = audioContext.createGain()
@@ -47,10 +48,20 @@ class GeneratedStopsetAssetBase {
     this.index = index
     this.error = false
     this.finished = false
+    this.playing = false
+  }
+
+  updateCallback() {
+    this.generatedStopset.updateCallback()
+  }
+
+  get active() {
+    return this.generatedStopset.current === this.index
   }
 
   done(error) {
     this.finished = true
+    this.playing = false
     if (error) {
       console.log(`An error occurred while playing ${this.name}`, error)
     }
@@ -76,48 +87,52 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
     return this.rotator.color
   }
 
-  getAudioObject() {
-    const i = PlayableAsset._reusableAudioObjects.find((audio) => audio._used)
-    let audio
-    if (i > -1) {
-      audio = PlayableAsset._reusableAudioObjects[i]
-    } else {
+  static getAudioObject() {
+    let audio = PlayableAsset._reusableAudioObjects.find(item => !item.__tomato_used)
+
+    if (!audio) {
       audio = new Audio()
       const audioSource = audioContext.createMediaElementSource(audio)
       audioSource.connect(inputNode)
       PlayableAsset._reusableAudioObjects.push(audio)
     }
-    audio._used = true
+    audio.__tomato_used = true
 
     if (PlayableAsset._reusableAudioObjects.length > 50) {
-      console.warn("Length of PlayableAsset._reusuableAudioObjects exceeds > 50, something may be very wrong.")
+      console.warn(`Length of re-usable audio objects ${PlayableAsset._reusableAudioObjects.length} > 50. Really long stop sets could cause this.`)
     }
     return audio
   }
 
   loadAudio() {
-    this.audio = this.getAudioObject()
+    if (!this.audio) {
+      this.audio = PlayableAsset.getAudioObject()
 
-    console.log(`Loading ${this.file.localUrl}`)
-    this.audio.ondurationchange = () => {
-      this.duration = this.audio.duration
-      this.generatedStopset.updateCallback()
+      // TODO set duration quicker than this using an interval for smoother UI?
+      this.audio.ondurationchange = () => {
+        this.duration = this.audio.duration
+        this.updateCallback()
+      }
+      this.audio.ontimeupdate = () => {
+        this.elapsed = this.audio.currentTime
+        this.updateCallback()
+      }
+      this.audio.onended = () => this.done()
+      this.audio.onerror = (e) => {
+        this.error = true
+        this.done()
+      }
+      this.audio.src = this.file.localUrl
     }
-    this.audio.ontimeupdate = () => {
-      this.elapsed = this.audio.currentTime
-      this.generatedStopset.updateCallback()
-    }
-    this.audio.onended = () => this.done()
-    this.audio.onerror = this.audio.onabort = () => {
-      this.error = true
-      this.done()
-    }
-    this.audio.src = this.file.localUrl
   }
 
   unloadAudio() {
-    this.pause()
-    this.audio._used = false
+    if (this.audio) {
+      this.audio.ondurationchange = this.audio.ontimeupdate = this.audio.onended = this.audio.onended = null
+      this.audio.pause()
+      this.audio.__tomato_used = false
+      this.audio = null
+    }
   }
 
   get remaining() {
@@ -128,17 +143,17 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
     return Math.min((this.elapsed / this.duration) * 100, 100)
   }
 
-  get active() {
-    return this.generatedStopset.current === this.index
-  }
-
   play() {
     console.log(`Playing ${this.name}`)
+    this.playing = true
     this.audio.play().catch(() => this.done())
+    this.updateCallback()
   }
 
   pause() {
+    this.playing = false
     this.audio.pause()
+    this.updateCallback()
   }
 
   toString() {
@@ -161,6 +176,7 @@ class NonPlayableAsset extends GeneratedStopsetAssetBase {
 
 export class GeneratedStopset {
   constructor(stopset, rotatorsAndAssets, doneCallback, updateCallback) {
+    this.generatedId = currentGeneratedId++
     Object.assign(this, stopset)
     this.updateCallback = updateCallback || noop // UI update function
     this.doneCallback = doneCallback || noop
@@ -185,7 +201,6 @@ export class GeneratedStopset {
     return this.playableNonErrorItems.reduce((s, item) => s + item.remaining, 0)
   }
 
-  //TODO: may want to change this to playableNonErrorItems
   get playableNonErrorItems() {
     return this.items.filter((item) => item.playable && !item.error)
   }
@@ -196,16 +211,15 @@ export class GeneratedStopset {
 
   loadAudio() {
     if (!this.loaded) {
-      this.items.filter((item) => item.playable)
-      this.playableNonErrorItems.forEach((item) => item.loadAudio())
       this.loaded = true
+      this.playableItems.forEach((item) => item.loadAudio())
     }
   }
 
   unloadAudio() {
-    if (!this.loaded) {
+    if (this.loaded) {
       this.loaded = false
-      this.items.filter((item) => item.playable).forEach((item) => item.unloadAudio())
+      this.playableItems.forEach((item) => item.unloadAudio())
     }
   }
 
@@ -222,9 +236,10 @@ export class GeneratedStopset {
 
   done(skipCallback = false) {
     // Must be able to be called twice
-    this.unloadAudio()
     this.playing = false
+    this.unloadAudio()
     if (!skipCallback) {
+      console.log("calling done callback")
       this.doneCallback()
     }
   }
@@ -248,6 +263,7 @@ export class Wait {
   static currentStopsetOverdueTime = 0
 
   constructor(doneCallback, updateCallback) {
+    this.generatedId = currentGeneratedId++
     this.updateCallback = updateCallback || noop
     this.doneCallback = doneCallback || noop
     this.duration = Wait.currentWaitInterval || 1 // Should never get created if it's 0

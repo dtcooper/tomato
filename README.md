@@ -88,12 +88,13 @@ Head over to <http://localhost:8888/> in your web browser.
 - [x] CSV export to client log entries
 - [ ] Button to play an asset from a specific rotator (on Stream Deck too).
   - [x] Backend done as `SINGLE_PLAY_ROTATORS`
-- [ ] Idiot mode, easy mode, advanced mode
+- [x] Idiot mode, easy mode, advanced mode
 - [ ] ~~Timeout on fetch?~~ (websockets makes this unneeded, except for downloading files)
 - [x] Attempt to prevent duplicate assets from playing within a certain time period
 - [ ] Start/end time for assets in client are based on "is likely to play at" time
 - [ ] Empty rotators are warned on (based on feature flag)
-- [ ] Compression and selecting output device using a bridge to
+- [ ] Deal with non-playable assets (error state ones)
+- [x] Compression and selecting output device using a bridge to
       [the web audio API](https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createMediaElementSource).
 - [x] Any custom django admin pages can [follow this guide](https://dev.to/daiquiri_team/creating-a-custom-page-in-django-admin-4pbd)
 - [ ] Flash **whole** screen after configurable time with some messaging ("play the promos, station management has been notified")

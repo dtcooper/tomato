@@ -1,5 +1,5 @@
 <script>
-  import { slide } from "svelte/transition"
+  import { fade } from "svelte/transition"
   import playCircleOutlineIcon from "@iconify/icons-mdi/play-circle-outline"
   import pauseCircleOutlineIcon from "@iconify/icons-mdi/pause-circle-outline"
   import skipForwardOutlineIcon from "@iconify/icons-mdi/skip-forward-outline"
@@ -9,16 +9,18 @@
   import PlayBar from "./player/PlayBar.svelte"
 
   import { config, userConfig } from "../stores/config"
-  import { db, restoreAssetsDBFromLocalStorage } from "../stores/db"
+  import { db } from "../stores/db"
   import { Wait } from "../stores/player"
   import { prettyDuration, humanDuration } from "../utils"
 
   // Object automatically updates on change
   let items = []
-  const firstItem = () => (items.length > 0 ? items[0] : null)
-  const updateUI = () => (items = items) // Callback for force re-render
 
-  const hasOneStopset = () => items.some((item) => item.type === "stopset")
+  const updateUI = () => (items = items) // Callback for force re-render
+  const PRE_GENERATED_STOPSETS = 3  // TODO: Should be a config option
+  const numStopsetsToPreload = 2
+
+
   const addStopset = () => {
     // If previous item is not a wait interval
     let shouldPrependWait = $config.WAIT_INTERVAL > 0 && items.length > 0 && items[items.length - 1].type !== "wait"
@@ -26,9 +28,6 @@
     let generatedStopset = $db.generateStopset(null, processItem, updateUI)
 
     if (generatedStopset) {
-      if (!hasOneStopset()) {
-        generatedStopset.loadAudio() // Preload audio
-      }
       if (shouldPrependWait) {
         items.push(new Wait(processItem, updateUI))
       }
@@ -47,17 +46,28 @@
       console.warn(`Index ${index} out of band while processing items`)
       return
     }
-    while (index-- > 0) items.shift().done(true) // skip callback (would be recursive)
-    if (items.length === 0 || !hasOneStopset()) addStopset()
+    while (index-- > 0) {
+      items.shift().done(true)
+    }
+
+    let numStopsetsToAdd = PRE_GENERATED_STOPSETS - items.filter(item => item.type === "stopset").length
+    while (numStopsetsToAdd-- > 0) {
+      addStopset()
+    }
+
     if (items.length === 0) {
       console.warn("No items to process")
       return
     }
 
+    // Preload first few
+    items.filter(item => item.type === "stopset").slice(0, numStopsetsToPreload).forEach(item => item.loadAudio())
+
     const nextItem = items[0]
     if (nextItem.type === "wait") {
       nextItem.run()
     } else if (nextItem.type === "stopset" && (play || (IS_DEV && $userConfig.autoplay))) {
+      console.log("processItem(): playing first stopset")
       nextItem.play()
     }
   }
@@ -88,14 +98,12 @@
   })
 </script>
 
-<div class="col-span-2">
+<div class="col-span-2 flex flex-col gap-2 mt-3">
   {#if items.length > 0}
-    <PlayBar item={items[0]} />
-
-    <div class="mt-4 flex items-center justify-center gap-3">
+    <div class="flex items-center justify-center gap-3">
       <button
         class="btn btn-success btn-lg pl-3"
-        disabled={!hasOneStopset() || (items[0].type === "stopset" && items[0].playing)}
+        disabled={!items.some((item) => item.type === "stopset") || (items[0].type === "stopset" && items[0].playing)}
         on:click={play}
       >
         <Icon icon={playCircleOutlineIcon} class="h-12 w-12" /> Play
@@ -123,8 +131,14 @@
         </button>
       {/if}
     </div>
+    <PlayBar item={items[0]} />
+
+    <div class="flex items items-center justify-center gap-2">
+      Status:
+      <span class="font-bold text-success font-mono">Playing</span>
+    </div>
   {:else}
-    <div class="text-full mt-3 text-center text-3xl italic text-error">
+    <div class="mt-3 text-center text-3xl italic text-error">
       Can't generate a stopset. You're sure the server has data?
     </div>
   {/if}
@@ -133,58 +147,69 @@
 <!-- col-span-2 until we have a single play rotator player -->
 <div class="col-span-2 flex h-0 min-h-full flex-col gap-2 border-base-content">
   <div class="divider my-0 text-sm font-bold text-primary">Playlist</div>
-  <div class="flex flex-1 flex-col gap-1.5 overflow-y-auto" id="playlist" transition:slide|global>
-    {#each items as item, index}
-      <div
-        class="divider my-0 italic"
-        class:text-secondary={item.type === "stopset"}
-        class:text-accent={item.type === "wait"}
-      >
-        {item.name}
-      </div>
-      {#if item.type === "stopset"}
-        {#each item.items as asset}
-          <div class="border-l-4 border-base-content pl-2">
+  <div class="flex flex-1 flex-col overflow-y-auto" id="playlist">
+    {#each items as item, index (item.generatedId)}
+      {@const isFirstItem = index === 0}
+      <div class="flex flex-1 flex-col gap-2 px-2" out:fade={{duration: 250}}>
+        <div
+          class="divider mb-0 mt-2 italic"
+          class:text-secondary={item.type === "stopset"}
+          class:text-accent={item.type === "wait"}
+        >
+          {item.name} ({item.generatedId})
+        </div>
+        {#if item.type === "stopset"}
+          {#each item.items as asset}
+            {@const rightColor = asset.color.value}
+            {@const leftColor = asset.color.dark}
             <div
-              class="flex items-center gap-3 overflow-hidden rounded-xl bg-clip-text px-3 py-1"
-              style:background={`linear-gradient(to right, ${asset.color.dark} 0%, ${asset.color.dark} ${asset.percentDone}%, ${asset.color.value} ${asset.percentDone}%, ${asset.color.value} 100%)`}
-              style:color={asset.color.content}
+              class="border-l-4 pl-2"
+              class:border-base-content={asset.finished}
+              class:border-success={isFirstItem && asset.active}
+              class:border-base-300={!asset.finished && !asset.active}
+            >
+              <div
+                class="flex items-center gap-3 overflow-hidden rounded-xl bg-clip-text px-3 py-1"
+                style:background={`linear-gradient(to right, ${leftColor} 0%, ${leftColor} ${asset.percentDone}%, ${rightColor} ${asset.percentDone}%, ${rightColor} 100%)`}
+                style:color={asset.color.content}
+              >
+                <div
+                  class="radial-progress h-20 w-20 font-mono text-sm"
+                  style:--value={(asset.elapsed / asset.duration) * 100}
+                  style:--thickness={asset.elapsed === 0 ? "0" : "0.4rem"}
+                >
+                  {prettyDuration(asset.remaining)}
+                </div>
+                <div class="flex flex-1 flex-col overflow-hidden">
+                  <div class="text-xl truncate">{asset.name}</div>
+                  <div class="font-sm font-mono font-bold truncate">{asset.rotator.name}</div>
+                </div>
+                <div>timer</div>
+              </div>
+            </div>
+          {/each}
+        {:else if item.type === "wait"}
+          <!-- wonky because items being identical? -->
+          <div class="border-l-4 pl-2" class:border-base-content={!isFirstItem} class:border-success={isFirstItem}>
+            <div
+              class="flex items-center gap-3 overflow-hidden rounded-xl px-3 py-1"
+              style:background-image={`linear-gradient(to right, hsl(var(--b3)) 0%, hsl(var(--b3)) ${item.percentDone}%, hsl(var(--b2)) ${item.percentDone}%, hsl(var(--b2)) 100%)`}
             >
               <div
                 class="radial-progress h-20 w-20 font-mono text-sm"
-                style:--value={(asset.elapsed / asset.duration) * 100}
-                style:--thickness={asset.elapsed === 0 ? "0" : "0.4rem"}
+                style:--value={(item.elapsed / item.duration) * 100}
+                style:--thickness={item.elapsed === 0 ? "0" : "0.4rem"}
               >
-                {prettyDuration(asset.remaining)}
+                {prettyDuration(item.remaining)}
               </div>
-              <div class="flex flex-1 flex-col truncate">
-                <div class="text-xl">{asset.name}</div>
-                <div class="font-sm font-mono font-bold">{asset.rotator.name}</div>
+              <div class="flex-1 text-2xl font-bold">Wait for {humanDuration(item.duration)}</div>
+              <div class="self-start font-mono text-sm">
+                {prettyDuration(item.elapsed, item.duration)} / {prettyDuration(item.duration)}
               </div>
-              <div>timer</div>
             </div>
           </div>
-        {/each}
-      {:else if item.type === "wait"}
-        <div class="border-l-4 pl-2" class:border-base-content={index !== 0} class:border-success={index === 0}>
-          <div
-            class="flex items-center gap-3 overflow-hidden rounded-xl px-3 py-1"
-            style:background-image={`linear-gradient(to right, hsl(var(--b3)) 0%, hsl(var(--b3)) ${item.percentDone}%, hsl(var(--b2)) ${item.percentDone}%, hsl(var(--b2)) 100%)`}
-          >
-            <div
-              class="radial-progress h-20 w-20 font-mono text-sm"
-              style:--value={(item.elapsed / item.duration) * 100}
-              style:--thickness={item.elapsed === 0 ? "0" : "0.4rem"}
-            >
-              {prettyDuration(item.remaining)}
-            </div>
-            <div class="flex-1 text-2xl font-bold">Wait for {humanDuration(item.duration)}</div>
-            <div class="self-start font-mono text-sm">
-              {prettyDuration(item.elapsed, item.duration)} / {prettyDuration(item.duration)}
-            </div>
-          </div>
-        </div>
-      {/if}
+        {/if}
+      </div>
     {/each}
     <div class="flex flex-col items-center">Add more</div>
   </div>

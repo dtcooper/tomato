@@ -13,7 +13,7 @@
   }
 </script>
 
-<div class="my-3 flex justify-center">
+<div class="mb-3 flex justify-center">
   <div class="text-2xl font-bold">
     <span class="font-mono">{prettyDuration(item.remaining)}</span>
     remaining

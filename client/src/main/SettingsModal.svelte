@@ -14,6 +14,8 @@
 
   const allowedThemes = ["tomato", ...daisyThemes]
 
+  // TODO: host error seems to show when logging, in particular if you press logout when disconnected
+
   export let show = true
   let showLogout = false
   let logoutStationName
