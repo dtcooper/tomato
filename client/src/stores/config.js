@@ -33,5 +33,4 @@ userConfig.subscribe(({ theme, powerSaveBlocker }) => {
   ipcRenderer.invoke("power-save-blocker", powerSaveBlocker)
 })
 
-
 export { readonlyConfig as config }

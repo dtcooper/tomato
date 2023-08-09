@@ -1,7 +1,7 @@
 <script>
   import playCircleOutlineIcon from "@iconify/icons-mdi/play-circle-outline"
   import pauseCircleOutlineIcon from "@iconify/icons-mdi/pause-circle-outline"
-  import skipNextCircleOutline from '@iconify/icons-mdi/skip-next-circle-outline'
+  import skipNextCircleOutline from "@iconify/icons-mdi/skip-next-circle-outline"
   import skipForwardOutlineIcon from "@iconify/icons-mdi/skip-forward-outline"
   import reloadIcon from "@iconify/icons-mdi/reload"
 
@@ -32,39 +32,31 @@
     <Icon icon={playCircleOutlineIcon} class="h-12 w-12" /> Play
   </button>
   {#if $userConfig.uiMode >= 1}
-    <button
-      class="btn btn-warning btn-lg pl-3"
-      disabled={item.type !== "stopset" || !item.playing}
-      on:click={pause}
-    >
+    <button class="btn btn-warning btn-lg pl-3" disabled={item.type !== "stopset" || !item.playing} on:click={pause}>
       <Icon icon={pauseCircleOutlineIcon} class="h-12 w-12" /> Pause
     </button>
     <div
       class={item.type === "stopset" && "tooltip tooltip-error tooltip-bottom"}
       data-tip="Warning: this action will be logged!"
     >
-      <button
-        class="btn btn-error btn-lg pl-3"
-        disabled={item.type !== "stopset"}
-        on:click={skip}
-      >
+      <button class="btn btn-error btn-lg pl-3" disabled={item.type !== "stopset"} on:click={skip}>
         <Icon icon={skipNextCircleOutline} class="h-12 w-12" /> Skip
       </button>
     </div>
   {/if}
   {#if $userConfig.uiMode >= 2}
     <div class="flex flex-col gap-2">
-      <div class="divider italic my-0 text-sm">Stopset Control</div>
-      <div class="flex gap-2 justify-center">
+      <div class="divider my-0 text-sm italic">Stopset Control</div>
+      <div class="flex justify-center gap-2">
         <div
           class={item.type === "stopset" && "tooltip tooltip-error tooltip-bottom"}
           data-tip="Warning: this action will be logged!"
         >
-          <button class="btn btn-sm btn-error pl-0.5" disabled={item.type !== "stopset"} on:click={skipCurrentStopset}>
+          <button class="btn btn-error btn-sm pl-0.5" disabled={item.type !== "stopset"} on:click={skipCurrentStopset}>
             <Icon icon={skipForwardOutlineIcon} class="h-6 w-6" /> Skip Current
           </button>
         </div>
-        <button class="btn btn-sm btn-warning pl-0.5" on:click={regenerateNextStopset}>
+        <button class="btn btn-warning btn-sm pl-0.5" on:click={regenerateNextStopset}>
           <Icon icon={reloadIcon} class="h-6 w-6" /> Regenerate Next
         </button>
       </div>
@@ -74,12 +66,12 @@
 
 <style lang="postcss">
   .btn-success[disabled] {
-    @apply text-success border-current;
+    @apply border-current text-success;
   }
   .btn-warning[disabled] {
-    @apply text-warning border-current;
+    @apply border-current text-warning;
   }
   .btn-error[disabled] {
-    @apply text-error border-current;
+    @apply border-current text-error;
   }
 </style>

@@ -6,7 +6,10 @@ import { config } from "./config"
 
 export const speaker = persisted("speaker", null)
 export const speakers = writable([])
-export const playStatus = derived([speaker, speakers], ([$speaker, $speakers]) => ({speaker: $speaker, speakers: $speakers}))
+export const playStatus = derived([speaker, speakers], ([$speaker, $speakers]) => ({
+  speaker: $speaker,
+  speakers: $speakers
+}))
 
 let compressorEnabled = false
 let currentGeneratedId = 0
@@ -80,7 +83,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   }
 
   static getAudioObject() {
-    let audio = PlayableAsset._reusableAudioObjects.find(item => !item.__tomato_used)
+    let audio = PlayableAsset._reusableAudioObjects.find((item) => !item.__tomato_used)
 
     if (!audio) {
       audio = new Audio()
@@ -91,7 +94,9 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
     audio.__tomato_used = true
 
     if (PlayableAsset._reusableAudioObjects.length > 50) {
-      console.warn(`Length of re-usable audio objects ${PlayableAsset._reusableAudioObjects.length} > 50. Really long stop sets could cause this.`)
+      console.warn(
+        `Length of re-usable audio objects ${PlayableAsset._reusableAudioObjects.length} > 50. Really long stop sets could cause this.`
+      )
     }
     return audio
   }

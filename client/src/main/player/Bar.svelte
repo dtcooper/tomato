@@ -62,12 +62,12 @@
 
 <div class="grid grid-cols-2 items-center gap-2 text-lg">
   <div class="text-right">Status:</div>
-  <div class="font-bold font-mono italic">
+  <div class="font-mono font-bold italic">
     {#if item.type === "stopset"}
       {#if item.playing}
         <span class="text-success">Playing</span>
       {:else}
-        <span class="text-warning animate-pulse">Paused</span>
+        <span class="animate-pulse text-warning">Paused</span>
       {/if}
     {:else if item.type === "wait"}
       {#if item.overtime || item.overdue}

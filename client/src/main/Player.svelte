@@ -1,5 +1,4 @@
 <script>
-
   import PlayBar from "./player/Bar.svelte"
   import PlayButtons from "./player/Buttons.svelte"
   import PlayList from "./player/List.svelte"
@@ -7,7 +6,6 @@
   import { config, userConfig } from "../stores/config"
   import { db } from "../stores/db"
   import { Wait } from "../stores/player"
-
 
   // Object automatically updates on change
   let items = []
@@ -50,7 +48,7 @@
       // swap it out, maintaining generatedId so UI doesn't trigger a transition
       let generatedStopset = $db.generateStopset(null, processItem, updateUI, items[nextStopset].generatedId)
       if (generatedStopset) {
-        items[nextStopset].done(true)  // Mark swap out one as done
+        items[nextStopset].done(true) // Mark swap out one as done
         items[nextStopset] = generatedStopset
         updateUI()
       }
@@ -70,7 +68,8 @@
       items.shift().done(true)
     }
 
-    let numStopsetsToAdd = Math.max($config.STOPSET_PRELOAD_COUNT, 1) - items.filter(item => item.type === "stopset").length
+    let numStopsetsToAdd =
+      Math.max($config.STOPSET_PRELOAD_COUNT, 1) - items.filter((item) => item.type === "stopset").length
     while (numStopsetsToAdd-- > 0) {
       addStopset()
     }
@@ -81,7 +80,10 @@
     }
 
     // Preload first few
-    items.filter(item => item.type === "stopset").slice(0, numStopsetsToPreload).forEach(item => item.loadAudio())
+    items
+      .filter((item) => item.type === "stopset")
+      .slice(0, numStopsetsToPreload)
+      .forEach((item) => item.loadAudio())
 
     const nextItem = items[0]
     if (nextItem.type === "wait") {
@@ -92,13 +94,13 @@
     }
   }
 
-  const play = window.play = () => {
+  const play = (window.play = () => {
     const firstStopsetIndex = items.findIndex((item) => item.type === "stopset")
     if (firstStopsetIndex === -1) {
       throw new Error("play() SHOULD have found a first stopset")
     }
     processItem(firstStopsetIndex, true)
-  }
+  })
 
   const pause = () => {
     items[0].pause()
@@ -122,13 +124,12 @@
   })
 </script>
 
-<div class="col-span-2 flex flex-col gap-5 mt-3">
+<div class="col-span-2 mt-3 flex flex-col gap-5">
   {#if items.length > 0}
     {@const item = items[0]}
 
     <PlayButtons {items} {pause} {play} {skip} {regenerateNextStopset} {skipCurrentStopset} />
     <PlayBar {item} />
-
   {:else}
     <div class="mt-3 text-center text-3xl italic text-error">
       Can't generate a stopset. You're sure the server has data?

@@ -56,7 +56,7 @@
       <div class="join join-horizontal">
         {#each ["Simple", "Standard", "Advanced"] as uiMode, index}
           {#if $config.UI_MODES.indexOf(index) !== -1}
-            <button class="btn join-item btn-active btn-disabled">{uiMode}</button>
+            <button class="btn btn-disabled join-item btn-active">{uiMode}</button>
           {/if}
         {/each}
       </div>

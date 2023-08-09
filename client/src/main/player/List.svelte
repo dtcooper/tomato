@@ -11,7 +11,7 @@
   <div class="flex flex-1 flex-col overflow-y-auto" id="playlist">
     {#each items as item, index (item.generatedId)}
       {@const isFirstItem = index === 0}
-      <div class="flex flex-col gap-2 px-2" out:fade={{duration: 250}}>
+      <div class="flex flex-col gap-2 px-2" out:fade={{ duration: 250 }}>
         <div
           class="divider mb-0 mt-2 italic"
           class:text-secondary={item.type === "stopset"}
@@ -31,7 +31,9 @@
             >
               <div
                 class="flex items-center gap-3 overflow-hidden bg-clip-text px-3 py-1"
-                style={asset.finished ? '' : `color: ${asset.color.content}; background: linear-gradient(to right, ${leftColor} 0%, ${leftColor} ${asset.percentDone}%, ${rightColor} ${asset.percentDone}%, ${rightColor} 100%);`}
+                style={asset.finished
+                  ? ""
+                  : `color: ${asset.color.content}; background: linear-gradient(to right, ${leftColor} 0%, ${leftColor} ${asset.percentDone}%, ${rightColor} ${asset.percentDone}%, ${rightColor} 100%);`}
                 class:bg-base-300={asset.finished}
                 class:text-base-content={asset.finished}
               >
@@ -43,10 +45,12 @@
                   {prettyDuration(asset.remaining)}
                 </div>
                 <div class="flex flex-1 flex-col overflow-hidden">
-                  <div class="text-xl truncate">{asset.name}</div>
-                  <div class="font-sm font-mono font-bold truncate">{asset.rotator.name}</div>
+                  <div class="truncate text-xl">{asset.name}</div>
+                  <div class="font-sm truncate font-mono font-bold">{asset.rotator.name}</div>
                 </div>
-                <div class="self-start font-mono text-sm">{prettyDuration(asset.elapsed, asset.duration)} / {prettyDuration(asset.duration)}</div>
+                <div class="self-start font-mono text-sm">
+                  {prettyDuration(asset.elapsed, asset.duration)} / {prettyDuration(asset.duration)}
+                </div>
               </div>
             </div>
           {/each}
@@ -64,16 +68,18 @@
               >
                 {prettyDuration(item.remaining)}
               </div>
-              <div class="flex-1 flex flex-col text-xl font-bold">
-                <div class:italic={item.overtime}>Wait{item.overtime ? 'ed' : ''} for {humanDuration(item.duration)}{item.overtime ? '!' : ''}</div>
+              <div class="flex flex-1 flex-col text-xl font-bold">
+                <div class:italic={item.overtime}>
+                  Wait{item.overtime ? "ed" : ""} for {humanDuration(item.duration)}{item.overtime ? "!" : ""}
+                </div>
                 {#if item.overtime}
-                  <div class="text-success animate-pulse">Play next stop set now!</div>
+                  <div class="animate-pulse text-success">Play next stop set now!</div>
                 {/if}
               </div>
-              <div class="self-start flex flex-col font-mono text-sm">
+              <div class="flex flex-col self-start font-mono text-sm">
                 <div>{prettyDuration(item.elapsed, item.duration)} / {prettyDuration(item.duration)}</div>
                 {#if item.overtime}
-                  <div class="font-bold text-error animate-pulse">{prettyDuration(item.overtimeElapsed)} overdue</div>
+                  <div class="animate-pulse font-bold text-error">{prettyDuration(item.overtimeElapsed)} overdue</div>
                   {item.overdue}
                 {/if}
               </div>
