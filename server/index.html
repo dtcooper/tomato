@@ -589,7 +589,7 @@ heavily leveraging its automatic admin interface.</p>
 <h3 id="airing-options">Airing Options<a class="headerlink" href="#airing-options" title="Permanent link">←</a></h3>
 <div class="admonition info">
 <dl>
-<dt><code>WAIT_INTERVAL</code> --- <strong>Type: Numeric</strong></dt>
+<dt><code>WAIT_INTERVAL</code> --- <strong>Type: Numerica</strong></dt>
 <dd>
 <p>Time to wait between stop sets (in seconds). Set to 0 to disable the wait interval entirely.</p>
 <p>Default: <code>1200</code></p>
@@ -604,7 +604,12 @@ heavily leveraging its automatic admin interface.</p>
 <p>Warn when a rotator has no eligible assets to choose from. (Desktop app only)</p>
 <p>Default: <code>True</code></p>
 </dd>
-<dt><code>STOPSET_OVERDUE_TIME</code> --- <strong>Type: Numeric</strong></dt>
+<dt><code>STOPSET_PRELOAD_COUNT</code> --- <strong>Type: Numerica</strong></dt>
+<dd>
+<p>Number of stopsets to preload in the UI. 2-3 is a good value for this, since new data could make preloaded ones stale.</p>
+<p>Default: <code>2</code></p>
+</dd>
+<dt><code>STOPSET_OVERDUE_TIME</code> --- <strong>Type: Numerica</strong></dt>
 <dd>
 <p>The time (in seconds) after the <code>WAIT_INTERVAL</code> after which an "overdue" message will flash. Set to 0 disable.</p>
 <p>Default: <code>0</code></p>
@@ -614,7 +619,7 @@ heavily leveraging its automatic admin interface.</p>
 <p>The overdue message to be displayed when <code>STOPSET_OVERDUE_TIME</code></p>
 <p>Default: <code>"You're overdue to play the next stopset. Please play it as soon as possible."</code></p>
 </dd>
-<dt><code>NO_REPEAT_ASSETS_TIME</code> --- <strong>Type: Numeric</strong></dt>
+<dt><code>NO_REPEAT_ASSETS_TIME</code> --- <strong>Type: Numerica</strong></dt>
 <dd>
 <p>The time (in seconds) required to elapse for the dkestop app to attempt to not repeat any assets. Set to 0 to disable and allow potential repetition in the randomization algorithm. If there are not enough assets in a rotator to respect this setting, it will be ignored.</p>
 <p>Default: <code>0</code></p>
