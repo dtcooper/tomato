@@ -11,7 +11,7 @@
   <div class="flex flex-1 flex-col overflow-y-auto" id="playlist">
     {#each items as item, index (item.generatedId)}
       {@const isFirstItem = index === 0}
-      <div class="flex flex-col gap-2 px-2" out:fade={{ duration: 750 }}>
+      <div class="flex flex-col gap-2 px-2" out:fade={{ duration: 800 }}>
         <div
           class="divider mb-0 mt-2"
           class:text-secondary={item.type === "stopset"}
@@ -28,11 +28,12 @@
               class:border-base-content={!isFirstItem || (!asset.finished && !asset.active)}
             >
               <div
-                class="flex min-h-[5rem] items-center gap-3 overflow-hidden px-3 py-1 text-secondary-content"
+                class="flex min-h-[5rem] items-center gap-3 overflow-hidden px-3 py-1"
                 style={asset.finished
                   ? ""
                   : `background: linear-gradient(to right, hsl(var(--sf)) 0%, hsl(var(--sf)) ${asset.percentDone}%, hsl(var(--s)) ${asset.percentDone}%, hsl(var(--s)) 100%);`}
                 class:bg-neutral={asset.finished}
+                class:text-secondary-content={!asset.finished}
                 class:text-neutral-content={asset.finished}
               >
                 {#if $userConfig.uiMode > 0}

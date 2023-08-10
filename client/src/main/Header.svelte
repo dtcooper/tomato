@@ -22,7 +22,7 @@
     </div>
     <div class="flex items-center gap-3">
       {#if $config.UI_MODES.includes(0) && $userConfig.uiMode >= 1}
-        <button class="btn btn-secondary" on:click={() => ($userConfig.uiMode = 0)}>← Back to simple view</button>
+        <button class="btn btn-accent" on:click={() => ($userConfig.uiMode = 0)}>← Back to simple view</button>
       {/if}
       <button
         class="btn btn-circle btn-ghost flex items-center justify-center overflow-hidden"

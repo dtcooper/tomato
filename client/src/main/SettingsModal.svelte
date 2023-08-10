@@ -51,22 +51,17 @@
   <svelte:fragment slot="content">
     <div class="grid grid-cols-[max-content_1fr] items-baseline gap-3">
       <div class="flex items-center justify-end text-lg font-bold">User Interface mode:</div>
-      <div class="join join-horizontal">
+      <div class="tabs-boxed tabs w-max">
         {#each ["Simple", "Standard", "Advanced"] as uiMode, index}
           {#if $config.UI_MODES.indexOf(index) !== -1}
-            <button class="btn btn-disabled join-item btn-active">{uiMode}</button>
+            <button
+              class="tab"
+              class:tab-active={index === $userConfig.uiMode}
+              on:click={() => ($userConfig.uiMode = index)}>{uiMode}</button
+            >
           {/if}
         {/each}
       </div>
-
-      <div class="flex items-center justify-end text-lg font-bold">User Interface mode:</div>
-      <select class="select select-bordered select-lg" on:change={(e) => ($userConfig.uiMode = +e.target.value)}>
-        {#each ["Simple", "Standard", "Advanced"] as uiMode, index}
-          {#if $config.UI_MODES.indexOf(index) !== -1}
-            <option value={index} selected={index === $userConfig.uiMode}>{uiMode}</option>
-          {/if}
-        {/each}
-      </select>
 
       <div class="flex justify-end text-lg font-bold">Audio Output Device:</div>
       <select class="select select-bordered select-lg" on:change={(e) => setSpeaker(e.target.value)}>
@@ -78,26 +73,24 @@
       <!-- svelte-ignore missing-declaration -->
       {#if IS_DEV}
         <div class="flex justify-end text-lg font-bold">Autoplay (dev only):</div>
-        <div class="flex items-center justify-center gap-4 font-mono text-xl font-bold">
+        <div class="flex w-max items-center justify-center gap-4 font-mono text-xl font-bold">
           <span class:text-error={!$userConfig.autoplay}>OFF</span>
           <input type="checkbox" class="toggle toggle-success toggle-lg" bind:checked={$userConfig.autoplay} />
           <span class:text-success={$userConfig.autoplay}>ON</span>
         </div>
       {/if}
 
-      {#if $userConfig.uiMode > 0}
-        <div class="flex justify-end text-lg font-bold">Broadcast Compression:</div>
-        <div
-          class="text-lg"
-          class:text-error={!$config.BROADCAST_COMPRESSION}
-          class:text-success={$config.BROADCAST_COMPRESSION}
-        >
-          {$config.BROADCAST_COMPRESSION ? "Enabled" : "Disabled"}
-        </div>
+      <div class="flex justify-end text-lg font-bold">Broadcast Compression:</div>
+      <div
+        class="w-max text-lg"
+        class:text-error={!$config.BROADCAST_COMPRESSION}
+        class:text-success={$config.BROADCAST_COMPRESSION}
+      >
+        {$config.BROADCAST_COMPRESSION ? "Enabled" : "Disabled"}
+      </div>
 
-        <div class="flex justify-end text-lg font-bold">Station Admin:</div>
-        <a class="link-hover link-primary link text-lg" href={$db.host}>Open in your web browser</a>
-      {/if}
+      <div class="flex justify-end text-lg font-bold">Station Admin:</div>
+      <a class="link-hover link-primary link text-lg" href={$db.host}>Open in your web browser</a>
     </div>
 
     <div class="col-span-2">
