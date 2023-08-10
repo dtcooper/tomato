@@ -61,7 +61,7 @@
     </div>
     <Icon icon={tomatoIcon} class="h-20 w-20" shape-rendering="crispEdges" viewBox="0 -.5 16 16" />
   </div>
-  <div class="card relative w-full bg-base-300 shadow-2xl">
+  <div class="card relative w-full bg-base-300">
     <form class="card-body" on:submit|preventDefault={submit}>
       <!-- For demo mode
         <div class="form-control items-end">

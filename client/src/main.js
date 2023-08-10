@@ -1,4 +1,4 @@
-const { app, BrowserWindow, powerSaveBlocker, shell, ipcMain } = require("electron")
+const { app, BrowserWindow, powerSaveBlocker, shell, ipcMain, nativeTheme } = require("electron")
 const windowStateKeeper = require("electron-window-state")
 const fs = require("fs")
 const fsExtra = require("fs-extra")
@@ -170,4 +170,30 @@ if (squirrelCheck || !singleInstanceLock) {
   app.on("window-all-closed", () => {
     app.quit()
   })
+
+  if (process.platform === "linux") {
+    const dbus = require("@homebridge/dbus-native")
+
+    dbus
+      .sessionBus()
+      .getService("org.freedesktop.portal.Desktop")
+      .getInterface(
+        "/org/freedesktop/portal/desktop",
+        "org.freedesktop.portal.Settings",
+        function (err, notifications) {
+          notifications.Read("org.freedesktop.appearance", "color-scheme", function (err, resp) {
+            console.log("Current color-scheme", resp[1][0][1][0])
+            nativeTheme.themeSource = resp[1][0][1][0] ? "dark" : "light"
+          })
+
+          // dbus signals are EventEmitter events
+          notifications.on("SettingChanged", function () {
+            if (arguments["0"] == "org.freedesktop.appearance" && arguments["1"] == "color-scheme") {
+              nativeTheme.themeSource = arguments["2"][1][0] ? "dark" : "light"
+              console.log("SettingChanged", arguments)
+            }
+          })
+        }
+      )
+  }
 }
