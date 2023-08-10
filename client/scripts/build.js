@@ -2,6 +2,7 @@ const axios = require("axios")
 const { context: esbuildContext, build: esbuild } = require("esbuild")
 const { version: electronVersion } = require("electron/package.json")
 const path = require("path")
+const process = require("process")
 const sveltePlugin = require("esbuild-svelte")
 const sveltePreprocess = require("svelte-preprocess")
 
@@ -70,8 +71,13 @@ const runBuild = async () => {
       esbuild(options)
     }
   }
+  const mainExternal = ["electron", "svelte-devtools-standalone"]
+  if (process.platform !== "linux") {
+    // only used on Linux
+    mainExternal.push("@homebridge/dbus-native")
+  }
 
-  build("main.js", { bundle: !isDev, format: "cjs", external: ["electron", "svelte-devtools-standalone"] })
+  build("main.js", { bundle: !isDev, format: "cjs", external: mainExternal })
   build("app.js", {
     external: ["electron", "./assets/fonts/*"],
     loader: { ".svg": "text" },
