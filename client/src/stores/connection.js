@@ -137,7 +137,7 @@ export const login = (username, password, host) => {
       host = url.toString()
     } else {
       // Called with no args = logging back in on first load
-      ({ username, password, host } = get(conn))
+      ;({ username, password, host } = get(conn))
     }
 
     if (!username || !password) {

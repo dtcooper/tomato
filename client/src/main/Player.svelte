@@ -72,6 +72,7 @@
   }
 
   const skipCurrentStopset = () => {
+    items[0].didSkip = true
     processItem()
   }
 

@@ -1,15 +1,14 @@
 {
   "protocol_version": 0,
   "client_log_entry_types": [
+    "login",
+    "logout",
     "played_asset",
-    "played_part_stopset",
     "played_stopset",
     "skipped_asset",
     "skipped_stopset",
+    "overdue",
     "waited",
-    "stopset_overdue",
-    "login",
-    "logout",
     "unspecified"
   ],
   "colors": [

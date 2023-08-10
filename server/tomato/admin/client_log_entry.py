@@ -20,13 +20,13 @@ class ClientLogEntryAdmin(ListPrefetchRelatedMixin, admin.ModelAdmin):
     actions = ("csv",)
     date_hierarchy = "created_at"
     empty_value_display = mark_safe("<em>Unknown / deleted</em>")
-    fields = ("id", "created_at_display", "type", "created_by", "description_display")
-    list_display = ("created_at_display", "type", "created_by", "description_display")
+    fields = ("id", "created_at_display", "category", "type", "created_by", "description_display")
+    list_display = ("created_at_display", "category", "type", "created_by", "description_display")
     list_filter = ("created_by", "type")
     list_max_show_all = 2500
     list_per_page = 250
     list_prefetch_related = ("created_by",)
-    readonly_fields = ("created_at_display", "description_display")
+    readonly_fields = ("created_at_display", "category", "description_display")
     save_on_top = True
     search_fields = ("description",)
 
@@ -56,13 +56,14 @@ class ClientLogEntryAdmin(ListPrefetchRelatedMixin, admin.ModelAdmin):
         )
 
         writer = csv.writer(response, quoting=csv.QUOTE_ALL)
-        writer.writerow(("ID", "Created At", "Type", "Created By", "Description"))
+        writer.writerow(("ID", "Created At", "Category", "Type", "Created By", "Description"))
 
         for entry in queryset.order_by("created_at").prefetch_related("created_by"):
             writer.writerow(
                 (
                     str(entry.id),
                     localtime(entry.created_at).strftime("%Y/%m/%d %H:%M:%S"),
+                    entry.category(),
                     entry.type,
                     "unknown/deleted" if entry.created_by is None else entry.created_by.username,
                     entry.description,

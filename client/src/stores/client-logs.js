@@ -44,4 +44,4 @@ export const acknowledgeLog = (id) => {
   savePendingLogs()
 }
 
-setInterval(sendPendingLogs, 30000) // Run every 30 seconds
+setInterval(sendPendingLogs, IS_DEV ? 2500 : 30000) // Run every 30 seconds

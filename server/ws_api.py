@@ -21,7 +21,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 django.setup()
 
-from tomato.constants import PROTOCOL_VERSION, REDIS_PUBSUB_KEY  # noqa - after django.setup()
+from tomato.constants import PROTOCOL_VERSION, REDIS_PUBSUB_KEY, CLIENT_LOG_ENTRY_TYPES  # noqa - after django.setup()
 from tomato.models import ClientLogEntry, serialize_for_api  # noqa
 
 
@@ -73,6 +73,8 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
         if self.user.enable_client_logs:
             uuid = data.pop("id")
             data["created_by"] = self.user
+            if data["type"] not in CLIENT_LOG_ENTRY_TYPES:
+                data["type"] = "unspecified"
             _, created = await ClientLogEntry.objects.aupdate_or_create(id=uuid, defaults=data)
             return {"success": True, "id": uuid, "updated_existing": not created, "ignored": False}
         else:

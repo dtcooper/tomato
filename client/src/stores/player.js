@@ -2,6 +2,8 @@ import dayjs from "dayjs"
 import { persisted } from "svelte-local-storage-store"
 import { noop } from "svelte/internal"
 import { derived, get, writable } from "svelte/store"
+import { prettyDuration } from "../utils"
+import { log } from "./client-logs"
 import { config } from "./config"
 
 export const speaker = persisted("speaker", null)
@@ -58,12 +60,9 @@ class GeneratedStopsetAssetBase {
     return this.generatedStopset.current === this.index
   }
 
-  done(error) {
+  done() {
     this.finished = true
     this.playing = false
-    if (error) {
-      console.log(`An error occurred while playing ${this.name}`, error)
-    }
     this.generatedStopset.donePlaying()
   }
 }
@@ -82,6 +81,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
     this.audio = null
     this.error = false
     this._duration = duration
+    this.didSkip = false
   }
 
   static getAudioObject() {
@@ -149,7 +149,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   }
 
   _errorHelper(e) {
-    console.error("audio got error:", e)
+    console.error("audio error:", e)
     this.error = true
     if (this.playing) {
       this.playing = false
@@ -169,7 +169,16 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
     this.updateCallback()
   }
 
+  done() {
+    log(
+      this.didSkip ? "skipped_asset" : "played_asset",
+      `[Stopset=${this.generatedStopset.name}] [Rotator=${this.rotator.name}] [Asset=${this.name}]`
+    )
+    super.done()
+  }
+
   skip() {
+    this.didSkip = true
     this.play()
     this.audio.currentTime = this.audio.duration
   }
@@ -211,6 +220,8 @@ export class GeneratedStopset {
     this.loaded = false
     this.type = "stopset"
     this.playing = false
+    this.didSkip = false
+    this.didLog = false
   }
 
   get duration() {
@@ -232,6 +243,7 @@ export class GeneratedStopset {
   }
 
   skip() {
+    this.didSkip = true
     this.items[this.current].skip()
   }
 
@@ -261,12 +273,15 @@ export class GeneratedStopset {
   }
 
   done(skipCallback = false) {
-    // Must be able to be called twice
     this.playing = false
     this.unloadAudio()
     if (!skipCallback) {
       console.log("calling done callback")
       this.doneCallback()
+    }
+    if (!this.didLog) {
+      this.didLog = true
+      log(this.didSkip ? "skipped_stopset" : "played_stopset", `[Stopset=${this.name}]`)
     }
   }
 
@@ -299,10 +314,10 @@ export class Wait {
     this.overdue = false
     this.overtimeElapsed = 0
     this.overtime = false
-
     this.expires = null
     this.interval = null
     this.active = false
+    this.didLog = false
   }
 
   get remaining() {
@@ -344,6 +359,15 @@ export class Wait {
   done(skipCallback) {
     // Must be able to be called twice
     clearInterval(this.interval)
+
+    if (!this.didLog) {
+      this.didLog = true
+      log("waited", `waited for ${prettyDuration(this.elapsed + this.overtimeElapsed)}`)
+      if (this.overdue) {
+        log("overdue", `overdue by ${prettyDuration(this.overtimeElapsed)}`)
+      }
+    }
+
     if (!skipCallback) {
       this.doneCallback()
     }

@@ -404,9 +404,9 @@ CONSTANCE_CONFIG = {
     "ALLOW_REPEATS_IN_STOPSET": (
         False,
         (
-            "The randomization algorithm will try its absolute best to avoid duplicates. However, when that's not"
-            " possible (for example because of a nearly empty rotator), do you want assets to repeat, or for the"
-            " rotator to be ignored in a given stop set?"
+            mark_safe("The randomization algorithm will try its absolute best to avoid duplicates. However, when that's not"
+            " possible (for example because of a nearly empty rotator), do you want <strong>the same asset</strong> to repeat,"
+            " or for the rotator to be ignored in a given stop set?")
         ),
     ),
     "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME": (
@@ -464,6 +464,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
         (
             "Airing Options",
             (
+                "BROADCAST_COMPRESSION",
                 "WAIT_INTERVAL",
                 "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME",
                 "WARN_ON_EMPTY_ROTATORS",
@@ -475,7 +476,6 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
                 "ALLOW_REPEATS_IN_STOPSET",
                 "SINGLE_PLAY_ROTATORS",
                 "END_DATE_PRIORITY_WEIGHT_MULTIPLIER",
-                "BROADCAST_COMPRESSION",
             ),
         ),
     )

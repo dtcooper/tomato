@@ -9,19 +9,32 @@ from .user import User
 
 class ClientLogEntry(models.Model):
     class Type(models.TextChoices):
-        PLAYED_ASSET = "played_asset", "Played an audio asset"
-        PLAYED_PARTIAL_STOPSET = "played_part_stopset", "Played a partial stop set"
-        PLAYED_STOPSET = "played_stopset", "Played an entire stop set"
-        SKIPPED_ASSET = "skipped_asset", "Skipped playing an audio asset"
-        SKIPPED_STOPSET = "skipped_stopset", "Skipped playing an entire stop set"
-        WAITED = "waited", "Waited"
-        STOPSET_OVERDUE = "stopset_overdue", "Playing of stop set overdue"
-        LOGGED_IN = "login", "Logged in"
+        LOGGED_IN = "login", "Logged in or reconnected"
         LOGGED_OUT = "logout", "Logged out"
+        PLAYED_ASSET = "played_asset", "Played an audio asset"
+        PLAYED_STOPSET = "played_stopset", "Played an entire stop set"
+        SKIPPED_ASSET = "skipped_asset", "Skipped (or played a partial) audio asset"
+        SKIPPED_STOPSET = "skipped_stopset", "Skipped (or played a partial) stop set."
+        OVERDUE = "overdue", "Playing of stop set overdue"
+        WAITED = "waited", "Waited"
         UNSPECIFIED = "unspecified", "Unspecified"
 
-    if set(Type.values) != set(CLIENT_LOG_ENTRY_TYPES):
+    CATEGORIES = {
+        Type.LOGGED_IN.value: "auth",
+        Type.LOGGED_OUT.value: "auth",
+        Type.PLAYED_ASSET.value: "asset",
+        Type.PLAYED_STOPSET.value: "stopset",
+        Type.SKIPPED_ASSET.value: "asset",
+        Type.SKIPPED_STOPSET.value: "stopset",
+        Type.OVERDUE.value: "wait",
+        Type.UNSPECIFIED.value: "unspecified",
+        Type.WAITED.value: "wait",
+    }
+
+    if set(Type.values) != CLIENT_LOG_ENTRY_TYPES:
         raise Exception("Mismatch of client log entry types in constants.json")
+    if set(CATEGORIES.keys()) != CLIENT_LOG_ENTRY_TYPES:
+        raise Exception("Log entry type without a category found")
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     created_at = models.DateTimeField(
@@ -38,6 +51,9 @@ class ClientLogEntry(models.Model):
             f"{self.created_by.username if self.created_by else 'unknown/deleted user'}:"
             f"{self.get_type_display().lower()} at {timezone.localtime(self.created_at.replace(microsecond=0))}"
         )
+
+    def category(self):
+        return self.CATEGORIES.get(self.type, "unspecified")
 
     class Meta:
         verbose_name = "client log entry"
