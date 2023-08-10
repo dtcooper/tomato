@@ -21,7 +21,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 django.setup()
 
-from tomato.constants import PROTOCOL_VERSION, REDIS_PUBSUB_KEY, CLIENT_LOG_ENTRY_TYPES  # noqa - after django.setup()
+from tomato.constants import CLIENT_LOG_ENTRY_TYPES, PROTOCOL_VERSION, REDIS_PUBSUB_KEY  # noqa - after django.setup()
 from tomato.models import ClientLogEntry, serialize_for_api  # noqa
 
 

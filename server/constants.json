@@ -1,6 +1,7 @@
 {
   "protocol_version": 0,
   "client_log_entry_types": [
+    "internal_error",
     "login",
     "logout",
     "played_asset",

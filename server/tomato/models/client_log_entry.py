@@ -9,17 +9,19 @@ from .user import User
 
 class ClientLogEntry(models.Model):
     class Type(models.TextChoices):
+        INTERNAL_ERROR = "internal_error", "Internal client error"
         LOGGED_IN = "login", "Logged in or reconnected"
         LOGGED_OUT = "logout", "Logged out"
+        OVERDUE = "overdue", "Playing of stop set overdue"
         PLAYED_ASSET = "played_asset", "Played an audio asset"
         PLAYED_STOPSET = "played_stopset", "Played an entire stop set"
         SKIPPED_ASSET = "skipped_asset", "Skipped (or played a partial) audio asset"
         SKIPPED_STOPSET = "skipped_stopset", "Skipped (or played a partial) stop set."
-        OVERDUE = "overdue", "Playing of stop set overdue"
         WAITED = "waited", "Waited"
         UNSPECIFIED = "unspecified", "Unspecified"
 
     CATEGORIES = {
+        Type.INTERNAL_ERROR.value: Type.INTERNAL_ERROR.value,
         Type.LOGGED_IN.value: "auth",
         Type.LOGGED_OUT.value: "auth",
         Type.PLAYED_ASSET.value: "asset",
@@ -27,7 +29,7 @@ class ClientLogEntry(models.Model):
         Type.SKIPPED_ASSET.value: "asset",
         Type.SKIPPED_STOPSET.value: "stopset",
         Type.OVERDUE.value: "wait",
-        Type.UNSPECIFIED.value: "unspecified",
+        Type.UNSPECIFIED.value: Type.UNSPECIFIED.value,
         Type.WAITED.value: "wait",
     }
 

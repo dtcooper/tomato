@@ -404,9 +404,11 @@ CONSTANCE_CONFIG = {
     "ALLOW_REPEATS_IN_STOPSET": (
         False,
         (
-            mark_safe("The randomization algorithm will try its absolute best to avoid duplicates. However, when that's not"
-            " possible (for example because of a nearly empty rotator), do you want <strong>the same asset</strong> to repeat,"
-            " or for the rotator to be ignored in a given stop set?")
+            mark_safe(
+                "The randomization algorithm will try its absolute best to avoid duplicates. However, when that's not"
+                " possible (for example because of a nearly empty rotator), do you want <strong>the same asset</strong>"
+                " to repeat, or for the rotator to be ignored in a given stop set?"
+            )
         ),
     ),
     "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME": (

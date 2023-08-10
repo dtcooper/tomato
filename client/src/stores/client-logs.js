@@ -45,3 +45,15 @@ export const acknowledgeLog = (id) => {
 }
 
 setInterval(sendPendingLogs, IS_DEV ? 2500 : 30000) // Run every 30 seconds
+
+// Rudimentary handling of uncaught exceptions / promise rejections (debounced)
+let errorDebounce
+window.addEventListener("error", (event) => {
+  clearTimeout(errorDebounce)
+  errorDebounce = setTimeout(() => log("internal_error", `Error: ${event.error}`), 2500)
+})
+
+window.addEventListener("unhandledrejection", (event) => {
+  clearTimeout(errorDebounce)
+  errorDebounce = setTimeout(() => log("internal_error", `Unhandled rejection: ${event.error}`), 2500)
+})
