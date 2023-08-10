@@ -4,16 +4,21 @@
   import { config, userConfig } from "../../stores/config"
 
   export let items
+  export let addStopset
+
+  export let numStopsetsToDisableAddMoreAt
+
+  $: numStopsets = items.reduce((s, item) => s + (item.type === "stopset" ? 1 : 0), 0)
 </script>
 
 <!-- col-span-2 until we have a single play rotator player -->
-<div class="col-span-2 flex h-0 min-h-full flex-col gap-2 rounded-lg border-base-content bg-base-200 p-1.5">
-  <div class="flex flex-1 flex-col overflow-y-auto" id="playlist">
+<div class="col-span-2 flex h-0 min-h-full flex-col rounded-lg border-base-content bg-base-200 p-1.5">
+  <div class="flex flex-1 flex-col gap-2 overflow-y-auto" id="playlist">
     {#each items as item, index (item.generatedId)}
       {@const isFirstItem = index === 0}
       <div class="flex flex-col gap-2 px-2" out:fade={{ duration: 650 }}>
         <div
-          class="divider mb-0 mt-2"
+          class="divider my-0 mb-0"
           class:text-secondary={item.type === "stopset"}
           class:text-accent={item.type === "wait"}
         >
@@ -139,7 +144,7 @@
               {/if}
               <div class="flex flex-1 flex-col text-xl font-bold">
                 <div class:italic={item.overtime}>
-                  Wait{item.overtime ? "ed" : ""} for {humanDuration(item.duration)}{item.overtime ? "!" : ""}
+                  Wait{item.overtime ? "ed" : ""} for {humanDuration(item.duration)}
                 </div>
                 {#if item.overtime}
                   <div class="animate-pulse" class:text-success={!item.overdue} class:text-error={item.overdue}>
@@ -165,8 +170,24 @@
         {/if}
       </div>
     {:else}
-      <div class="font-error italic text-lg">No items in playlist!</div>
+      <div class="border-l-4 border-error pl-2">
+        <div class="flex min-h-[5rem] items-center gap-3 overflow-hidden bg-error px-3 py-1 text-error-content">
+          <!-- in the place of the radial -->
+          {#if $userConfig.uiMode >= 1}
+            <div class="flex h-[5rem] w-[5rem] items-center justify-center font-mono text-sm font-bold italic">
+              Error!
+            </div>
+          {/if}
+          <div class="flex flex-1 flex-col overflow-x-hidden">
+            <span class="font-medium italic">Playlist has no items.</span>
+          </div>
+        </div>
+      </div>
     {/each}
-    <div class="flex flex-col items-center">Add more</div>
+    <div class="flex justify-center">
+      <button disabled={numStopsets >= numStopsetsToDisableAddMoreAt} class="btn btn-neutral" on:click={addStopset}>
+        Load another {$config.STOPSET_ENTITY_NAME}...
+      </button>
+    </div>
   </div>
 </div>

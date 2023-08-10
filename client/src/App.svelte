@@ -50,14 +50,14 @@
     @apply h-16 w-16;
   }
 
+  :root {
+    --btn-text-case: normal;
+  }
+
   :global(.tomato-pulse) {
     animation: tomato-pulse 1.5s infinite;
     --pulse-color: var(--bc);
     --pulse-size: 15px;
-  }
-
-  :root {
-    --btn-text-case: normal;
   }
 
   @keyframes tomato-pulse {
@@ -71,6 +71,23 @@
 
     100% {
       box-shadow: 0 0 0 0 hsl(var(--pulse-color) / 0);
+    }
+  }
+
+  :global(.tomato-flash-bg) {
+    animation: tomato-flash-bg 2s linear infinite;
+    --flash-bg-color: var(--er);
+  }
+
+  @keyframes tomato-flash-bg {
+    0% {
+      background-color: unset;
+    }
+    50% {
+      background-color: hsl(var(--flash-bg-color));
+    }
+    100% {
+      background-color: unset;
     }
   }
 </style>

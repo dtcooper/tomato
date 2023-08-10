@@ -15,14 +15,10 @@
 </script>
 
 <div class="flex justify-center">
-  <div
-    class="font-mono text-2xl font-bold"
-    class:tomato-pulse={item.type === "wait" && item.overdue}
-    style="--pulse-color: var(--er); --pulse-size: 5px;"
-  >
+  <div class="font-mono text-2xl font-bold">
     {#if item.type === "wait" && item.overtime}
       {#if item.overdue}
-        <span class="italiv text-error">
+        <span class="italic text-error">
           You are <span class="underline">OVERDUE</span> to play a {$config.STOPSET_ENTITY_NAME}. Press play now.
         </span>
       {:else}

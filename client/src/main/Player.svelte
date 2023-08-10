@@ -13,10 +13,15 @@
 
   const updateUI = () => (items = items) // Callback for force re-render
   const numStopsetsToPreloadAudioFor = 2
+  const numStopsetsToDisableAddMoreAt = 5
+
+  export let overdue
+  $: overdue = items.length > 0 && items[0].type === "wait" && items[0].overdue
 
   const doneWaiting = () => {
-    // true = keep waiting and do overtime stuff
-    if ($userConfig.autoplay) {
+    // return true = keep waiting and do overtime stuff
+    if ($userConfig.autoplay || items.length < 2 || items[1].type !== "stopset") {
+      // Continue processing, if autoplay is on, if next time doesn't exist or isn't a stopset
       processItem()
       return false
     } else {
@@ -153,10 +158,10 @@
     <PlayButtons {items} {pause} {play} {skip} {regenerateNextStopset} {skipCurrentStopset} />
     <PlayBar {item} />
   {:else}
-    <div class="mt-3 text-center text-3xl italic text-error">
-      Can't generate a stopset. You're sure the server has data?
+    <div class="mt-3 text-center text-xl italic text-error">
+      Can't generate a stopset. You're sure the server has data that's set to air now?
     </div>
   {/if}
 </div>
 
-<PlayList {items} />
+<PlayList {items} {numStopsetsToDisableAddMoreAt} {addStopset} />
