@@ -589,6 +589,11 @@ heavily leveraging its automatic admin interface.</p>
 <h3 id="airing-options">Airing Options<a class="headerlink" href="#airing-options" title="Permanent link">←</a></h3>
 <div class="admonition info">
 <dl>
+<dt><code>BROADCAST_COMPRESSION</code> --- <strong>Type: Boolean (true or false)</strong></dt>
+<dd>
+<p>Enable broadcast compression, smoothing out dynamic range in audio output.<br><strong>NOTE:</strong> compression is applied at the time you play an audio asset and performed on-the-fly in the desktop app.</p>
+<p>Default: <code>False</code></p>
+</dd>
 <dt><code>WAIT_INTERVAL</code> --- <strong>Type: Numerica</strong></dt>
 <dd>
 <p>Time to wait between stop sets (in seconds). Set to 0 to disable the wait interval entirely.</p>
@@ -631,7 +636,7 @@ heavily leveraging its automatic admin interface.</p>
 </dd>
 <dt><code>ALLOW_REPEATS_IN_STOPSET</code> --- <strong>Type: Boolean (true or false)</strong></dt>
 <dd>
-<p>The randomization algorithm will try its absolute best to avoid duplicates. However, when that's not possible (for example because of a nearly empty rotator), do you want assets to repeat, or for the rotator to be ignored in a given stop set?</p>
+<p>The randomization algorithm will try its absolute best to avoid duplicates. However, when that's not possible (for example because of a nearly empty rotator), do you want <strong>the same asset</strong> to repeat, or for the rotator to be ignored in a given stop set?</p>
 <p>Default: <code>False</code></p>
 </dd>
 <dt><code>SINGLE_PLAY_ROTATORS</code> --- <strong>Type: One or more rotators</strong></dt>
@@ -643,11 +648,6 @@ heavily leveraging its automatic admin interface.</p>
 <dd>
 <p>Multiply an asset's weight by this number if it has an end date <strong>and</strong> the current date is the end date. Set to 0 to disable this feature. <span style="color: red">(Currently not implemented.)</span></p>
 <p>Default: <code>0</code></p>
-</dd>
-<dt><code>BROADCAST_COMPRESSION</code> --- <strong>Type: Boolean (true or false)</strong></dt>
-<dd>
-<p>Enable broadcast compression, smoothing out dynamic range in audio output.<br><strong>NOTE:</strong> compression is applied at the time you play an audio asset and performed on-the-fly in the desktop app.</p>
-<p>Default: <code>False</code></p>
 </dd>
 </dl>
 </div>
