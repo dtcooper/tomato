@@ -1,6 +1,7 @@
 <script>
   import { tick } from "svelte"
   import { prettyDuration } from "../../utils"
+  import { config } from "../../stores/config"
 
   export let item
 
@@ -14,16 +15,23 @@
 </script>
 
 <div class="flex justify-center">
-  <div class="text-2xl font-bold">
+  <div class="text-2xl font-mono font-bold" class:tomato-pulse={item.type === "wait" && item.overdue} style:--pulse-color="var(--er)">
     {#if item.type === "wait" && item.overtime}
-      <span class="text-success">Please play next stopset</span>
+      {#if item.overdue}
+        <span class="text-error italiv">
+          You are <span class="underline">OVERDUE</span> to play a {$config.STOPSET_ENTITY_NAME}.
+          Press play now.
+        </span>
+      {:else}
+        <span class="text-success">Play next {$config.STOPSET_ENTITY_NAME} now</span>
+      {/if}
     {:else}
-      <span class="font-mono">{prettyDuration(item.remaining)}</span>
+      {prettyDuration(item.remaining)}
       remaining
       {#if item.type === "wait"}
         to wait
       {:else if item.type === "stopset"}
-        in {item.name}
+        in {$config.STOPSET_ENTITY_NAME}
       {/if}
     {/if}
   </div>
@@ -36,7 +44,7 @@
   {:else if item.type === "stopset"}
     <div class="relative flex flex-1">
       <div
-        class="relative grid h-8 flex-1 gap-2 overflow-hidden rounded-xl bg-base-300"
+        class="relative grid h-8 flex-1 gap-1 overflow-hidden rounded-xl bg-base-300"
         style:grid-template-columns={item.playableNonErrorItems.map((item) => `${item.duration}fr`).join(" ")}
       >
         {#each item.playableNonErrorItems as asset}
@@ -49,32 +57,14 @@
             <span>{prettyDuration(asset.duration)}</span>
           </div>
         {/each}
+        <div class="absolute z-10 bg-base-100 left-0 h-full opacity-40" style:width={`${(item.elapsed / item.duration) * 100}%`} />
         <div
-          class="absolute z-10 h-full w-[5px] bg-error"
+          class="absolute z-10 h-full w-[6px] bg-base-content border-x-[1px] border-base-100"
           class:animate-pulse={!item.playing}
-          style:left={`calc(${(item.elapsed / item.duration) * 100}% - 2.5px)`}
+          style:left={`calc(${(item.elapsed / item.duration) * 100}% - 3px)`}
         />
       </div>
     </div>
   {/if}
   <div class="font-mono">{prettyDuration(item.duration)}</div>
-</div>
-
-<div class="grid grid-cols-2 items-center gap-2 text-lg">
-  <div class="text-right">Status:</div>
-  <div class="font-mono font-bold italic">
-    {#if item.type === "stopset"}
-      {#if item.playing}
-        <span class="text-success">Playing</span>
-      {:else}
-        <span class="animate-pulse text-warning">Paused</span>
-      {/if}
-    {:else if item.type === "wait"}
-      {#if item.overtime || item.overdue}
-        <span class="text-success">Ready</span>
-      {:else}
-        <span class="text-warning">Waiting</span>
-      {/if}
-    {/if}
-  </div>
 </div>

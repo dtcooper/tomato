@@ -27,36 +27,64 @@
 }
 
 @font-face {
-  font-family: "Space Grotesk Local";
+  font-family: "Inter Local";
+  font-style: normal;
+  font-weight: 100;
+  src: url("../assets/fonts/inter-100.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter Local";
+  font-style: normal;
+  font-weight: 200;
+  src: url("../assets/fonts/inter-200.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter Local";
   font-style: normal;
   font-weight: 300;
-  src: url("../assets/fonts/space-grotesk-300.woff2") format("woff2");
+  src: url("../assets/fonts/inter-300.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: "Space Grotesk Local";
+  font-family: "Inter Local";
   font-style: normal;
   font-weight: 400;
-  src: url("../assets/fonts/space-grotesk-regular.woff2") format("woff2");
+  src: url("../assets/fonts/inter-regular.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: "Space Grotesk Local";
+  font-family: "Inter Local";
   font-style: normal;
   font-weight: 500;
-  src: url("../assets/fonts/space-grotesk-500.woff2") format("woff2");
+  src: url("../assets/fonts/inter-500.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: "Space Grotesk Local";
+  font-family: "Inter Local";
   font-style: normal;
   font-weight: 600;
-  src: url("../assets/fonts/space-grotesk-600.woff2") format("woff2");
+  src: url("../assets/fonts/inter-600.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: "Space Grotesk Local";
+  font-family: "Inter Local";
   font-style: normal;
   font-weight: 700;
-  src: url("../assets/fonts/space-grotesk-700.woff2") format("woff2");
+  src: url("../assets/fonts/inter-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter Local";
+  font-style: normal;
+  font-weight: 800;
+  src: url("../assets/fonts/inter-800.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter Local";
+  font-style: normal;
+  font-weight: 900;
+  src: url("../assets/fonts/inter-900.woff2") format("woff2");
 }

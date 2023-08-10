@@ -6,7 +6,7 @@ import { get, readonly } from "svelte/store"
 const config = persisted("config", {})
 const readonlyConfig = readonly(config)
 
-const defaultUserConfig = { uiMode: 0, theme: "tomato", autoplay: false, powerSaveBlocker: true }
+const defaultUserConfig = { uiMode: 0, autoplay: false, powerSaveBlocker: true }
 export const userConfig = persisted("user-config", defaultUserConfig)
 export const resetUserConfig = () => userConfig.set(defaultUserConfig)
 
@@ -27,9 +27,7 @@ export const setServerConfig = ({ _numeric: numeric, ...newConfig }) => {
   config.set(newConfig)
 }
 
-document.documentElement.setAttribute("data-theme", get(userConfig).theme)
-userConfig.subscribe(({ theme, powerSaveBlocker }) => {
-  document.documentElement.setAttribute("data-theme", theme)
+userConfig.subscribe(({ powerSaveBlocker }) => {
   ipcRenderer.invoke("power-save-blocker", powerSaveBlocker)
 })
 

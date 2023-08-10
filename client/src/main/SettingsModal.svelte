@@ -5,14 +5,12 @@
   import Modal from "../components/Modal.svelte"
 
   import cogOutline from "@iconify/icons-mdi/cog-outline"
-  import { themeOrder as daisyThemes } from "daisyui/src/theming/themeDefaults"
+
   import { db } from "../stores/db"
   import { logout } from "../stores/connection"
   import { playStatus, speaker, setSpeaker } from "../stores/player"
 
   import { config, userConfig } from "../stores/config"
-
-  const allowedThemes = ["tomato", ...daisyThemes]
 
   // TODO: host error seems to show when logging, in particular if you press logout when disconnected
 
@@ -74,15 +72,6 @@
       <select class="select select-bordered select-lg" on:change={(e) => setSpeaker(e.target.value)}>
         {#each $playStatus.speakers as [id, name]}
           <option value={id} selected={id === $speaker}>{name}</option>
-        {/each}
-      </select>
-
-      <div class="flex justify-end text-lg font-bold">Theme:</div>
-      <select class="select select-bordered select-lg" on:change={(e) => ($userConfig.theme = e.target.value)}>
-        {#each allowedThemes as theme}
-          <option value={theme} selected={$userConfig.theme === theme}>
-            {theme.charAt(0).toUpperCase()}{theme.slice(1)}
-          </option>
         {/each}
       </select>
 

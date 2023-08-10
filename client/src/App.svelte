@@ -56,6 +56,10 @@
     --pulse-color: var(--bc);
   }
 
+  :root {
+    --btn-text-case: normal;
+  }
+
   @keyframes tomato-pulse {
     0% {
       box-shadow: 0 0 0 0 hsl(var(--pulse-color, var(--bc)) / 0.7);

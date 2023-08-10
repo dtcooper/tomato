@@ -23,7 +23,7 @@
 
 <div class="flex items-center justify-center gap-3">
   <button
-    class="btn btn-success btn-lg pl-3"
+    class="btn btn-success btn-lg pl-3 font-mono italic"
     disabled={!items.some((item) => item.type === "stopset") || (item.type === "stopset" && item.playing)}
     on:click={play}
     class:tomato-pulse={(item.type === "wait" && item.overtime) || (item.type === "stopset" && !item.playing)}
@@ -63,15 +63,3 @@
     </div>
   {/if}
 </div>
-
-<style lang="postcss">
-  .btn-success[disabled] {
-    @apply border-current text-success;
-  }
-  .btn-warning[disabled] {
-    @apply border-current text-warning;
-  }
-  .btn-error[disabled] {
-    @apply border-current text-error;
-  }
-</style>

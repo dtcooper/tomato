@@ -1,6 +1,4 @@
 const materialUIColors = require("material-ui-colors")
-const { "[data-theme=synthwave]": synthwaveTheme } = require("daisyui/src/theming/themes")
-const { themeOrder: daisyThemes } = require("daisyui/src/theming/themeDefaults")
 
 // Use material UI colors
 const colors = Object.keys(materialUIColors).reduce(
@@ -31,7 +29,7 @@ module.exports = {
         sm: "600px"
       },
       fontFamily: {
-        sans: "Space Grotesk Local",
+        sans: "Inter Local",
         mono: "Space Mono Local"
       },
       colors
@@ -39,17 +37,8 @@ module.exports = {
   },
   daisyui: {
     logs: false,
-    themes: [
-      {
-        tomato: {
-          ...synthwaveTheme,
-          primary: "#fc49ab",
-          secondary: "#5fe8ff",
-          accent: "#c07eec"
-        }
-      },
-      ...daisyThemes
-    ]
+    darkTheme: "night",
+    themes: ["emerald", "night"]
   },
   plugins: [require("daisyui")]
 }

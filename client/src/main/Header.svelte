@@ -16,7 +16,7 @@
 
 <div class="col-span-3 flex flex-col gap-6">
   <div class="flex items-center justify-between bg-base-200 px-5 py-2">
-    <div class="flex items-center gap-3 text-3xl">
+    <div class="flex items-center gap-3 text-3xl font-mono italic">
       <Icon icon={tomatoIcon} class="h-12 w-12" shape-rendering="crispEdges" viewBox="0 -.5 16 16" />
       {$config.STATION_NAME}
     </div>

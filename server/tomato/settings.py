@@ -290,7 +290,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
             ),
         },
     ),
-    "station_name": (
+    "short_text": (
         "django.forms.CharField",
         {
             "max_length": 50,
@@ -326,7 +326,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
     ),
 }
 CONSTANCE_CONFIG = {
-    "STATION_NAME": ("Tomato Radio Automation", "The name of your station.", "station_name"),
+    "STATION_NAME": ("Tomato Radio Automation", "The name of your station.", "short_text"),
     "SINGLE_PLAY_ROTATORS": (
         [],
         "Optional rotators to play a single asset from in the Desktop app. You can choose a maximum of 3.",
@@ -363,15 +363,23 @@ CONSTANCE_CONFIG = {
     "NO_REPEAT_ASSETS_TIME": (
         0,
         (
-            "The time (in seconds) required to elapse for the dkestop app to attempt to not repeat any assets. Set to 0"
+            "The time (in seconds) required to elapse for the Desktop app to attempt to not repeat any assets. Set to 0"
             " to disable and allow potential repetition in the randomization algorithm. If there are not enough assets"
             " in a rotator to respect this setting, it will be ignored."
         ),
         "seconds",
     ),
+    "STOPSET_ENTITY_NAME": (
+        "stop set",
+        "Override the language in the Desktop app to change the word 'stop set' to something custom",
+        "short_text",
+    ),
     "STOPSET_PRELOAD_COUNT": (
         2,
-        "Number of stopsets to preload in the UI. 2-3 is a good value for this, since new data could make preloaded ones stale.",
+        (
+            "Number of stopsets to preload in the UI. 2-3 is a good value for this, since new data could make preloaded"
+            " ones stale."
+        ),
         "stopset_preload_count",
     ),
     "STOPSET_OVERDUE_TIME": (
@@ -380,11 +388,14 @@ CONSTANCE_CONFIG = {
             'The time (in seconds) after the <code>WAIT_INTERVAL</code> after which an "overdue" message will flash.'
             " Set to 0 disable."
         ),
-        "seconds"
+        "seconds",
     ),
     "STOPSET_OVERDUE_MESSAGE": (
         "You're overdue to play the next stopset. Please play it as soon as possible.",
-        mark_safe("The overdue message to be displayed when <code>STOPSET_OVERDUE_TIME</code>"),
+        mark_safe(
+            'The overdue message to be displayed when <code>STOPSET_OVERDUE_TIME</code>. <span style="color:'
+            ' red">(Currently not implemented.)</span>'
+        ),
         "stopset_overdue_message",
     ),
     "ALLOW_REPEATS_IN_STOPSET": (
@@ -453,6 +464,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
                 "WAIT_INTERVAL",
                 "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME",
                 "WARN_ON_EMPTY_ROTATORS",
+                "STOPSET_ENTITY_NAME",
                 "STOPSET_PRELOAD_COUNT",
                 "STOPSET_OVERDUE_TIME",
                 "STOPSET_OVERDUE_MESSAGE",
