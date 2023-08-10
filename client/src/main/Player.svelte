@@ -1,4 +1,5 @@
 <script>
+  import { tick } from "svelte"
   import PlayBar from "./player/Bar.svelte"
   import PlayButtons from "./player/Buttons.svelte"
   import PlayList from "./player/List.svelte"
@@ -21,6 +22,11 @@
     } else {
       return true
     }
+  }
+
+  const scrollToTopOfPlaylist = async () => {
+    await tick()
+    document.getElementById("playlist").scroll({ top: 0, behavior: "smooth" })
   }
 
   const addStopset = () => {
@@ -78,6 +84,8 @@
       items.shift().done(true)
     }
 
+    scrollToTopOfPlaylist()
+
     let numStopsetsToAdd =
       Math.max($config.STOPSET_PRELOAD_COUNT, 1) - items.filter((item) => item.type === "stopset").length
     while (numStopsetsToAdd-- > 0) {
@@ -105,6 +113,7 @@
   }
 
   const play = (window.play = () => {
+    scrollToTopOfPlaylist()
     const firstStopsetIndex = items.findIndex((item) => item.type === "stopset")
     if (firstStopsetIndex === -1) {
       throw new Error("play() SHOULD have found a first stopset")
@@ -113,10 +122,12 @@
   })
 
   const pause = () => {
+    scrollToTopOfPlaylist()
     items[0].pause()
   }
 
   const skip = () => {
+    scrollToTopOfPlaylist()
     items[0].skip()
   }
 

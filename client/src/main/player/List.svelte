@@ -11,7 +11,7 @@
   <div class="flex flex-1 flex-col overflow-y-auto" id="playlist">
     {#each items as item, index (item.generatedId)}
       {@const isFirstItem = index === 0}
-      <div class="flex flex-col gap-2 px-2" out:fade={{ duration: 800 }}>
+      <div class="flex flex-col gap-2 px-2" out:fade={{ duration: 650 }}>
         <div
           class="divider mb-0 mt-2"
           class:text-secondary={item.type === "stopset"}
