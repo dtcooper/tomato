@@ -220,6 +220,7 @@ export class GeneratedStopset {
     this.loaded = false
     this.type = "stopset"
     this.playing = false
+    this.startedPlaying = false
     this.didSkip = false
     this.didLog = false
   }
@@ -287,7 +288,7 @@ export class GeneratedStopset {
 
   play() {
     this.loadAudio()
-    this.playing = true
+    this.playing = this.startedPlaying = true
     this.items[this.current].play()
     this.updateCallback()
   }

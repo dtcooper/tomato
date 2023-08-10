@@ -44,7 +44,11 @@
       class={firstItem.type === "stopset" && "tooltip tooltip-error tooltip-bottom"}
       data-tip="Warning: this action will be logged!"
     >
-      <button class="btn btn-error btn-lg pl-3" disabled={firstItem.type !== "stopset"} on:click={skip}>
+      <button
+        class="btn btn-error btn-lg pl-3"
+        disabled={firstItem.type !== "stopset" || !firstItem.startedPlaying}
+        on:click={skip}
+      >
         <Icon icon={skipNextCircleOutline} class="h-12 w-12" /> Skip
       </button>
     </div>

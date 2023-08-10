@@ -12,13 +12,13 @@
 </script>
 
 <!-- col-span-2 until we have a single play rotator player -->
-<div class="col-span-2 flex h-0 min-h-full flex-col rounded-lg border-base-content bg-base-200 p-1.5">
+<div class="col-span-2 flex h-0 min-h-full flex-col rounded-lg border-base-content bg-base-200 p-1.5 pt-2">
   <div class="flex flex-1 flex-col gap-2 overflow-y-auto" id="playlist">
     {#each items as item, index (item.generatedId)}
       {@const isFirstItem = index === 0}
       <div class="flex flex-col gap-2 px-2" out:fade={{ duration: 650 }}>
         <div
-          class="divider my-0 mb-0"
+          class="divider m-0"
           class:text-secondary={item.type === "stopset"}
           class:text-accent={item.type === "wait"}
         >
@@ -49,13 +49,16 @@
                   class:bg-error={asset.error && !asset.finished}
                   class:text-warning-content={!asset.playable && !asset.finished}
                   class:bg-warning={!asset.playable && !asset.finished}
-                  class:bg-neutral={asset.finished}
-                  class:text-neutral-content={asset.finished}
+                  class:bg-base-300={asset.finished}
+                  class:text-base-content={asset.finished}
                 >
                   {#if $userConfig.uiMode > 0}
                     <div
-                      class="radial-progress flex h-[5rem] w-[5rem] items-center justify-center font-mono text-sm"
-                      class:radial-progress={!asset.error && asset.playable}
+                      class="flex h-[5rem] w-[5rem] items-center justify-center font-mono text-sm"
+                      class:radial-progress={!asset.error &&
+                        asset.playable &&
+                        item.startedPlaying &&
+                        asset.index <= item.current}
                       class:italic={asset.error || !asset.playable}
                       class:font-bold={asset.error || !asset.playable}
                       style:--value={(asset.elapsed / asset.duration) * 100}
