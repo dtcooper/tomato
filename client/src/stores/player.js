@@ -240,7 +240,6 @@ export class GeneratedStopset {
   }
 
   done(skipCallback = false) {
-    //setPlayStatus({ playing: false })
     // Must be able to be called twice
     this.playing = false
     this.unloadAudio()
@@ -251,7 +250,6 @@ export class GeneratedStopset {
   }
 
   play() {
-    //setPlayStatus({ playing: true})
     this.loadAudio()
     this.playing = true
     this.items[this.current].play()
@@ -259,7 +257,6 @@ export class GeneratedStopset {
   }
 
   pause() {
-    //setPlayStatus({ playing: false })
     this.items[this.current].pause()
     this.playing = false
     this.updateCallback()
@@ -296,7 +293,6 @@ export class Wait {
   }
 
   run() {
-    //setPlayStatus({ waiting: true })
     this.active = true
     this.expires = dayjs().add(this.duration, "seconds")
     this.interval = setInterval(() => {
@@ -312,13 +308,16 @@ export class Wait {
   doneCountdown() {
     this.overtime = true
     clearInterval(this.interval)
-    this.interval = setInterval(() => {
-      this.overtimeElapsed = dayjs().diff(this.expires, "ms") / 1000
-      this.updateCallback()
-      if (Wait.currentStopsetOverdueTime > 0 && this.overtimeElapsed > Wait.currentStopsetOverdueTime) {
-        this.overdue = true
-      }
-    }, 333)
+    if (this.doneCallback()) {
+      // returns true if we want to do overtime stuff
+      this.interval = setInterval(() => {
+        this.overtimeElapsed = dayjs().diff(this.expires, "ms") / 1000
+        this.updateCallback()
+        if (Wait.currentStopsetOverdueTime > 0 && this.overtimeElapsed > Wait.currentStopsetOverdueTime) {
+          this.overdue = true
+        }
+      }, 333)
+    }
   }
 
   done(skipCallback) {
@@ -327,7 +326,6 @@ export class Wait {
     if (!skipCallback) {
       this.doneCallback()
     }
-    //setPlayStatus({ waiting: false})
   }
 }
 

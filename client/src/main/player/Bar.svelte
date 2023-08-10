@@ -1,4 +1,5 @@
 <script>
+  import { fade } from "svelte/transition"
   import { tick } from "svelte"
   import { prettyDuration } from "../../utils"
   import { config } from "../../stores/config"
@@ -18,7 +19,7 @@
   <div
     class="font-mono text-2xl font-bold"
     class:tomato-pulse={item.type === "wait" && item.overdue}
-    style:--pulse-color="var(--er)"
+    style="--pulse-color: var(--er); --pulse-size: 5px;"
   >
     {#if item.type === "wait" && item.overtime}
       {#if item.overdue}
@@ -65,7 +66,7 @@
           style:width={`${(item.elapsed / item.duration) * 100}%`}
         />
         <div
-          class="absolute z-10 h-full w-[6px] border-x-[1px] border-base-100 bg-base-content"
+          class="absolute z-20 h-full w-[6px] border-x-[1px] border-base-100 bg-base-content"
           class:animate-pulse={!item.playing}
           style:left={`calc(${(item.elapsed / item.duration) * 100}% - 3px)`}
         />

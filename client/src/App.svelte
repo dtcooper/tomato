@@ -54,6 +54,7 @@
   :global(.tomato-pulse) {
     animation: tomato-pulse 1.5s infinite;
     --pulse-color: var(--bc);
+    --pulse-size: 15px;
   }
 
   :root {
@@ -62,15 +63,15 @@
 
   @keyframes tomato-pulse {
     0% {
-      box-shadow: 0 0 0 0 hsl(var(--pulse-color, var(--bc)) / 0.7);
+      box-shadow: 0 0 0 0 hsl(var(--pulse-color) / 0.7);
     }
 
     85% {
-      box-shadow: 0 0 0 15px hsl(var(--pulse-color, var(--bc)) / 0);
+      box-shadow: 0 0 0 var(--pulse-size) hsl(var(--pulse-color) / 0);
     }
 
     100% {
-      box-shadow: 0 0 0 0 hsl(var(--pulse-color, var(--bc)) / 0);
+      box-shadow: 0 0 0 0 hsl(var(--pulse-color) / 0);
     }
   }
 </style>

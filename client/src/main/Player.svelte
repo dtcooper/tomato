@@ -11,7 +11,17 @@
   let items = []
 
   const updateUI = () => (items = items) // Callback for force re-render
-  const numStopsetsToPreload = 2
+  const numStopsetsToPreloadAudioFor = 2
+
+  const doneWaiting = () => {
+    // true = keep waiting and do overtime stuff
+    if ($userConfig.autoplay) {
+      processItem()
+      return false
+    } else {
+      return true
+    }
+  }
 
   const addStopset = () => {
     // If previous item is not a wait interval
@@ -21,11 +31,11 @@
 
     if (generatedStopset) {
       if (shouldPrependWait) {
-        items.push(new Wait(processItem, updateUI))
+        items.push(new Wait(doneWaiting, updateUI))
       }
       items.push(generatedStopset)
       if ($config.WAIT_INTERVAL > 0) {
-        items.push(new Wait(processItem, updateUI))
+        items.push(new Wait(doneWaiting, updateUI))
       }
     } else {
       console.warn("Couldn't generate a stopset!")
@@ -82,7 +92,7 @@
     // Preload first few
     items
       .filter((item) => item.type === "stopset")
-      .slice(0, numStopsetsToPreload)
+      .slice(0, numStopsetsToPreloadAudioFor)
       .forEach((item) => item.loadAudio())
 
     const nextItem = items[0]
@@ -111,7 +121,7 @@
   }
 
   if ($config.WAIT_INTERVAL) {
-    items.push(new Wait(processItem, updateUI))
+    items.push(new Wait(doneWaiting, updateUI))
   }
 
   processItem(0)
@@ -124,7 +134,7 @@
   })
 </script>
 
-<div class="col-span-2 my-10 flex flex-col gap-5">
+<div class="col-span-2 my-8 flex flex-col gap-5">
   {#if items.length > 0}
     {@const item = items[0]}
 
