@@ -327,7 +327,6 @@ DB._loadAssetPlayTimes()
 const emptyDB = new DB()
 window.DB = DB
 const dbStore = writable(emptyDB)
-let db = emptyDB
 const dbReadonly = readonly(dbStore)
 export { dbReadonly as db }
 
@@ -376,14 +375,12 @@ export const syncAssetsDB = runOnceAndQueueLastCall(async (jsonData) => {
   window.localStorage.setItem("last-db-data", JSON.stringify(jsonData, null, ""))
   window.db = replacementDB // Swap out DB
   dbStore.set(replacementDB)
-  db = replacementDB
   syncProgress.set(emptySyncProgress)
 })
 
 export const clearAssetsDB = () => {
   window.db = emptyDB
   dbStore.set(emptyDB)
-  db = emptyDB
   window.localStorage.removeItem("last-db-data")
 }
 
@@ -393,7 +390,6 @@ export const restoreAssetsDBFromLocalStorage = () => {
     if (state) {
       const loadedDb = (window.db = new DB(state))
       dbStore.set(loadedDb)
-      db = loadedDb
       return
     }
   } catch (e) {
@@ -402,7 +398,6 @@ export const restoreAssetsDBFromLocalStorage = () => {
 
   window.db = emptyDB
   dbStore.set(emptyDB)
-  db = emptyDB
 }
 
 export const clearSoftIgnoredAssets = () => window.localStorage.removeItem("soft-ignored-ids")

@@ -75,7 +75,8 @@
     processItem()
   }
 
-  const processItem = (index = 1, play = false, subindex = 0) => {
+  const processItem = (index = 1, play = false, subindex) => {
+    // TODO: subindex is for advanced mode, playing an asset inside a stopset
     if (index > items.length) {
       console.warn(`Index ${index} out of band while processing items`)
       return
@@ -113,7 +114,6 @@
   }
 
   const play = (window.play = () => {
-    scrollToTopOfPlaylist()
     const firstStopsetIndex = items.findIndex((item) => item.type === "stopset")
     if (firstStopsetIndex === -1) {
       throw new Error("play() SHOULD have found a first stopset")

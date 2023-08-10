@@ -1,5 +1,4 @@
 <script>
-  import { fade } from "svelte/transition"
   import { tick } from "svelte"
   import { prettyDuration } from "../../utils"
   import { config } from "../../stores/config"

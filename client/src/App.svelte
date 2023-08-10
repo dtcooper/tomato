@@ -1,6 +1,5 @@
 <script>
   import { conn, login } from "./stores/connection"
-  import { userConfig } from "./stores/config"
   import { restoreAssetsDBFromLocalStorage } from "./stores/db"
 
   import Login from "./Login.svelte"

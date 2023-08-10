@@ -15,7 +15,7 @@ const connPersisted = persisted("conn", {
   authenticated: false, // Got at least one successful auth since login. Stays true on disconnect
   didFirstSync: false // Completed one whole sync
 })
-connEphemeral = writable({
+const connEphemeral = writable({
   connecting: false, // Before successful auth
   connected: false // Whether socket is "online" state or not (after successful auth)
 })
@@ -103,7 +103,7 @@ export const messageServer = (type, data) => {
 }
 
 export const login = (username, password, host) => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     let gotAuthResponse = false
     let connTimeout
     let url
@@ -137,7 +137,7 @@ export const login = (username, password, host) => {
       host = url.toString()
     } else {
       // Called with no args = logging back in on first load
-      ;({ username, password, host } = get(conn))
+      ({ username, password, host } = get(conn))
     }
 
     if (!username || !password) {

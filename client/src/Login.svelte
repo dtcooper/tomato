@@ -4,7 +4,6 @@
   import { persisted } from "svelte-local-storage-store"
 
   import { conn, login } from "./stores/connection"
-  import { config } from "./stores/config"
 
   import { tomatoIcon } from "./utils"
 

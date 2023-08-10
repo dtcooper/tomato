@@ -64,7 +64,7 @@ class GeneratedStopsetAssetBase {
     if (error) {
       console.log(`An error occurred while playing ${this.name}`, error)
     }
-    this.generatedStopset.donePlaying(this.index)
+    this.generatedStopset.donePlaying()
   }
 }
 
@@ -249,7 +249,7 @@ export class GeneratedStopset {
     }
   }
 
-  donePlaying(index) {
+  donePlaying() {
     this.current++
     this.updateCallback()
     if (this.current < this.items.length) {
