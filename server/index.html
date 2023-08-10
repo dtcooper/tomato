@@ -604,6 +604,11 @@ heavily leveraging its automatic admin interface.</p>
 <p>Warn when a rotator has no eligible assets to choose from. (Desktop app only)</p>
 <p>Default: <code>True</code></p>
 </dd>
+<dt><code>STOPSET_ENTITY_NAME</code> --- <strong>Type: String</strong></dt>
+<dd>
+<p>Override the language in the Desktop app to change the word 'stop set' to something custom</p>
+<p>Default: <code>'stop set'</code></p>
+</dd>
 <dt><code>STOPSET_PRELOAD_COUNT</code> --- <strong>Type: Numerica</strong></dt>
 <dd>
 <p>Number of stopsets to preload in the UI. 2-3 is a good value for this, since new data could make preloaded ones stale.</p>
@@ -616,12 +621,12 @@ heavily leveraging its automatic admin interface.</p>
 </dd>
 <dt><code>STOPSET_OVERDUE_MESSAGE</code> --- <strong>Type: String</strong></dt>
 <dd>
-<p>The overdue message to be displayed when <code>STOPSET_OVERDUE_TIME</code></p>
+<p>The overdue message to be displayed when <code>STOPSET_OVERDUE_TIME</code>. <span style="color: red">(Currently not implemented.)</span></p>
 <p>Default: <code>"You're overdue to play the next stopset. Please play it as soon as possible."</code></p>
 </dd>
 <dt><code>NO_REPEAT_ASSETS_TIME</code> --- <strong>Type: Numerica</strong></dt>
 <dd>
-<p>The time (in seconds) required to elapse for the dkestop app to attempt to not repeat any assets. Set to 0 to disable and allow potential repetition in the randomization algorithm. If there are not enough assets in a rotator to respect this setting, it will be ignored.</p>
+<p>The time (in seconds) required to elapse for the Desktop app to attempt to not repeat any assets. Set to 0 to disable and allow potential repetition in the randomization algorithm. If there are not enough assets in a rotator to respect this setting, it will be ignored.</p>
 <p>Default: <code>0</code></p>
 </dd>
 <dt><code>ALLOW_REPEATS_IN_STOPSET</code> --- <strong>Type: Boolean (true or false)</strong></dt>
