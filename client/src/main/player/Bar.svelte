@@ -15,12 +15,15 @@
 </script>
 
 <div class="flex justify-center">
-  <div class="text-2xl font-mono font-bold" class:tomato-pulse={item.type === "wait" && item.overdue} style:--pulse-color="var(--er)">
+  <div
+    class="font-mono text-2xl font-bold"
+    class:tomato-pulse={item.type === "wait" && item.overdue}
+    style:--pulse-color="var(--er)"
+  >
     {#if item.type === "wait" && item.overtime}
       {#if item.overdue}
-        <span class="text-error italiv">
-          You are <span class="underline">OVERDUE</span> to play a {$config.STOPSET_ENTITY_NAME}.
-          Press play now.
+        <span class="italiv text-error">
+          You are <span class="underline">OVERDUE</span> to play a {$config.STOPSET_ENTITY_NAME}. Press play now.
         </span>
       {:else}
         <span class="text-success">Play next {$config.STOPSET_ENTITY_NAME} now</span>
@@ -57,9 +60,12 @@
             <span>{prettyDuration(asset.duration)}</span>
           </div>
         {/each}
-        <div class="absolute z-10 bg-base-100 left-0 h-full opacity-40" style:width={`${(item.elapsed / item.duration) * 100}%`} />
         <div
-          class="absolute z-10 h-full w-[6px] bg-base-content border-x-[1px] border-base-100"
+          class="absolute left-0 z-10 h-full bg-base-100 opacity-40"
+          style:width={`${(item.elapsed / item.duration) * 100}%`}
+        />
+        <div
+          class="absolute z-10 h-full w-[6px] border-x-[1px] border-base-100 bg-base-content"
           class:animate-pulse={!item.playing}
           style:left={`calc(${(item.elapsed / item.duration) * 100}% - 3px)`}
         />
