@@ -325,11 +325,15 @@ CONSTANCE_ADDITIONAL_FIELDS = {
         },
     ),
 }
+_constance_not_implemented_html = '<span style="color: red">(Currently not implemented.)</span>'
 CONSTANCE_CONFIG = {
     "STATION_NAME": ("Tomato Radio Automation", "The name of your station.", "short_text"),
     "SINGLE_PLAY_ROTATORS": (
         [],
-        "Optional rotators to play a single asset from in the Desktop app. You can choose a maximum of 3.",
+        mark_safe(
+            "Optional rotators to play a single asset from in the Desktop app. You can choose a maximum of 3."
+            f" {_constance_not_implemented_html}"
+        ),
         "single_play_rotators",
     ),
     "BROADCAST_COMPRESSION": (
@@ -350,8 +354,7 @@ CONSTANCE_CONFIG = {
         Decimal(0),
         mark_safe(
             "Multiply an asset's weight by this number if it has an end date <strong>and</strong> the current date is"
-            ' the end date. Set to 0 to disable this feature. <span style="color: red">(Currently not'
-            " implemented.)</span>"
+            f" the end date. Set to 0 to disable this feature. {_constance_not_implemented_html}"
         ),
         "asset_end_date_priority_weight_multiplier",
     ),
@@ -393,8 +396,8 @@ CONSTANCE_CONFIG = {
     "STOPSET_OVERDUE_MESSAGE": (
         "You're overdue to play the next stopset. Please play it as soon as possible.",
         mark_safe(
-            'The overdue message to be displayed when <code>STOPSET_OVERDUE_TIME</code>. <span style="color:'
-            ' red">(Currently not implemented.)</span>'
+            "The overdue message to be displayed when <code>STOPSET_OVERDUE_TIME</code>."
+            f" {_constance_not_implemented_html}"
         ),
         "stopset_overdue_message",
     ),

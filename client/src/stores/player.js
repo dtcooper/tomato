@@ -50,6 +50,10 @@ class GeneratedStopsetAssetBase {
     this.generatedStopset.updateCallback()
   }
 
+  get color() {
+    return this.rotator.color
+  }
+
   get active() {
     return this.generatedStopset.current === this.index
   }
@@ -67,19 +71,17 @@ class GeneratedStopsetAssetBase {
 class PlayableAsset extends GeneratedStopsetAssetBase {
   static _reusableAudioObjects = []
 
-  constructor({ ...asset }, ...args) {
+  constructor({ duration, ...asset }, ...args) {
     super(...args)
     // Assigns asset._db, which holds a reference to the underlying asset object
     // therefore a reference to the _original_ asset is held and it won't be garbage
     // collected and cleaned  up yet
     Object.assign(this, asset)
-    this.elapsed = 0
+    this._elapsed = 0
     this.playable = true
     this.audio = null
-  }
-
-  get color() {
-    return this.rotator.color
+    this.error = false
+    this._duration = duration
   }
 
   static getAudioObject() {
@@ -101,24 +103,30 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
     return audio
   }
 
+  get duration() {
+    return this.error ? 0 : this._duration
+  }
+
+  get elapsed() {
+    return this.error ? 0 : this._elapsed
+  }
+
   loadAudio() {
     if (!this.audio) {
       this.audio = PlayableAsset.getAudioObject()
 
       // TODO set duration quicker than this using an interval for smoother UI?
       this.audio.ondurationchange = () => {
-        this.duration = this.audio.duration
+        this._duration = this.audio.duration
         this.updateCallback()
       }
       this.audio.ontimeupdate = () => {
-        this.elapsed = this.audio.currentTime
+        this._elapsed = this.audio.currentTime
         this.updateCallback()
       }
       this.audio.onended = () => this.done()
-      this.audio.onerror = (e) => {
-        this.error = true
-        this.done()
-      }
+      this.audio.onerror = (e) => this._errorHelper(e)
+
       this.audio.src = this.file.localUrl
     }
   }
@@ -140,10 +148,24 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
     return Math.min((this.elapsed / this.duration) * 100, 100)
   }
 
+  _errorHelper(e) {
+    console.error("audio got error:", e)
+    this.error = true
+    if (this.playing) {
+      this.playing = false
+      this.done()
+    }
+  }
+
   play() {
     console.log(`Playing ${this.name}`)
-    this.playing = true
-    this.audio.play().catch(() => this.done())
+
+    if (this.error) {
+      this.done()
+    } else {
+      this.playing = true
+      this.audio.play().catch((e) => this._errorHelper(e))
+    }
     this.updateCallback()
   }
 
@@ -166,13 +188,12 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
 class NonPlayableAsset extends GeneratedStopsetAssetBase {
   constructor(...args) {
     super(...args)
-    this.name = "Non-playable asset"
     this.playable = false
   }
 
   play() {
     console.log("Called play() on non-playable asset")
-    done()
+    this.done()
   }
 }
 
@@ -193,17 +214,17 @@ export class GeneratedStopset {
   }
 
   get duration() {
-    return this.playableNonErrorItems.reduce((s, item) => s + item.duration, 0)
+    return this.playableItems.reduce((s, item) => s + item.duration, 0)
   }
   get elapsed() {
-    return this.playableNonErrorItems.reduce((s, item) => s + item.elapsed, 0)
+    return this.playableItems.reduce((s, item) => s + item.elapsed, 0)
   }
   get remaining() {
-    return this.playableNonErrorItems.reduce((s, item) => s + item.remaining, 0)
+    return this.playableItems.reduce((s, item) => s + item.remaining, 0)
   }
 
   get playableNonErrorItems() {
-    return this.items.filter((item) => item.playable && !item.error)
+    return this.playableItems.filter((item) => !item.error)
   }
 
   get playableItems() {

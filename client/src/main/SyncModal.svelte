@@ -11,11 +11,11 @@
   import lanDisconnect from "@iconify/icons-mdi/lan-disconnect"
 
   export let show = true
-  export let canDismiss = true
+  export let isFromLogin = true
   export let title = `Sync status`
 </script>
 
-<Modal bind:show bind:canDismiss>
+<Modal bind:show canDismiss={!isFromLogin}>
   <svelte:fragment slot="icon">
     {#if !$conn.connected}
       <Icon icon={lanDisconnect} />
@@ -52,7 +52,7 @@
     {/if}
   </svelte:fragment>
   <svelte:fragment slot="extra-buttons">
-    {#if !canDismiss}
+    {#if isFromLogin}
       <button type="button" class="btn btn-error" on:click|preventDefault={() => logout()} tabindex="-1"
         >Cancel &amp; Logout</button
       >

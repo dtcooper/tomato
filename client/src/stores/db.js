@@ -304,11 +304,22 @@ class DB {
   }
 
   generateStopset(startTime, doneCallback, updateCallback, generatedId) {
-    const stopset = pickRandomItemByWeight(filterItemsByActive(this.stopsets, startTime))
-    if (stopset) {
-      return stopset.generate(startTime, doneCallback, updateCallback, generatedId)
+    let generated = null
+    for (let i = 0; i < 3; i++) {
+      const stopset = pickRandomItemByWeight(filterItemsByActive(this.stopsets, startTime))
+      if (stopset) {
+        generated = stopset.generate(startTime, doneCallback, updateCallback, generatedId)
+        if (generated.items.some((item) => item.playable)) {
+          return generated
+        }
+      } else {
+        return null
+      }
     }
-    return null
+    console.warn(
+      "Tried 5 times to generated a stopset with some playable assets. Couldn't so returning an unplayable one."
+    )
+    return generated
   }
 }
 

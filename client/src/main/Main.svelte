@@ -8,7 +8,7 @@
   let showSyncModal = false
 </script>
 
-<SyncModal bind:show={showSyncModal} />
+<SyncModal bind:show={showSyncModal} isFromLogin={false} />
 <SettingsModal bind:show={showSettingsModal} />
 
 <div class="max-w-screen flex h-screen max-h-screen w-screen flex-col gap-2">

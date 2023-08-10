@@ -8,6 +8,7 @@
     "build": "node scripts/build.js",
     "clean": "rm -rf dist out",
     "dev": "NODE_ENV=development npm-run-all clean -p -r build dev:electron",
+    "prod": "NODE_ENV=production npm-run-all clean build dev:electron:run",
     "debug": "DEV_EXTRA_FORGE_FLAGS=--inspect-brk-electron npm run dev",
     "svelte-dev": "SVELTE_DEVTOOLS=1 npm run dev",
     "dev:electron": "npm-run-all dev:electron:wait dev:electron:run",

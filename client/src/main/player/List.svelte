@@ -17,57 +17,111 @@
           class:text-secondary={item.type === "stopset"}
           class:text-accent={item.type === "wait"}
         >
-          <span>{item.name} <span class="font-mono">[{prettyDuration(item.duration)}]</span></span>
+          <span
+            >{item.name}{#if item.duration > 0}
+              <span class="font-mono">[{prettyDuration(item.duration)}]</span>{/if}</span
+          >
         </div>
         {#if item.type === "stopset"}
           {#each item.items as asset}
-            <div
-              class="border-l-4 pl-2"
-              class:border-base-300={asset.finished}
-              class:border-success={isFirstItem && asset.active}
-              class:border-base-content={!isFirstItem || (!asset.finished && !asset.active)}
-            >
+            {#if asset.playable || $config.WARN_ON_EMPTY_ROTATORS}
               <div
-                class="flex min-h-[5rem] items-center gap-3 overflow-hidden px-3 py-1"
-                style={asset.finished
-                  ? ""
-                  : `background: linear-gradient(to right, hsl(var(--sf)) 0%, hsl(var(--sf)) ${asset.percentDone}%, hsl(var(--s)) ${asset.percentDone}%, hsl(var(--s)) 100%);`}
-                class:bg-neutral={asset.finished}
-                class:text-secondary-content={!asset.finished}
-                class:text-neutral-content={asset.finished}
+                class="border-l-4 pl-2"
+                class:border-error={asset.error}
+                class:border-warning={!asset.playable}
+                class:border-base-300={asset.playable && !asset.error && asset.finished}
+                class:border-success={asset.playable && isFirstItem && asset.active}
+                class:border-base-content={!isFirstItem ||
+                  (asset.playable && !asset.error && !asset.finished && !asset.active)}
               >
-                {#if $userConfig.uiMode > 0}
-                  <div
-                    class="h-18 w-18 radial-progress font-mono text-sm"
-                    style:--value={(asset.elapsed / asset.duration) * 100}
-                    style:--thickness={asset.elapsed === 0 ? "0" : "0.4rem"}
-                  >
-                    {prettyDuration(asset.remaining)}
+                <div
+                  class="flex min-h-[5rem] items-center gap-3 overflow-hidden px-3 py-1"
+                  style={asset.playable && !asset.error && !asset.finished
+                    ? `background: linear-gradient(to right, hsl(var(--sf)) 0%, hsl(var(--sf)) ${asset.percentDone}%, hsl(var(--s)) ${asset.percentDone}%, hsl(var(--s)) 100%);`
+                    : ""}
+                  class:text-secondary-content={asset.playable && !asset.error && !asset.finished}
+                  class:text-error-content={asset.error && !asset.finished}
+                  class:bg-error={asset.error && !asset.finished}
+                  class:text-warning-content={!asset.playable && !asset.finished}
+                  class:bg-warning={!asset.playable && !asset.finished}
+                  class:bg-neutral={asset.finished}
+                  class:text-neutral-content={asset.finished}
+                >
+                  {#if $userConfig.uiMode > 0}
+                    <div
+                      class="radial-progress flex h-[5rem] w-[5rem] items-center justify-center font-mono text-sm"
+                      class:radial-progress={!asset.error && asset.playable}
+                      class:italic={asset.error || !asset.playable}
+                      class:font-bold={asset.error || !asset.playable}
+                      style:--value={(asset.elapsed / asset.duration) * 100}
+                      style:--thickness="0.4rem"
+                    >
+                      {#if asset.error}
+                        Error!
+                      {:else if asset.playable}
+                        {prettyDuration(asset.remaining)}
+                      {:else}
+                        Empty!
+                      {/if}
+                    </div>
+                  {/if}
+                  <div class="flex flex-1 flex-col overflow-x-hidden">
+                    <div class="font-sm truncate">
+                      <span
+                        class="badge border-secondary-content font-medium"
+                        style:background-color={asset.color.value}
+                        style:color={asset.color.content}
+                      >
+                        {asset.rotator.name}
+                      </span>
+                    </div>
+                    <div class="truncate text-xl">
+                      {#if asset.playable}
+                        {#if asset.error}
+                          <span class="font-bold">Error loading:</span>
+                        {/if}
+                        {asset.name}
+                      {:else}
+                        <span class="text-medium text-base italic"
+                          >Rotator had no eligible assets to chose from! This may be intentional.</span
+                        >
+                      {/if}
+                    </div>
+                  </div>
+                  {#if !asset.error && asset.playable}
+                    <div class="self-start font-mono text-sm">
+                      {#if $userConfig.uiMode >= 1}
+                        {prettyDuration(asset.elapsed, asset.duration)} /
+                      {:else}
+                        Length:
+                      {/if}
+                      {prettyDuration(asset.duration)}
+                    </div>
+                  {/if}
+                </div>
+              </div>
+            {/if}
+          {/each}
+          {#if item.items.length === 0 || (!$config.WARN_ON_EMPTY_ROTATORS && item.items.every((asset) => !asset.playable))}
+            <div class="border-l-4 border-warning pl-2">
+              <div
+                class="flex min-h-[5rem] items-center gap-3 overflow-hidden bg-warning px-3 py-1 text-warning-content"
+              >
+                <!-- in the place of the radial -->
+                {#if $userConfig.uiMode >= 1}
+                  <div class="flex h-[5rem] w-[5rem] items-center justify-center font-mono text-sm font-bold italic">
+                    Warning!
                   </div>
                 {/if}
                 <div class="flex flex-1 flex-col overflow-x-hidden">
-                  <div class="font-sm truncate">
-                    <span
-                      class="badge border-secondary-content font-medium"
-                      style:background-color={asset.color.value}
-                      style:color={asset.color.content}
-                    >
-                      {asset.rotator.name}
-                    </span>
-                  </div>
-                  <div class="truncate text-xl">{asset.name}</div>
-                </div>
-                <div class="self-start font-mono text-sm">
-                  {#if $userConfig.uiMode >= 1}
-                    {prettyDuration(asset.elapsed, asset.duration)} /
-                  {:else}
-                    Length:
-                  {/if}
-                  {prettyDuration(asset.duration)}
+                  <span class="font-medium italic">
+                    {$config.STOPSET_ENTITY_NAME.charAt(0).toUpperCase() + $config.STOPSET_ENTITY_NAME.slice(1)}
+                    {item.name} was generated but has no eligible assets.</span
+                  >
                 </div>
               </div>
             </div>
-          {/each}
+          {/if}
         {:else if item.type === "wait"}
           <div class="border-l-4 pl-2" class:border-base-content={!isFirstItem} class:border-success={isFirstItem}>
             <div
@@ -76,7 +130,7 @@
             >
               {#if $userConfig.uiMode > 0}
                 <div
-                  class="w-18 h-18 radial-progress font-mono text-sm"
+                  class="radial-progress h-[5rem] w-[5rem] font-mono text-sm"
                   style:--value={(item.elapsed / item.duration) * 100}
                   style:--thickness={item.elapsed === 0 ? "0" : "0.4rem"}
                 >

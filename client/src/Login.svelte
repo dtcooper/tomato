@@ -47,7 +47,7 @@
   }
 </script>
 
-<SyncModal title={`Connecting`} canDismiss={false} show={showSyncModal} />
+<SyncModal title="Connecting" isFromLogin={true} show={showSyncModal} />
 
 <div
   class="mx-auto flex min-h-screen w-full max-w-2xl flex-col items-center justify-center gap-y-3"

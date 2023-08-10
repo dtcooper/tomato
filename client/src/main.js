@@ -1,4 +1,4 @@
-const { app, BrowserWindow, powerSaveBlocker, shell, ipcMain, nativeTheme } = require("electron")
+const { app, BrowserWindow, powerSaveBlocker, shell, ipcMain, nativeTheme, dialog } = require("electron")
 const windowStateKeeper = require("electron-window-state")
 const fs = require("fs")
 const fsExtra = require("fs-extra")
@@ -72,7 +72,7 @@ if (squirrelCheck || !singleInstanceLock) {
       fullscreenable: false,
       icon: path.resolve(path.join(__dirname, "../assets/icons/tomato.png")),
       webPreferences: {
-        devTools: !app.isPackaged,
+        devTools: true,
         contextIsolation: false,
         nodeIntegration: true,
         webSecurity: false,
@@ -124,6 +124,26 @@ if (squirrelCheck || !singleInstanceLock) {
       }
     })
 
+    if (!IS_DEV) {
+      // Prevent accidental closing
+      win.on("close", async (event) => {
+        event.preventDefault()
+        const choice = await dialog.showMessageBox(win, {
+          type: "question",
+          normalizeAccessKeys: false,
+          buttons: ["Quit", "Cancel & Keeping Running"],
+          defaultId: 1,
+          cancelId: 1,
+          title: "Quit Tomato",
+          message: "Are you SURE you want to quit Tomato?"
+        })
+        if (choice.response === 0) {
+          window.destroy()
+          app.quit()
+        }
+      })
+    }
+
     win.loadURL(url)
     if (!app.isPackaged) {
       win.webContents.openDevTools({ mode: "detach" })
@@ -174,6 +194,7 @@ if (squirrelCheck || !singleInstanceLock) {
   if (process.platform === "linux") {
     const dbus = require("@homebridge/dbus-native")
 
+    // Switch night and dark mode on Linux by subscribing to dbus
     dbus
       .sessionBus()
       .getService("org.freedesktop.portal.Desktop")
