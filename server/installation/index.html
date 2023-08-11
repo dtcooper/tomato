@@ -516,8 +516,8 @@
 <p>Follow these steps to get started.</p>
 <div class="admonition note">
 <p class="admonition-title">Docker Installation</p>
-<p>You'll need to install [Docker] to get started (which now comes preloaded
-with [Compose]).</p>
+<p>You'll need to install <a href="https://www.docker.com/">Docker</a> to get started (which now comes preloaded
+with <a href="https://docs.docker.com/compose/">Compose</a>).</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Linux Instructions</label><label for="__tabbed_1_2">macOS Instructions</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -526,12 +526,12 @@ with [Compose]).</p>
 </code></pre></div>
 </div>
 <div class="tabbed-block">
-<p>You can install Docker Desktop by [following the instructions here][docker-desktop].</p>
+<p>You can install Docker Desktop by <a href="https://www.docker.com/products/docker-desktop">following the instructions here</a>.</p>
 </div>
 </div>
 </div>
 </div>
-<p>At the command line clone and enter [Tomato's git repository][tomato-git], then
+<p>At the command line clone and enter <a href="https://github.com/dtcooper/tomato">Tomato's git repository</a>, then
 copy over the <code>.env</code> configuration file.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/dtcooper/tomato.git
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">cd</span><span class="w"> </span>tomato/server
@@ -546,7 +546,7 @@ Action on the following,</p>
 <li>Set <code>DEBUG</code> flag to <code>1</code> &mdash; which tells Tomato to run in development
   mode.</li>
 </ul>
-<p>Now, create a symbolic link for the development [Compose] overrides,</p>
+<p>Now, create a symbolic link for the development <a href="https://docs.docker.com/compose/">Compose</a> overrides,</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>ln<span class="w"> </span>-s<span class="w"> </span>docker-compose.dev.yml<span class="w"> </span>docker-compose.override.yml
 </code></pre></div>
 <p>Build the containers (or pull them by instead executing <code class="highlight">docker<span class="w"> </span>compose<span class="w"> </span>pull</code>),</p>
@@ -598,7 +598,7 @@ Take action on the following,</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">With Included Nginx Container</label><label for="__tabbed_3_2">Reverse Proxying Yourself</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<p>It's <strong>highly recommended</strong> that you use the production [Nginx]
+<p>It's <strong>highly recommended</strong> that you use the production <a href="https://www.nginx.com/">Nginx</a>
 container, which automatically generates an SSL certificate for you and
 takes care of reverse proxying into Tomato for you.</p>
 <p>To do so, first make sure of the following in your <code>.env</code> file,</p>
@@ -609,7 +609,7 @@ takes care of reverse proxying into Tomato for you.</p>
 <p class="admonition-title"><code>DOMAIN_NAME</code> and <code>CERTBOT_EMAIL</code> <strong>must</strong> be properly set!</p>
 <p>If you don't set <code>DOMAIN_NAME</code> and <code>CERTBOT_EMAIL</code> properly as described
 above, the production Nginx container will not  start correctly. This
-is a requirement of [Certbot], the underlying component that automatically
+is a requirement of <a href="https://certbot.eff.org/">Certbot</a>, the underlying component that automatically
 generates an SSL certificate for you.</p>
 </div>
 <p>The nginx container is now included in the default installation, so no
