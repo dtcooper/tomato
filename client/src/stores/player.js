@@ -82,6 +82,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
     this.error = false
     this._duration = duration
     this.didSkip = false
+    this.didLogError = false
   }
 
   static getAudioObject() {
@@ -151,6 +152,10 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   _errorHelper(e) {
     console.error("audio error:", e)
     this.error = true
+    if (!this.didLogError) {
+      this.didLogError = true
+      log("internal_error", `Audio error with asset ${this.name}`)
+    }
     if (this.playing) {
       this.playing = false
       this.done()

@@ -9,6 +9,7 @@ import { WeakRefSet } from "weak-ref-collections"
 import { get, readonly, writable } from "svelte/store"
 
 import { colors } from "../../../server/constants.json"
+import { log } from "./client-logs"
 import { config } from "./config"
 import { conn } from "./connection"
 import { GeneratedStopset } from "./player"
@@ -111,7 +112,11 @@ class Asset extends AssetStopsetHydratableObject {
       if (!exists) {
         console.log(`Downloading: ${url}`)
         // Accept any certificate during local development (ie, self-signed ones)
-        await download(url, dirname, { filename: tmpBasename, rejectUnauthorized: !IS_DEV })
+        await download(url, dirname, {
+          filename: tmpBasename,
+          rejectUnauthorized: !IS_DEV,
+          timeout: { request: 60000 }
+        })
         const actualMd5sum = await md5File(tmpPath)
         if (actualMd5sum !== md5sum) {
           throw new Error(`MD5 sum mismatch. Actual=${actualMd5sum} Expected=${md5sum}`)
@@ -319,6 +324,7 @@ class DB {
     console.warn(
       "Tried 5 times to generated a stopset with some playable assets. Couldn't so returning an unplayable one."
     )
+    log("internal_error", `Generated stopset ${generated.name} but it had no playable assets`)
     return generated
   }
 }
@@ -372,6 +378,7 @@ export const syncAssetsDB = runOnceAndQueueLastCall(async (jsonData) => {
   for (let data of [jsonData, replacementDB]) {
     data.assets = data.assets.filter((asset) => downloadedAssetsIds.has(asset.id))
   }
+
   window.localStorage.setItem("last-db-data", JSON.stringify(jsonData, null, ""))
   window.db = replacementDB // Swap out DB
   dbStore.set(replacementDB)
@@ -400,6 +407,9 @@ export const restoreAssetsDBFromLocalStorage = () => {
   dbStore.set(emptyDB)
 }
 
-export const clearSoftIgnoredAssets = () => window.localStorage.removeItem("soft-ignored-ids")
+export const clearSoftIgnoredAssets = () => {
+  DB._assetPlayTimes = new Map()
+  window.localStorage.removeItem("soft-ignored-ids")
+}
 
 setInterval(() => DB.cleanup(), 45 * 60 * 60) // Clean up every 45 minutes

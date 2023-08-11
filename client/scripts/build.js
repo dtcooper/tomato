@@ -17,7 +17,7 @@ const releasesUrl = "https://electronjs.org/headers/index.json"
 const runBuild = async () => {
   let electronReleases
   try {
-    electronReleases = (await axios.get(releasesUrl, { timeout: 5000, maxContentLength: 1024 * 1024 * 1024 })).data
+    electronReleases = (await axios.get(releasesUrl, { timeout: 10000, maxContentLength: 1024 * 1024 * 1024 })).data
     if (!Array.isArray(electronReleases)) {
       throw new Error("Response not a JSON array")
     }
