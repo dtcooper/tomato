@@ -21,6 +21,7 @@ const connEphemeral = writable({
 })
 const reloading = writable(false) // Whether the whole app is in the reloading process
 let loggingOut = false
+export const protocolVersion = protocol_version
 
 export const conn = derived(
   [connPersisted, connEphemeral, reloading],

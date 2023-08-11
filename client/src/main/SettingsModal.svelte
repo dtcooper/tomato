@@ -7,7 +7,7 @@
   import cogOutline from "@iconify/icons-mdi/cog-outline"
 
   import { db } from "../stores/db"
-  import { logout } from "../stores/connection"
+  import { logout, protocolVersion } from "../stores/connection"
   import { playStatus, speaker, setSpeaker } from "../stores/player"
 
   import { config, userConfig } from "../stores/config"
@@ -91,6 +91,10 @@
 
       <div class="flex justify-end text-lg font-bold">Station Admin:</div>
       <a class="link-hover link-primary link text-lg" href={$db.host}>Open in your web browser</a>
+
+      <div class="flex justify-end text-lg font-bold">Version:</div>
+      <!-- svelte-ignore missing-declaration-->
+      <div class="text-md w-max">{TOMATO_VERSION} / protocol: {protocolVersion}</div>
     </div>
 
     <div class="col-span-2">

@@ -3,7 +3,7 @@
 
   import { persisted } from "svelte-local-storage-store"
 
-  import { conn, login } from "./stores/connection"
+  import { conn, login, protocolVersion } from "./stores/connection"
 
   import { tomatoIcon } from "./utils"
 
@@ -161,7 +161,7 @@
       <div class="text-center text-xs">
         <a class="link-hover link-secondary link" href="https://dtcooper.github.io/tomato/">Tomato Radio Automation</a>,
         <!-- svelte-ignore missing-declaration-->
-        version: {TOMATO_VERSION}
+        version: {TOMATO_VERSION} / protocol: {protocolVersion}
         <br />
         Copyright &copy; 2019-{dayjs().year()}
         <a class="link-hover link-secondary link" href="https://jew.pizza/">David Cooper</a>
