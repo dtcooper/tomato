@@ -24,23 +24,30 @@
       {#if $config.UI_MODES.includes(0) && $userConfig.uiMode >= 1}
         <button class="btn btn-accent" on:click={() => ($userConfig.uiMode = 0)}>← Back to simple view</button>
       {/if}
-      <button
-        class="btn btn-circle btn-ghost flex items-center justify-center overflow-hidden"
-        on:click={() => (showSyncModal = true)}
-        class:!bg-transparent={$userConfig.uiMode === 0}
-        disabled={$userConfig.uiMode === 0}
+      <div
+        class="tooltip tooltip-bottom"
+        data-tip={!$conn.connected ? "Disconnected" : $syncProgress.syncing ? "Synchronizing" : "Connected"}
       >
-        {#if !$conn.connected}
-          <Icon icon={lanDisconnect} class="h-8 w-8 text-error" />
-        {:else if $syncProgress.syncing}
-          <Icon icon={autorenew} class="h-8 w-8 animate-[spin_2s_linear_infinite] text-info" />
-        {:else}
-          <Icon icon={lanConnect} class="h-8 w-8 text-success" />
-        {/if}
-      </button>
-      <button class="btn btn-circle btn-ghost" on:click={() => (showSettingsModal = true)}>
-        <Icon icon={cogOutline} class="h-8 w-8" />
-      </button>
+        <button
+          class="btn btn-circle btn-ghost flex items-center justify-center overflow-hidden"
+          on:click={() => (showSyncModal = true)}
+          class:!bg-transparent={$userConfig.uiMode === 0}
+          disabled={$userConfig.uiMode === 0}
+        >
+          {#if !$conn.connected}
+            <Icon icon={lanDisconnect} class="h-8 w-8 text-error" />
+          {:else if $syncProgress.syncing}
+            <Icon icon={autorenew} class="h-8 w-8 animate-[spin_2s_linear_infinite] text-info" />
+          {:else}
+            <Icon icon={lanConnect} class="h-8 w-8 text-success" />
+          {/if}
+        </button>
+      </div>
+      <div class="tooltip tooltip-bottom" data-tip="Settings">
+        <button class="btn btn-circle btn-ghost" on:click={() => (showSettingsModal = true)}>
+          <Icon icon={cogOutline} class="h-8 w-8" />
+        </button>
+      </div>
     </div>
   </div>
 </div>
