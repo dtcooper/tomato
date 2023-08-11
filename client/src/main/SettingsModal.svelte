@@ -64,7 +64,7 @@
       </div>
 
       <div class="flex justify-end text-lg font-bold">Audio Output Device:</div>
-      <select class="select select-bordered select-lg" on:change={(e) => setSpeaker(e.target.value)}>
+      <select class="select select-bordered select-lg w-full" on:change={(e) => setSpeaker(e.target.value)}>
         {#each $playStatus.speakers as [id, name]}
           <option value={id} selected={id === $speaker}>{name}</option>
         {/each}
