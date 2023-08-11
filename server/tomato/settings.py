@@ -365,10 +365,10 @@ CONSTANCE_CONFIG = {
     ),
     "NO_REPEAT_ASSETS_TIME": (
         0,
-        (
+        mark_safe(
             "The time (in seconds) required to elapse for the Desktop app to attempt to not repeat any assets. Set to 0"
             " to disable and allow potential repetition in the randomization algorithm. If there are not enough assets"
-            " in a rotator to respect this setting, it will be ignored."
+            f" in a rotator to respect this setting, it will be ignored. {_constance_not_implemented_html}"
         ),
         "seconds",
     ),

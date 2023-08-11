@@ -107,8 +107,14 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
                 await websocket.close()
 
         else:
+            error = "Server incompatible with client."
+            if isinstance(protocol_version, int):
+                if protocol_version > PROTOCOL_VERSION:
+                    error = "Server appears older than client. You need to downgrade."
+                else:
+                    error = f"{error} You may need to upgrade Tomato."
             logger.info(f"Client sent protocol_version = {protocol_version!r}, but we are on {PROTOCOL_VERSION!r}.")
-            await websocket.send_json(failure("Invalid protocol version. Try updating your client?"))
+            await websocket.send_json(failure(error))
             await websocket.close()
 
     @classmethod

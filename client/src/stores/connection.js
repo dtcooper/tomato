@@ -20,6 +20,7 @@ const connEphemeral = writable({
   connected: false // Whether socket is "online" state or not (after successful auth)
 })
 const reloading = writable(false) // Whether the whole app is in the reloading process
+let loggingOut = false
 
 export const conn = derived(
   [connPersisted, connEphemeral, reloading],
@@ -50,11 +51,17 @@ const updateConn = ({ connecting, connected, ...restPersisted }) => {
 let ws = (window.ws = null)
 
 export const logout = (error) => {
+  if (loggingOut) return
+  loggingOut = true
+
   const wasInReadyState = get(conn).ready // hard refresh if app was in "ready" state
 
   // Send off pending logs before logout
-  log("logout")
-  sendPendingLogs(true)
+  console.log(wasInReadyState)
+  if (wasInReadyState) {
+    log("logout")
+    sendPendingLogs(true)
+  }
   updateConn({ authenticated: false, connected: false, connecting: false, didFirstSync: false })
   clearAssetsDB()
   clearSoftIgnoredAssets() // Do I want this cleared?
@@ -154,7 +161,7 @@ export const login = (username, password, host) => {
       if (ready) {
         updateConn({ connected: false })
       } else if (authenticated) {
-        logout({ type: "host", message: "A connect error occurred with the server. Please try again." })
+        logout({ type: "host", message: "A connection error occurred with the server. Please try again." })
       } else {
         logout({ type: "host", message: "Failed to shake hands with server. You're sure this address is correct?" })
       }
@@ -167,7 +174,7 @@ export const login = (username, password, host) => {
         updateConn({ connected: false })
       } else {
         // If we've not in ready state, reload application (clean login)
-        logout({ type: "host", message: "A connect error occurred with the server. Please try again." })
+        logout({ type: "host", message: "A connection error occurred with the server. Please try again." })
       }
     }
 
@@ -182,6 +189,7 @@ export const login = (username, password, host) => {
           console.log("Succesfully authenticated!")
           resolve()
         } else {
+          console.log("Got false auth response. Logging out.")
           logout({ type: message.field || "host", message: message.error })
         }
       } else if (get(conn).authenticated) {

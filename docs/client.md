@@ -31,7 +31,8 @@ or can be download below.
 !!! danger "Unsigned Binaries"
     The above releases are **not signed** nor **notaraized**, which means
     you may have to go through your operating system's security settings to be
-    able to run them.
+    able to run them. (This just means I didn't pay Apple :simple-apple: or
+    Microsoft :simple-windows: an unnecessary fee to avoid these warnings.)
 
     Read more about [how to do that on macOS :simple-apple: here](https://support.apple.com/en-gb/HT202491)
     under the section _"If you want to open an app that hasn't been notarized or

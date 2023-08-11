@@ -1,5 +1,5 @@
 {
-  "protocol_version": 0,
+  "protocol_version": 1,
   "client_log_entry_types": [
     "internal_error",
     "login",
