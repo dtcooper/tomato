@@ -236,3 +236,10 @@ cp .env.sample .env
 
     Tomato will be configured to auto-restart on crashes, and and system
     start-up.
+
+[certbot]: https://certbot.eff.org/
+[compose]: https://docs.docker.com/compose/
+[docker-desktop]: https://www.docker.com/products/docker-desktop
+[docker]: https://www.docker.com/
+[nginx]: https://www.nginx.com/
+[tomato-git]: https://github.com/dtcooper/tomato

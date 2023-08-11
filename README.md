@@ -31,7 +31,7 @@ connectivity loss.
 
 Detailed instructions on how to install the server in both development and
 production environments
-[can be found here in the docs](https://dtcooper.github.io/tomato/server/).
+[can be found here in the docs](https://dtcooper.github.io/tomato/server/installation/).
 
 ### Client (Desktop App)
 
