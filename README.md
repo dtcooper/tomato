@@ -89,7 +89,7 @@ Head over to <http://localhost:8888/> in your web browser.
 - [x] Idiot mode, easy mode, advanced mode
 - [ ] ~~Timeout on fetch?~~ (websockets makes this unneeded, except for downloading files)
 - [x] Attempt to prevent duplicate assets from playing within a certain time period
-- [ ] Start/end time for assets in client are based on "is likely to play at" time
+- [x] Start/end time for assets in client are based on "is likely to play at" time
 - [x] Empty rotators are warned on (based on feature flag)
 - [x] Deal with non-playable assets (error state ones)
 - [x] Compression and selecting output device using a bridge to

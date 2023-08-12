@@ -1,4 +1,5 @@
 <script>
+  import dayjs from "dayjs"
   import { tick } from "svelte"
   import PlayBar from "./player/Bar.svelte"
   import PlayButtons from "./player/Buttons.svelte"
@@ -35,11 +36,20 @@
     document.getElementById("playlist").scroll({ top: 0, behavior: "smooth" })
   }
 
+  window.durationOfItems = () => {
+    return items.reduce((s, item) => s + item.remaining, 0)
+  }
+
   const addStopset = () => {
     // If previous item is not a wait interval
     let shouldPrependWait = $config.WAIT_INTERVAL > 0 && items.length > 0 && items[items.length - 1].type !== "wait"
 
-    let generatedStopset = $db.generateStopset(null, processItem, updateUI)
+    const secondsUntilPlay = items.reduce(
+      (s, item) => s + item.remaining,
+      shouldPrependWait ? $config.WAIT_INTERVAL : 0
+    )
+    const likelyPlayTime = dayjs().add(secondsUntilPlay, "seconds")
+    let generatedStopset = $db.generateStopset(likelyPlayTime, processItem, updateUI)
 
     if (generatedStopset) {
       if (shouldPrependWait) {
@@ -68,7 +78,9 @@
       addStopset()
     } else {
       // swap it out, maintaining generatedId so UI doesn't trigger a transition
-      let generatedStopset = $db.generateStopset(null, processItem, updateUI, items[nextStopset].generatedId)
+      const secondsUntilPlay = items.slice(0, nextStopset).reduce((s, item) => s + item.remaining, 0)
+      const likelyPlayTime = dayjs().add(secondsUntilPlay, "seconds")
+      let generatedStopset = $db.generateStopset(likelyPlayTime, processItem, updateUI, items[nextStopset].generatedId)
       if (generatedStopset) {
         items[nextStopset].done(true) // Mark swap out one as done
         items[nextStopset] = generatedStopset
