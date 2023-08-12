@@ -9,7 +9,7 @@ from django.utils.safestring import mark_safe
 from constance import config as constance_config
 from constance.admin import Config
 
-from ..constants import COLORS_DICT, HELP_DOCS_URL
+from ..constants import COLORS_DICT, HELP_DOCS_URL, PROTOCOL_VERSION
 from ..models import Asset, ClientLogEntry, Rotator, Stopset, User
 from .asset import AssetAdmin
 from .client_log_entry import ClientLogEntryAdmin
@@ -60,6 +60,7 @@ class TomatoAdminSite(admin.AdminSite):
             "help_docs_url": HELP_DOCS_URL,
             "help_docs_text": help_docs_text,
             "tomato_version": settings.TOMATO_VERSION,
+            "protocol_version": PROTOCOL_VERSION,
             "tomato_json_data": {"colors": COLORS_DICT},
             **context,
         }
