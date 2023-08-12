@@ -19,8 +19,7 @@ module.exports = {
     ignore: ["^/src$", "^/scripts$", "^/forge.config.js$", "^/tailwind.config.js$"],
     executableName: "tomato",
     icon: "assets/icons/tomato",
-    afterExtract,
-    appVersion: process.env.TOMATO_VERSION || "unknown"
+    afterExtract
   },
   makers: [
     {
