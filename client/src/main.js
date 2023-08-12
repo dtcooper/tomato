@@ -52,7 +52,7 @@ if (squirrelCheck || !singleInstanceLock) {
   })
 
   const baseUrl =
-    app.isPackaged || isDev
+    (!app.isPackaged && isDev)
       ? "http://localhost:3000/"
       : `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
   const url = `${baseUrl}?userDataDir=${encodeURIComponent(userDataDir)}&dev=${isDev ? "1" : "0"}`
