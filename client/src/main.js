@@ -1,4 +1,4 @@
-const { app, BrowserWindow, powerSaveBlocker, shell, ipcMain, nativeTheme, dialog } = require("electron")
+const { app, BrowserWindow, powerSaveBlocker, shell, ipcMain, nativeTheme, dialog, Menu } = require("electron")
 const windowStateKeeper = require("electron-window-state")
 const fs = require("fs")
 const fsExtra = require("fs-extra")
@@ -21,6 +21,10 @@ if (squirrelCheck || !singleInstanceLock) {
   const elgatoVendorId = 4057
   let blocker = null
   const [minWidth, minHeight, defaultWidth, defaultHeight] = [800, 600, 1000, 800]
+  const isLinux = process.platform === "linux"
+  const isMac = process.platform === "darwin"
+  const isDev = process.argv.includes("--enable-dev-mode") || process.env.NODE_ENV === "development"
+  const iconPath = path.resolve(path.join(__dirname, "../assets/icons/tomato.png"))
 
   // Migrate when there's a protocol version bump
   for (let i = 0; i < protocol_version; i++) {
@@ -42,16 +46,18 @@ if (squirrelCheck || !singleInstanceLock) {
     applicationName: "Tomato Radio Automation\n(Desktop App)",
     copyright: `\u00A9 2019-${new Date().getFullYear()} David Cooper & BMIR.\nAll rights reserved.`,
     website: "https://github.com/dtcooper/tomato",
-    iconPath: path.resolve(path.join(__dirname, "../assets/icons/tomato.png"))
+    iconPath,
+    applicationVersion: TOMATO_VERSION,
+    version: TOMATO_VERSION
   })
 
   const baseUrl =
-    app.isPackaged || NODE_ENV === "production"
+    app.isPackaged || isDev
       ? `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
       : "http://localhost:3000/"
-  const url = `${baseUrl}?userDataDir=${encodeURIComponent(userDataDir)}`
+  const url = `${baseUrl}?userDataDir=${encodeURIComponent(userDataDir)}&dev=${isDev ? "1" : "0"}`
 
-  function createWindow() {
+  const createWindow = () => {
     const { screen } = require("electron")
     const primaryDisplay = screen.getPrimaryDisplay()
     const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize
@@ -66,13 +72,12 @@ if (squirrelCheck || !singleInstanceLock) {
       y: mainWindowState.y,
       width: mainWindowState.width,
       height: mainWindowState.height,
+      useContentSize: true,
       minWidth,
       minHeight,
-      fullscreen: false,
-      fullscreenable: false,
-      icon: path.resolve(path.join(__dirname, "../assets/icons/tomato.png")),
+      icon: iconPath,
       webPreferences: {
-        devTools: true,
+        devTools: isDev,
         contextIsolation: false,
         nodeIntegration: true,
         webSecurity: false,
@@ -83,6 +88,93 @@ if (squirrelCheck || !singleInstanceLock) {
     win.webContents.setVisualZoomLevelLimits(1, 1)
 
     mainWindowState.manage(win)
+
+
+    const menu = Menu.buildFromTemplate([
+      // { role: 'appMenu' }
+      ...(isMac
+        ? [{
+            label: app.name,
+            submenu: [
+              { role: 'about' },
+              { type: 'separator' },
+              { role: 'services' },
+              { type: 'separator' },
+              { role: 'hide' },
+              { role: 'hideOthers' },
+              { role: 'unhide' },
+              { type: 'separator' },
+              { role: 'quit' }
+            ]
+          }]
+        : []),
+      // { role: 'fileMenu' }
+      {
+        label: 'File',
+        submenu: [
+          ...(isMac ? [{ role: 'close' }] : [{ role: 'quit' }]),
+        ]
+      },
+      // { role: 'editMenu' }
+      {
+        label: 'Edit',
+        submenu: [
+          { role: 'undo' },
+          { role: 'redo' },
+          { type: 'separator' },
+          { role: 'cut' },
+          { role: 'copy' },
+          { role: 'paste' },
+          { role: 'delete' },
+          ...(isMac ? [{ role: 'pasteAndMatchStyle' }] : []),
+          { type: 'separator' },
+          { role: 'selectAll' }
+        ]
+      },
+      // { role: 'viewMenu' }
+      {
+        label: 'View',
+        submenu: [
+          ...(isDev ? [
+            { role: 'reload' },
+            { role: 'forceReload' },
+            { role: 'toggleDevTools' },
+            { type: 'separator' },
+          ] : []),
+          { role: 'togglefullscreen' }
+        ]
+      },
+      // { role: 'windowMenu' }
+      {
+        label: 'Window',
+        submenu: [
+          { role: 'minimize' },
+          { role: 'zoom' },
+          ...(isMac
+            ? [
+                { type: 'separator' },
+                { role: 'front' },
+                { type: 'separator' },
+                { role: 'window' }
+              ]
+            : [
+                { role: 'close' }
+              ])
+        ]
+      },
+      {
+        role: 'help',
+        submenu: [
+          {
+            label: 'Learn More',
+            click: async () => {
+              await shell.openExternal("https://dtcooper.github.io/tomato/")
+            }
+          }
+        ]
+      }
+    ])
+    Menu.setApplicationMenu(menu)
 
     win.webContents.session.on("select-hid-device", (event, details, callback) => {
       if (details.deviceList && details.deviceList.length > 0) {
@@ -111,21 +203,14 @@ if (squirrelCheck || !singleInstanceLock) {
     win.webContents.on("will-navigate", (event) => {
       // Allow niave page refreshes in dev only, when baseURL is matched (ie browser-sync)
       // Actual refresh uses "refresh" ipc message
-      if (!IS_DEV || !event.url.startsWith(baseUrl)) {
+      if (!isDev || !event.url.startsWith(baseUrl)) {
         event.preventDefault()
         shell.openExternal(event.url)
       }
     })
 
-    win.webContents.on("before-input-event", (event, input) => {
-      // Disable reloading and zooming in/out
-      if (!IS_DEV && input.meta && ["KeyR", "Equal", "Minus"].includes(input.code)) {
-        event.preventDefault()
-      }
-    })
-
-    if (!IS_DEV) {
-      // Prevent accidental closing
+    if (app.isPackaged) {
+      // Prevent accidental closing (except when unpackaged, since electron-forge restart kills the app
       win.on("close", async (event) => {
         event.preventDefault()
         const choice = await dialog.showMessageBox(win, {
@@ -191,8 +276,8 @@ if (squirrelCheck || !singleInstanceLock) {
     app.quit()
   })
 
-  if (process.platform === "linux") {
-    const dbus = require("@homebridge/dbus-native")
+  if (isLinux) {
+    const dbus = require("@homebridge/dbus-native")  // Don't bundle on mac/windows
 
     // Switch night and dark mode on Linux by subscribing to dbus
     dbus

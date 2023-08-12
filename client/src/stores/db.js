@@ -9,12 +9,13 @@ import { WeakRefSet } from "weak-ref-collections"
 import { get, readonly, writable } from "svelte/store"
 
 import { colors } from "../../../server/constants.json"
+import { urlParams, IS_DEV } from "../utils"
 import { log } from "./client-logs"
 import { config } from "./config"
 import { conn } from "./connection"
 import { GeneratedStopset } from "./player"
 
-const assetsDir = path.join(new URLSearchParams(window.location.search).get("userDataDir"), "assets")
+const assetsDir = urlParams.userDataDir
 
 const emptySyncProgress = { syncing: false, total: -1, index: -1, percent: 0, item: "" }
 const syncProgress = writable(emptySyncProgress)

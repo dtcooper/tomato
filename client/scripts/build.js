@@ -38,14 +38,13 @@ const runBuild = async () => {
       `electron ${electronVersion}, node ${nodeVersion || "unknown"}${watch ? ", watching" : ""}...`
   )
 
-  const NODE_ENV = `"${process.env.NODE_ENV}"`
   const defaults = {
     bundle: true,
     logLevel: "info",
     minify: !isDev,
     platform: "node",
     sourcemap: true,
-    define: { NODE_ENV, "process.env.NODE_ENV": NODE_ENV, IS_DEV: isDev ? "true" : "false", TOMATO_VERSION }
+    define: { TOMATO_VERSION }
   }
 
   if (nodeVersion) {

@@ -5,7 +5,7 @@
 
   import { conn, login, protocolVersion } from "./stores/connection"
 
-  import { tomatoIcon } from "./utils"
+  import { tomatoIcon, IS_DEV, urlParams } from "./utils"
 
   import Icon from "./components/Icon.svelte"
   import SyncModal from "./main/SyncModal.svelte"
@@ -17,11 +17,7 @@
   let host = persisted("login-host", "")
   let showSyncModal
 
-  let error = { type: "", message: "" }
-  const searchParams = Object.fromEntries(new URLSearchParams(window.location.search).entries())
-  if (searchParams.errorType && searchParams.errorMessage) {
-    error = { type: searchParams.errorType, message: searchParams.errorMessage }
-  }
+  let error = { type: urlParams.errorType || "", message: urlParams.errorMessage || "" }
 
   const clearError = () => (error = { type: "", message: "" })
 

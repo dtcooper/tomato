@@ -3,6 +3,7 @@ import { get } from "svelte/store"
 import { v4 as uuid } from "uuid"
 
 import { client_log_entry_types } from "../../../server/constants.json"
+import { IS_DEV } from "../utils"
 import { conn, messageServer } from "./connection"
 
 let pendingLogs = {}

@@ -4,6 +4,7 @@
   import PlayButtons from "./player/Buttons.svelte"
   import PlayList from "./player/List.svelte"
 
+  import { IS_DEV } from "../utils"
   import { config, userConfig } from "../stores/config"
   import { db } from "../stores/db"
   import { Wait } from "../stores/player"

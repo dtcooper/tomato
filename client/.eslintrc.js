@@ -5,7 +5,6 @@ module.exports = {
   },
   extends: ["eslint:recommended", "plugin:svelte/recommended"],
   globals: {
-    IS_DEV: true,
     TOMATO_VERSION: true
   },
   overrides: [
@@ -13,10 +12,13 @@ module.exports = {
       env: {
         node: true
       },
-      files: [".eslintrc.{js,cjs}"],
+      files: [".eslintrc.{js,cjs}", "src/main*.js"],
       parserOptions: {
         sourceType: "script"
-      }
+      },
+      globals: {
+        TOMATO_VERSION: true,
+      },
     }
   ],
   parserOptions: {

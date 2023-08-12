@@ -6,10 +6,10 @@
 
   import cogOutline from "@iconify/icons-mdi/cog-outline"
 
+  import { IS_DEV } from "../utils"
   import { db } from "../stores/db"
   import { logout, protocolVersion } from "../stores/connection"
   import { playStatus, speaker, setSpeaker } from "../stores/player"
-
   import { config, userConfig } from "../stores/config"
 
   // TODO: host error seems to show when logging, in particular if you press logout when disconnected

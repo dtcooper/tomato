@@ -1,6 +1,6 @@
 {
   "name": "tomato",
-  "productName": "Tomato Radio Automation",
+  "productName": "Tomato",
   "version": "0.0.1-dev0",
   "description": "Tomato Radio Automation (Desktop App)",
   "main": "dist/main.js",
