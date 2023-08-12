@@ -62,7 +62,7 @@ jobs:
           if [ "$GITHUB_REF_TYPE" = tag ]; then
             echo "TOMATO_VERSION_SUFFIX=" >> "$GITHUB_ENV"
           else
-            echo "TOMATO_VERSION_SUFFIX=-$(git rev-parse --short=8 HEAD)" >> "$GITHUB_ENV"
+            echo "TOMATO_VERSION_SUFFIX=-r$(git rev-list --count HEAD).$(git rev-parse --short=8 HEAD)" >> "$GITHUB_ENV"
           fi
       -
         name: Setup Node v18
@@ -107,7 +107,7 @@ jobs:
           if [ "$GITHUB_REF_TYPE" = tag ]; then
             echo "TOMATO_VERSION_SUFFIX=" >> "$GITHUB_ENV"
           else
-            echo "TOMATO_VERSION_SUFFIX=-$(git rev-parse --short=8 HEAD)" >> "$GITHUB_ENV"
+            echo "TOMATO_VERSION_SUFFIX=-r$(git rev-list --count HEAD).$(git rev-parse --short=8 HEAD)" >> "$GITHUB_ENV"
           fi
       -
         name: Setup rootless Docker
