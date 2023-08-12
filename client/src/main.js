@@ -53,8 +53,8 @@ if (squirrelCheck || !singleInstanceLock) {
 
   const baseUrl =
     app.isPackaged || isDev
-      ? `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
-      : "http://localhost:3000/"
+      ? "http://localhost:3000/"
+      : `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
   const url = `${baseUrl}?userDataDir=${encodeURIComponent(userDataDir)}&dev=${isDev ? "1" : "0"}`
 
   const createWindow = () => {
@@ -89,84 +89,73 @@ if (squirrelCheck || !singleInstanceLock) {
 
     mainWindowState.manage(win)
 
-
     const menu = Menu.buildFromTemplate([
       // { role: 'appMenu' }
       ...(isMac
-        ? [{
-            label: app.name,
-            submenu: [
-              { role: 'about' },
-              { type: 'separator' },
-              { role: 'services' },
-              { type: 'separator' },
-              { role: 'hide' },
-              { role: 'hideOthers' },
-              { role: 'unhide' },
-              { type: 'separator' },
-              { role: 'quit' }
-            ]
-          }]
+        ? [
+            {
+              label: app.name,
+              submenu: [
+                { role: "about" },
+                { type: "separator" },
+                { role: "services" },
+                { type: "separator" },
+                { role: "hide" },
+                { role: "hideOthers" },
+                { role: "unhide" },
+                { type: "separator" },
+                { role: "quit" }
+              ]
+            }
+          ]
         : []),
       // { role: 'fileMenu' }
       {
-        label: 'File',
-        submenu: [
-          ...(isMac ? [{ role: 'close' }] : [{ role: 'quit' }]),
-        ]
+        label: "File",
+        submenu: [...(isMac ? [{ role: "close" }] : [{ role: "quit" }])]
       },
       // { role: 'editMenu' }
       {
-        label: 'Edit',
+        label: "Edit",
         submenu: [
-          { role: 'undo' },
-          { role: 'redo' },
-          { type: 'separator' },
-          { role: 'cut' },
-          { role: 'copy' },
-          { role: 'paste' },
-          { role: 'delete' },
-          ...(isMac ? [{ role: 'pasteAndMatchStyle' }] : []),
-          { type: 'separator' },
-          { role: 'selectAll' }
+          { role: "undo" },
+          { role: "redo" },
+          { type: "separator" },
+          { role: "cut" },
+          { role: "copy" },
+          { role: "paste" },
+          { role: "delete" },
+          ...(isMac ? [{ role: "pasteAndMatchStyle" }] : []),
+          { type: "separator" },
+          { role: "selectAll" }
         ]
       },
       // { role: 'viewMenu' }
       {
-        label: 'View',
+        label: "View",
         submenu: [
-          ...(isDev ? [
-            { role: 'reload' },
-            { role: 'forceReload' },
-            { role: 'toggleDevTools' },
-            { type: 'separator' },
-          ] : []),
-          { role: 'togglefullscreen' }
+          ...(isDev
+            ? [{ role: "reload" }, { role: "forceReload" }, { role: "toggleDevTools" }, { type: "separator" }]
+            : []),
+          { role: "togglefullscreen" }
         ]
       },
       // { role: 'windowMenu' }
       {
-        label: 'Window',
+        label: "Window",
         submenu: [
-          { role: 'minimize' },
-          { role: 'zoom' },
+          { role: "minimize" },
+          { role: "zoom" },
           ...(isMac
-            ? [
-                { type: 'separator' },
-                { role: 'front' },
-                { type: 'separator' },
-                { role: 'window' }
-              ]
-            : [
-                { role: 'close' }
-              ])
+            ? [{ type: "separator" }, { role: "front" }, { type: "separator" }, { role: "window" }]
+            : [{ role: "close" }])
         ]
       },
       {
-        role: 'help',
+        role: "help",
         submenu: [
           {
-            label: 'Learn More',
+            label: "Learn More",
             click: async () => {
               await shell.openExternal("https://dtcooper.github.io/tomato/")
             }
@@ -255,9 +244,9 @@ if (squirrelCheck || !singleInstanceLock) {
   ipcMain.handle("power-save-blocker", (event, on) => {
     if (on && blocker === null) {
       blocker = powerSaveBlocker.start("prevent-display-sleep")
-      console.log("Turning on power save blocker", blocker)
+      console.log("Turning on power save blocker")
     } else if (!on && blocker !== null) {
-      console.log("Turning off power save blocker", blocker)
+      console.log("Turning off power save blocker")
       powerSaveBlocker.stop(blocker)
       blocker = null
     }
@@ -277,7 +266,7 @@ if (squirrelCheck || !singleInstanceLock) {
   })
 
   if (isLinux) {
-    const dbus = require("@homebridge/dbus-native")  // Don't bundle on mac/windows
+    const dbus = require("@homebridge/dbus-native") // Don't bundle on mac/windows
 
     // Switch night and dark mode on Linux by subscribing to dbus
     dbus

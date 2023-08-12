@@ -49,8 +49,8 @@
   <svelte:fragment slot="title">Settings</svelte:fragment>
   <svelte:fragment slot="close-text">Close settings</svelte:fragment>
   <svelte:fragment slot="content">
-    <div class="grid grid-cols-[max-content_1fr] items-baseline gap-3">
-      <div class="flex items-center justify-end text-lg font-bold">User Interface mode:</div>
+    <div class="grid w-full max-w-full grid-cols-[max-content_auto] items-baseline gap-3">
+      <div class="flex items-center justify-end text-lg font-bold">User interface mode:</div>
       <div class="tabs-boxed tabs w-max">
         {#each ["Simple", "Standard", "Advanced"] as uiMode, index}
           {#if $config.UI_MODES.indexOf(index) !== -1}
@@ -72,21 +72,34 @@
 
       <!-- svelte-ignore missing-declaration -->
       {#if IS_DEV}
-        <div class="flex justify-end text-lg font-bold">Autoplay (dev only):</div>
-        <div class="flex w-max items-center justify-center gap-4 font-mono text-xl font-bold">
+        <div class="flex items-center justify-end text-lg font-bold">Autoplay (dev only):</div>
+        <div class="flex w-max items-center justify-center gap-4 text-xl font-bold">
           <span class:text-error={!$userConfig.autoplay}>OFF</span>
           <input type="checkbox" class="toggle toggle-success toggle-lg" bind:checked={$userConfig.autoplay} />
           <span class:text-success={$userConfig.autoplay}>ON</span>
         </div>
       {/if}
 
-      <div class="flex justify-end text-lg font-bold">Broadcast Compression:</div>
+      <div class="flex items-center justify-end text-lg font-bold">Power save blocker:</div>
       <div
-        class="w-max text-lg"
-        class:text-error={!$config.BROADCAST_COMPRESSION}
-        class:text-success={$config.BROADCAST_COMPRESSION}
+        class="tooltip tooltip-warning tooltip-bottom flex w-max items-center justify-center gap-4 text-xl"
+        data-tip="When on, attempts to suppress your display from going to sleep and your system from suspending while Tomato is running"
       >
-        {$config.BROADCAST_COMPRESSION ? "Enabled" : "Disabled"}
+        <span class="font-bold" class:text-error={!$userConfig.powerSaveBlocker}>OFF</span>
+        <input type="checkbox" class="toggle toggle-success toggle-lg" bind:checked={$userConfig.powerSaveBlocker} />
+        <span class="font-bold" class:text-success={$userConfig.powerSaveBlocker}>ON</span>
+      </div>
+
+      <div class="flex justify-end text-lg font-bold">Broadcast Compression:</div>
+      <div class="w-full text-lg">
+        <span
+          class="font-bold"
+          class:text-error={!$config.BROADCAST_COMPRESSION}
+          class:text-success={$config.BROADCAST_COMPRESSION}
+        >
+          {$config.BROADCAST_COMPRESSION ? "Enabled" : "Disabled"}
+        </span>
+        (configured on server)
       </div>
 
       <div class="flex justify-end text-lg font-bold">Station Admin:</div>

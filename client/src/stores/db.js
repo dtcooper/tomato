@@ -9,7 +9,7 @@ import { WeakRefSet } from "weak-ref-collections"
 import { get, readonly, writable } from "svelte/store"
 
 import { colors } from "../../../server/constants.json"
-import { urlParams, IS_DEV } from "../utils"
+import { IS_DEV, urlParams } from "../utils"
 import { log } from "./client-logs"
 import { config } from "./config"
 import { conn } from "./connection"

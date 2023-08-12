@@ -28,9 +28,9 @@
           on:click|preventDefault={close}>✕</button
         >
       {/if}
-      <div class="flex items-center gap-x-3">
+      <div class="flex items-center gap-x-5">
         <slot name="icon" />
-        <h2 class="text-3xl"><slot name="title" /></h2>
+        <h2 class="font-mono text-3xl font-bold italic"><slot name="title" /></h2>
       </div>
       <slot name="content" />
       {#if canDismiss || $$slots["extra-buttons"]}

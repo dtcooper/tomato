@@ -17,8 +17,8 @@ module.exports = {
         sourceType: "script"
       },
       globals: {
-        TOMATO_VERSION: true,
-      },
+        TOMATO_VERSION: true
+      }
     }
   ],
   parserOptions: {
