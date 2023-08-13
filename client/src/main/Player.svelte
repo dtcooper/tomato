@@ -164,7 +164,7 @@
   })
 </script>
 
-<div class="col-span-2 my-8 flex flex-col gap-5">
+<div class="col-span-2 mb-5 mt-7 flex flex-col gap-5">
   {#if items.length > 0}
     {@const item = items[0]}
 

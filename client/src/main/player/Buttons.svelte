@@ -19,7 +19,19 @@
   export let regenerateNextStopset
 
   $: firstItem = items[0]
+  $: playDisabled =
+    !items.some((item) => item.type === "stopset") || (firstItem.type === "stopset" && firstItem.playing)
+  $: pauseDisabled = firstItem.type !== "stopset" || !firstItem.playing
 </script>
+
+<svelte:window
+  on:keydown={(event) => {
+    if (!playDisabled && event.code === "Space") {
+      play()
+      event.preventDefault()
+    }
+  }}
+/>
 
 <div class="flex items-center justify-center gap-3">
   <button
@@ -33,11 +45,7 @@
     <Icon icon={playCircleOutlineIcon} class="h-12 w-12" /> Play
   </button>
   {#if $userConfig.uiMode >= 1}
-    <button
-      class="btn btn-warning btn-lg pl-3"
-      disabled={firstItem.type !== "stopset" || !firstItem.playing}
-      on:click={pause}
-    >
+    <button class="btn btn-warning btn-lg pl-3" disabled={pauseDisabled} on:click={pause}>
       <Icon icon={pauseCircleOutlineIcon} class="h-12 w-12" /> Pause
     </button>
     <div

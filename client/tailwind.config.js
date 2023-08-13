@@ -24,10 +24,10 @@ const colors = Object.keys(materialUIColors).reduce(
 module.exports = {
   content: ["index.html", "./src/**/*.{html,js,svelte}"],
   theme: {
+    screens: {
+      md: "900px"
+    },
     extend: {
-      minWidth: {
-        sm: "600px"
-      },
       fontFamily: {
         sans: "Inter Local",
         mono: "Space Mono Local"
