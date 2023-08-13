@@ -40,7 +40,7 @@ if (squirrelCheck || !singleInstanceLock) {
     }
   }
 
-  app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors")
+  app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors,HardwareMediaKeyHandling,MediaSessionService")
   app.commandLine.appendSwitch("disable-pinch")
   app.setAboutPanelOptions({
     applicationName: "Tomato Radio Automation\n(Desktop App)",
