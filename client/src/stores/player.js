@@ -306,14 +306,13 @@ export class GeneratedStopset {
 }
 
 export class Wait {
-  static currentWaitInterval = 1
   static currentStopsetOverdueTime = 0
 
-  constructor(doneCallback, updateCallback) {
+  constructor(duration, doneCallback, updateCallback) {
     this.generatedId = currentGeneratedId++
     this.updateCallback = updateCallback || noop
     this.doneCallback = doneCallback || noop
-    this.duration = Wait.currentWaitInterval || 1 // Should never get created if it's 0
+    this.duration = duration
     this.name = "Wait"
     this.elapsed = 0
     this.type = "wait"
@@ -381,7 +380,6 @@ export class Wait {
 }
 
 config.subscribe(($config) => {
-  Wait.currentWaitInterval = $config.WAIT_INTERVAL || 1
   Wait.currentStopsetOverdueTime = $config.STOPSET_OVERDUE_TIME || 0
 })
 

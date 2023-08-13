@@ -413,10 +413,19 @@ CONSTANCE_CONFIG = {
     ),
     "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME": (
         False,
-        mark_safe(
-            "Wait time subtracts the playtime of a stop set in minutes. This will provide more even results, ie the "
-            f"number of stop sets played per hour will be more consistent at the expense of a DJs air time. {_constance_not_implemented_html}"
+        (
+            "Wait time subtracts the playtime of a stop set in minutes. This will provide more even results, ie the"
+            " number of stop sets played per hour will be more consistent at the expense of a DJs air time."
         ),
+    ),
+    "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME_MIN_LENGTH": (
+        600,
+        mark_safe(
+            "When <code>WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME</code> is set to True, wait intervals are of"
+            " variable length. A very long stopset might naively result in a negative wait interval. This setting"
+            " avoids that by setting minimum wait interval length (in seconds)."
+        ),
+        "seconds",
     ),
     "TRIM_SILENCE": (
         True,
@@ -469,6 +478,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
                 "BROADCAST_COMPRESSION",
                 "WAIT_INTERVAL",
                 "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME",
+                "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME_MIN_LENGTH",
                 "WARN_ON_EMPTY_ROTATORS",
                 "STOPSET_ENTITY_NAME",
                 "STOPSET_PRELOAD_COUNT",

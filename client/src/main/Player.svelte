@@ -41,23 +41,29 @@
   }
 
   const addStopset = () => {
-    // If previous item is not a wait interval
-    let shouldPrependWait = $config.WAIT_INTERVAL > 0 && items.length > 0 && items[items.length - 1].type !== "wait"
+    // Prepend a full wait interval IF:
+    // There's nothing in the items list, or the previous item is a stopset
+    // Happens on app start, and when a wait interval is enabled (having previously been 0)
+    if ($config.WAIT_INTERVAL > 0 && (items.length === 0 || items[items.length - 1].type === "stopset")) {
+      items.push(new Wait($config.WAIT_INTERVAL, doneWaiting, updateUI))
+    }
 
-    const secondsUntilPlay = items.reduce(
-      (s, item) => s + item.remaining,
-      shouldPrependWait ? $config.WAIT_INTERVAL : 0
-    )
+    const secondsUntilPlay = items.reduce((s, item) => s + item.remaining, 0)
     const likelyPlayTime = dayjs().add(secondsUntilPlay, "seconds")
     let generatedStopset = $db.generateStopset(likelyPlayTime, processItem, updateUI)
 
     if (generatedStopset) {
-      if (shouldPrependWait) {
-        items.push(new Wait(doneWaiting, updateUI))
-      }
+      // Always add a stopset AND THEN a wait interval
       items.push(generatedStopset)
       if ($config.WAIT_INTERVAL > 0) {
-        items.push(new Wait(doneWaiting, updateUI))
+        let duration = $config.WAIT_INTERVAL
+        if ($config.WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME) {
+          duration = Math.max(
+            duration - generatedStopset.duration,
+            $config.WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME_MIN_LENGTH
+          )
+        }
+        items.push(new Wait(duration, doneWaiting, updateUI))
       }
     } else {
       console.warn("Couldn't generate a stopset!")
@@ -148,10 +154,6 @@
   const skip = () => {
     scrollToTopOfPlaylist()
     items[0].skip()
-  }
-
-  if ($config.WAIT_INTERVAL) {
-    items.push(new Wait(doneWaiting, updateUI))
   }
 
   processItem(0)

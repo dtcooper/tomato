@@ -5,7 +5,7 @@ from unittest.mock import Mock
 
 _django_settings = None
 TYPES_TO_STRING = {
-    int: "Numerica",
+    int: "Numeric",
     decimal.Decimal: "Numeric",
     bool: "Boolean (true or false)",
     str: "String",
