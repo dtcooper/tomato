@@ -112,7 +112,7 @@ if (squirrelCheck || !singleInstanceLock) {
       // { role: 'fileMenu' }
       {
         label: "File",
-        submenu: [...(isMac ? [{ role: "close" }] : [{ role: "quit" }])]
+        submenu: [...(isMac ? [{ role: "close" }] : [{role: "about"}, { role: "quit" }])]
       },
       // { role: 'editMenu' }
       {
