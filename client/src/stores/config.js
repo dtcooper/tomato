@@ -1,7 +1,7 @@
 import { ipcRenderer } from "electron"
 
 import { persisted } from "svelte-local-storage-store"
-import { get, readonly } from "svelte/store"
+import { get, readonly, writable } from "svelte/store"
 
 const config = persisted("config", {})
 const readonlyConfig = readonly(config)
@@ -9,6 +9,7 @@ const readonlyConfig = readonly(config)
 const defaultUserConfig = { uiMode: 0, autoplay: false, powerSaveBlocker: true }
 export const userConfig = persisted("user-config", defaultUserConfig)
 export const resetUserConfig = () => userConfig.set(defaultUserConfig)
+export const isFullscreen = writable(true)
 
 export const setServerConfig = ({ _numeric: numeric, ...newConfig }) => {
   if (numeric) {
@@ -30,5 +31,17 @@ export const setServerConfig = ({ _numeric: numeric, ...newConfig }) => {
 userConfig.subscribe(({ powerSaveBlocker }) => {
   ipcRenderer.invoke("power-save-blocker", powerSaveBlocker)
 })
+
+ipcRenderer.invoke("is-fullscreen").then((response) => {
+  isFullscreen.set(response)
+})
+
+ipcRenderer.on("set-fullscreen", (event, value) => {
+  isFullscreen.set(value)
+})
+
+export const disableFullscreen = () => {
+  ipcRenderer.invoke("disable-fullscreen")
+}
 
 export { readonlyConfig as config }

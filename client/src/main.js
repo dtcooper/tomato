@@ -52,7 +52,7 @@ if (squirrelCheck || !singleInstanceLock) {
   })
 
   const baseUrl =
-    (!app.isPackaged && isDev)
+    !app.isPackaged && isDev
       ? "http://localhost:3000/"
       : `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
   const url = `${baseUrl}?userDataDir=${encodeURIComponent(userDataDir)}&dev=${isDev ? "1" : "0"}`
@@ -112,7 +112,7 @@ if (squirrelCheck || !singleInstanceLock) {
       // { role: 'fileMenu' }
       {
         label: "File",
-        submenu: [...(isMac ? [{ role: "close" }] : [{role: "about"}, { role: "quit" }])]
+        submenu: [...(isMac ? [{ role: "close" }] : [{ role: "about" }, { role: "quit" }])]
       },
       // { role: 'editMenu' }
       {
@@ -223,6 +223,13 @@ if (squirrelCheck || !singleInstanceLock) {
       win.webContents.openDevTools({ mode: "detach" })
     }
 
+    win.on("enter-full-screen", () => {
+      win.webContents.send("set-fullscreen", true)
+    })
+    win.on("leave-full-screen", () => {
+      win.webContents.send("set-fullscreen", false)
+    })
+
     return win
   }
 
@@ -238,6 +245,17 @@ if (squirrelCheck || !singleInstanceLock) {
         extra = "&" + new URLSearchParams(urlParams).toString()
       }
       window.loadURL(`${url}${extra}`)
+    }
+  })
+
+  ipcMain.handle("is-fullscreen", () => {
+    if (window) {
+      return window.isFullScreen()
+    }
+  })
+  ipcMain.handle("disable-fullscreen", () => {
+    if (window) {
+      window.setFullScreen(false)
     }
   })
 

@@ -6,8 +6,9 @@
   import lanDisconnect from "@iconify/icons-mdi/lan-disconnect"
   import autorenew from "@iconify/icons-mdi/autorenew"
   import cogOutline from "@iconify/icons-mdi/cog-outline"
+  import fullscreenExit from "@iconify/icons-mdi/fullscreen-exit"
   import { conn } from "../stores/connection"
-  import { config, userConfig } from "../stores/config"
+  import { config, userConfig, isFullscreen, disableFullscreen } from "../stores/config"
   import { syncProgress } from "../stores/db"
 
   export let showSyncModal = false
@@ -23,6 +24,13 @@
     <div class="flex items-center gap-3">
       {#if $config.UI_MODES.includes(0) && $userConfig.uiMode >= 1}
         <button class="btn btn-accent" on:click={() => ($userConfig.uiMode = 0)}>← Back to simple view</button>
+      {/if}
+      {#if $isFullscreen}
+        <div class="tooltip tooltip-bottom" data-tip="Exit fullscreen mode">
+          <button class="btn btn-circle btn-ghost" on:click={() => disableFullscreen()}>
+            <Icon icon={fullscreenExit} class="h-8 w-8" />
+          </button>
+        </div>
       {/if}
       <div
         class="tooltip tooltip-bottom"
