@@ -413,9 +413,9 @@ CONSTANCE_CONFIG = {
     ),
     "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME": (
         False,
-        (
+        mark_safe(
             "Wait time subtracts the playtime of a stop set in minutes. This will provide more even results, ie the "
-            "number of stop sets played per hour will be more consistent at the expense of a DJs air time."
+            f"number of stop sets played per hour will be more consistent at the expense of a DJs air time. {_constance_not_implemented_html}"
         ),
     ),
     "TRIM_SILENCE": (
