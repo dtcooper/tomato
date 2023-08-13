@@ -96,7 +96,7 @@ Head over to <http://localhost:8888/> in your web browser.
       [the web audio API](https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createMediaElementSource).
 - [x] Any custom django admin pages can [follow this guide](https://dev.to/daiquiri_team/creating-a-custom-page-in-django-admin-4pbd)
 - [x] Flash **whole** screen after configurable time with some messaging ("play the promos, station management has been notified")
-- [ ] Button to get out of fullscreen (useful on Linux)
+- [x] Button to get out of fullscreen (useful on Linux)
 
 ### Future Versions
 
