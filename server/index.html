@@ -594,15 +594,20 @@ heavily leveraging its automatic admin interface.</p>
 <p>Enable broadcast compression, smoothing out dynamic range in audio output.<br><strong>NOTE:</strong> compression is applied at the time you play an audio asset and performed on-the-fly in the desktop app.</p>
 <p>Default: <code>False</code></p>
 </dd>
-<dt><code>WAIT_INTERVAL</code> --- <strong>Type: Numerica</strong></dt>
+<dt><code>WAIT_INTERVAL</code> --- <strong>Type: Numeric</strong></dt>
 <dd>
 <p>Time to wait between stop sets (in seconds). Set to 0 to disable the wait interval entirely.</p>
 <p>Default: <code>1200</code></p>
 </dd>
 <dt><code>WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME</code> --- <strong>Type: Boolean (true or false)</strong></dt>
 <dd>
-<p>Wait time subtracts the playtime of a stop set in minutes. This will provide more even results, ie the number of stop sets played per hour will be more consistent at the expense of a DJs air time. <span style="color: red">(Currently not implemented.)</span></p>
+<p>Wait time subtracts the playtime of a stop set in minutes. This will provide more even results, ie the number of stop sets played per hour will be more consistent at the expense of a DJs air time.</p>
 <p>Default: <code>False</code></p>
+</dd>
+<dt><code>WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME_MIN_LENGTH</code> --- <strong>Type: Numeric</strong></dt>
+<dd>
+<p>When <code>WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME</code> is set to True, wait intervals are of variable length. A very long stopset might naively result in a negative wait interval. This setting avoids that by setting minimum wait interval length (in seconds).</p>
+<p>Default: <code>600</code></p>
 </dd>
 <dt><code>WARN_ON_EMPTY_ROTATORS</code> --- <strong>Type: Boolean (true or false)</strong></dt>
 <dd>
@@ -614,12 +619,12 @@ heavily leveraging its automatic admin interface.</p>
 <p>Override the language in the Desktop app to change the word 'stop set' to something custom</p>
 <p>Default: <code>'stop set'</code></p>
 </dd>
-<dt><code>STOPSET_PRELOAD_COUNT</code> --- <strong>Type: Numerica</strong></dt>
+<dt><code>STOPSET_PRELOAD_COUNT</code> --- <strong>Type: Numeric</strong></dt>
 <dd>
 <p>Number of stopsets to preload in the UI. 2-3 is a good value for this, since new data could make preloaded ones stale.</p>
 <p>Default: <code>2</code></p>
 </dd>
-<dt><code>STOPSET_OVERDUE_TIME</code> --- <strong>Type: Numerica</strong></dt>
+<dt><code>STOPSET_OVERDUE_TIME</code> --- <strong>Type: Numeric</strong></dt>
 <dd>
 <p>The time (in seconds) after the <code>WAIT_INTERVAL</code> after which an "overdue" message will flash. Set to 0 disable.</p>
 <p>Default: <code>0</code></p>
@@ -629,7 +634,7 @@ heavily leveraging its automatic admin interface.</p>
 <p>The overdue message to be displayed when <code>STOPSET_OVERDUE_TIME</code>. <span style="color: red">(Currently not implemented.)</span></p>
 <p>Default: <code>"You're overdue to play the next stopset. Please play it as soon as possible."</code></p>
 </dd>
-<dt><code>NO_REPEAT_ASSETS_TIME</code> --- <strong>Type: Numerica</strong></dt>
+<dt><code>NO_REPEAT_ASSETS_TIME</code> --- <strong>Type: Numeric</strong></dt>
 <dd>
 <p>The time (in seconds) required to elapse for the Desktop app to attempt to not repeat any assets. Set to 0 to disable and allow potential repetition in the randomization algorithm. If there are not enough assets in a rotator to respect this setting, it will be ignored. <span style="color: red">(Currently not implemented.)</span></p>
 <p>Default: <code>0</code></p>
