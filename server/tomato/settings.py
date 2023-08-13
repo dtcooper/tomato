@@ -299,15 +299,6 @@ CONSTANCE_ADDITIONAL_FIELDS = {
             "required": True,
         },
     ),
-    "stopset_overdue_message": (
-        "django.forms.CharField",
-        {
-            "max_length": 250,
-            "widget": "django.forms.TextInput",
-            "widget_kwargs": {"attrs": {"size": 60}},
-            "required": True,
-        },
-    ),
     "stopset_preload_count": (
         "django.forms.IntegerField",
         {
@@ -352,9 +343,9 @@ CONSTANCE_CONFIG = {
     ),
     "END_DATE_PRIORITY_WEIGHT_MULTIPLIER": (
         Decimal(0),
-        mark_safe(
+        (
             "Multiply an asset's weight by this number if it has an end date <strong>and</strong> the current date is"
-            f" the end date. Set to 0 to disable this feature. {_constance_not_implemented_html}"
+            " the end date. Set to 0 to disable this feature."
         ),
         "asset_end_date_priority_weight_multiplier",
     ),
@@ -365,10 +356,10 @@ CONSTANCE_CONFIG = {
     ),
     "NO_REPEAT_ASSETS_TIME": (
         0,
-        mark_safe(
+        (
             "The time (in seconds) required to elapse for the Desktop app to attempt to not repeat any assets. Set to 0"
             " to disable and allow potential repetition in the randomization algorithm. If there are not enough assets"
-            f" in a rotator to respect this setting, it will be ignored. {_constance_not_implemented_html}"
+            " in a rotator to respect this setting, it will be ignored."
         ),
         "seconds",
     ),
@@ -392,14 +383,6 @@ CONSTANCE_CONFIG = {
             " Set to 0 disable."
         ),
         "seconds",
-    ),
-    "STOPSET_OVERDUE_MESSAGE": (
-        "You're overdue to play the next stopset. Please play it as soon as possible.",
-        mark_safe(
-            "The overdue message to be displayed when <code>STOPSET_OVERDUE_TIME</code>."
-            f" {_constance_not_implemented_html}"
-        ),
-        "stopset_overdue_message",
     ),
     "ALLOW_REPEATS_IN_STOPSET": (
         False,
@@ -483,7 +466,6 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
                 "STOPSET_ENTITY_NAME",
                 "STOPSET_PRELOAD_COUNT",
                 "STOPSET_OVERDUE_TIME",
-                "STOPSET_OVERDUE_MESSAGE",
                 "NO_REPEAT_ASSETS_TIME",
                 "ALLOW_REPEATS_IN_STOPSET",
                 "SINGLE_PLAY_ROTATORS",

@@ -139,16 +139,23 @@ class Asset extends AssetStopsetHydratableObject {
   }
 }
 
-const pickRandomItemByWeight = (objects) => {
-  const totalWeight = objects.reduce((weight, obj) => weight + obj.weight, 0)
-  const randomWeight = Math.random() * totalWeight
-  let weight = 0
-  for (const index in objects) {
-    const object = objects[index]
-    if (object.weight + weight > randomWeight) {
-      return object
+const pickRandomItemByWeight = (objects, endDateMultiplier = null, startTime = null) => {
+  objects = objects.map((obj) => {
+    // Apply end date multiplier (if it exists)
+    if (endDateMultiplier && endDateMultiplier > 0 && obj.end && startTime && obj.end.isSame(startTime, "day")) {
+      return [obj, obj.weight * endDateMultiplier]
+    } else {
+      return [obj, obj.weight]
     }
-    weight += object.weight
+  })
+  const totalWeight = objects.reduce((s, [obj, weight]) => s + weight, 0)
+  const randomWeight = Math.random() * totalWeight
+  let cumulativeWeight = 0
+  for (const [obj, weight] of objects) {
+    if (weight + cumulativeWeight > randomWeight) {
+      return obj
+    }
+    cumulativeWeight += weight
   }
   return null
 }
@@ -168,7 +175,7 @@ class Rotator extends HydratableObject {
     this.color = colors.find((c) => c.name === color)
   }
 
-  getAsset(softIgnoreIds = new Set(), hardIgnoreIds = new Set(), startTime) {
+  getAsset(softIgnoreIds = new Set(), hardIgnoreIds = new Set(), startTime, endDateMultiplier) {
     const activeAssets = filterItemsByActive(this.assets, startTime)
     const hardIgnoredAssets = activeAssets.filter((a) => !hardIgnoreIds.has(a.id))
     const softIgnoredAssets = hardIgnoredAssets.filter((a) => !softIgnoreIds.has(a.id))
@@ -178,14 +185,14 @@ class Rotator extends HydratableObject {
       tries.push(activeAssets)
     }
 
-    let asset = pickRandomItemByWeight(softIgnoredAssets)
+    let asset = pickRandomItemByWeight(softIgnoredAssets, endDateMultiplier, startTime)
     if (!asset) {
       console.log(`Failed to get an asset form soft ignores [rotator = ${this.name}]`)
-      asset = pickRandomItemByWeight(hardIgnoredAssets)
+      asset = pickRandomItemByWeight(hardIgnoredAssets, endDateMultiplier, startTime)
       if (!asset) {
         console.log(`Failed to pick an asset from hard ignores [rotator = ${this.name}]`)
         if (get(config).ALLOW_REPEATS_IN_STOPSET) {
-          asset = pickRandomItemByWeight(activeAssets)
+          asset = pickRandomItemByWeight(activeAssets, endDateMultiplier, startTime)
         }
       }
     }
@@ -207,7 +214,7 @@ class RotatorsMap extends Map {
 }
 
 class Stopset extends AssetStopsetHydratableObject {
-  generate(startTime, doneCallback, updateCallback, generatedId) {
+  generate(startTime, endDateMultiplier, doneCallback, updateCallback, generatedId) {
     const hardIgnoreIds = new Set()
     let softIgnoreIds = undefined
 
@@ -223,12 +230,13 @@ class Stopset extends AssetStopsetHydratableObject {
 
     const items = []
     for (const rotator of this.rotators) {
-      const asset = rotator.getAsset(softIgnoreIds, hardIgnoreIds, startTime)
+      const asset = rotator.getAsset(softIgnoreIds, hardIgnoreIds, startTime, endDateMultiplier)
       if (asset) {
         hardIgnoreIds.add(asset.id)
         /// XXX should this be marked by player code only?
         /// Except then the next stopset may include it, so maybe this _is_ the spot for marking
         DB.markPlayed(asset)
+        startTime = startTime.add(asset.duration, "seconds")
       }
       items.push({ rotator, asset })
     }
@@ -309,12 +317,12 @@ class DB {
     }
   }
 
-  generateStopset(startTime, doneCallback, updateCallback, generatedId) {
+  generateStopset(startTime, endDateMultiplier, doneCallback, updateCallback, generatedId) {
     let generated = null
     for (let i = 0; i < 3; i++) {
       const stopset = pickRandomItemByWeight(filterItemsByActive(this.stopsets, startTime))
       if (stopset) {
-        generated = stopset.generate(startTime, doneCallback, updateCallback, generatedId)
+        generated = stopset.generate(startTime, endDateMultiplier, doneCallback, updateCallback, generatedId)
         if (generated.items.some((item) => item.playable)) {
           return generated
         }

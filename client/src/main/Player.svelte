@@ -50,7 +50,12 @@
 
     const secondsUntilPlay = items.reduce((s, item) => s + item.remaining, 0)
     const likelyPlayTime = dayjs().add(secondsUntilPlay, "seconds")
-    let generatedStopset = $db.generateStopset(likelyPlayTime, processItem, updateUI)
+    let generatedStopset = $db.generateStopset(
+      likelyPlayTime,
+      $config.END_DATE_PRIORITY_WEIGHT_MULTIPLIER,
+      processItem,
+      updateUI
+    )
 
     if (generatedStopset) {
       // Always add a stopset AND THEN a wait interval
@@ -86,7 +91,13 @@
       // swap it out, maintaining generatedId so UI doesn't trigger a transition
       const secondsUntilPlay = items.slice(0, nextStopset).reduce((s, item) => s + item.remaining, 0)
       const likelyPlayTime = dayjs().add(secondsUntilPlay, "seconds")
-      let generatedStopset = $db.generateStopset(likelyPlayTime, processItem, updateUI, items[nextStopset].generatedId)
+      let generatedStopset = $db.generateStopset(
+        likelyPlayTime,
+        $config.END_DATE_PRIORITY_WEIGHT_MULTIPLIER,
+        processItem,
+        updateUI,
+        items[nextStopset].generatedId
+      )
       if (generatedStopset) {
         items[nextStopset].done(true) // Mark swap out one as done
         items[nextStopset] = generatedStopset
