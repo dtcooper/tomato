@@ -253,9 +253,9 @@ if (squirrelCheck || !singleInstanceLock) {
       return window.isFullScreen()
     }
   })
-  ipcMain.handle("disable-fullscreen", () => {
+  ipcMain.handle("set-fullscreen", (event, value) => {
     if (window) {
-      window.setFullScreen(false)
+      window.setFullScreen(value)
     }
   })
 

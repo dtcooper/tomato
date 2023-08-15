@@ -40,8 +40,8 @@ ipcRenderer.on("set-fullscreen", (event, value) => {
   isFullscreen.set(value)
 })
 
-export const disableFullscreen = () => {
-  ipcRenderer.invoke("disable-fullscreen")
+export const setFullscreen = (value) => {
+  ipcRenderer.invoke("set-fullscreen", value)
 }
 
 export { readonlyConfig as config }
