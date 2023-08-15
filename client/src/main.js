@@ -295,15 +295,17 @@ if (squirrelCheck || !singleInstanceLock) {
         "org.freedesktop.portal.Settings",
         function (err, notifications) {
           notifications.Read("org.freedesktop.appearance", "color-scheme", function (err, resp) {
-            console.log("Current color-scheme", resp[1][0][1][0])
-            nativeTheme.themeSource = resp[1][0][1][0] ? "dark" : "light"
+            const colorScheme = resp[1][0][1][0] ? "dark" : "light"
+            nativeTheme.themeSource = colorScheme
+            console.log("(linux) Set initial color scheme to", colorScheme)
           })
 
           // dbus signals are EventEmitter events
           notifications.on("SettingChanged", function () {
             if (arguments["0"] == "org.freedesktop.appearance" && arguments["1"] == "color-scheme") {
-              nativeTheme.themeSource = arguments["2"][1][0] ? "dark" : "light"
-              console.log("SettingChanged", arguments)
+              const colorScheme = arguments["2"][1][0] ? "dark" : "light"
+              nativeTheme.themeSource = colorScheme
+              console.log("(linux) Updated color scheme to", colorScheme)
             }
           })
         }

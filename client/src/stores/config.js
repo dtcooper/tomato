@@ -20,7 +20,6 @@ export const setServerConfig = ({ _numeric: numeric, ...newConfig }) => {
   console.log("Got new config", newConfig)
 
   if (newConfig.UI_MODES && newConfig.UI_MODES.indexOf(get(userConfig).uiMode) === -1) {
-    console.log(get(userConfig).uiMode)
     userConfig.update(($userConfig) => {
       return { ...$userConfig, uiMode: Math.min(newConfig.UI_MODES) }
     })

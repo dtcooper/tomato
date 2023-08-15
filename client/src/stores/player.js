@@ -18,6 +18,8 @@ let compressorEnabled = false
 let currentGeneratedId = 0
 const audioContext = new AudioContext()
 
+const progressBarAnimationFramerate = 30
+
 const inputNode = audioContext.createGain()
 inputNode.gain.value = 1
 inputNode.connect(audioContext.destination)
@@ -81,6 +83,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
     this.playable = true
     this.audio = null
     this.error = false
+    this.interval = null
     this._duration = duration
     this.didSkip = false
     this.didLogError = false
@@ -134,6 +137,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   }
 
   unloadAudio() {
+    clearInterval(this.interval)
     if (this.audio) {
       this.audio.ondurationchange = this.audio.ontimeupdate = this.audio.onended = this.audio.onended = null
       this.audio.pause()
@@ -172,11 +176,19 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
     } else {
       this.playing = true
       this.audio.play().catch((e) => this._errorHelper(e))
+      clearInterval(this.interval)
+      this.interval = setInterval(() => {
+        if (this.audio) {
+          this._elapsed = this.audio.currentTime
+          this.updateCallback()
+        }
+      }, progressBarAnimationFramerate)
     }
     this.updateCallback()
   }
 
   done() {
+    clearInterval(this.interval)
     log(
       this.didSkip ? "skipped_asset" : "played_asset",
       `[Stopset=${this.generatedStopset.name}] [Rotator=${this.rotator.name}] [Asset=${this.name}]`
@@ -191,6 +203,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   }
 
   pause() {
+    clearInterval(this.interval)
     this.playing = false
     this.audio.pause()
     this.updateCallback()
@@ -284,7 +297,6 @@ export class GeneratedStopset {
     this.playing = false
     this.unloadAudio()
     if (!skipCallback) {
-      console.log("calling done callback")
       this.doneCallback()
     }
     if (!this.didLog) {
@@ -345,7 +357,7 @@ export class Wait {
         this.doneCountdown()
       }
       this.updateCallback()
-    }, 50)
+    }, progressBarAnimationFramerate)
   }
 
   doneCountdown() {

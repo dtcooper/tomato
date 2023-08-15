@@ -93,7 +93,6 @@ class Asset extends AssetStopsetHydratableObject {
       tmpPath,
       tmpBasename: path.basename(tmpPath)
     }
-    // TODO: override weight via END_DATE_PRIORITY_WEIGHT_MULTIPLIER
   }
 
   async download() {

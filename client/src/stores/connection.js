@@ -7,7 +7,6 @@ import { acknowledgeLog, log, sendPendingLogs } from "./client-logs"
 import { resetUserConfig, setServerConfig } from "./config"
 import { clearAssetsDB, clearSoftIgnoredAssets, syncAssetsDB } from "./db"
 
-// TODO this is a mess, connecting + connected SHOULD NOT be persisted, they are ephemeral
 const connPersisted = persisted("conn", {
   username: "",
   password: "",

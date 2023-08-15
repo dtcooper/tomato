@@ -56,7 +56,7 @@
   const addStopset = () => {
     // Prepend a full wait interval IF:
     // There's nothing in the items list, or the previous item is a stopset
-    // Happens on app start, and when a wait interval is enabled (having previously been 0)
+    // Happens on app start, and when a wait interval is skipped or enabled (having previously been 0)
     if ($config.WAIT_INTERVAL > 0 && (items.length === 0 || items[items.length - 1].type === "stopset")) {
       items.push(new Wait($config.WAIT_INTERVAL, doneWaiting, updateUI))
     }
@@ -76,7 +76,9 @@
             $config.WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME_MIN_LENGTH
           )
         }
-        items.push(new Wait(duration, doneWaiting, updateUI))
+        if (duration > 0) {
+          items.push(new Wait(duration, doneWaiting, updateUI))
+        }
       }
     } else {
       console.warn("Couldn't generate a stopset!")
@@ -146,7 +148,6 @@
     if (nextItem.type === "wait") {
       nextItem.run()
     } else if (nextItem.type === "stopset" && (play || (IS_DEV && $userConfig.autoplay))) {
-      console.log("processItem(): playing first stopset")
       nextItem.play()
     }
   }

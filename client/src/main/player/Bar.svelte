@@ -9,7 +9,7 @@
     await tick()
     if (el.clientWidth - el.firstChild.clientWidth - 10 < 0) {
       el.firstChild.remove()
-      console.log("too big!")
+      console.log("Duration for element too big! Hiding.")
     }
   }
 </script>

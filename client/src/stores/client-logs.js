@@ -30,7 +30,7 @@ export const sendPendingLogs = (forceClear = false) => {
     if (authenticated && connected) {
       for (const [id, data] of entries) {
         messageServer("log", { id, ...data })
-        console.log("Sending", { id, ...data })
+        console.log("Sending log:", { id, ...data })
       }
     }
   }

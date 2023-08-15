@@ -83,7 +83,7 @@
       <div class="flex items-center justify-end text-lg font-bold">Power save blocker:</div>
       <div
         class="tooltip tooltip-warning tooltip-bottom flex w-max items-center justify-center gap-4 text-xl"
-        data-tip="When on, attempts to suppress your display from going to sleep and your system from suspending while Tomato is running"
+        data-tip="When set to ON, Tomato attempts to suppress your display from going to sleep and your system from suspending"
       >
         <span class="font-bold" class:text-error={!$userConfig.powerSaveBlocker}>OFF</span>
         <input type="checkbox" class="toggle toggle-success toggle-lg" bind:checked={$userConfig.powerSaveBlocker} />
