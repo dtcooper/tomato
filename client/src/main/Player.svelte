@@ -36,8 +36,21 @@
     document.getElementById("playlist").scroll({ top: 0, behavior: "smooth" })
   }
 
-  window.durationOfItems = () => {
-    return items.reduce((s, item) => s + item.remaining, 0)
+  const generateStopsetHelper = (likelyPlayTime, generatedId) => {
+    return $db.generateStopset(
+      likelyPlayTime,
+      // Medium ignored assets (everything at exists on the screen right now in items list)
+      new Set(
+        items
+          .filter((i) => i.type === "stopset")
+          .map((s) => s.items.map((a) => a.id))
+          .flat(1)
+      ),
+      $config.END_DATE_PRIORITY_WEIGHT_MULTIPLIER,
+      processItem,
+      updateUI,
+      generatedId
+    )
   }
 
   const addStopset = () => {
@@ -50,12 +63,7 @@
 
     const secondsUntilPlay = items.reduce((s, item) => s + item.remaining, 0)
     const likelyPlayTime = dayjs().add(secondsUntilPlay, "seconds")
-    let generatedStopset = $db.generateStopset(
-      likelyPlayTime,
-      $config.END_DATE_PRIORITY_WEIGHT_MULTIPLIER,
-      processItem,
-      updateUI
-    )
+    let generatedStopset = generateStopsetHelper(likelyPlayTime)
 
     if (generatedStopset) {
       // Always add a stopset AND THEN a wait interval
@@ -91,13 +99,7 @@
       // swap it out, maintaining generatedId so UI doesn't trigger a transition
       const secondsUntilPlay = items.slice(0, nextStopset).reduce((s, item) => s + item.remaining, 0)
       const likelyPlayTime = dayjs().add(secondsUntilPlay, "seconds")
-      let generatedStopset = $db.generateStopset(
-        likelyPlayTime,
-        $config.END_DATE_PRIORITY_WEIGHT_MULTIPLIER,
-        processItem,
-        updateUI,
-        items[nextStopset].generatedId
-      )
+      let generatedStopset = generateStopsetHelper(likelyPlayTime, items[nextStopset].generatedId)
       if (generatedStopset) {
         items[nextStopset].done(true) // Mark swap out one as done
         items[nextStopset] = generatedStopset

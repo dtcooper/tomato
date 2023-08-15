@@ -5,6 +5,7 @@ import { derived, get, writable } from "svelte/store"
 import { prettyDuration } from "../utils"
 import { log } from "./client-logs"
 import { config } from "./config"
+import { markPlayed } from "./db"
 
 export const speaker = persisted("speaker", null)
 export const speakers = writable([])
@@ -163,7 +164,8 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   }
 
   play() {
-    console.log(`Playing ${this.name}`)
+    console.log(`Playing ${this.id}: ${this.name}`)
+    markPlayed(this)
 
     if (this.error) {
       this.done()

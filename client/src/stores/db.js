@@ -175,30 +175,44 @@ class Rotator extends HydratableObject {
     this.color = colors.find((c) => c.name === color)
   }
 
-  getAsset(softIgnoreIds = new Set(), hardIgnoreIds = new Set(), startTime, endDateMultiplier) {
+  getAsset(
+    softIgnoreIds = new Set(),
+    mediumIgnoreIds = new Set(),
+    hardIgnoreIds = new Set(),
+    startTime,
+    endDateMultiplier
+  ) {
+    // soft ignored = played within a recent amount of time
+    // medium ignored = exists on screen already
+    // hard ignored = exists within the stopset being generated
     const activeAssets = filterItemsByActive(this.assets, startTime)
     const hardIgnoredAssets = activeAssets.filter((a) => !hardIgnoreIds.has(a.id))
-    const softIgnoredAssets = hardIgnoredAssets.filter((a) => !softIgnoreIds.has(a.id))
+    const mediumIgnoredAssets = hardIgnoredAssets.filter((a) => !mediumIgnoreIds.has(a.id))
+    const softIgnoredAssets = mediumIgnoredAssets.filter((a) => !softIgnoreIds.has(a.id))
 
-    const tries = [softIgnoredAssets, hardIgnoredAssets]
+    const tries = [
+      ["soft ignored", softIgnoredAssets],
+      ["medium ignored", mediumIgnoredAssets],
+      ["hard ignored", hardIgnoredAssets]
+    ]
     if (get(config).ALLOW_REPEATS_IN_STOPSET) {
-      tries.push(activeAssets)
+      // ignore hard ignored
+      tries.push(["all active", activeAssets])
     }
 
-    let asset = pickRandomItemByWeight(softIgnoredAssets, endDateMultiplier, startTime)
-    if (!asset) {
-      console.log(`Failed to get an asset form soft ignores [rotator = ${this.name}]`)
-      asset = pickRandomItemByWeight(hardIgnoredAssets, endDateMultiplier, startTime)
-      if (!asset) {
-        console.log(`Failed to pick an asset from hard ignores [rotator = ${this.name}]`)
-        if (get(config).ALLOW_REPEATS_IN_STOPSET) {
-          asset = pickRandomItemByWeight(activeAssets, endDateMultiplier, startTime)
-        }
+    let asset = null
+    let assetListName = ""
+
+    for (const [name, assets] of tries) {
+      asset = pickRandomItemByWeight(assets, endDateMultiplier, startTime)
+      if (asset) {
+        assetListName = name
+        break
       }
     }
 
     if (asset) {
-      console.log(`Picked asset ${asset.id} [rotator = ${this.name}]`)
+      console.log(`Picked asset ${asset.id} from ${assetListName} asset list: ${asset.name} [rotator = ${this.name}]`)
     } else {
       console.warn(`Failed to pick an asset entirely! [rotator = ${this.name}]`)
     }
@@ -214,7 +228,7 @@ class RotatorsMap extends Map {
 }
 
 class Stopset extends AssetStopsetHydratableObject {
-  generate(startTime, endDateMultiplier, doneCallback, updateCallback, generatedId) {
+  generate(startTime, mediumIgnoreIds, endDateMultiplier, doneCallback, updateCallback, generatedId) {
     const hardIgnoreIds = new Set()
     let softIgnoreIds = undefined
 
@@ -230,12 +244,9 @@ class Stopset extends AssetStopsetHydratableObject {
 
     const items = []
     for (const rotator of this.rotators) {
-      const asset = rotator.getAsset(softIgnoreIds, hardIgnoreIds, startTime, endDateMultiplier)
+      const asset = rotator.getAsset(softIgnoreIds, mediumIgnoreIds, hardIgnoreIds, startTime, endDateMultiplier)
       if (asset) {
         hardIgnoreIds.add(asset.id)
-        /// XXX should this be marked by player code only?
-        /// Except then the next stopset may include it, so maybe this _is_ the spot for marking
-        DB.markPlayed(asset)
         startTime = startTime.add(asset.duration, "seconds")
       }
       items.push({ rotator, asset })
@@ -317,12 +328,19 @@ class DB {
     }
   }
 
-  generateStopset(startTime, endDateMultiplier, doneCallback, updateCallback, generatedId) {
+  generateStopset(startTime, mediumIgnoreIds, endDateMultiplier, doneCallback, updateCallback, generatedId) {
     let generated = null
     for (let i = 0; i < 3; i++) {
       const stopset = pickRandomItemByWeight(filterItemsByActive(this.stopsets, startTime))
       if (stopset) {
-        generated = stopset.generate(startTime, endDateMultiplier, doneCallback, updateCallback, generatedId)
+        generated = stopset.generate(
+          startTime,
+          mediumIgnoreIds,
+          endDateMultiplier,
+          doneCallback,
+          updateCallback,
+          generatedId
+        )
         if (generated.items.some((item) => item.playable)) {
           return generated
         }
@@ -420,5 +438,7 @@ export const clearSoftIgnoredAssets = () => {
   DB._assetPlayTimes = new Map()
   window.localStorage.removeItem("soft-ignored-ids")
 }
+
+export const markPlayed = (asset) => DB.markPlayed(asset)
 
 setInterval(() => DB.cleanup(), 45 * 60 * 60) // Clean up every 45 minutes

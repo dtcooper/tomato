@@ -7,7 +7,7 @@
   import autorenew from "@iconify/icons-mdi/autorenew"
   import cogOutline from "@iconify/icons-mdi/cog-outline"
   import fullscreenExit from "@iconify/icons-mdi/fullscreen-exit"
-  import fullscreenIcon from '@iconify/icons-mdi/fullscreen'
+  import fullscreenIcon from "@iconify/icons-mdi/fullscreen"
   import { conn } from "../stores/connection"
   import { config, userConfig, isFullscreen, setFullscreen } from "../stores/config"
   import { syncProgress } from "../stores/db"
@@ -26,7 +26,7 @@
       {#if $config.UI_MODES.includes(0) && $userConfig.uiMode >= 1}
         <button class="btn btn-accent" on:click={() => ($userConfig.uiMode = 0)}>← Back to simple view</button>
       {/if}
-      <div class="tooltip tooltip-bottom" data-tip={`${$isFullscreen ? 'Exit' : 'Enter'} fullscreen mode`}>
+      <div class="tooltip tooltip-bottom" data-tip={`${$isFullscreen ? "Exit" : "Enter"} fullscreen mode`}>
         <button class="btn btn-circle btn-ghost" on:click={() => setFullscreen(!$isFullscreen)}>
           <Icon icon={$isFullscreen ? fullscreenExit : fullscreenIcon} class="h-8 w-8" />
         </button>
