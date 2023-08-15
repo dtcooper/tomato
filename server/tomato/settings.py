@@ -322,7 +322,7 @@ CONSTANCE_CONFIG = {
     "SINGLE_PLAY_ROTATORS": (
         [],
         mark_safe(
-            "Optional rotators to play a single asset from in the Desktop app. You can choose a maximum of 3."
+            "Optional rotators to play a single asset from in the Desktop app. You can choose a maximum of 8."
             f" {_constance_not_implemented_html}"
         ),
         "single_play_rotators",
@@ -330,36 +330,40 @@ CONSTANCE_CONFIG = {
     "BROADCAST_COMPRESSION": (
         False,
         mark_safe(
-            "Enable broadcast compression, smoothing out dynamic range in audio output.<br><strong>NOTE:</strong> "
-            "compression is applied at the time you play an audio asset and performed on-the-fly in the desktop app."
+            "Enable broadcast compression when <code>True</code>, smoothing out dynamic range in audio"
+            " output.<br><strong>NOTE:</strong> compression is applied at the time you play an audio asset and"
+            " performed on-the-fly in the desktop app."
         ),
     ),
     "EXTRACT_METADATA_FROM_FILE": (
         True,
-        (
-            "Attempt to extract metadata from audio file, if this is set to False the system just uses filename. For"
-            " example with mp3s, metadata would extracted from an ID3 tag."
+        mark_safe(
+            "Attempt to extract metadata from audio file when <code>True</code>, if this is set to <code>False</code>"
+            " the system just uses filename. For example with mp3s, metadata would extracted from an ID3 tag."
         ),
     ),
     "END_DATE_PRIORITY_WEIGHT_MULTIPLIER": (
         Decimal(0),
-        (
+        mark_safe(
             "Multiply an asset's weight by this number if it has an end date <strong>and</strong> the current date is"
-            " the end date. Set to 0 to disable this feature."
+            " the end date. <strong>Set to 0 to disable</strong> this feature."
         ),
         "asset_end_date_priority_weight_multiplier",
     ),
     "WAIT_INTERVAL": (
         20 * 60,  # 20 minutes
-        "Time to wait between stop sets (in seconds). Set to 0 to disable the wait interval entirely.",
+        mark_safe(
+            "Time to wait between stop sets (in seconds). <strong>Set to 0 to disable</strong> the wait interval"
+            " entirely."
+        ),
         "seconds",
     ),
     "NO_REPEAT_ASSETS_TIME": (
         0,
-        (
-            "The time (in seconds) required to elapse for the Desktop app to attempt to not repeat any assets. Set to 0"
-            " to disable and allow potential repetition in the randomization algorithm. If there are not enough assets"
-            " in a rotator to respect this setting, it will be ignored."
+        mark_safe(
+            "The time (in seconds) required to elapse for the Desktop app to attempt to not repeat any assets."
+            " <strong>Set to 0 to disable</strong> and allow potential repetition in the randomization algorithm. If"
+            " there are not enough assets in a rotator to respect this setting, it will be ignored."
         ),
         "seconds",
     ),
@@ -371,8 +375,8 @@ CONSTANCE_CONFIG = {
     "STOPSET_PRELOAD_COUNT": (
         2,
         (
-            "Number of stopsets to preload in the UI. 2-3 is a good value for this, since new data could make preloaded"
-            " ones stale."
+            "Number of stopsets to preload in the UI. 2 or 3 are good values for this, since new data could make"
+            " preloaded ones stale."
         ),
         "stopset_preload_count",
     ),
@@ -380,7 +384,7 @@ CONSTANCE_CONFIG = {
         0,
         mark_safe(
             'The time (in seconds) after the <code>WAIT_INTERVAL</code> after which an "overdue" message will flash.'
-            " Set to 0 disable."
+            " <strong>Set to 0 disable</strong>."
         ),
         "seconds",
     ),
@@ -390,39 +394,41 @@ CONSTANCE_CONFIG = {
             mark_safe(
                 "The randomization algorithm will try its absolute best to avoid duplicates. However, when that's not"
                 " possible (for example because of a nearly empty rotator), do you want <strong>the same asset</strong>"
-                " to repeat, or for the rotator to be ignored in a given stop set?"
+                " to repeat (<code>True</code>), or for the rotator to be ignored in a given stop set"
+                " (<code>False</code>?"
             )
         ),
     ),
     "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME": (
         False,
-        (
-            "Wait time subtracts the playtime of a stop set in minutes. This will provide more even results, ie the"
-            " number of stop sets played per hour will be more consistent at the expense of a DJs air time."
+        mark_safe(
+            "Wait time subtracts the playtime of a stop set in minutes when <code>True</code>. When enabled Tomato will"
+            " provide more even results, ie the number of stop sets played per hour will be more consistent at the"
+            " possible expense of an individual DJs air time."
         ),
     ),
     "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME_MIN_LENGTH": (
         600,
         mark_safe(
-            "When <code>WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME</code> is set to True, wait intervals are of"
-            " variable length. A very long stopset might naively result in a negative wait interval. This setting"
-            " avoids that by setting minimum wait interval length (in seconds)."
+            "When <code>WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME</code> is set to <code>True</code>, wait"
+            " intervals are of variable length. A very long stopset might naively result in a negative wait interval."
+            " This setting avoids that by setting minimum wait interval length (in seconds)."
         ),
         "seconds",
     ),
     "TRIM_SILENCE": (
         True,
         mark_safe(
-            "Trim silence from the beginning and end of audio files. Since this processing is done on the server, it's"
-            " applied <strong>only</strong> at the time an audio file is uploaded. This means files will have silence"
-            " trimmed (or not) according to this setting at the time of upload."
+            "Trim silence from the beginning and end of audio files when <code>True</code>. Since this processing is"
+            " done on the server, it's applied <strong>only</strong> at the time an audio file is uploaded. This means"
+            " files will have silence trimmed (or not) according to this setting at the time of upload."
         ),
     ),
     "PREVENT_DUPLICATE_ASSETS": (
         True,
-        (
-            "Prevent duplicate audio assets from being uploaded when set. If not set, you may have multiple audio"
-            " assets with the same underlying audio file."
+        mark_safe(
+            "Prevent duplicate audio assets from being uploaded when <code>True</code>. If <code>False</code>, you may"
+            " have multiple audio assets with the same underlying audio file."
         ),
     ),
     "AUDIO_BITRATE": (
