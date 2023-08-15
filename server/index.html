@@ -571,17 +571,17 @@ heavily leveraging its automatic admin interface.</p>
 </dd>
 <dt><code>EXTRACT_METADATA_FROM_FILE</code> --- <strong>Type: Boolean (true or false)</strong></dt>
 <dd>
-<p>Attempt to extract metadata from audio file, if this is set to False the system just uses filename. For example with mp3s, metadata would extracted from an ID3 tag.</p>
+<p>Attempt to extract metadata from audio file when <code>True</code>, if this is set to <code>False</code> the system just uses filename. For example with mp3s, metadata would extracted from an ID3 tag.</p>
 <p>Default: <code>True</code></p>
 </dd>
 <dt><code>PREVENT_DUPLICATE_ASSETS</code> --- <strong>Type: Boolean (true or false)</strong></dt>
 <dd>
-<p>Prevent duplicate audio assets from being uploaded when set. If not set, you may have multiple audio assets with the same underlying audio file.</p>
+<p>Prevent duplicate audio assets from being uploaded when <code>True</code>. If <code>False</code>, you may have multiple audio assets with the same underlying audio file.</p>
 <p>Default: <code>True</code></p>
 </dd>
 <dt><code>TRIM_SILENCE</code> --- <strong>Type: Boolean (true or false)</strong></dt>
 <dd>
-<p>Trim silence from the beginning and end of audio files. Since this processing is done on the server, it's applied <strong>only</strong> at the time an audio file is uploaded. This means files will have silence trimmed (or not) according to this setting at the time of upload.</p>
+<p>Trim silence from the beginning and end of audio files when <code>True</code>. Since this processing is done on the server, it's applied <strong>only</strong> at the time an audio file is uploaded. This means files will have silence trimmed (or not) according to this setting at the time of upload.</p>
 <p>Default: <code>True</code></p>
 </dd>
 </dl>
@@ -591,22 +591,22 @@ heavily leveraging its automatic admin interface.</p>
 <dl>
 <dt><code>BROADCAST_COMPRESSION</code> --- <strong>Type: Boolean (true or false)</strong></dt>
 <dd>
-<p>Enable broadcast compression, smoothing out dynamic range in audio output.<br><strong>NOTE:</strong> compression is applied at the time you play an audio asset and performed on-the-fly in the desktop app.</p>
+<p>Enable broadcast compression when <code>True</code>, smoothing out dynamic range in audio output.<br><strong>NOTE:</strong> compression is applied at the time you play an audio asset and performed on-the-fly in the desktop app.</p>
 <p>Default: <code>False</code></p>
 </dd>
 <dt><code>WAIT_INTERVAL</code> --- <strong>Type: Numeric</strong></dt>
 <dd>
-<p>Time to wait between stop sets (in seconds). Set to 0 to disable the wait interval entirely.</p>
+<p>Time to wait between stop sets (in seconds). <strong>Set to 0 to disable</strong> the wait interval entirely.</p>
 <p>Default: <code>1200</code></p>
 </dd>
 <dt><code>WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME</code> --- <strong>Type: Boolean (true or false)</strong></dt>
 <dd>
-<p>Wait time subtracts the playtime of a stop set in minutes. This will provide more even results, ie the number of stop sets played per hour will be more consistent at the expense of a DJs air time.</p>
+<p>Wait time subtracts the playtime of a stop set in minutes when <code>True</code>. When enabled Tomato will provide more even results, ie the number of stop sets played per hour will be more consistent at the possible expense of an individual DJs air time.</p>
 <p>Default: <code>False</code></p>
 </dd>
 <dt><code>WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME_MIN_LENGTH</code> --- <strong>Type: Numeric</strong></dt>
 <dd>
-<p>When <code>WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME</code> is set to True, wait intervals are of variable length. A very long stopset might naively result in a negative wait interval. This setting avoids that by setting minimum wait interval length (in seconds).</p>
+<p>When <code>WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME</code> is set to <code>True</code>, wait intervals are of variable length. A very long stopset might naively result in a negative wait interval. This setting avoids that by setting minimum wait interval length (in seconds).</p>
 <p>Default: <code>600</code></p>
 </dd>
 <dt><code>WARN_ON_EMPTY_ROTATORS</code> --- <strong>Type: Boolean (true or false)</strong></dt>
@@ -621,32 +621,32 @@ heavily leveraging its automatic admin interface.</p>
 </dd>
 <dt><code>STOPSET_PRELOAD_COUNT</code> --- <strong>Type: Numeric</strong></dt>
 <dd>
-<p>Number of stopsets to preload in the UI. 2-3 is a good value for this, since new data could make preloaded ones stale.</p>
+<p>Number of stopsets to preload in the UI. 2 or 3 are good values for this, since new data could make preloaded ones stale.</p>
 <p>Default: <code>2</code></p>
 </dd>
 <dt><code>STOPSET_OVERDUE_TIME</code> --- <strong>Type: Numeric</strong></dt>
 <dd>
-<p>The time (in seconds) after the <code>WAIT_INTERVAL</code> after which an "overdue" message will flash. Set to 0 disable.</p>
+<p>The time (in seconds) after the <code>WAIT_INTERVAL</code> after which an "overdue" message will flash. <strong>Set to 0 disable</strong>.</p>
 <p>Default: <code>0</code></p>
 </dd>
 <dt><code>NO_REPEAT_ASSETS_TIME</code> --- <strong>Type: Numeric</strong></dt>
 <dd>
-<p>The time (in seconds) required to elapse for the Desktop app to attempt to not repeat any assets. Set to 0 to disable and allow potential repetition in the randomization algorithm. If there are not enough assets in a rotator to respect this setting, it will be ignored.</p>
+<p>The time (in seconds) required to elapse for the Desktop app to attempt to not repeat any assets. <strong>Set to 0 to disable</strong> and allow potential repetition in the randomization algorithm. If there are not enough assets in a rotator to respect this setting, it will be ignored.</p>
 <p>Default: <code>0</code></p>
 </dd>
 <dt><code>ALLOW_REPEATS_IN_STOPSET</code> --- <strong>Type: Boolean (true or false)</strong></dt>
 <dd>
-<p>The randomization algorithm will try its absolute best to avoid duplicates. However, when that's not possible (for example because of a nearly empty rotator), do you want <strong>the same asset</strong> to repeat, or for the rotator to be ignored in a given stop set?</p>
+<p>The randomization algorithm will try its absolute best to avoid duplicates. However, when that's not possible (for example because of a nearly empty rotator), do you want <strong>the same asset</strong> to repeat (<code>True</code>), or for the rotator to be ignored in a given stop set (<code>False</code>?</p>
 <p>Default: <code>False</code></p>
 </dd>
 <dt><code>SINGLE_PLAY_ROTATORS</code> --- <strong>Type: One or more rotators</strong></dt>
 <dd>
-<p>Optional rotators to play a single asset from in the Desktop app. You can choose a maximum of 3. <span style="color: red">(Currently not implemented.)</span></p>
+<p>Optional rotators to play a single asset from in the Desktop app. You can choose a maximum of 8. <span style="color: red">(Currently not implemented.)</span></p>
 <p>Default: <code>None</code></p>
 </dd>
 <dt><code>END_DATE_PRIORITY_WEIGHT_MULTIPLIER</code> --- <strong>Type: Numeric</strong></dt>
 <dd>
-<p>Multiply an asset's weight by this number if it has an end date <strong>and</strong> the current date is the end date. Set to 0 to disable this feature.</p>
+<p>Multiply an asset's weight by this number if it has an end date <strong>and</strong> the current date is the end date. <strong>Set to 0 to disable</strong> this feature.</p>
 <p>Default: <code>0</code></p>
 </dd>
 </dl>
