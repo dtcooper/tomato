@@ -27,6 +27,8 @@ or can be download below.
     &mdash; package in `.deb` format (amd64 only)
     * [:material-download: Arch :simple-archlinux: or Manjaro :simple-manjaro:](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux-x86_64.pkg.tar.zst)
     &mdash; package in `.pkg.tar.zst` format (amd64 only)
+    * [:material-download: Raspberry Pi :simple-raspberrypi:](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_arm64.deb)
+    &mdash; arm64 `.deb` package suitable for Raspberry Pi
 
 !!! danger "Unsigned Binaries"
     The above releases are **not signed** nor **notaraized**, which means
