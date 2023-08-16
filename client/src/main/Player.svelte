@@ -179,7 +179,7 @@
     // Runs on first load as well
     if (items.length === 0) {
       // When we get new data from server, if items is empty, regenerate stopset
-      processItem(0, false)
+      processItem(0)
     }
   })
 </script>
