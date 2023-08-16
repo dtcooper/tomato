@@ -15,7 +15,7 @@ import { config } from "./config"
 import { conn } from "./connection"
 import { GeneratedStopset } from "./player"
 
-const assetsDir = urlParams.userDataDir
+const assetsDir = path.join(urlParams.userDataDir, "assets")
 
 const emptySyncProgress = { syncing: false, total: -1, index: -1, percent: 0, item: "" }
 const syncProgress = writable(emptySyncProgress)
@@ -440,4 +440,4 @@ export const clearSoftIgnoredAssets = () => {
 
 export const markPlayed = (asset) => DB.markPlayed(asset)
 
-setInterval(() => DB.cleanup(), 45 * 60 * 60) // Clean up every 45 minutes
+setInterval(() => DB.cleanup(), IS_DEV ? 15 * 1000 : 45 * 60 * 1000) // Clean up every 45 minutes
