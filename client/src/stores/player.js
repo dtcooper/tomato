@@ -47,7 +47,6 @@ class GeneratedStopsetAssetBase {
     this.generatedStopset = generatedStopset
     this.index = index
     this.error = false
-    this.finished = false
     this.playing = false
   }
 
@@ -59,14 +58,23 @@ class GeneratedStopsetAssetBase {
     return this.rotator.color
   }
 
+  get beforeActive() {
+    return this.generatedStopset.current > this.index
+  }
   get active() {
     return this.generatedStopset.current === this.index
   }
+  get afterActive() {
+    return this.generatedStopset.current < this.index
+  }
+  get finished() {
+    return this.beforeActive
+  }
 
   done() {
-    this.finished = true
     this.playing = false
     this.generatedStopset.donePlaying()
+    this.updateCallback()
   }
 }
 
@@ -113,14 +121,13 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   }
 
   get elapsed() {
-    return this.error ? 0 : this._elapsed
+    return this.error ? 0 : this.beforeActive ? this.duration : this._elapsed
   }
 
   loadAudio() {
     if (!this.audio) {
       this.audio = PlayableAsset.getAudioObject()
 
-      // TODO set duration quicker than this using an interval for smoother UI?
       this.audio.ondurationchange = () => {
         this._duration = this.audio.duration
         this.updateCallback()
@@ -198,8 +205,8 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
 
   skip() {
     this.didSkip = true
-    this.play()
-    this.audio.currentTime = this.audio.duration
+    this.pause()
+    this.done()
   }
 
   pause() {
@@ -293,20 +300,30 @@ export class GeneratedStopset {
     this.updateCallback()
   }
 
-  done(skipCallback = false) {
+  done(skipCallback = false, skipLog = false) {
     this.playing = false
     this.unloadAudio()
     if (!skipCallback) {
       this.doneCallback()
     }
-    if (!this.didLog) {
+    if (!skipLog && !this.didLog) {
       this.didLog = true
       log(this.didSkip ? "skipped_stopset" : "played_stopset", `[Stopset=${this.name}]`)
     }
   }
 
-  play() {
+  play(subindex = null) {
     this.loadAudio()
+    if (subindex !== null) {
+      this.didSkip = this.didSkip || subindex !== this.current
+      this.items.slice(this.current, subindex).forEach((item) => {
+        log("skipped_asset", `[Stopset=${this.name}] [Rotator=${item.rotator.name}] [Asset=${item.name}]`)
+        if (item.playable) {
+          item.pause()
+        }
+      })
+      this.current = subindex
+    }
     this.playing = this.startedPlaying = true
     this.items[this.current].play()
     this.updateCallback()
@@ -375,11 +392,11 @@ export class Wait {
     }
   }
 
-  done(skipCallback) {
+  done(skipCallback, skipLog = false) {
     // Must be able to be called twice
     clearInterval(this.interval)
 
-    if (!this.didLog) {
+    if (!skipLog && !this.didLog) {
       this.didLog = true
       log("waited", `waited for ${prettyDuration(this.elapsed + this.overtimeElapsed)}`)
       if (this.overdue) {

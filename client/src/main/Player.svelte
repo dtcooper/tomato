@@ -57,15 +57,16 @@
     // Prepend a full wait interval IF:
     // There's nothing in the items list, or the previous item is a stopset
     // Happens on app start, and when a wait interval is skipped or enabled (having previously been 0)
-    if ($config.WAIT_INTERVAL > 0 && (items.length === 0 || items[items.length - 1].type === "stopset")) {
-      items.push(new Wait($config.WAIT_INTERVAL, doneWaiting, updateUI))
-    }
+    const prependWait = $config.WAIT_INTERVAL > 0 && (items.length === 0 || items[items.length - 1].type === "stopset")
 
     const secondsUntilPlay = items.reduce((s, item) => s + item.remaining, 0)
     const likelyPlayTime = dayjs().add(secondsUntilPlay, "seconds")
     let generatedStopset = generateStopsetHelper(likelyPlayTime)
 
     if (generatedStopset) {
+      if (prependWait) {
+        items.push(new Wait($config.WAIT_INTERVAL, doneWaiting, updateUI))
+      }
       // Always add a stopset AND THEN a wait interval
       items.push(generatedStopset)
       if ($config.WAIT_INTERVAL > 0) {
@@ -115,14 +116,16 @@
     processItem()
   }
 
-  const processItem = (index = 1, play = false, subindex) => {
-    // TODO: subindex is for advanced mode, playing an asset inside a stopset
+  const processItem = async (index = 1, play = false, subindex = null) => {
+    await tick() // Wait one tick for finished assets / waits to go black
+
+    // TODO:  = null is for advanced mode, playing an asset inside a stopset
     if (index > items.length) {
       console.warn(`Index ${index} out of band while processing items`)
       return
     }
-    while (index-- > 0) {
-      items.shift().done(true)
+    for (let i = index; i >= 1; i--) {
+      items.shift().done(true, i !== index) // skip callback (first arg) AND skip logs except for first one (second arg)
     }
 
     scrollToTopOfPlaylist()
@@ -148,7 +151,7 @@
     if (nextItem.type === "wait") {
       nextItem.run()
     } else if (nextItem.type === "stopset" && (play || (IS_DEV && $userConfig.autoplay))) {
-      nextItem.play()
+      nextItem.play(subindex)
     }
   }
 
@@ -193,4 +196,4 @@
   {/if}
 </div>
 
-<PlayList {items} {numStopsetsToDisableAddMoreAt} {addStopset} />
+<PlayList {items} {numStopsetsToDisableAddMoreAt} {addStopset} {processItem} {pause} />

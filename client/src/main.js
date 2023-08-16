@@ -53,7 +53,7 @@ if (squirrelCheck || !singleInstanceLock) {
     !app.isPackaged && isDev
       ? "http://localhost:3000/"
       : `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
-  const baseParams = new URLSearchParams({userDataDir, dev: isDev ? "1" : "0"})
+  const baseParams = new URLSearchParams({ userDataDir, dev: isDev ? "1" : "0" })
   const url = `${baseUrl}?${baseParams.toString()}`
 
   const createWindow = () => {

@@ -1,10 +1,17 @@
 <script>
+  import playIcon from "@iconify/icons-mdi/play"
+  import pauseIcon from "@iconify/icons-mdi/pause"
+
+  import Icon from "../../components/Icon.svelte"
+
   import { fade } from "svelte/transition"
   import { prettyDuration, humanDuration } from "../../utils"
   import { config, userConfig } from "../../stores/config"
 
   export let items
   export let addStopset
+  export let processItem
+  export let pause
 
   export let numStopsetsToDisableAddMoreAt
 
@@ -28,7 +35,7 @@
           >
         </div>
         {#if item.type === "stopset"}
-          {#each item.items as asset}
+          {#each item.items as asset, subindex}
             {#if asset.playable || $config.WARN_ON_EMPTY_ROTATORS}
               <div
                 class="border-l-4 pl-2"
@@ -52,13 +59,34 @@
                   class:bg-base-300={asset.finished}
                   class:text-base-content={asset.finished}
                 >
+                  {#if $userConfig.uiMode >= 2}
+                    <div class="flex items-center">
+                      {#if isFirstItem && asset.active && asset.playing}
+                        <button class="btn btn-square btn-warning btn-lg" on:click={() => pause()}>
+                          <Icon icon={pauseIcon} class="h-16 w-16" />
+                        </button>
+                      {:else}
+                        <button
+                          class="btn btn-square btn-success btn-lg"
+                          on:click={() => processItem(index, true, subindex)}
+                          disabled={!(
+                            asset.playable &&
+                            !asset.error &&
+                            (!isFirstItem || (isFirstItem && (asset.afterActive || (asset.active && !asset.playing))))
+                          )}
+                        >
+                          <Icon icon={playIcon} class="h-16 w-16" />
+                        </button>
+                      {/if}
+                    </div>
+                  {/if}
                   {#if $userConfig.uiMode > 0}
                     <div
                       class="flex h-[5rem] w-[5rem] items-center justify-center font-mono text-sm"
                       class:radial-progress={!asset.error &&
                         asset.playable &&
                         item.startedPlaying &&
-                        asset.index <= item.current}
+                        !asset.afterActive}
                       class:italic={asset.error || !asset.playable}
                       class:font-bold={asset.error || !asset.playable}
                       style:--value={(asset.elapsed / asset.duration) * 100}
@@ -136,6 +164,17 @@
               class="flex min-h-[5rem] items-center gap-3 overflow-hidden px-3 py-1 text-neutral-content"
               style:background-image={`linear-gradient(to right, hsl(var(--nf)) 0%, hsl(var(--nf)) ${item.percentDone}%, hsl(var(--n)) ${item.percentDone}%, hsl(var(--n)) 100%)`}
             >
+              {#if $userConfig.uiMode >= 2}
+                <div class="flex items-center">
+                  <button
+                    class="btn btn-square btn-success btn-lg"
+                    disabled={isFirstItem}
+                    on:click={() => processItem(index)}
+                  >
+                    <Icon icon={playIcon} class="h-16 w-16" />
+                  </button>
+                </div>
+              {/if}
               {#if $userConfig.uiMode > 0}
                 <div
                   class="radial-progress h-[5rem] w-[5rem] font-mono text-sm"

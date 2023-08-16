@@ -7,7 +7,7 @@
 
   const hideDurationIfSmall = async (el) => {
     await tick()
-    if (el.clientWidth - el.firstChild.clientWidth - 10 < 0) {
+    if (el.clientWidth - el.firstChild.clientWidth - 12 < 0) {
       el.firstChild.remove()
       console.log("Duration for element too big! Hiding.")
     }
