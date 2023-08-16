@@ -14,8 +14,10 @@
   let items = []
 
   const updateUI = () => (items = items) // Callback for force re-render
-  const numStopsetsToPreloadAudioFor = 2
-  const numStopsetsToDisableAddMoreAt = 5
+
+  // These numbers set arbitrarily to fit use case
+  const numStopsetsToPreloadAudioFor = 3
+  const numExtraStopsetsToDisableAddMoreAt = 3
 
   export let overdue
   $: overdue = items.length > 0 && items[0].type === "wait" && items[0].overdue
@@ -173,12 +175,11 @@
     items[0].skip()
   }
 
-  processItem(0)
-
   db.subscribe(() => {
+    // Runs on first load as well
     if (items.length === 0) {
       // When we get new data from server, if items is empty, regenerate stopset
-      processItem(0)
+      processItem(0, false)
     }
   })
 </script>
@@ -196,4 +197,4 @@
   {/if}
 </div>
 
-<PlayList {items} {numStopsetsToDisableAddMoreAt} {addStopset} {processItem} {pause} />
+<PlayList {items} numStopsetsToDisableAddMoreAt={$config.STOPSET_PRELOAD_COUNT + numExtraStopsetsToDisableAddMoreAt} {addStopset} {processItem} {pause} />

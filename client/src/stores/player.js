@@ -365,16 +365,18 @@ export class Wait {
   }
 
   run() {
-    this.active = true
-    this.expires = dayjs().add(this.duration, "seconds")
-    this.interval = setInterval(() => {
-      const secondsLeft = this.expires.diff(dayjs(), "ms") / 1000
-      this.elapsed = this.duration - secondsLeft
-      if (secondsLeft < 0) {
-        this.doneCountdown()
-      }
-      this.updateCallback()
-    }, progressBarAnimationFramerate)
+    if (!this.active) {
+      this.active = true
+      this.expires = dayjs().add(this.duration, "seconds")
+      this.interval = setInterval(() => {
+        const secondsLeft = this.expires.diff(dayjs(), "ms") / 1000
+        this.elapsed = this.duration - secondsLeft
+        if (secondsLeft < 0) {
+          this.doneCountdown()
+        }
+        this.updateCallback()
+      }, progressBarAnimationFramerate)
+    }
   }
 
   doneCountdown() {
