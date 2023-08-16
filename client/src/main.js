@@ -21,8 +21,6 @@ if (squirrelCheck || !singleInstanceLock) {
   const elgatoVendorId = 4057
   let blocker = null
   const [minWidth, minHeight, defaultWidth, defaultHeight] = [800, 600, 1000, 800]
-  const isLinux = process.platform === "linux"
-  const isMac = process.platform === "darwin"
   const isDev = process.argv.includes("--enable-dev-mode") || process.env.NODE_ENV === "development"
   const iconPath = path.resolve(path.join(__dirname, "../assets/icons/tomato.png"))
 
@@ -92,7 +90,7 @@ if (squirrelCheck || !singleInstanceLock) {
 
     const menu = Menu.buildFromTemplate([
       // { role: 'appMenu' }
-      ...(isMac
+      ...(IS_MAC
         ? [
             {
               label: app.name,
@@ -113,7 +111,7 @@ if (squirrelCheck || !singleInstanceLock) {
       // { role: 'fileMenu' }
       {
         label: "File",
-        submenu: [...(isMac ? [{ role: "close" }] : [{ role: "about" }, { role: "quit" }])]
+        submenu: [...(IS_MAC ? [{ role: "close" }] : [{ role: "about" }, { role: "quit" }])]
       },
       // { role: 'editMenu' }
       {
@@ -126,7 +124,7 @@ if (squirrelCheck || !singleInstanceLock) {
           { role: "copy" },
           { role: "paste" },
           { role: "delete" },
-          ...(isMac ? [{ role: "pasteAndMatchStyle" }] : []),
+          ...(IS_MAC ? [{ role: "pasteAndMatchStyle" }] : []),
           { type: "separator" },
           { role: "selectAll" }
         ]
@@ -147,7 +145,7 @@ if (squirrelCheck || !singleInstanceLock) {
         submenu: [
           { role: "minimize" },
           { role: "zoom" },
-          ...(isMac
+          ...(IS_MAC
             ? [{ type: "separator" }, { role: "front" }, { type: "separator" }, { role: "window" }]
             : [{ role: "close" }])
         ]
@@ -284,7 +282,7 @@ if (squirrelCheck || !singleInstanceLock) {
     app.quit()
   })
 
-  if (isLinux) {
+  if (IS_LINUX) {
     const dbus = require("@homebridge/dbus-native") // Don't bundle on mac/windows
 
     // Switch night and dark mode on Linux by subscribing to dbus

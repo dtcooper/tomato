@@ -13,6 +13,9 @@ if (!process.env.NODE_ENV) {
 }
 
 const releasesUrl = "https://electronjs.org/headers/index.json"
+const IS_MAC = process.platform === "darwin"
+const IS_WIN32 = process.platform === "win32"
+const IS_LINUX = process.platform === "linux"
 
 const runBuild = async () => {
   let electronReleases
@@ -44,7 +47,7 @@ const runBuild = async () => {
     minify: !isDev,
     platform: "node",
     sourcemap: true,
-    define: { TOMATO_VERSION }
+    define: { TOMATO_VERSION, IS_MAC: IS_MAC.toString(), IS_WIN32: IS_WIN32.toString(), IS_LINUX: IS_LINUX.toString() }
   }
 
   if (nodeVersion) {
@@ -70,13 +73,8 @@ const runBuild = async () => {
       esbuild(options)
     }
   }
-  const mainExternal = ["electron", "svelte-devtools-standalone"]
-  if (process.platform !== "linux") {
-    // only used on Linux
-    mainExternal.push("@homebridge/dbus-native")
-  }
 
-  build("main.js", { bundle: !isDev, format: "cjs", external: mainExternal })
+  build("main.js", { bundle: !isDev, format: "cjs", external: ["electron", "svelte-devtools-standalone"] })
   build("app.js", {
     external: ["electron", "./assets/fonts/*"],
     loader: { ".svg": "text" },
