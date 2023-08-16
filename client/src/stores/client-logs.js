@@ -11,7 +11,7 @@ try {
   pendingLogs = JSON.parse(window.localStorage.getItem("pending-logs")) || {}
 } catch {}
 
-const savePendingLogs = () => window.localStorage.setItem("pending-logs", JSON.stringify({}, null, ""))
+const savePendingLogs = () => window.localStorage.setItem("pending-logs", JSON.stringify(pendingLogs, null, ""))
 
 export const log = (window.log = (type = "unspecified", description = "") => {
   if (!client_log_entry_types.includes(type)) {
@@ -45,7 +45,7 @@ export const acknowledgeLog = (id) => {
   savePendingLogs()
 }
 
-setInterval(sendPendingLogs, IS_DEV ? 2500 : 30000) // Run every 30 seconds
+setInterval(() => sendPendingLogs(), IS_DEV ? 1000 : 30000) // Run every 30 seconds
 
 // Rudimentary handling of uncaught exceptions / promise rejections (debounced)
 let errorDebounce
