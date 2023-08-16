@@ -1,6 +1,6 @@
 <h1 align="center">
   <a href="https://dtcooper.github.io/tomato/">
-    <img src="https://raw.github.com/dtcooper/tomato/main/client/assets/icons/tomato.png" width="100"><br>
+    <img src="https://raw.github.com/dtcooper/tomato/main/docs/assets/tomato.png" width="100"><br>
     Tomato Radio Automation
   </a>
 </h1>
@@ -14,6 +14,10 @@
 Client and server for Tomato Radio Automation software. Tomato is easy to use,
 and hard to screw up playout software written for the specific use case of
 [Burning Man Information Radio](https://bmir.org).
+
+<div align="center">
+  <img src="https://raw.github.com/dtcooper/tomato/main/docs/assets/client-screenshot.png" width="850">
+</div>
 
 The backend server is written in [Python](https://www.python.org/)'s
 [Django web framework](https://www.djangoproject.com/), heavily leveraging its

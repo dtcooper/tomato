@@ -4,9 +4,11 @@ title: Desktop App
 
 # The Tomato Desktop App
 
-The desktop app is undocumented as it's being written and is in early alpha
+The desktop app is undocumented as it's being written and is in early preview
 stages. You can, however download [preview builds](#preview-builds) or
 [run the development code yourself](#run-development-code).
+
+![](assets/client-screenshot.png){ style="width: 100%" loading=lazy }
 
 
 ## Preview Builds
