@@ -16,7 +16,7 @@ try {
 const savePendingLogs = () =>
   window.localStorage.setItem("pending-logs", JSON.stringify(Array.from(pendingLogs.entries()), null, ""))
 
-export const log = (window.log = (type = "unspecified", description = "") => {
+export const log = (type = "unspecified", description = "") => {
   if (!client_log_entry_types.includes(type)) {
     console.error(`Invalid log type: ${type} - using unspecified`)
     type = "unspecified"
@@ -24,7 +24,7 @@ export const log = (window.log = (type = "unspecified", description = "") => {
 
   pendingLogs.set(uuid(), { created_at: dayjs().toISOString(), type, description })
   savePendingLogs()
-})
+}
 
 export const sendPendingLogs = (forceClear = false) => {
   const entries = Array.from(pendingLogs.entries())

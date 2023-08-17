@@ -45,6 +45,7 @@ const runBuild = async () => {
     bundle: true,
     logLevel: "info",
     minify: !isDev,
+    keepNames: true,
     platform: "node",
     sourcemap: true,
     define: { TOMATO_VERSION, IS_MAC: IS_MAC.toString(), IS_WIN32: IS_WIN32.toString(), IS_LINUX: IS_LINUX.toString() }
