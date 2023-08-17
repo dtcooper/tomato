@@ -67,7 +67,7 @@
     "run-script-os": "^1.1.6",
     "svelte": "^4.2.0",
     "svelte-devtools-standalone": "github:RedHatter/svelte-devtools-standalone",
-    "svelte-local-storage-store": "^0.5.0",
+    "svelte-local-storage-store": "^0.6.0",
     "svelte-preprocess": "^5.0.4",
     "tailwindcss": "^3.3.3",
     "trap-focus-svelte": "^1.0.1",

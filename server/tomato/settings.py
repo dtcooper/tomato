@@ -153,7 +153,6 @@ CACHES = {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "CONNECTION_POOL_KWARGS": {"max_connections": 50},
             "PICKLE_VERSION": -1,
-            "PARSER_CLASS": "redis.connection.HiredisParser",
         },
         "KEY_PREFIX": "cache",
     }
