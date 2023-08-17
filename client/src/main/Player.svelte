@@ -157,13 +157,13 @@
     }
   }
 
-  const play = (window.play = () => {
+  const play = () => {
     const firstStopsetIndex = items.findIndex((item) => item.type === "stopset")
     if (firstStopsetIndex === -1) {
       throw new Error("play() SHOULD have found a first stopset")
     }
     processItem(firstStopsetIndex, true)
-  })
+  }
 
   const pause = () => {
     scrollToTopOfPlaylist()

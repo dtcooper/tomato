@@ -48,7 +48,7 @@ const updateConn = ({ connecting, connected, ...restPersisted }) => {
   }
 }
 
-let ws = (window.ws = null)
+let ws = (window._websocket = null)
 
 export const logout = (error) => {
   if (loggingOut) return
@@ -154,7 +154,7 @@ export const login = (username, password, host) => {
       return
     }
 
-    ws = window.ws = new ReconnectingWebSocket(host)
+    ws = window._websocket = new ReconnectingWebSocket(host)
     ws.onerror = (e) => {
       console.error("Websocket error", e)
       const { ready, authenticated } = get(conn)

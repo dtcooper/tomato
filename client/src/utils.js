@@ -37,7 +37,7 @@ export const tomatoIcon = {
 if (IS_DEV) {
   const originalSetInterval = setInterval
   const originalClearInterval = clearInterval
-  const intervals = (window.activeIntervals = new Set())
+  const intervals = (window._activeIntervals = new Set())
   window.setInterval = (...args) => {
     const id = originalSetInterval(...args)
     intervals.add(id)

@@ -357,7 +357,7 @@ class DB {
 
 DB._loadAssetPlayTimes()
 const emptyDB = new DB()
-window.DB = DB
+window._DB = DB
 const dbStore = writable(emptyDB)
 const dbReadonly = readonly(dbStore)
 export { dbReadonly as db }
@@ -406,13 +406,13 @@ export const syncAssetsDB = runOnceAndQueueLastCall(async (jsonData) => {
   }
 
   window.localStorage.setItem("last-db-data", JSON.stringify(jsonData, null, ""))
-  window.db = replacementDB // Swap out DB
+  window._db = replacementDB // Swap out DB
   dbStore.set(replacementDB)
   syncProgress.set(emptySyncProgress)
 })
 
 export const clearAssetsDB = () => {
-  window.db = emptyDB
+  window._db = emptyDB
   dbStore.set(emptyDB)
   window.localStorage.removeItem("last-db-data")
 }
@@ -421,7 +421,7 @@ export const restoreAssetsDBFromLocalStorage = () => {
   try {
     const state = JSON.parse(window.localStorage.getItem("last-db-data"))
     if (state) {
-      const loadedDb = (window.db = new DB(state))
+      const loadedDb = (window._db = new DB(state))
       dbStore.set(loadedDb)
       return
     }
@@ -429,7 +429,7 @@ export const restoreAssetsDBFromLocalStorage = () => {
     console.error(e)
   }
 
-  window.db = emptyDB
+  window._db = emptyDB
   dbStore.set(emptyDB)
 }
 
