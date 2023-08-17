@@ -197,4 +197,10 @@
   {/if}
 </div>
 
-<PlayList {items} numStopsetsToDisableAddMoreAt={$config.STOPSET_PRELOAD_COUNT + numExtraStopsetsToDisableAddMoreAt} {addStopset} {processItem} {pause} />
+<PlayList
+  {items}
+  numStopsetsToDisableAddMoreAt={$config.STOPSET_PRELOAD_COUNT + numExtraStopsetsToDisableAddMoreAt}
+  {addStopset}
+  {processItem}
+  {pause}
+/>

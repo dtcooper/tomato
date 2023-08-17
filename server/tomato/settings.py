@@ -172,6 +172,10 @@ LANGUAGE_CODE = "en-us"
 USE_I18N = True
 USE_TZ = True
 
+# Let nginx handle these
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None
+DATA_UPLOAD_MAX_MEMORY_SIZE = None
+
 STATIC_URL = "/static/"
 STATIC_ROOT = "/serve/static"
 MEDIA_URL = "/assets/"

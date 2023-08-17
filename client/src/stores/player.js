@@ -71,6 +71,13 @@ class GeneratedStopsetAssetBase {
     return this.beforeActive
   }
 
+  get logLine() {
+    const stopset = this.generatedStopset
+    return `[Stopset=${stopset.name}] [Rotator=${this.rotator.name}] [${this.index + 1}/${
+      stopset.items.length
+    }] [Asset=${this.name}]`
+  }
+
   done() {
     this.playing = false
     this.generatedStopset.donePlaying()
@@ -196,10 +203,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
 
   done() {
     clearInterval(this.interval)
-    log(
-      this.didSkip ? "skipped_asset" : "played_asset",
-      `[Stopset=${this.generatedStopset.name}] [Rotator=${this.rotator.name}] [Asset=${this.name}]`
-    )
+    log(this.didSkip ? "skipped_asset" : "played_asset", this.logLine)
     super.done()
   }
 
@@ -317,7 +321,7 @@ export class GeneratedStopset {
     if (subindex !== null) {
       this.didSkip = this.didSkip || subindex !== this.current
       this.items.slice(this.current, subindex).forEach((item) => {
-        log("skipped_asset", `[Stopset=${this.name}] [Rotator=${item.rotator.name}] [Asset=${item.name}]`)
+        log("skipped_asset", item.logLine)
         if (item.playable) {
           item.pause()
         }

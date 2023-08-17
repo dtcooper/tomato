@@ -61,4 +61,4 @@ class ClientLogEntry(models.Model):
         verbose_name = "client log entry"
         verbose_name_plural = "client log entries"
         db_table = "logs"
-        ordering = ("-created_at",)
+        ordering = ("-created_at", "-id")

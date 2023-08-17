@@ -6,12 +6,15 @@ import { client_log_entry_types } from "../../../server/constants.json"
 import { IS_DEV } from "../utils"
 import { conn, messageServer } from "./connection"
 
-let pendingLogs = {}
+let pendingLogs = new Map()
 try {
-  pendingLogs = JSON.parse(window.localStorage.getItem("pending-logs")) || {}
-} catch {}
+  pendingLogs = new Map(JSON.parse(window.localStorage.getItem("pending-logs")) || [])
+} catch (e) {
+  console.warn("Error loading pendingLog:", e)
+}
 
-const savePendingLogs = () => window.localStorage.setItem("pending-logs", JSON.stringify(pendingLogs, null, ""))
+const savePendingLogs = () =>
+  window.localStorage.setItem("pending-logs", JSON.stringify(Array.from(pendingLogs.entries()), null, ""))
 
 export const log = (window.log = (type = "unspecified", description = "") => {
   if (!client_log_entry_types.includes(type)) {
@@ -19,12 +22,12 @@ export const log = (window.log = (type = "unspecified", description = "") => {
     type = "unspecified"
   }
 
-  pendingLogs[uuid()] = { created_at: dayjs().toISOString(), type, description }
+  pendingLogs.set(uuid(), { created_at: dayjs().toISOString(), type, description })
   savePendingLogs()
 })
 
 export const sendPendingLogs = (forceClear = false) => {
-  const entries = Object.entries(pendingLogs)
+  const entries = Array.from(pendingLogs.entries())
   if (entries.length) {
     const { authenticated, connected } = get(conn)
     if (authenticated && connected) {
@@ -41,7 +44,7 @@ export const sendPendingLogs = (forceClear = false) => {
 }
 
 export const acknowledgeLog = (id) => {
-  delete pendingLogs[id]
+  pendingLogs.delete(id)
   savePendingLogs()
 }
 
