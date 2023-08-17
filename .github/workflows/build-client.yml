@@ -61,6 +61,8 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v3
+        with:  # For rev number in TOMATO_VERSION_SUFFIX
+          fetch-depth: 0
       -
         name: Set variables
         shell: bash
@@ -104,7 +106,7 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v3
-        with:
+        with:  # For rev number in TOMATO_VERSION_SUFFIX
           fetch-depth: 0
       -
         name: Set variables
