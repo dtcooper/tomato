@@ -95,7 +95,8 @@ const handleMessages = {
 }
 
 export const messageServer = (type, data) => {
-  if (ws) {
+  const { connected } = get(conn)
+  if (ws && connected) {
     try {
       ws.send(JSON.stringify({ type, data }, null, ""))
       return true
