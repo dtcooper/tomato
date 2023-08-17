@@ -8,7 +8,7 @@
 
   import { IS_DEV } from "../utils"
   import { db } from "../stores/db"
-  import { logout, protocolVersion } from "../stores/connection"
+  import { logout, protocolVersion, conn } from "../stores/connection"
   import { playStatus, speaker, setSpeaker } from "../stores/player"
   import { config, userConfig } from "../stores/config"
 
@@ -90,6 +90,14 @@
         <span class="font-bold" class:text-error={!$userConfig.powerSaveBlocker}>OFF</span>
         <input type="checkbox" class="toggle toggle-success toggle-lg" bind:checked={$userConfig.powerSaveBlocker} />
         <span class="font-bold" class:text-success={$userConfig.powerSaveBlocker}>ON</span>
+      </div>
+
+      <div class="flex justify-end text-lg font-bold">Connection:</div>
+      <div class="w-full truncate">
+        <span class="font-mono text-sm">
+          {$conn.username} <span class="font-bold text-info">@</span>
+          {$conn.prettyHost}
+        </span>
       </div>
 
       <div class="flex justify-end text-lg font-bold">Broadcast Compression:</div>

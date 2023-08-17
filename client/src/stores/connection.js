@@ -24,12 +24,19 @@ export const protocolVersion = protocol_version
 
 export const conn = derived(
   [connPersisted, connEphemeral, reloading],
-  ([$connPersisted, $connEphemeral, $reloading]) => ({
-    ...$connPersisted,
-    ...$connEphemeral,
-    ready: $connPersisted.authenticated && $connPersisted.didFirstSync, // App ready to run, whether online or not
-    reloading: $reloading
-  })
+  ([$connPersisted, $connEphemeral, $reloading]) => {
+    let prettyHost = "unknown"
+    try {
+      prettyHost = new URL($connPersisted.host).host
+    } catch {}
+    return {
+      ...$connPersisted,
+      ...$connEphemeral,
+      ready: $connPersisted.authenticated && $connPersisted.didFirstSync, // App ready to run, whether online or not
+      reloading: $reloading,
+      prettyHost
+    }
+  }
 )
 
 const updateConn = ({ connecting, connected, ...restPersisted }) => {
