@@ -106,7 +106,8 @@
       const likelyPlayTime = dayjs().add(secondsUntilPlay, "seconds")
       let generatedStopset = generateStopsetHelper(likelyPlayTime, items[nextStopset].generatedId)
       if (generatedStopset) {
-        items[nextStopset].done(true) // Mark swap out one as done
+        generatedStopset.loadAudio()
+        items[nextStopset].done(true, true) // Mark swap out one as done and don't log
         items[nextStopset] = generatedStopset
         updateUI()
       }
