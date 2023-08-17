@@ -100,7 +100,7 @@ export const messageServer = (type, data) => {
       ws.send(JSON.stringify({ type, data }, null, ""))
       return true
     } catch (e) {
-      console.error(`Error sending ${type} message to websocket`)
+      console.error(`Error sending ${type} message to websocket`, e)
       return false
     }
   } else {

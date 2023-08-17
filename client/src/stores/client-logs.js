@@ -48,7 +48,7 @@ export const acknowledgeLog = (id) => {
   savePendingLogs()
 }
 
-setInterval(() => sendPendingLogs(), IS_DEV ? 1000 : 30000) // Run every 30 seconds
+setInterval(() => sendPendingLogs(), IS_DEV ? 2500 : 30000) // Run every 30 seconds
 
 // Rudimentary handling of uncaught exceptions / promise rejections (debounced)
 let errorDebounce
