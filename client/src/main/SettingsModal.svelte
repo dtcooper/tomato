@@ -42,6 +42,8 @@
       }
     }
   }
+
+  const uiModeStrings = ["Simple", "Standard", "Advanced"]
 </script>
 
 <Modal bind:show class="max-w-3xl">
@@ -52,14 +54,14 @@
     <div class="grid w-full max-w-full grid-cols-[max-content_auto] items-baseline gap-3">
       <div class="flex items-center justify-end text-lg font-bold">User interface mode:</div>
       <div class="tabs-boxed tabs w-max">
-        {#each ["Simple", "Standard", "Advanced"] as uiMode, index}
-          {#if $config.UI_MODES.indexOf(index) !== -1}
-            <button
-              class="tab"
-              class:tab-active={index === $userConfig.uiMode}
-              on:click={() => ($userConfig.uiMode = index)}>{uiMode}</button
-            >
-          {/if}
+        {#each $config.UI_MODES as uiMode}
+          <button
+            class="tab"
+            class:tab-active={uiMode === $userConfig.uiMode}
+            on:click={() => ($userConfig.uiMode = uiMode)}
+          >
+            {uiModeStrings[uiMode]}
+          </button>
         {/each}
       </div>
 

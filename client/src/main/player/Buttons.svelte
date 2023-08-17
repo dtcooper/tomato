@@ -5,7 +5,8 @@
   import skipForwardOutlineIcon from "@iconify/icons-mdi/skip-forward-outline"
   import reloadIcon from "@iconify/icons-mdi/reload"
 
-  import { userConfig } from "../../stores/config"
+  import { config, userConfig } from "../../stores/config"
+  import { titleCase } from "../../utils"
 
   import Icon from "../../components/Icon.svelte"
 
@@ -63,7 +64,7 @@
   {/if}
   {#if $userConfig.uiMode >= 2}
     <div class="flex flex-col gap-2">
-      <div class="divider my-0 text-sm italic">Stopset Control</div>
+      <div class="divider my-0 text-sm italic">{titleCase($config.STOPSET_ENTITY_NAME)} Control</div>
       <div class="flex justify-center gap-2">
         <div
           class={firstItem.type === "stopset" && "tooltip tooltip-error tooltip-bottom"}

@@ -303,6 +303,15 @@ CONSTANCE_ADDITIONAL_FIELDS = {
             "required": True,
         },
     ),
+    "shorter_text": (
+        "django.forms.CharField",
+        {
+            "max_length": 20,
+            "widget": "django.forms.TextInput",
+            "widget_kwargs": {"attrs": {"size": 16}},
+            "required": True,
+        },
+    ),
     "stopset_preload_count": (
         "django.forms.IntegerField",
         {
@@ -374,7 +383,7 @@ CONSTANCE_CONFIG = {
     "STOPSET_ENTITY_NAME": (
         "stop set",
         "Override the language in the Desktop app to change the word 'stop set' to something custom",
-        "short_text",
+        "shorter_text",
     ),
     "STOPSET_PRELOAD_COUNT": (
         2,

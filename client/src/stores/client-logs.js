@@ -38,7 +38,7 @@ export const sendPendingLogs = (forceClear = false) => {
     }
   }
   if (forceClear) {
-    pendingLogs = {}
+    pendingLogs = new Map()
     savePendingLogs()
   }
 }

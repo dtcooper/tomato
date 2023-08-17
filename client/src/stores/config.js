@@ -21,7 +21,7 @@ export const setServerConfig = ({ _numeric: numeric, ...newConfig }) => {
 
   if (newConfig.UI_MODES && newConfig.UI_MODES.indexOf(get(userConfig).uiMode) === -1) {
     userConfig.update(($userConfig) => {
-      return { ...$userConfig, uiMode: Math.min(newConfig.UI_MODES) }
+      return { ...$userConfig, uiMode: Math.min(...newConfig.UI_MODES) }
     })
   }
   config.set(newConfig)

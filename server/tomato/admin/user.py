@@ -44,7 +44,7 @@ class UserAdmin(ListPrefetchRelatedMixin, DjangoUserAdmin):
     search_fields = ("username",)
 
     def save_model(self, request, obj, form, change):
-        changed_password = 'password' in obj.get_dirty_fields()
+        changed_password = "password" in obj.get_dirty_fields()
         super().save_model(request, obj, form, change)
         if not obj.is_active or changed_password:
             mark_logged_out_users([obj.id])

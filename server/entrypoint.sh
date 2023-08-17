@@ -17,7 +17,10 @@ wait-for-it --timeout 0 --service db:5432 --service redis:6379
 if [ -z "$__RUN_HUEY" -a -z "$__RUN_API" ]; then
     if [ "$NO_SECRET_KEY" ]; then
         echo 'Generating SECRET_KEY...'
-        python -c 'import string as s, random as r; print("".join(r.choice(s.ascii_letters + s.digits) for _ in range(54)))'
+        NEW_SECRET_KEY="$(python -c 'import string as s, random as r; print("".join(r.choice(s.ascii_letters + s.digits) for _ in range(54)))')"
+        sed "s/^SECRET_KEY=/SECRET_KEY=$NEW_SECRET_KEY/" /.env > /tmp/new-env
+        cp /tmp/new-env /.env
+        rm /tmp/new-env
         . /.env
     fi
 
@@ -29,7 +32,7 @@ if [ -z "$__RUN_HUEY" -a -z "$__RUN_API" ]; then
     fi
 
 elif [ "$NO_SECRET_KEY" ]; then
-    echo 'Delaying huey while SECRET_KEY is being generated...'
+    echo 'Delaying huey/api while SECRET_KEY is being generated...'
     sleep 10
     . /.env
 fi

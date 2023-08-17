@@ -5,7 +5,7 @@
   import Icon from "../../components/Icon.svelte"
 
   import { fade } from "svelte/transition"
-  import { prettyDuration, humanDuration } from "../../utils"
+  import { prettyDuration, humanDuration, upperCaseFirst } from "../../utils"
   import { config, userConfig } from "../../stores/config"
 
   export let items
@@ -151,7 +151,7 @@
                 {/if}
                 <div class="flex flex-1 flex-col overflow-x-hidden">
                   <span class="font-medium italic">
-                    {$config.STOPSET_ENTITY_NAME.charAt(0).toUpperCase() + $config.STOPSET_ENTITY_NAME.slice(1)}
+                    {upperCaseFirst($config.STOPSET_ENTITY_NAME)}
                     {item.name} was generated but has no eligible assets.</span
                   >
                 </div>

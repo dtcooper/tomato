@@ -25,6 +25,7 @@ services:
     environment:
       USE_LOCAL_CA: "${NGINX_DEBUG_MODE_ONLY_USE_LOCAL_CA:-0}"
       __NGINX_STATIC_FILES_CONF: "# Static files disabled by configuration override in docker-compose.dev.yml"
+
   db:
     restart: 'no'
     ports:
