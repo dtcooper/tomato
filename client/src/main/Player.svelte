@@ -128,7 +128,9 @@
       return
     }
     for (let i = index; i >= 1; i--) {
-      items.shift().done(true, i !== index) // skip callback (first arg) AND skip logs except for first one (second arg)
+      // skip callback (first arg) AND skip logs except for first one (second arg)
+      // third arg == consider it a "skipped" stopset
+      items.shift().done(true, i !== index, true)
     }
 
     scrollToTopOfPlaylist()

@@ -304,7 +304,7 @@ export class GeneratedStopset {
     this.updateCallback()
   }
 
-  done(skipCallback = false, skipLog = false) {
+  done(skipCallback = false, skipLog = false, forceDidSkip = false) {
     this.playing = false
     this.unloadAudio()
     if (!skipCallback) {
@@ -312,7 +312,7 @@ export class GeneratedStopset {
     }
     if (!skipLog && !this.didLog) {
       this.didLog = true
-      log(this.didSkip ? "skipped_stopset" : "played_stopset", `[Stopset=${this.name}]`)
+      log(this.didSkip || forceDidSkip ? "skipped_stopset" : "played_stopset", `[Stopset=${this.name}]`)
     }
   }
 
