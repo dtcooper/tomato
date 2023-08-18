@@ -33,10 +33,6 @@ module.exports = {
       config: {
         description: "Tomato Radio Automation",
         name: "Tomato Radio Automation",
-        features: {
-          autoUpdate: false,
-          autoLaunch: true
-        },
         ui: {
           chooseDirectory: true
         }
