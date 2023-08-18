@@ -8,7 +8,7 @@
   import reloadIcon from "@iconify/icons-mdi/reload"
 
   import { config, userConfig } from "../../stores/config"
-  import { titleCase } from "../../utils"
+  import { upperCaseFirst } from "../../utils"
 
   import Icon from "../../components/Icon.svelte"
 
@@ -26,7 +26,6 @@
     !items.some((item) => item.type === "stopset") || (firstItem.type === "stopset" && firstItem.playing)
   $: pauseDisabled = firstItem.type !== "stopset" || !firstItem.playing
 
-
   ipcRenderer.on("play-server-cmd-play", (...args) => {
     if (playDisabled) {
       console.log("Got command from play server, but currently not eligible to play!")
@@ -35,7 +34,6 @@
       play()
     }
   })
-
 </script>
 
 <svelte:window
@@ -54,7 +52,6 @@
     on:click={play}
     class:tomato-pulse={(firstItem.type === "wait" && firstItem.overtime) ||
       (firstItem.type === "stopset" && !firstItem.playing)}
-    style:--pulse-color="var(--su)"
   >
     <Icon icon={playCircleOutlineIcon} class="h-12 w-12" /> Play
   </button>
@@ -77,7 +74,7 @@
   {/if}
   {#if $userConfig.uiMode >= 2}
     <div class="flex flex-col gap-2">
-      <div class="divider my-0 text-sm italic">{titleCase($config.STOPSET_ENTITY_NAME)} Control</div>
+      <div class="divider my-0 text-sm italic">{upperCaseFirst($config.STOPSET_ENTITY_NAME)} control</div>
       <div class="flex justify-center gap-2">
         <div
           class={firstItem.type === "stopset" && "tooltip tooltip-error tooltip-bottom"}
