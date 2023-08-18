@@ -62,7 +62,7 @@
                   {#if $userConfig.uiMode >= 2}
                     <div class="flex items-center">
                       {#if isFirstItem && asset.active && asset.playing}
-                        <button class="btn btn-square btn-warning btn-lg" on:click={() => pause()}>
+                        <button class="btn btn-square btn-warning btn-lg" on:click={() => pause()} tabindex="-1">
                           <Icon icon={pauseIcon} class="h-16 w-16" />
                         </button>
                       {:else}
@@ -74,6 +74,7 @@
                             !asset.error &&
                             (!isFirstItem || (isFirstItem && (asset.afterActive || (asset.active && !asset.playing))))
                           )}
+                          tabindex="-1"
                         >
                           <Icon icon={playIcon} class="h-16 w-16" />
                         </button>
@@ -170,6 +171,7 @@
                     class="btn btn-square btn-success btn-lg"
                     disabled={isFirstItem}
                     on:click={() => processItem(index)}
+                    tabindex="-1"
                   >
                     <Icon icon={playIcon} class="h-16 w-16" />
                   </button>
@@ -226,8 +228,13 @@
         </div>
       </div>
     {/each}
-    <div class="flex justify-center">
-      <button disabled={numStopsets >= numStopsetsToDisableAddMoreAt} class="btn btn-neutral" on:click={addStopset}>
+    <div class="flex justify-center pb-1">
+      <button
+        disabled={numStopsets >= numStopsetsToDisableAddMoreAt}
+        class="btn btn-neutral"
+        on:click={addStopset}
+        tabindex="-1"
+      >
         Load another {$config.STOPSET_ENTITY_NAME}...
       </button>
     </div>

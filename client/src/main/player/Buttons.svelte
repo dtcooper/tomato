@@ -8,6 +8,7 @@
   import reloadIcon from "@iconify/icons-mdi/reload"
 
   import { config, userConfig } from "../../stores/config"
+  import { blockSpacebarPlay } from "../../stores/player"
   import { upperCaseFirst } from "../../utils"
 
   import Icon from "../../components/Icon.svelte"
@@ -38,7 +39,7 @@
 
 <svelte:window
   on:keydown={(event) => {
-    if (!playDisabled && event.code === "Space") {
+    if (!playDisabled && !$blockSpacebarPlay && event.code === "Space") {
       play()
       event.preventDefault()
     }
@@ -52,11 +53,12 @@
     on:click={play}
     class:tomato-pulse={(firstItem.type === "wait" && firstItem.overtime) ||
       (firstItem.type === "stopset" && !firstItem.playing)}
+    tabindex="-1"
   >
     <Icon icon={playCircleOutlineIcon} class="h-12 w-12" /> Play
   </button>
   {#if $userConfig.uiMode >= 1}
-    <button class="btn btn-warning btn-lg pl-3" disabled={pauseDisabled} on:click={pause}>
+    <button class="btn btn-warning btn-lg pl-3" disabled={pauseDisabled} on:click={pause} tabindex="-1">
       <Icon icon={pauseCircleOutlineIcon} class="h-12 w-12" /> Pause
     </button>
     <div
@@ -67,6 +69,7 @@
         class="btn btn-error btn-lg pl-3"
         disabled={firstItem.type !== "stopset" || !firstItem.startedPlaying}
         on:click={skip}
+        tabindex="-1"
       >
         <Icon icon={skipNextCircleOutline} class="h-12 w-12" /> Skip
       </button>
@@ -84,11 +87,12 @@
             class="btn btn-error btn-sm pl-0.5"
             disabled={firstItem.type !== "stopset"}
             on:click={skipCurrentStopset}
+            tabindex="-1"
           >
             <Icon icon={skipForwardOutlineIcon} class="h-6 w-6" /> Skip Current
           </button>
         </div>
-        <button class="btn btn-warning btn-sm pl-0.5" on:click={regenerateNextStopset}>
+        <button class="btn btn-warning btn-sm pl-0.5" on:click={regenerateNextStopset} tabindex="-1">
           <Icon icon={reloadIcon} class="h-6 w-6" /> Regenerate Next
         </button>
       </div>

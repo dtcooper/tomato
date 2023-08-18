@@ -13,6 +13,7 @@ export const playStatus = derived([speaker, speakers], ([$speaker, $speakers]) =
   speaker: $speaker,
   speakers: $speakers
 }))
+export const blockSpacebarPlay = writable(false)
 
 let compressorEnabled = false
 let currentGeneratedId = 0

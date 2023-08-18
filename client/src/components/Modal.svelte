@@ -1,5 +1,6 @@
 <script>
   import { trapFocus } from "trap-focus-svelte"
+  import { blockSpacebarPlay } from "../stores/player"
 
   export let canDismiss = true
   export let show = true
@@ -7,6 +8,9 @@
   const close = () => {
     show = false
   }
+
+  // Block spacebar play when any modal is active
+  $: $blockSpacebarPlay = show
 </script>
 
 {#if show}
@@ -24,7 +28,8 @@
       {#if canDismiss}
         <button
           type="button"
-          class="btn btn-circle btn-ghost btn-sm absolute right-2 top-2 text-xl"
+          class="btn btn-circle btn-ghost btn-sm absolute right-2 top-2 text-2xl"
+          tabindex="-1"
           on:click|preventDefault={close}>✕</button
         >
       {/if}

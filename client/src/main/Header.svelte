@@ -24,10 +24,12 @@
     </div>
     <div class="flex items-center gap-3">
       {#if $config.UI_MODES.includes(0) && $userConfig.uiMode >= 1}
-        <button class="btn btn-accent" on:click={() => ($userConfig.uiMode = 0)}>← Back to simple view</button>
+        <button class="btn btn-accent" on:click={() => ($userConfig.uiMode = 0)} tabindex="-1">
+          Back to simple view
+        </button>
       {/if}
       <div class="tooltip tooltip-bottom" data-tip={`${$isFullscreen ? "Exit" : "Enter"} fullscreen mode`}>
-        <button class="btn btn-circle btn-ghost" on:click={() => setFullscreen(!$isFullscreen)}>
+        <button class="btn btn-circle btn-ghost" on:click={() => setFullscreen(!$isFullscreen)} tabindex="-1">
           <Icon icon={$isFullscreen ? fullscreenExit : fullscreenIcon} class="h-8 w-8" />
         </button>
       </div>
@@ -40,6 +42,7 @@
           on:click={() => (showSyncModal = true)}
           class:!bg-transparent={$userConfig.uiMode === 0}
           disabled={$userConfig.uiMode === 0}
+          tabindex="-1"
         >
           {#if !$conn.connected}
             <Icon icon={lanDisconnect} class="h-8 w-8 text-error" />
@@ -51,7 +54,7 @@
         </button>
       </div>
       <div class="tooltip tooltip-bottom" data-tip="Settings">
-        <button class="btn btn-circle btn-ghost" on:click={() => (showSettingsModal = true)}>
+        <button class="btn btn-circle btn-ghost" on:click={() => (showSettingsModal = true)} tabindex="-1">
           <Icon icon={cogOutline} class="h-8 w-8" />
         </button>
       </div>

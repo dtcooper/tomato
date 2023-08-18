@@ -53,9 +53,9 @@
   </svelte:fragment>
   <svelte:fragment slot="extra-buttons">
     {#if isFromLogin}
-      <button type="button" class="btn btn-error" on:click|preventDefault={() => logout()} tabindex="-1"
-        >Cancel &amp; Logout</button
-      >
+      <button type="button" class="btn btn-error" on:click|preventDefault={() => logout()} tabindex="-1">
+        Cancel &amp; Logout
+      </button>
     {/if}
   </svelte:fragment>
 </Modal>

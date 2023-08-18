@@ -65,7 +65,7 @@
         {/each}
       </div>
 
-      <div class="flex justify-end text-lg font-bold">Audio Output Device:</div>
+      <div class="flex justify-end text-lg font-bold">Audio output device:</div>
       <select class="select select-bordered select-lg w-full" on:change={(e) => setSpeaker(e.target.value)}>
         {#each $playStatus.speakers as [id, name]}
           <option value={id} selected={id === $speaker}>{name}</option>
@@ -100,7 +100,7 @@
         </span>
       </div>
 
-      <div class="flex justify-end text-lg font-bold">Broadcast Compression:</div>
+      <div class="flex justify-end text-lg font-bold">Broadcast compression:</div>
       <div class="w-full text-lg">
         <span
           class="font-bold"
@@ -112,8 +112,8 @@
         (configured on server)
       </div>
 
-      <div class="flex justify-end text-lg font-bold">Station Admin:</div>
-      <a class="link-hover link-primary link text-lg" href={$db.host}>Open in your web browser</a>
+      <div class="flex justify-end text-lg font-bold">Station admin site:</div>
+      <a class="link-hover link-info link text-lg" href={$db.host}>Open in your web browser</a>
 
       <div class="flex justify-end text-lg font-bold">Version:</div>
       <!-- svelte-ignore missing-declaration-->
@@ -121,9 +121,9 @@
     </div>
 
     <div class="col-span-2">
-      <button type="button" class="btn btn-error" on:click|preventDefault={confirmLogout}>
-        DANGER: Log out of server</button
-      >
+      <button type="button" class="btn btn-error" on:click|preventDefault={confirmLogout} tabindex="-1">
+        DANGER: Log out of server
+      </button>
     </div>
   </svelte:fragment>
 </Modal>
