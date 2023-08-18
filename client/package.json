@@ -37,7 +37,7 @@
     "@electron-forge/cli": "^6.3.0",
     "@electron-forge/maker-deb": "^6.3.0",
     "@electron-forge/maker-dmg": "^6.3.0",
-    "@electron-forge/maker-squirrel": "^6.3.0",
+    "@electron-forge/maker-wix": "^6.3.0",
     "@elgato-stream-deck/webhid": "^5.7.3",
     "@homebridge/dbus-native": "^0.5.1",
     "@iconify/icons-mdi": "^1.2.47",

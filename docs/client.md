@@ -76,9 +76,8 @@ or can be download below.
 
   * [:material-download: macOS :simple-apple:](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-macos.dmg)
     &mdash; An application bundle with a  **universal binary** for Intel or Apple M1 chips
-  * [:material-download: Windows :simple-windows:](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-windows.exe)
-    &mdash; a Windows executable that automatically installs Tomato on first run (using
-    [Squirrel.Windows](https://github.com/Squirrel/Squirrel.Windows))
+  * [:material-download: Windows :simple-windows:](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-windows.msi)
+    &mdash; a MSI installer for Windows
   * Linux :simple-linux:
     * [:material-download: Ubuntu :simple-ubuntu: or Debian :simple-debian:](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_amd64.deb)
     &mdash; package in `.deb` format (amd64 only)

@@ -327,6 +327,7 @@ if (squirrelCheck || !singleInstanceLock) {
     playServer.listen(+cmdArgs["play-server-port"] || 8207, cmdArgs["play-server-host"])
   }
 
+  // Needed until https://github.com/electron/electron/pull/38977 is merged
   if (IS_LINUX) {
     const dbus = require("@homebridge/dbus-native") // Don't bundle on mac/windows
 
