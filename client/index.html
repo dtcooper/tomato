@@ -390,6 +390,26 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#features-at-a-glance" class="md-nav__link">
+    Features at a glance
+  </a>
+  
+    <nav class="md-nav" aria-label="Features at a glance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#user-interface-modes" class="md-nav__link">
+    User Interface Modes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#preview-builds" class="md-nav__link">
     Preview Builds
   </a>
@@ -522,10 +542,55 @@
 
 
 <h1 id="the-tomato-desktop-app">The Tomato Desktop App<a class="headerlink" href="#the-tomato-desktop-app" title="Permanent link">←</a></h1>
-<p>The desktop app is undocumented as it's being written and is in early preview
-stages. You can, however download <a href="#preview-builds">preview builds</a> or
-<a href="#run-development-code">run the development code yourself</a>.</p>
-<p><img alt="" loading="lazy" src="../assets/client-screenshot.png" style="width: 100%" /></p>
+<p>The desktop app is being developed and is in early preview stages. You can, however
+download <a href="#preview-builds">preview builds</a> or <a href="#run-development-code">run the development code yourself</a>.</p>
+<p><img alt="" loading="lazy" src="../assets/client/screenshot.png" style="width: 100%" /></p>
+<h2 id="features-at-a-glance">Features at a glance<a class="headerlink" href="#features-at-a-glance" title="Permanent link">←</a></h2>
+<h3 id="user-interface-modes">User Interface Modes<a class="headerlink" href="#user-interface-modes" title="Permanent link">←</a></h3>
+<p>Tomato has three different user interface modes: <strong>simple</strong>, <strong>standard</strong>, and
+<strong>advanced</strong> to accommodate varying levels of literacy with audio software.</p>
+<p>Select a tab below to find out more about each mode.</p>
+<p>To change this, head to the settings click on the settings gear <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97 0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1 0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/></svg></span>
+and choose a <em>"user interface mode".</em></p>
+<p><img alt="" loading="lazy" src="../assets/client/ui-mode-selector.png" style="width: 400px" /></p>
+<div class="admonition info">
+<p class="admonition-title">User Interface Modes</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Simple mode</label><label for="__tabbed_1_2">Standard mode</label><label for="__tabbed_1_3">Advanced mode</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>The simplest mode Tomato can operate on. It has one <em><strong>Play</strong></em> button
+that plays through a stop set.</p>
+<p><figure markdown>
+  <img alt="" loading="lazy" src="../assets/client/simple-mode.png" style="width: 100%" />
+  <figcaption>Simple mode</figcaption>
+</figure></p>
+<p>All other modes have a large button on the top that allow a confused user
+to return to this mode easily. It looks like this,</p>
+<p><img alt="" loading="lazy" src="../assets/client/back-to-simple-mode-btn.png" style="width: 200px" /></p>
+</div>
+<div class="tabbed-block">
+<p>Standard mode builds on simple mode adding radial countdown clocks on
+each item in the playlist, more details progress/duration information,
+and <em><strong>Pause</strong></em> and <em><strong>Skip</strong></em> buttons that work on the currently
+playing asset.</p>
+<p><figure markdown>
+  <img alt="" loading="lazy" src="../assets/client/standard-mode.png" style="width: 100%" />
+  <figcaption>Standard mode</figcaption>
+</figure></p>
+</div>
+<div class="tabbed-block">
+<p>Advanced mode builds on simple mode adding stop set control, allowing you
+to skip the currently playing stop set and <em>regenerate the next</em> stop set.</p>
+<p>This mode also adds individual play buttons next to all items in your
+playlist, for easy skipping ahead.</p>
+<p><figure markdown>
+  <img alt="" loading="lazy" src="../assets/client/advanced-mode.png" style="width: 100%" />
+  <figcaption>Advanced mode</figcaption>
+</figure></p>
+</div>
+</div>
+</div>
+</div>
 <h2 id="preview-builds">Preview Builds<a class="headerlink" href="#preview-builds" title="Permanent link">←</a></h2>
 <p><strong>Development preview builds may not be safe: use them at your own risk.</strong></p>
 <p>Preview builds
