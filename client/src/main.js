@@ -1,10 +1,22 @@
-const { app, BrowserWindow, powerSaveBlocker, shell, ipcMain, nativeTheme, dialog, Menu } = require("electron")
+const {
+  app,
+  BrowserWindow,
+  powerSaveBlocker,
+  shell,
+  ipcMain,
+  nativeTheme,
+  dialog,
+  Menu,
+  globalShortcut
+} = require("electron")
 const windowStateKeeper = require("electron-window-state")
 const fs = require("fs")
 const fsExtra = require("fs-extra")
+const { parseArgs } = require("util")
 const path = require("path")
 const { check: squirrelCheck } = require("electron-squirrel-startup")
 const { protocol_version } = require("../../server/constants.json")
+const net = require("net")
 
 // Needs to happen before single instance lock check
 const appDataDir = app.getPath("appData")
@@ -15,13 +27,26 @@ app.setPath("userData", userDataDir)
 const singleInstanceLock = app.requestSingleInstanceLock()
 
 if (squirrelCheck || !singleInstanceLock) {
+  if (!singleInstanceLock) {
+    console.error("Couldn't acquire single instance lock!")
+  }
   app.quit()
 } else {
+  const cmdArgs = parseArgs({
+    options: {
+      "enable-dev-mode": { type: "boolean", default: false },
+      "disable-play-server": { type: "boolean", default: false },
+      "play-server-port": { type: "string", default: "8207" },
+      "play-server-host": { type: "string", default: "127.0.0.1" }
+    },
+    strict: false
+  }).values
+
   let window = null
   const elgatoVendorId = 4057
   let blocker = null
   const [minWidth, minHeight, defaultWidth, defaultHeight] = [800, 600, 1000, 800]
-  const isDev = process.argv.includes("--enable-dev-mode") || process.env.NODE_ENV === "development"
+  const isDev = cmdArgs["enable-dev-mode"] || process.env.NODE_ENV === "development"
   const iconPath = path.resolve(path.join(__dirname, "../assets/icons/tomato.png"))
 
   // Migrate when there's a protocol version bump
@@ -281,6 +306,26 @@ if (squirrelCheck || !singleInstanceLock) {
   app.on("window-all-closed", () => {
     app.quit()
   })
+
+  if (!cmdArgs["disable-play-server"]) {
+    const playServerPort = +cmdArgs["play-server-port"] || 8207
+    console.log(`Running play server on ${cmdArgs["play-server-host"]}:${playServerPort}`)
+    const playServer = net.createServer((socket) => {
+      setTimeout(() => socket.destroy(), 1000)
+      socket.on("data", (data) => {
+        if (data.toString().toLowerCase().startsWith("play\n")) {
+          socket.write("Sent play command to Tomato!\n")
+          if (window) {
+            window.webContents.send("play-server-cmd-play")
+          }
+        } else {
+          socket.write("Invalid command!\n")
+        }
+        socket.destroySoon()
+      })
+    })
+    playServer.listen(+cmdArgs["play-server-port"] || 8207, cmdArgs["play-server-host"])
+  }
 
   if (IS_LINUX) {
     const dbus = require("@homebridge/dbus-native") // Don't bundle on mac/windows

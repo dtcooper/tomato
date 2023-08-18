@@ -1,4 +1,6 @@
 <script>
+  import { ipcRenderer } from "electron"
+
   import playCircleOutlineIcon from "@iconify/icons-mdi/play-circle-outline"
   import pauseCircleOutlineIcon from "@iconify/icons-mdi/pause-circle-outline"
   import skipNextCircleOutline from "@iconify/icons-mdi/skip-next-circle-outline"
@@ -23,6 +25,17 @@
   $: playDisabled =
     !items.some((item) => item.type === "stopset") || (firstItem.type === "stopset" && firstItem.playing)
   $: pauseDisabled = firstItem.type !== "stopset" || !firstItem.playing
+
+
+  ipcRenderer.on("play-server-cmd-play", (...args) => {
+    if (playDisabled) {
+      console.log("Got command from play server, but currently not eligible to play!")
+    } else {
+      console.log("Calling play() based on command from play server")
+      play()
+    }
+  })
+
 </script>
 
 <svelte:window
