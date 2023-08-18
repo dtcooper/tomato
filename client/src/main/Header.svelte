@@ -25,7 +25,7 @@
     <div class="flex items-center gap-3">
       {#if $config.UI_MODES.includes(0) && $userConfig.uiMode >= 1}
         <button class="btn btn-accent" on:click={() => ($userConfig.uiMode = 0)} tabindex="-1">
-          Back to simple view
+          &ShortLeftArrow; Back to simple view
         </button>
       {/if}
       <div class="tooltip tooltip-bottom" data-tip={`${$isFullscreen ? "Exit" : "Enter"} fullscreen mode`}>

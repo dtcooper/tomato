@@ -15,7 +15,7 @@ specific use case of [Burning Man Information Radio](https://bmir.org).
     This documentation may not reflect the latest changes, or may include changes
     that are not yet available. _Beware!_
 
-![](assets/client-screenshot.png){ style="width: 100%" loading=lazy }
+![](assets/client/screenshot.png){ style="width: 100%" loading=lazy }
 
 ## Quickstart
 

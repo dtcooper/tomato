@@ -407,7 +407,7 @@ CONSTANCE_CONFIG = {
                 "The randomization algorithm will try its absolute best to avoid duplicates. However, when that's not"
                 " possible (for example because of a nearly empty rotator), do you want <strong>the same asset</strong>"
                 " to repeat (<code>True</code>), or for the rotator to be ignored in a given stop set"
-                " (<code>False</code>?"
+                " (<code>False</code>)?"
             )
         ),
     ),

@@ -16,7 +16,7 @@ and hard to screw up playout software written for the specific use case of
 [Burning Man Information Radio](https://bmir.org).
 
 <div align="center">
-  <img src="https://raw.github.com/dtcooper/tomato/main/docs/assets/client-screenshot.png" width="850">
+  <img src="https://raw.github.com/dtcooper/tomato/main/docs/assets/client/screenshot.png" width="850">
 </div>
 
 The backend server is written in [Python](https://www.python.org/)'s
