@@ -192,7 +192,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
       this.audio.play().catch((e) => this._errorHelper(e))
       clearInterval(this.interval)
       this.interval = setInterval(() => {
-        if (this.audio) {
+        if (this.audio && !this.error) {
           this._elapsed = this.audio.currentTime
           this.updateCallback()
         }
