@@ -41,8 +41,8 @@ jobs:
             os: windows-2022
             arch: x64
             platform: win32
-            out_path: wix/x64/*.msi
-            filename_suffix: windows.msi
+            out_path: squirrel.windows/x64/*.exe
+            filename_suffix: windows.exe
           -
             title: Debian/Ubuntu Linux
             os: ubuntu-22.04
@@ -86,7 +86,6 @@ jobs:
           cd client
           if [ "${{ matrix.platform }}" = "win32" ]; then
             npm config set script-shell $(which bash)
-            export PATH="${PATH}:/c/Program Files (x86)/WiX Toolset v3.11/bin"
           fi
           npm clean-install
           TOMATO_VERSION=${{ env.TOMATO_VERSION }}${{ env.TOMATO_VERSION_SUFFIX }} npm run build

@@ -29,13 +29,10 @@ module.exports = {
       }
     },
     {
-      name: "@electron-forge/maker-wix",
+      name: "@electron-forge/maker-squirrel",
       config: {
-        description: "Tomato Radio Automation",
-        name: "Tomato Radio Automation",
-        ui: {
-          chooseDirectory: true
-        }
+        iconUrl: "https://raw.githubusercontent.com/dtcooper/tomato/main/client/assets/icons/tomato.ico",
+        setupIcon: "assets/icons/tomato.ico"
       }
     },
     {
