@@ -104,6 +104,10 @@ Head over to <http://localhost:8888/> in your web browser.
 
 ### Future Versions
 
+Changes for 2024 based on feedback
+- [ ] Make rotators able to disabled (UI for assets / stopsets needs to show that too)
+
+Other things
 - [ ] "Island Mode" with an embedded [standalone Python distribution](https://python-build-standalone.readthedocs.io/en/latest/)
 - [ ] Login interstitial to populate with demo data
 - [ ] Integrated Twilio call board
