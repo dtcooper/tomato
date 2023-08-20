@@ -89,11 +89,11 @@
             on:click={skipCurrentStopset}
             tabindex="-1"
           >
-            <Icon icon={skipForwardOutlineIcon} class="h-6 w-6" /> Skip Current
+            <Icon icon={skipForwardOutlineIcon} class="h-6 w-6" /> Skip current
           </button>
         </div>
         <button class="btn btn-warning btn-sm pl-0.5" on:click={regenerateNextStopset} tabindex="-1">
-          <Icon icon={reloadIcon} class="h-6 w-6" /> Regenerate Next
+          <Icon icon={reloadIcon} class="h-6 w-6" /> Regenerate next
         </button>
       </div>
     </div>

@@ -146,7 +146,13 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
       }
       this.audio.onended = () => this.done()
       this.audio.onerror = (e) => this._errorHelper(e)
-
+      this.audio.onpause = () => {
+        // In the unlikely event we get a pause event from the OS?
+        if (!this.playing) {
+          console.warning("Got pause event while in playing state (should have been set to false)")
+          this.pause()
+        }
+      }
       this.audio.src = this.file.localUrl
     }
   }
@@ -154,7 +160,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   unloadAudio() {
     clearInterval(this.interval)
     if (this.audio) {
-      this.audio.ondurationchange = this.audio.ontimeupdate = this.audio.onended = this.audio.onended = null
+      this.audio.ondurationchange = this.audio.ontimeupdate = this.audio.onended = this.audio.onended = this.audio.onpause = null
       this.audio.pause()
       this.audio.__tomato_used = false
       this.audio = null
