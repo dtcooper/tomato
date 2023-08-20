@@ -160,7 +160,12 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   unloadAudio() {
     clearInterval(this.interval)
     if (this.audio) {
-      this.audio.ondurationchange = this.audio.ontimeupdate = this.audio.onended = this.audio.onended = this.audio.onpause = null
+      this.audio.ondurationchange =
+        this.audio.ontimeupdate =
+        this.audio.onended =
+        this.audio.onended =
+        this.audio.onpause =
+          null
       this.audio.pause()
       this.audio.__tomato_used = false
       this.audio = null

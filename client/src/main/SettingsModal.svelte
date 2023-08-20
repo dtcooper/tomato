@@ -44,6 +44,8 @@
   }
 
   const uiModeStrings = ["Simple", "Standard", "Advanced"]
+
+  $: speakerLocked = show
 </script>
 
 <Modal bind:show class="max-w-3xl">
@@ -66,11 +68,33 @@
       </div>
 
       <div class="flex justify-end text-lg font-bold">Audio output device:</div>
-      <select class="select select-bordered select-lg w-full" on:change={(e) => setSpeaker(e.target.value)}>
-        {#each $playStatus.speakers as [id, name]}
-          <option value={id} selected={id === $speaker}>{name}</option>
-        {/each}
-      </select>
+      <div class="flex flex-col items-end">
+        <div
+          class:tooltip={speakerLocked}
+          class="tooltip-warning tooltip-bottom w-full"
+          data-tip="Unlock device by clicking below"
+        >
+          <select
+            class="select select-bordered select-lg w-full"
+            on:change={(e) => setSpeaker(e.target.value)}
+            disabled={speakerLocked}
+          >
+            {#each $playStatus.speakers as [id, name]}
+              <option value={id} selected={id === $speaker}>{name}</option>
+            {/each}
+          </select>
+        </div>
+        <div class="w-max pr-5 pt-1 text-xs">
+          <button
+            class="link-hover link"
+            class:link-primary={!speakerLocked}
+            class:link-warning={speakerLocked}
+            on:click={() => (speakerLocked = !speakerLocked)}
+          >
+            {speakerLocked ? "Unl" : "L"}ock output device
+          </button>
+        </div>
+      </div>
 
       <!-- svelte-ignore missing-declaration -->
       {#if IS_DEV}
@@ -121,7 +145,7 @@
     </div>
 
     <div class="col-span-2">
-      <button type="button" class="btn btn-error" on:click|preventDefault={confirmLogout} tabindex="-1">
+      <button type="button" class="btn btn-error btn-sm" on:click|preventDefault={confirmLogout} tabindex="-1">
         DANGER: Log out of server
       </button>
     </div>
