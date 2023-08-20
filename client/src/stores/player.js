@@ -120,6 +120,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
       console.warn(
         `Length of re-usable audio objects ${PlayableAsset._reusableAudioObjects.length} > 50. Really long stop sets could cause this.`
       )
+      log("internal_error", `Length of re-usable audion objects ${PlayableAsset._reusableAudioObjects.length} > 50.`)
     }
     return audio
   }
@@ -148,8 +149,9 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
       this.audio.onerror = (e) => this._errorHelper(e)
       this.audio.onpause = () => {
         // In the unlikely event we get a pause event from the OS?
-        if (!this.playing) {
-          console.warning("Got pause event while in playing state (should have been set to false)")
+        if (this.playing) {
+          console.warn("Got pause event while in playing state (should have been set to false)")
+          this.generatedStopset.playing = false
           this.pause()
         }
       }
