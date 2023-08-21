@@ -11,7 +11,6 @@ TYPES_TO_STRING = {
     str: "String",
 }
 TYPE_HINTS_TO_STRING = {
-    "single_play_rotators": "One or more rotators",
     "audio_bitrate": "32kbps through 320kbps",
     "ui_modes": "Simple, standard, and/or advanced mode",
 }
@@ -48,8 +47,6 @@ def get_constance_config_default(name, default):
 
     if name == "AUDIO_BITRATE":
         return f"{default}kbps"
-    elif name == "SINGLE_PLAY_ROTATORS":
-        return "None"
     elif name == "UI_MODES":
         return "Simple & standard mode"
     return repr(default)

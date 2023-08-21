@@ -1,28 +1,54 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.urls import reverse
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 
+from ..utils import mark_models_dirty
 from .base import AiringEnabledMixin, NoNullRelatedOnlyFieldFilter, NumAssetsMixin, TomatoModelAdminBase
 
 
 class RotatorAdmin(AiringEnabledMixin, NumAssetsMixin, TomatoModelAdminBase):
-    actions = ("enable", "disable")
-    list_display = ("name", "enabled", "color_display", "stopsets_display", "num_assets")
+    actions = ("enable", "disable", "enable_single_play", "disable_single_play")
+    list_display = ("name", "enabled", "is_single_play", "color_display", "stopsets_display", "num_assets")
     list_prefetch_related = ("stopsets",)
+    COLOR_FIELDSET = ("Color", {"fields": ("color", "color_preview")})
     add_fieldsets = (
-        (None, {"fields": ("name",)}),
-        ("Color", {"fields": ("color", "color_preview")}),
+        (None, {"fields": ("name", "is_single_play")}),
+        COLOR_FIELDSET,
     )
-    fieldsets = add_fieldsets + (
-        ("Airing Information", {"fields": ("enabled",)}),
+    fieldsets = (
+        (None, {"fields": ("name",)}),
+        ("Airing Information", {"fields": ("enabled", "is_single_play")}),
+        COLOR_FIELDSET,
         ("Stop sets", {"fields": ("stopsets_display",)}),
         ("Additional information", {"fields": ("num_assets", "created_by", "created_at")}),
     )
     # Average asset length?
     # Assets
     readonly_fields = ("stopsets_display", "color_preview", "num_assets") + TomatoModelAdminBase.readonly_fields
-    list_filter = ("enabled", "stopsets", ("created_by", NoNullRelatedOnlyFieldFilter))
+    list_filter = ("enabled", "stopsets", ("created_by", NoNullRelatedOnlyFieldFilter), "is_single_play")
+
+    @admin.action(
+        description="Enable single play for selected %(verbose_name_plural)s", permissions=("add", "change", "delete")
+    )
+    def enable_single_play(self, request, queryset):
+        num = queryset.update(is_single_play=True)
+        if num:
+            self.message_user(
+                request, f"Enabled single play for {num} {self.model._meta.verbose_name}(s) .", messages.SUCCESS
+            )
+            mark_models_dirty(request)
+
+    @admin.action(
+        description="Disable single play for selected %(verbose_name_plural)s", permissions=("add", "change", "delete")
+    )
+    def disable_single_play(self, request, queryset):
+        num = queryset.update(is_single_play=False)
+        if num:
+            self.message_user(
+                request, f"Disabled single play for {num} {self.model._meta.verbose_name}(s).", messages.SUCCESS
+            )
+            mark_models_dirty(request)
 
     @admin.display(description="Color", ordering="color")
     def color_display(self, obj=None):

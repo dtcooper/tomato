@@ -118,7 +118,7 @@ Other things
 - [ ] Custom UI labels unused labels that play every N times (ie for telling the DJ to do something)
 - [ ] Add configurable silence between ads
 - [ ] Client "Demo mode", requiring no backend with demo assets.
-- [ ] Button to play an asset from a specific rotator (on Stream Deck too).
+- [x] Button to play an asset from a specific rotator (on Stream Deck too).
   - [x] Backend done as `SINGLE_PLAY_ROTATORS`
 
 ## License

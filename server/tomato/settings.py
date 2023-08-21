@@ -2,7 +2,6 @@ from collections import OrderedDict
 from decimal import Decimal
 from pathlib import Path
 
-from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 
 import environ
@@ -241,17 +240,6 @@ if REQUIRE_STRONG_PASSWORDS:
     ]
 
 
-def rotator_choices():
-    from tomato.models import Rotator
-
-    return tuple(Rotator.objects.values_list("id", "name").order_by("name"))
-
-
-def validate_no_more_than_eight(value):
-    if len(value) > 8:
-        raise ValidationError("Pick a maximum of three choices.")
-
-
 MIGRATION_MODULES = {"constance": None}  # Ignore constance models
 CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
 CONSTANCE_SUPERUSER_ONLY = False
@@ -264,15 +252,6 @@ CONSTANCE_ADDITIONAL_FIELDS = {
             "choices": (("0", "Simple view"), ("1", "Standard view"), ("2", "Advanced view")),
             "widget": "django.forms.widgets.CheckboxSelectMultiple",
             "required": True,
-        },
-    ),
-    "single_play_rotators": (
-        "django.forms.MultipleChoiceField",
-        {
-            "choices": rotator_choices,
-            "widget": "django.forms.widgets.CheckboxSelectMultiple",
-            "required": False,
-            "validators": (validate_no_more_than_eight,),
         },
     ),
     "asset_end_date_priority_weight_multiplier": (
@@ -331,14 +310,6 @@ CONSTANCE_ADDITIONAL_FIELDS = {
 _constance_not_implemented_html = '<span style="color: red">(Currently not implemented.)</span>'
 CONSTANCE_CONFIG = {
     "STATION_NAME": ("Tomato Radio Automation", "The name of your station.", "short_text"),
-    "SINGLE_PLAY_ROTATORS": (
-        [],
-        mark_safe(
-            "Optional rotators to play a single asset from in the Desktop app. You can choose a maximum of 8."
-            f" {_constance_not_implemented_html}"
-        ),
-        "single_play_rotators",
-    ),
     "BROADCAST_COMPRESSION": (
         False,
         mark_safe(
@@ -473,7 +444,6 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
             (
                 "BROADCAST_COMPRESSION",
                 "WARN_ON_EMPTY_ROTATORS",
-                "SINGLE_PLAY_ROTATORS",
                 "WAIT_INTERVAL",
                 "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME",
                 "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME_MIN_LENGTH",

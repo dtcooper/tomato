@@ -2,6 +2,7 @@ import dayjs from "dayjs"
 
 export const urlParams = Object.fromEntries(new URLSearchParams(window.location.search).entries())
 export const IS_DEV = urlParams.dev === "1"
+export const progressBarAnimationFramerate = 30
 
 export const prettyDuration = (item, max) => {
   item = dayjs.duration(Math.round(item), "seconds")

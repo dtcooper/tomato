@@ -174,13 +174,24 @@ class Rotator extends HydratableObject {
     this.color = colors.find((c) => c.name === color)
   }
 
-  getAsset(
-    softIgnoreIds = new Set(),
-    mediumIgnoreIds = new Set(),
-    hardIgnoreIds = new Set(),
-    startTime,
-    endDateMultiplier
-  ) {
+  static getSoftIgnoreIds() {
+    let softIgnoreIds = new Set()
+
+    const NO_REPEAT_ASSETS_TIME = get(config).NO_REPEAT_ASSETS_TIME
+    if (NO_REPEAT_ASSETS_TIME > 0) {
+      // Purge _assetPlayTimes if their outside time bounds
+      DB._assetPlayTimes = new Map(
+        Array.from(DB._assetPlayTimes.entries()).filter(([, ts]) => ts + NO_REPEAT_ASSETS_TIME >= timestamp())
+      )
+      DB._saveAssetPlayTimes()
+      softIgnoreIds = new Set(DB._assetPlayTimes.keys())
+    }
+    return softIgnoreIds
+  }
+
+  getAsset(mediumIgnoreIds = new Set(), hardIgnoreIds = new Set(), startTime, endDateMultiplier) {
+    const softIgnoreIds = Rotator.getSoftIgnoreIds()
+
     // soft ignored = played within a recent amount of time
     // medium ignored = exists on screen already
     // hard ignored = exists within the stopset being generated
@@ -227,10 +238,8 @@ class RotatorsMap extends Map {
 }
 
 class Stopset extends AssetStopsetHydratableObject {
-  generate(startTime, mediumIgnoreIds, endDateMultiplier, doneCallback, updateCallback, generatedId) {
-    const hardIgnoreIds = new Set()
+  static getSoftIgnoreIds() {
     let softIgnoreIds = undefined
-
     const NO_REPEAT_ASSETS_TIME = get(config).NO_REPEAT_ASSETS_TIME
     if (NO_REPEAT_ASSETS_TIME > 0) {
       // Purge _assetPlayTimes if their outside time bounds
@@ -240,12 +249,17 @@ class Stopset extends AssetStopsetHydratableObject {
       DB._saveAssetPlayTimes()
       softIgnoreIds = new Set(DB._assetPlayTimes.keys())
     }
+    return softIgnoreIds
+  }
+
+  generate(startTime, mediumIgnoreIds, endDateMultiplier, doneCallback, updateCallback, generatedId) {
+    const hardIgnoreIds = new Set()
 
     const items = []
     for (const rotator of this.rotators) {
       let asset = null
       if (rotator.enabled) {
-        asset = rotator.getAsset(softIgnoreIds, mediumIgnoreIds, hardIgnoreIds, startTime, endDateMultiplier)
+        asset = rotator.getAsset(mediumIgnoreIds, hardIgnoreIds, startTime, endDateMultiplier)
         if (asset) {
           hardIgnoreIds.add(asset.id)
           startTime = startTime.add(asset.duration, "seconds")

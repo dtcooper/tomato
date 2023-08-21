@@ -7,6 +7,7 @@
   import { fade } from "svelte/transition"
   import { prettyDuration, humanDuration } from "../../utils"
   import { config, userConfig } from "../../stores/config"
+  import { singlePlayRotators } from "../../stores/single-play-rotators"
 
   export let items
   export let addStopset
@@ -19,7 +20,13 @@
 </script>
 
 <!-- col-span-2 until we have a single play rotator player -->
-<div class="col-span-2 flex h-0 min-h-full flex-col rounded-lg border-base-content bg-base-200 p-1.5 pt-2">
+<div
+  class="flex h-0 min-h-full flex-col rounded-lg border-base-content bg-base-200 p-1.5 pt-2"
+  class:col-span-2={!$singlePlayRotators.enabled}
+>
+  {#if $singlePlayRotators.enabled}
+    <div class="divider m-0 mb-2 font-mono text-sm italic text-primary">Playlist</div>
+  {/if}
   <div class="flex flex-1 flex-col gap-2 overflow-y-auto" id="playlist">
     {#each items as item, index (item.generatedId)}
       {@const isFirstItem = index === 0}
@@ -29,10 +36,9 @@
           class:text-secondary={item.type === "stopset"}
           class:text-accent={item.type === "wait"}
         >
-          <span
-            >{item.name}{#if item.duration > 0}
-              <span class="font-mono">[{prettyDuration(item.duration)}]</span>{/if}</span
-          >
+          <span>
+            {item.name}{#if item.duration > 0}<span class="font-mono">[{prettyDuration(item.duration)}]</span>{/if}
+          </span>
         </div>
         {#if item.type === "stopset"}
           {#each item.items as asset, subindex}
@@ -102,7 +108,7 @@
                       {/if}
                     </div>
                   {/if}
-                  <div class="flex flex-1 flex-col overflow-x-hidden">
+                  <div class="flex w-0 flex-1 flex-col">
                     <div class="font-sm truncate">
                       <span
                         class="badge border-secondary-content font-medium"

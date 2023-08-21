@@ -4,9 +4,11 @@
   import PlayBar from "./player/Bar.svelte"
   import PlayButtons from "./player/Buttons.svelte"
   import PlayList from "./player/List.svelte"
+  import SinglePlayRotators from "./player/SinglePlayRotators.svelte"
 
   import { IS_DEV } from "../utils"
   import { config, userConfig } from "../stores/config"
+  import { singlePlayRotators, stop as stopSinglePlayRotator } from "../stores/single-play-rotators"
   import { db } from "../stores/db"
   import { Wait } from "../stores/player"
 
@@ -156,6 +158,7 @@
     if (nextItem.type === "wait") {
       nextItem.run()
     } else if (nextItem.type === "stopset" && (play || (IS_DEV && $userConfig.autoplay))) {
+      stopSinglePlayRotator()
       nextItem.play(subindex)
     }
   }
@@ -175,6 +178,7 @@
 
   const skip = () => {
     scrollToTopOfPlaylist()
+    stopSinglePlayRotator()
     items[0].skip()
   }
 
@@ -207,3 +211,7 @@
   {processItem}
   {pause}
 />
+
+{#if $singlePlayRotators.enabled}
+  <SinglePlayRotators playlistItems={items} />
+{/if}

@@ -2,7 +2,7 @@ import dayjs from "dayjs"
 import { persisted } from "svelte-local-storage-store"
 import { noop } from "svelte/internal"
 import { derived, get, writable } from "svelte/store"
-import { prettyDuration } from "../utils"
+import { prettyDuration, progressBarAnimationFramerate } from "../utils"
 import { log } from "./client-logs"
 import { config } from "./config"
 import { markPlayed } from "./db"
@@ -18,8 +18,6 @@ export const blockSpacebarPlay = writable(false)
 let compressorEnabled = false
 let currentGeneratedId = 0
 const audioContext = new AudioContext()
-
-const progressBarAnimationFramerate = 30
 
 const inputNode = audioContext.createGain()
 inputNode.gain.value = 1

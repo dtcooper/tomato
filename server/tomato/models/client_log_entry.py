@@ -14,9 +14,10 @@ class ClientLogEntry(models.Model):
         LOGGED_OUT = "logout", "Logged out"
         OVERDUE = "overdue", "Playing of stop set overdue"
         PLAYED_ASSET = "played_asset", "Played an audio asset"
+        PLAYED_SINGLE_PLAY_ROTATOR = "played_single", "Played single play rotator"
         PLAYED_STOPSET = "played_stopset", "Played an entire stop set"
         SKIPPED_ASSET = "skipped_asset", "Skipped (or played a partial) audio asset"
-        SKIPPED_STOPSET = "skipped_stopset", "Skipped (or played a partial) stop set."
+        SKIPPED_STOPSET = "skipped_stopset", "Skipped (or played a partial) stop set"
         WAITED = "waited", "Waited"
         UNSPECIFIED = "unspecified", "Unspecified"
 
@@ -25,6 +26,7 @@ class ClientLogEntry(models.Model):
         Type.LOGGED_IN.value: "auth",
         Type.LOGGED_OUT.value: "auth",
         Type.PLAYED_ASSET.value: "asset",
+        Type.PLAYED_SINGLE_PLAY_ROTATOR.value: "asset",
         Type.PLAYED_STOPSET.value: "stopset",
         Type.SKIPPED_ASSET.value: "asset",
         Type.SKIPPED_STOPSET.value: "stopset",

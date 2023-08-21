@@ -1,10 +1,11 @@
 {
-  "protocol_version": 2,
+  "protocol_version": 3,
   "client_log_entry_types": [
     "internal_error",
     "login",
     "logout",
     "played_asset",
+    "played_single",
     "played_stopset",
     "skipped_asset",
     "skipped_stopset",

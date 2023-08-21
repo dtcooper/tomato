@@ -15,6 +15,14 @@ class Rotator(TomatoModelBase):
         choices=COLOR_CHOICES,
         help_text="Color that appears in the client for this rotator.",
     )
+    is_single_play = models.BooleanField(
+        "single play",
+        default=False,
+        help_text=(
+            "Enable single play mode, which will cause the desktop app to allow playing a random asset from this"
+            " rotator. (Standard and advanced mode only.)"
+        ),
+    )
     enabled = models.BooleanField(
         "enabled",
         default=True,
@@ -31,7 +39,7 @@ class Rotator(TomatoModelBase):
     )
 
     def serialize(self):
-        return {"color": self.color, **super().serialize()}
+        return {"color": self.color, "is_single_play": self.is_single_play, **super().serialize()}
 
     def get_color(self, content=False):
         return COLORS_DICT[self.color]["content" if content else "value"]
