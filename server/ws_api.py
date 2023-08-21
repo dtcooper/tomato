@@ -70,8 +70,8 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
             await self.on_recieve_authenticated(websocket, data)
 
     async def process_log(self, data):
+        uuid = data.pop("id")
         if self.user.enable_client_logs:
-            uuid = data.pop("id")
             data["created_by"] = self.user
             if data["type"] not in CLIENT_LOG_ENTRY_TYPES:
                 data["type"] = "unspecified"
