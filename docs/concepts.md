@@ -26,7 +26,7 @@ have additional data for example when they begin and end airing.
 **A <u>rotator</u> is a collection of _similar_ audio assets.** A rotator is how
 you to _categorize_ assets into a group.
 
-While an asset _can_ belong to more than one rotator, in practice they won't.
+While an asset _can_ belong to more than one rotator, in practice they shouldn't.
 
 !!! example "Rotator Example"
     From the asset example above, you might put _"David's Steel Guitar Ad"_
@@ -77,7 +77,7 @@ station ID jingles at the start and end of a stop set, as in the example below.
     ```mermaid
     flowchart RL
         stopset(Evening Stop Set)
-        subgraph "Rotators in Stop Set"
+        subgraph "Rotators in stop set"
             direction TB
             rotator1(1. Station IDs\n<em>Rotator</em>)
             rotator2(2. Advertisements\n<em>Rotator</em>)
@@ -92,12 +92,12 @@ station ID jingles at the start and end of a stop set, as in the example below.
         rotator5 --- stopset
     ```
 
-    Then, when an _"Evening Stop Set"_ is played by Tomato during a commercial
-    break, here's what's played,
+    Then, when an _"Evening Stop Set"_ is generated and played by Tomato during
+    a commercial break, here's what's played.
 
     ```mermaid
     flowchart LR
-        subgraph "Rotators in Stop Set"
+        subgraph "Rotators in stop set"
             direction TB
             rotator1(1. Station IDs\n<em>Rotator</em>)
             rotator2(2. Advertisements\n<em>Rotator</em>)
@@ -106,7 +106,7 @@ station ID jingles at the start and end of a stop set, as in the example below.
             rotator5(5. Station IDs\n<em>Rotator</em>)
         end
         stopset(Evening Stop Set)
-        subgraph "Assets Played"
+        subgraph "Assets played (generated)"
             direction TB
             asset1(S_ID_2.mp3\n<em>Asset</em>)
             asset2(AD_3.mp3\n<em>Asset</em>)
@@ -126,6 +126,12 @@ station ID jingles at the start and end of a stop set, as in the example below.
         asset5 -- randomly\nselected\nfrom rotator --- rotator5
     ```
 
+    !!!note "Stop sets and ***generated*** stop sets"
+
+        Note, the above is a so-called "generated" stop set. It's an actual stop set
+        that is played in the desktop client. We refer to these as _generated_
+        because Tomato picks (or generates) individual assets to play.
+
 ### Relationship Diagram
 
 Here's a simple relationship diagram for the entities described above.
@@ -143,7 +149,6 @@ flowchart RL
 
 Tomato's **wait interval** is how long the desktop app should wait before
 notifying the user that a stop set is due to be played.
-
 
 ## Weight
 **<u>Weight</u> (or random weight) is how likely random selection of an item occurs**,
@@ -218,4 +223,38 @@ $$
     weight $1$.
 
 
-[^1]: The random selection process can be biased by random [weight](#weight).
+
+## Anti-Repeat Algorithm
+
+Tomato tries _very_ hard not to repeat playing the same asset too soon. There
+are several sets of assets that can potentially be ignored as defined below.
+
+$\text{ignores}_\text{soft} = [\text{assets played recently (within NO_REPEAT_ASSETS_TIME)}]$
+
+$\text{ignores}_\text{medium} = [\text{assets on another generated stop set within current playlist}]$
+
+$\text{ignores}_\text{hard} = [\text{assets that exist as previous entries in current generated stopset}]$
+
+!!!note
+    $\text{ignores}_\text{soft}$ will be an empty set if `NO_REPEAT_ASSETS_TIME = 0`
+
+So $\text{ignores}_\text{soft}$ are _stuff that's played recently_, $\text{ignores}_\text{medium}$
+are _stuff that's going to play later in the playlist_, and $\text{ignores}_\text{hard}$ are _assets in
+the current stopset._
+
+Suppose Tomato is ready to select an asset from a rotator. Tomato will attempt
+to ignore assets by trying to ignore them using the priority order as defined below.
+That's to say, it'll go through several _tries_ to ignore assets. If Tomato can't
+select an asset, it'll proceed to the next try.
+
+Starting with the set of all _eligible_ assets  in a rotator (enabled and valid air dates),
+
+* Try #1: Ignore all assets in $\text{ignores}_\text{soft} \cup \text{ignores}_\text{medium} \cup \text{ignores}_\text{hard}$
+* Try #2: Ignore all assets in $\text{ignores}_\text{medium} \cup \text{ignores}_\text{hard}$
+* Try #3: Ignore all assets in $\text{ignores}_\text{hard}$
+* Try #4 (only if `ALLOW_REPEATS_IN_STOPSET = True`): Choose an asset from complete set of eligible assets
+* Fail (no asset selected).
+
+
+[^1]: The random selection process can be biased by random [weight](#weight) and
+    the [anti-repeat algorithm](#anti-repeat-algorithm)
