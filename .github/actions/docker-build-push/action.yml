@@ -18,6 +18,10 @@ inputs:
   build-args:
     description: List of build-time variables
     required: false
+  paltforms:
+    platforms: Container build platforms
+    required: false
+    default: 'linux/amd64,linux/arm64'
 
 runs:
   using: composite
@@ -50,7 +54,7 @@ runs:
       with:
         push: true
         pull: true
-        platforms: linux/amd64,linux/arm64
+        platforms: ${{ inputs.platforms }}
         context: ./${{ inputs.container }}/
         tags: ${{ env.REPO }}:${{ inputs.tag }}
         build-args: ${{ inputs.build-args }}

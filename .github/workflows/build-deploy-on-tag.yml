@@ -20,6 +20,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           container: server
           tag: ${{ github.ref_name }}
+          paltforms: linux/amd64  # TODO: Add back arm64 after Burning Man 2023
           no-cache: true
           build-args: |
             TOMATO_VERSION=${{ github.ref_name }}
