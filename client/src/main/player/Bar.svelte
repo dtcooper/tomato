@@ -19,10 +19,10 @@
     {#if item.type === "wait" && item.overtime}
       {#if item.overdue}
         <span class="italic text-error">
-          You are <span class="underline">OVERDUE</span> to play a {$config.STOPSET_ENTITY_NAME}. Press play now!
+          You are <span class="underline">OVERDUE</span> to play a stop set. Press play now!
         </span>
       {:else}
-        <span class="text-success">Play next {$config.STOPSET_ENTITY_NAME} now</span>
+        <span class="text-success">Play next stop set now</span>
       {/if}
     {:else}
       {prettyDuration(item.remaining)}
@@ -30,7 +30,7 @@
       {#if item.type === "wait"}
         to wait
       {:else if item.type === "stopset"}
-        in {$config.STOPSET_ENTITY_NAME}
+        in stop set
       {/if}
     {/if}
   </div>

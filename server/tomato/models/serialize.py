@@ -16,7 +16,6 @@ def get_constance_config(valid_rotator_ids):
     config.update(
         {
             "SINGLE_PLAY_ROTATORS": sorted(set(map(int, config["SINGLE_PLAY_ROTATORS"])) & set(valid_rotator_ids)),
-            "STOPSET_ENTITY_NAME": config["STOPSET_ENTITY_NAME"].strip().lower(),
             "UI_MODES": list(map(int, config["UI_MODES"])),
         }
     )

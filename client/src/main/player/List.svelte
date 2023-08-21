@@ -152,8 +152,7 @@
                 {/if}
                 <div class="flex flex-1 flex-col overflow-x-hidden">
                   <span class="font-medium italic">
-                    {upperCaseFirst($config.STOPSET_ENTITY_NAME)}
-                    {item.name} was generated but has no eligible assets.</span
+                    Stop set {item.name} was generated but has no eligible assets.</span
                   >
                 </div>
               </div>
@@ -192,7 +191,7 @@
                 </div>
                 {#if item.overtime}
                   <div class="animate-pulse" class:text-success={!item.overdue} class:text-error={item.overdue}>
-                    Play next {$config.STOPSET_ENTITY_NAME} now!
+                    Play next stop set now!
                   </div>
                 {/if}
               </div>
@@ -235,7 +234,7 @@
         on:click={addStopset}
         tabindex="-1"
       >
-        Load another {$config.STOPSET_ENTITY_NAME}...
+        Load another stop set...
       </button>
     </div>
   </div>

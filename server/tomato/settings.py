@@ -379,11 +379,6 @@ CONSTANCE_CONFIG = {
         ),
         "seconds",
     ),
-    "STOPSET_ENTITY_NAME": (
-        "stop set",
-        "Override the language in the Desktop app to change the word 'stop set' to something custom",
-        "shorter_text",
-    ),
     "STOPSET_PRELOAD_COUNT": (
         2,
         (
@@ -465,7 +460,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
             ),
         ),
         (
-            "Audio Options",
+            "Server processing audio options",
             (
                 "AUDIO_BITRATE",
                 "EXTRACT_METADATA_FROM_FILE",
@@ -474,19 +469,18 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
             ),
         ),
         (
-            "Airing Options",
+            "Desktop client options",
             (
                 "BROADCAST_COMPRESSION",
+                "WARN_ON_EMPTY_ROTATORS",
+                "SINGLE_PLAY_ROTATORS",
                 "WAIT_INTERVAL",
                 "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME",
                 "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME_MIN_LENGTH",
-                "WARN_ON_EMPTY_ROTATORS",
-                "STOPSET_ENTITY_NAME",
-                "STOPSET_PRELOAD_COUNT",
-                "STOPSET_OVERDUE_TIME",
                 "NO_REPEAT_ASSETS_TIME",
+                "STOPSET_OVERDUE_TIME",
+                "STOPSET_PRELOAD_COUNT",
                 "ALLOW_REPEATS_IN_STOPSET",
-                "SINGLE_PLAY_ROTATORS",
                 "END_DATE_PRIORITY_WEIGHT_MULTIPLIER",
             ),
         ),

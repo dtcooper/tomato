@@ -77,7 +77,7 @@
   {/if}
   {#if $userConfig.uiMode >= 2}
     <div class="flex flex-col gap-2">
-      <div class="divider my-0 text-sm italic">{upperCaseFirst($config.STOPSET_ENTITY_NAME)} control</div>
+      <div class="divider my-0 text-sm italic">Stop set control</div>
       <div class="flex justify-center gap-2">
         <div
           class={firstItem.type === "stopset" && "tooltip tooltip-error tooltip-bottom"}
