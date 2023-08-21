@@ -524,6 +524,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#anti-repeat-algorithm" class="md-nav__link">
+    Anti-Repeat Algorithm
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -579,7 +586,7 @@ have additional data for example when they begin and end airing.</p>
 <h3 id="rotator">Rotator<a class="headerlink" href="#rotator" title="Permanent link">←</a></h3>
 <p><strong>A <u>rotator</u> is a collection of <em>similar</em> audio assets.</strong> A rotator is how
 you to <em>categorize</em> assets into a group.</p>
-<p>While an asset <em>can</em> belong to more than one rotator, in practice they won't.</p>
+<p>While an asset <em>can</em> belong to more than one rotator, in practice they shouldn't.</p>
 <div class="admonition example">
 <p class="admonition-title">Rotator Example</p>
 <p>From the asset example above, you might put <em>"David's Steel Guitar Ad"</em>
@@ -622,7 +629,7 @@ each of them them,</p>
 of five rotators, shown here,</p>
 <pre class="mermaid"><code>flowchart RL
     stopset(Evening Stop Set)
-    subgraph "Rotators in Stop Set"
+    subgraph "Rotators in stop set"
         direction TB
         rotator1(1. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
         rotator2(2. Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;)
@@ -635,10 +642,10 @@ of five rotators, shown here,</p>
     rotator3 --- stopset
     rotator4 --- stopset
     rotator5 --- stopset</code></pre>
-<p>Then, when an <em>"Evening Stop Set"</em> is played by Tomato during a commercial
-break, here's what's played,</p>
+<p>Then, when an <em>"Evening Stop Set"</em> is generated and played by Tomato during
+a commercial break, here's what's played.</p>
 <pre class="mermaid"><code>flowchart LR
-    subgraph "Rotators in Stop Set"
+    subgraph "Rotators in stop set"
         direction TB
         rotator1(1. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
         rotator2(2. Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;)
@@ -647,7 +654,7 @@ break, here's what's played,</p>
         rotator5(5. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
     end
     stopset(Evening Stop Set)
-    subgraph "Assets Played"
+    subgraph "Assets played (generated)"
         direction TB
         asset1(S_ID_2.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
         asset2(AD_3.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
@@ -665,6 +672,12 @@ break, here's what's played,</p>
     asset3 -- randomly\nselected\nfrom rotator --- rotator3
     asset4 -- randomly\nselected\nfrom rotator --- rotator4
     asset5 -- randomly\nselected\nfrom rotator --- rotator5</code></pre>
+<div class="admonition note">
+<p class="admonition-title">Stop sets and <strong><em>generated</em></strong> stop sets</p>
+<p>Note, the above is a so-called "generated" stop set. It's an actual stop set
+that is played in the desktop client. We refer to these as <em>generated</em>
+because Tomato picks (or generates) individual assets to play.</p>
+</div>
 </details>
 <h3 id="relationship-diagram">Relationship Diagram<a class="headerlink" href="#relationship-diagram" title="Permanent link">←</a></h3>
 <p>Here's a simple relationship diagram for the entities described above.</p>
@@ -734,11 +747,37 @@ or <span class="arithmatex">\(\text{B}_\text{weight} = 1,\ \text{C}_\text{weight
 weight <span class="arithmatex">\(2\)</span> is <strong>twice as likely</strong> to be played as <em>"Commercial B"</em> with
 weight <span class="arithmatex">\(1\)</span>.</p>
 </details>
+<h2 id="anti-repeat-algorithm">Anti-Repeat Algorithm<a class="headerlink" href="#anti-repeat-algorithm" title="Permanent link">←</a></h2>
+<p>Tomato tries <em>very</em> hard not to repeat playing the same asset too soon. There
+are several sets of assets that can potentially be ignored as defined below.</p>
+<p><span class="arithmatex">\(\text{ignores}_\text{soft} = [\text{assets played recently (within NO_REPEAT_ASSETS_TIME)}]\)</span></p>
+<p><span class="arithmatex">\(\text{ignores}_\text{medium} = [\text{assets on another generated stop set within current playlist}]\)</span></p>
+<p><span class="arithmatex">\(\text{ignores}_\text{hard} = [\text{assets that exist as previous entries in current generated stopset}]\)</span></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><span class="arithmatex">\(\text{ignores}_\text{soft}\)</span> will be an empty set if <code>NO_REPEAT_ASSETS_TIME = 0</code></p>
+</div>
+<p>So <span class="arithmatex">\(\text{ignores}_\text{soft}\)</span> are <em>stuff that's played recently</em>, <span class="arithmatex">\(\text{ignores}_\text{medium}\)</span>
+are <em>stuff that's going to play later in the playlist</em>, and <span class="arithmatex">\(\text{ignores}_\text{hard}\)</span> are <em>assets in
+the current stopset.</em></p>
+<p>Suppose Tomato is ready to select an asset from a rotator. Tomato will attempt
+to ignore assets by trying to ignore them using the priority order as defined below.
+That's to say, it'll go through several <em>tries</em> to ignore assets. If Tomato can't
+select an asset, it'll proceed to the next try.</p>
+<p>Starting with the set of all <em>eligible</em> assets  in a rotator (enabled and valid air dates),</p>
+<ul>
+<li>Try #1: Ignore all assets in <span class="arithmatex">\(\text{ignores}_\text{soft} \cup \text{ignores}_\text{medium} \cup \text{ignores}_\text{hard}\)</span></li>
+<li>Try #2: Ignore all assets in <span class="arithmatex">\(\text{ignores}_\text{medium} \cup \text{ignores}_\text{hard}\)</span></li>
+<li>Try #3: Ignore all assets in <span class="arithmatex">\(\text{ignores}_\text{hard}\)</span></li>
+<li>Try #4 (only if <code>ALLOW_REPEATS_IN_STOPSET = True</code>): Choose an asset from complete set of eligible assets</li>
+<li>Fail (no asset selected).</li>
+</ul>
 <div class="footnote">
 <hr />
 <ol>
 <li id="fn:1">
-<p>The random selection process can be biased by random <a href="#weight">weight</a>.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<p>The random selection process can be biased by random <a href="#weight">weight</a> and
+the <a href="#anti-repeat-algorithm">anti-repeat algorithm</a>&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
