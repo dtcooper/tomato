@@ -1,14 +1,4 @@
-const {
-  app,
-  BrowserWindow,
-  powerSaveBlocker,
-  shell,
-  ipcMain,
-  nativeTheme,
-  dialog,
-  Menu,
-  globalShortcut
-} = require("electron")
+const { app, BrowserWindow, powerSaveBlocker, shell, ipcMain, nativeTheme, dialog, Menu } = require("electron")
 const windowStateKeeper = require("electron-window-state")
 const fs = require("fs")
 const fsExtra = require("fs-extra")
@@ -226,16 +216,31 @@ if (squirrelCheck || !singleInstanceLock) {
       // Prevent accidental closing (except when unpackaged, since electron-forge restart kills the app
       win.on("close", async (event) => {
         event.preventDefault()
-        const choice = await dialog.showMessageBox(win, {
-          type: "question",
-          normalizeAccessKeys: false,
-          buttons: ["Quit", "Cancel & Keeping Running"],
-          defaultId: 1,
-          cancelId: 1,
-          title: "Quit Tomato",
-          message: "Are you SURE you want to quit Tomato?"
+
+        const isReady = await new Promise((resolve) => {
+          if (win) {
+            ipcMain.handleOnce("is-ready", (event, value) => resolve(value))
+            win.webContents.send("is-ready")
+          } else {
+            resolve(false)
+          }
         })
-        if (choice.response === 0) {
+
+        if (isReady) {
+          const choice = await dialog.showMessageBox(win, {
+            type: "question",
+            normalizeAccessKeys: false,
+            buttons: ["Quit", "Cancel & Keeping Running"],
+            defaultId: 1,
+            cancelId: 1,
+            title: "Quit Tomato",
+            message: "Are you SURE you want to quit Tomato?"
+          })
+          if (choice.response === 0) {
+            window.destroy()
+            app.quit()
+          }
+        } else {
           window.destroy()
           app.quit()
         }

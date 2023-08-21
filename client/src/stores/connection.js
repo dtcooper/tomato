@@ -84,6 +84,10 @@ export const logout = (error) => {
   }
 }
 
+ipcRenderer.on("is-ready", () => {
+  ipcRenderer.invoke("is-ready", get(conn).ready)
+})
+
 // Functions defined for various message types we get from server after authentication
 const handleMessages = {
   data: async (data) => {
