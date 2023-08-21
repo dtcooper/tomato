@@ -1,8 +1,11 @@
 <script>
   import dayjs from "dayjs"
+  import fullscreenExit from "@iconify/icons-mdi/fullscreen-exit"
+  import fullscreenIcon from "@iconify/icons-mdi/fullscreen"
 
   import { persisted } from "svelte-local-storage-store"
 
+  import { isFullscreen, setFullscreen } from "./stores/config"
   import { conn, login, protocolVersion } from "./stores/connection"
 
   import { tomatoIcon, IS_DEV, urlParams } from "./utils"
@@ -40,9 +43,19 @@
       }
     }
   }
+
 </script>
 
 <SyncModal title="Connecting" isFromLogin={true} show={showSyncModal} />
+
+<!-- Fixed fullscreen toggle for login only (z-index of modal is 9999) -->
+<div class="fixed top-2 right-2 z-[10000]">
+  <div class="tooltip tooltip-left" data-tip={`${$isFullscreen ? "Exit" : "Enter"} fullscreen mode`}>
+    <button class="btn btn-circle btn-ghost" on:click={() => setFullscreen(!$isFullscreen)} tabindex="-1">
+      <Icon icon={$isFullscreen ? fullscreenExit : fullscreenIcon} class="h-8 w-8" />
+    </button>
+  </div>
+</div>
 
 <div
   class="mx-auto flex min-h-screen w-full max-w-2xl flex-col items-center justify-center gap-y-3"
