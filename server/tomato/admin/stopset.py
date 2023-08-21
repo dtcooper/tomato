@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db.models import Prefetch
 from django.urls import reverse
-from django.utils.html import format_html_join
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from ..models import Rotator, StopsetRotator
@@ -50,12 +50,31 @@ class StopsetAdmin(AiringMixin, NumAssetsMixin, TomatoModelAdminBase):
 
     @admin.display(description="Rotators")
     def rotators_display(self, obj):
-        rotators = [
-            (i, reverse("admin:tomato_rotator_change", args=(r.id,)), r.get_color(content=True), r.get_color(), r.name)
+        html = mark_safe("")
+        for index, url, content_color, color, enabled, name in (
+            (
+                i,
+                reverse("admin:tomato_rotator_change", args=(r.id,)),
+                r.get_color(content=True),
+                r.get_color(),
+                r.enabled,
+                r.name,
+            )
             for i, r in enumerate(obj.rotators.all(), 1)
-        ]
-        return format_html_join(
-            "\n",
-            '<div style="padding: 2px 0">{}. <a href="{}" style="color: {}; background-color: {}">{}</a></div>',
-            rotators,
-        ) or mark_safe('<span style="color: red"><strong>WARNING:</strong> no rotators in this stop set</span>')
+        ):
+            html = html + format_html(
+                '<div style="padding: 2px 0">{}. <a href="{}" style="color: {}; background-color: {};">',
+                index,
+                url,
+                content_color,
+                color,
+            )
+            if not enabled:
+                html = html + format_html('<span style="text-decoration: line-through">{}</span></a> (disabled)', name)
+            else:
+                html = html + format_html("{}</a>", name)
+            html = html + mark_safe("</div>")
+
+        if not html:
+            return mark_safe('<span style="color: red"><strong>WARNING:</strong> no rotators in this stop set</span>')
+        return html

@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
-from django.utils.html import format_html, format_html_join
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from django_file_form.forms import FileFormMixin, MultipleUploadedFileField
@@ -144,15 +144,32 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
 
     @admin.display(description="Rotator(s)")
     def rotators_display(self, obj):
-        rotators = [
-            (reverse("admin:tomato_rotator_change", args=(r.id,)), r.get_color(content=True), r.get_color(), r.name)
+        html = mark_safe("")
+        for url, content_color, color, enabled, name in (
+            (
+                reverse("admin:tomato_rotator_change", args=(r.id,)),
+                r.get_color(content=True),
+                r.get_color(),
+                r.enabled,
+                r.name,
+            )
             for r in obj.rotators.all()
-        ]
-        return format_html_join(
-            mark_safe("\n"),
-            '<div style="padding: 2px 0">&#x25cf; <a href="{}" style="color: {}; background-color: {};">{}</a></div>',
-            rotators,
-        ) or mark_safe('<span style="color: red"><strong>WARNING:</strong> not in any rotators</span>')
+        ):
+            html = html + format_html(
+                '<div style="padding: 2px 0">&#x25cf; <a href="{}" style="color: {}; background-color: {};">',
+                url,
+                content_color,
+                color,
+            )
+            if not enabled:
+                html = html + format_html('<span style="text-decoration: line-through">{}</span></a> (disabled)', name)
+            else:
+                html = html + format_html("{}</a>", name)
+            html = html + mark_safe("</div>")
+
+        if not html:
+            return mark_safe('<span style="color: red"><strong>WARNING:</strong> not in any rotators</span>')
+        return html
 
     @admin.action(description="Add selected audio assets to rotator", permissions=("add", "change", "delete"))
     def add_rotator(self, request, queryset):

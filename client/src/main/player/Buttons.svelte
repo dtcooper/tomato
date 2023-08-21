@@ -7,9 +7,8 @@
   import skipForwardOutlineIcon from "@iconify/icons-mdi/skip-forward-outline"
   import reloadIcon from "@iconify/icons-mdi/reload"
 
-  import { config, userConfig } from "../../stores/config"
+  import { userConfig } from "../../stores/config"
   import { blockSpacebarPlay } from "../../stores/player"
-  import { upperCaseFirst } from "../../utils"
 
   import Icon from "../../components/Icon.svelte"
 

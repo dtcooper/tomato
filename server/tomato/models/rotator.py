@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.safestring import mark_safe
 
 from ..constants import COLORS, COLORS_DICT
 from .base import TomatoModelBase
@@ -13,6 +14,13 @@ class Rotator(TomatoModelBase):
         max_length=20,
         choices=COLOR_CHOICES,
         help_text="Color that appears in the client for this rotator.",
+    )
+    enabled = models.BooleanField(
+        "enabled",
+        default=True,
+        help_text=mark_safe(
+            "If unselected, rotator is <strong>completely disabled</strong> regardless of its inclusion in a stop set."
+        ),
     )
     stopsets = models.ManyToManyField(
         Stopset,

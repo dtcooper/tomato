@@ -5,7 +5,7 @@
   import Icon from "../../components/Icon.svelte"
 
   import { fade } from "svelte/transition"
-  import { prettyDuration, humanDuration, upperCaseFirst } from "../../utils"
+  import { prettyDuration, humanDuration } from "../../utils"
   import { config, userConfig } from "../../stores/config"
 
   export let items
@@ -119,9 +119,13 @@
                         {/if}
                         {asset.name}
                       {:else}
-                        <span class="text-medium text-base italic"
-                          >Rotator had no eligible assets to chose from! This may be intentional.</span
-                        >
+                        <span class="text-medium text-base italic">
+                          {#if asset.rotator.enabled}
+                            Rotator has no eligible assets to chose from! This may be intentional.
+                          {:else}
+                            Rotator has been disabled.
+                          {/if}
+                        </span>
                       {/if}
                     </div>
                   </div>

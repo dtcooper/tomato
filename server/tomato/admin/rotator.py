@@ -3,24 +3,26 @@ from django.urls import reverse
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 
-from .base import NoNullRelatedOnlyFieldFilter, NumAssetsMixin, TomatoModelAdminBase
+from .base import AiringEnabledMixin, NoNullRelatedOnlyFieldFilter, NumAssetsMixin, TomatoModelAdminBase
 
 
-class RotatorAdmin(NumAssetsMixin, TomatoModelAdminBase):
-    list_display = ("name", "color_display", "stopsets_display", "num_assets")
+class RotatorAdmin(AiringEnabledMixin, NumAssetsMixin, TomatoModelAdminBase):
+    actions = ("enable", "disable")
+    list_display = ("name", "enabled", "color_display", "stopsets_display", "num_assets")
     list_prefetch_related = ("stopsets",)
     add_fieldsets = (
         (None, {"fields": ("name",)}),
         ("Color", {"fields": ("color", "color_preview")}),
     )
     fieldsets = add_fieldsets + (
+        ("Airing Information", {"fields": ("enabled",)}),
         ("Stop sets", {"fields": ("stopsets_display",)}),
         ("Additional information", {"fields": ("num_assets", "created_by", "created_at")}),
     )
     # Average asset length?
     # Assets
     readonly_fields = ("stopsets_display", "color_preview", "num_assets") + TomatoModelAdminBase.readonly_fields
-    list_filter = ("stopsets", ("created_by", NoNullRelatedOnlyFieldFilter))
+    list_filter = ("enabled", "stopsets", ("created_by", NoNullRelatedOnlyFieldFilter))
 
     @admin.display(description="Color", ordering="color")
     def color_display(self, obj=None):

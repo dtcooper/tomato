@@ -448,7 +448,7 @@ CONSTANCE_CONFIG = {
         "audio_bitrate",
     ),
     "UI_MODES": (["0", "1", "2"], "Restrict what user interface modes are available to the desktop app.", "ui_modes"),
-    "WARN_ON_EMPTY_ROTATORS": (True, "Warn when a rotator has no eligible assets to choose from. (Desktop app only)"),
+    "WARN_ON_EMPTY_ROTATORS": (True, "Warn when a rotator is disabled or has no eligible assets to choose from."),
 }
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
     (

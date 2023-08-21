@@ -243,10 +243,13 @@ class Stopset extends AssetStopsetHydratableObject {
 
     const items = []
     for (const rotator of this.rotators) {
-      const asset = rotator.getAsset(softIgnoreIds, mediumIgnoreIds, hardIgnoreIds, startTime, endDateMultiplier)
-      if (asset) {
-        hardIgnoreIds.add(asset.id)
-        startTime = startTime.add(asset.duration, "seconds")
+      let asset = null
+      if (rotator.enabled) {
+        asset = rotator.getAsset(softIgnoreIds, mediumIgnoreIds, hardIgnoreIds, startTime, endDateMultiplier)
+        if (asset) {
+          hardIgnoreIds.add(asset.id)
+          startTime = startTime.add(asset.duration, "seconds")
+        }
       }
       items.push({ rotator, asset })
     }

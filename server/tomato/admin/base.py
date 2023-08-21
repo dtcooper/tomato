@@ -58,7 +58,23 @@ class SaveCreatedByMixin:
         super().save_model(request, obj, form, change)
 
 
-class AiringMixin:
+class AiringEnabledMixin:
+    @admin.action(description="Enable selected %(verbose_name_plural)s", permissions=("add", "change", "delete"))
+    def enable(self, request, queryset):
+        num = queryset.update(enabled=True)
+        if num:
+            self.message_user(request, f"Enabled {num} {self.model._meta.verbose_name}(s).", messages.SUCCESS)
+            mark_models_dirty(request)
+
+    @admin.action(description="Disable selected %(verbose_name_plural)s", permissions=("add", "change", "delete"))
+    def disable(self, request, queryset):
+        num = queryset.update(enabled=False)
+        if num:
+            self.message_user(request, f"Disabled {num} {self.model._meta.verbose_name}(s).", messages.SUCCESS)
+            mark_models_dirty(request)
+
+
+class AiringMixin(AiringEnabledMixin):
     AIRING_INFO_FIELDSET = ("Airing Information", {"fields": ("enabled", "weight", "begin", "end")})
 
     @admin.display(description="Air date", ordering=Coalesce("begin", "end"))
@@ -79,20 +95,6 @@ class AiringMixin:
             return format_html('<img src="{}">', YES_ICON)
         else:
             return format_html('<img src="{}"> {}', NO_ICON, reason)
-
-    @admin.action(description="Enable selected %(verbose_name_plural)s", permissions=("add", "change", "delete"))
-    def enable(self, request, queryset):
-        num = queryset.update(enabled=True)
-        if num:
-            self.message_user(request, f"Enabled {num} {self.model._meta.verbose_name}(s).", messages.SUCCESS)
-            mark_models_dirty(request)
-
-    @admin.action(description="Disable selected %(verbose_name_plural)s", permissions=("add", "change", "delete"))
-    def disable(self, request, queryset):
-        num = queryset.update(enabled=False)
-        if num:
-            self.message_user(request, f"Disabled {num} {self.model._meta.verbose_name}(s).", messages.SUCCESS)
-            mark_models_dirty(request)
 
 
 class NumAssetsMixin:

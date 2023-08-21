@@ -119,7 +119,6 @@ class EnabledBeginEndWeightMixin(models.Model):
 
     def serialize(self):
         return {
-            "enabled": self.enabled,
             "weight": round(float(self.weight), 2),
             "begin": self.begin,
             "end": self.end,
@@ -146,4 +145,5 @@ class TomatoModelBase(models.Model):
         return {
             "id": self.id,
             "name": self.name,
+            "enabled": self.enabled,
         }
