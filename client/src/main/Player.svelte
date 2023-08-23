@@ -51,7 +51,6 @@
   const generateStopsetHelper = (likelyPlayTime, generatedId) => {
     return $db.generateStopset(
       likelyPlayTime,
-
       mediumIgnoreIds,
       $config.END_DATE_PRIORITY_WEIGHT_MULTIPLIER,
       processItem,
