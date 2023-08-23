@@ -34,7 +34,7 @@
       {#if item.type === "wait"}
         to wait
       {:else if item.type === "stopset"}
-        in <span class="italic">{item.name}</span> stop set
+        in stop set
       {/if}
     {/if}
   </div>
@@ -59,7 +59,7 @@
 
     <div class="relative flex flex-1">
       <div
-        class="relative grid h-8 flex-1 gap-1 overflow-hidden rounded-xl bg-base-300"
+        class="relative grid h-8 flex-1 gap-1 overflow-hidden rounded-2xl bg-base-300"
         style:grid-template-columns={columns}
       >
         {#each assets as asset}

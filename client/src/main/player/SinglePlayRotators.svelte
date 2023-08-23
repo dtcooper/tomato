@@ -1,19 +1,12 @@
 <script>
-  import { singlePlayRotators, play } from "../../stores/single-play-rotators"
+  import { singlePlayRotators, play, stop } from "../../stores/single-play-rotators"
   import playCircleOutlineIcon from "@iconify/icons-mdi/play-circle-outline"
+  import stopCircleOutlineIcon from "@iconify/icons-mdi/stop-circle-outline"
 
   import Icon from "../../components/Icon.svelte"
 
   export let playlistItems
-
-  $: mediumIgnoreIds =
-    // Copied from Player.svelte generateStopsetHelper()
-    new Set(
-      playlistItems
-        .filter((i) => i.type === "stopset")
-        .map((s) => s.items.map((a) => a.id))
-        .flat(1)
-    )
+  export let mediumIgnoreIds
 
   $: playDisabled =
     $singlePlayRotators.isPlaying ||
@@ -27,6 +20,10 @@
   <div class="flex flex-1 flex-col gap-2 overflow-y-auto px-2">
     {#each $singlePlayRotators.rotators as rotator, index}
       {@const error = $singlePlayRotators.errors.get(rotator.id)}
+      {@const disabled =
+        playDisabled && (!$singlePlayRotators.rotator || $singlePlayRotators.rotator.id !== rotator.id)}
+      {@const playing =
+        $singlePlayRotators.isPlaying && $singlePlayRotators.rotator && $singlePlayRotators.rotator.id === rotator.id}
       <div
         class="tooltip-error tooltip-bottom tooltip-open flex"
         data-tip={`${error}!`}
@@ -37,12 +34,14 @@
         <button
           class="btn w-0 flex-1 text-left hover:brightness-110"
           class:btn-lg={$singlePlayRotators.rotators.length <= 4}
+          class:hover:brightness-110={!disabled}
+          class:btn-error={playing}
           style={playDisabled ? "" : `background-color: ${rotator.color.value}; color: ${rotator.color.content}`}
-          disabled={playDisabled}
-          on:click={() => play(rotator, mediumIgnoreIds)}
+          {disabled}
+          on:click={() => (playing ? stop() : play(rotator, mediumIgnoreIds))}
           tabindex="-1"
         >
-          <Icon icon={playCircleOutlineIcon} class="h-8 w-8" />
+          <Icon icon={playing ? stopCircleOutlineIcon : playCircleOutlineIcon} class="h-10 w-10" />
           <span class="w-0 flex-1 truncate py-2">{rotator.name}</span>
         </button>
       </div>

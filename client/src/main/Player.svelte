@@ -40,16 +40,19 @@
     document.getElementById("playlist").scroll({ top: 0, behavior: "smooth" })
   }
 
+  // Medium ignored assets (everything at exists on the screen right now in items list)
+  $: mediumIgnoreIds = new Set(
+    items
+      .filter((i) => i.type === "stopset")
+      .map((s) => s.items.map((a) => a.id))
+      .flat(1)
+  )
+
   const generateStopsetHelper = (likelyPlayTime, generatedId) => {
     return $db.generateStopset(
       likelyPlayTime,
-      // Medium ignored assets (everything at exists on the screen right now in items list)
-      new Set(
-        items
-          .filter((i) => i.type === "stopset")
-          .map((s) => s.items.map((a) => a.id))
-          .flat(1)
-      ),
+
+      mediumIgnoreIds,
       $config.END_DATE_PRIORITY_WEIGHT_MULTIPLIER,
       processItem,
       updateUI,
@@ -213,5 +216,5 @@
 />
 
 {#if $singlePlayRotators.enabled}
-  <SinglePlayRotators playlistItems={items} />
+  <SinglePlayRotators playlistItems={items} {mediumIgnoreIds} />
 {/if}

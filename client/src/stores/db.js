@@ -191,6 +191,9 @@ class Rotator extends HydratableObject {
 
   getAsset(mediumIgnoreIds = new Set(), hardIgnoreIds = new Set(), startTime, endDateMultiplier) {
     const softIgnoreIds = Rotator.getSoftIgnoreIds()
+    if (!startTime) {
+      startTime = dayjs()
+    }
 
     // soft ignored = played within a recent amount of time
     // medium ignored = exists on screen already

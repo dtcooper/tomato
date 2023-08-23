@@ -146,9 +146,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
       this.audio.onended = () => this.done()
       this.audio.onerror = (e) => this._errorHelper(e)
       this.audio.onpause = () => {
-        // In the unlikely event we get a pause event from the OS?
         if (this.playing) {
-          console.warn("Got pause event while in playing state (should have been set to false)")
           this.generatedStopset.playing = false
           this.pause()
         }

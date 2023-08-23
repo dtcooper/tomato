@@ -88,7 +88,6 @@ export const play = (rotator, mediumIgnoreIds = new Set()) => {
     audio.onerror = () => error(rotator, "Error playing asset")
     audio.onpause = () => {
       // In the unlikely event we get a pause event from the OS?
-      console.warn("Got pause event while in playing state (should have been set to false)")
       audio.pause()
       stop()
     }
