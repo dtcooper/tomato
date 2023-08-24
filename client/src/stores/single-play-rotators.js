@@ -70,7 +70,7 @@ export const play = (rotator, mediumIgnoreIds = new Set()) => {
       remaining: 0,
       rotator
     }))
-    audio.src = asset.file.url
+    audio.src = asset.file.localUrl
     audio.play().catch(() => error(rotator, "Error playing asset"))
     audio.ondurationchange = () =>
       playing.update(($playing) => ({
