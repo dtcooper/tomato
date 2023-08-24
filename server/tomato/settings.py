@@ -306,6 +306,14 @@ CONSTANCE_ADDITIONAL_FIELDS = {
             "max_value": 24 * 60 * 60,
         },
     ),
+    "reset_hours": (
+        "django.forms.IntegerField",
+        {
+            "widget": "django.forms.TextInput",
+            "min_value": 0,
+            "max_value": 24,
+        },
+    ),
 }
 _constance_not_implemented_html = '<span style="color: red">(Currently not implemented.)</span>'
 CONSTANCE_CONFIG = {
@@ -419,6 +427,7 @@ CONSTANCE_CONFIG = {
         "audio_bitrate",
     ),
     "UI_MODES": (["0", "1", "2"], "Restrict what user interface modes are available to the desktop app.", "ui_modes"),
+    "UI_MODE_RESET_HOURS": (0, mark_safe("Reset UI mode every hour. For example, a value of 2 would reset the UI mode every two hours, on the hour (midnight, 2am, 4am, etc). <strong>Set to 0 disable</strong>."), "reset_hours"),
     "WARN_ON_EMPTY_ROTATORS": (True, "Warn when a rotator is disabled or has no eligible assets to choose from."),
 }
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
@@ -428,6 +437,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
             (
                 "STATION_NAME",
                 "UI_MODES",
+                "UI_MODE_RESET_HOURS",
             ),
         ),
         (
