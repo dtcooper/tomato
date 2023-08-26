@@ -17,9 +17,9 @@ export const blockSpacebarPlay = writable(false)
 
 let compressorEnabled = false
 let currentGeneratedId = 0
-const audioContext = new AudioContext()
+export const audioContext = new AudioContext()
 
-const inputNode = audioContext.createGain()
+export const inputNode = audioContext.createGain()
 inputNode.gain.value = 1
 inputNode.connect(audioContext.destination)
 

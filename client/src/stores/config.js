@@ -50,7 +50,8 @@ export const setFullscreen = (value) => {
 }
 
 const msToNextHour = () => {
-  const nextHour = dayjs().add("1", "hour").set("minute", 0).set("second", 0).set("millsecond", 0)
+  // 15 seconds before the next hour
+  const nextHour = dayjs().add("1", "hour").set("minute", 0).set("second", 0).set("millsecond", 0).subtract(15, "seconds")
   const diff = nextHour.diff(dayjs())
   console.log(`Next hour happens in ${Math.round(diff / 60 / 1000)} minutes`)
   return diff

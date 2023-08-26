@@ -3,8 +3,12 @@ import { progressBarAnimationFramerate } from "../utils"
 import { log } from "./client-logs"
 import { userConfig } from "./config"
 import { db, markPlayed } from "./db"
+import { audioContext, inputNode } from "./player"
 
 const audio = new Audio()
+const audioSource = audioContext.createMediaElementSource(audio)
+audioSource.connect(inputNode)
+
 let interval = null
 
 const notPlayingTemplate = {
