@@ -81,7 +81,7 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
         db_table = "assets"
         verbose_name = "audio asset"
         ordering = ("-created_at",)
-        permissions = [("immediate_play_asset", "Can immediately play audio assets")]
+        permissions = [("configure_live_clients", "Can configure currently connected Desktop clients")]
 
     def save(self, dont_overwrite_original_filename=False, *args, **kwargs):
         if not dont_overwrite_original_filename and "file" in self.get_dirty_fields():

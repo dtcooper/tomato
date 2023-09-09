@@ -79,8 +79,35 @@
         cell.append(link)
       })
 
-      {% if perms.tomato.immediate_play_asset %}
-        {# add immediate play link here #}
+      {% if perms.tomato.configure_live_clients %}
+        {% if request.resolver_match.url_name == 'configure_live_clients' %}
+          document.querySelector('.app-constance.module').classList.add('current-app')
+        {% endif %}
+
+        Array.from(document.querySelectorAll('.app-constance.module tbody')).forEach(tbody => {
+          const tr = document.createElement('tr')
+          {% if request.resolver_match.url_name == 'configure_live_clients' %}
+            tr.classList.add('current-model')
+          {% endif %}
+          const th = document.createElement('th')
+          th.scope = "row"
+          const a = document.createElement('a')
+          a.textContent = "Live Clients Admin"
+          a.href = "{% filter escapejs %}{% url 'admin:configure_live_clients' %}{% endfilter %}"
+          th.append(a)
+          tr.append(th)
+          tr.append(document.createElement('td'))
+          {% if request.resolver_match.url_name == 'index' %}
+            const tdChangelink = document.createElement('td')
+            const aChangelink = document.createElement('a')
+            aChangelink.classList.add('changelink')
+            aChangelink.href = "{% filter escapejs %}{% url 'admin:configure_live_clients' %}{% endfilter %}"
+            aChangelink.textContent = 'Change'
+            tdChangelink.append(aChangelink)
+            tr.append(tdChangelink)
+          {% endif %}
+          tbody.append(tr)
+        })
       {% endif %}
 
       Array.from(document.querySelectorAll('.dismiss-message')).forEach(dismissLink => {

@@ -47,7 +47,7 @@ class TomatoConfig(AppConfig):
         ):
             group, _ = Group.objects.get_or_create(name=name)
             group.permissions.add(
-                *Permission.objects.filter(content_type__in=content_types).exclude(codename="immediate_play_asset")
+                *Permission.objects.filter(content_type__in=content_types).exclude(codename="configure_live_clients")
             )
             all_groups.append(group)
 
@@ -56,8 +56,8 @@ class TomatoConfig(AppConfig):
         group.permissions.add(Permission.objects.get(codename="change_config"))
         all_groups.append(group)
 
-        group, _ = Group.objects.get_or_create(name="Can immediately schedule audio assets to play")
-        group.permissions.add(Permission.objects.get(codename="immediate_play_asset"))
+        group, _ = Group.objects.get_or_create(name="Can configure currently connected Desktop clients")
+        group.permissions.add(Permission.objects.get(codename="configure_live_clients"))
         all_groups.append(group)
 
         Group.objects.exclude(id__in=[group.id for group in all_groups]).delete()

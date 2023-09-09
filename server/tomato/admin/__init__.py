@@ -5,6 +5,7 @@ from django.contrib import admin
 from django.templatetags.static import static
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from django.urls import path
 
 from constance import config as constance_config
 from constance.admin import Config
@@ -46,6 +47,16 @@ class TomatoAdminSite(admin.AdminSite):
             static("tomato/tomato.png"),
             self.site_title,
         )
+
+    def get_urls(self):
+        return [
+            path('test/', self.admin_view(self.test_admin_view), name="configure_live_clients"),
+            *super().get_urls(),
+        ]
+
+    def test_admin_view(self, request):
+        from django.shortcuts import render
+        return render(request, "admin/base_site.html", {"title": "test", **self.each_context(request)})
 
     def each_context(self, request):
         context = super().each_context(request)

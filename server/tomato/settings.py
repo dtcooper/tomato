@@ -315,7 +315,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
         },
     ),
 }
-_constance_not_implemented_html = '<span style="color: red">(Currently not implemented.)</span>'
+
 CONSTANCE_CONFIG = {
     "STATION_NAME": ("Tomato Radio Automation", "The name of your station.", "short_text"),
     "BROADCAST_COMPRESSION": (
@@ -436,6 +436,7 @@ CONSTANCE_CONFIG = {
         "reset_hours",
     ),
     "WARN_ON_EMPTY_ROTATORS": (True, "Warn when a rotator is disabled or has no eligible assets to choose from."),
+    "REFRESH_PLAYLIST_ON_CHANGES": (False, "Refresh the playlist of any the desktop app (if connected) on any data changes (including these settings)"),
 }
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
     (
@@ -461,6 +462,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
             (
                 "BROADCAST_COMPRESSION",
                 "WARN_ON_EMPTY_ROTATORS",
+                "REFRESH_PLAYLIST_ON_CHANGES",
                 "WAIT_INTERVAL",
                 "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME",
                 "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME_MIN_LENGTH",
