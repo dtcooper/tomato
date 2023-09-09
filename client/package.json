@@ -48,7 +48,7 @@
     "daisyui": "^3.7.3",
     "dayjs": "^1.11.9",
     "download": "^8.0.0",
-    "electron": "^26.2.0",
+    "electron": "^25.8.0",
     "electron-squirrel-startup": "^1.0.0",
     "electron-window-state": "^5.0.3",
     "esbuild": "^0.19.2",
