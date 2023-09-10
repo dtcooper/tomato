@@ -106,6 +106,11 @@ Head over to <http://localhost:8888/> in your web browser.
 
 Changes for 2024 based on feedback
 - [x] Make rotators able to disabled (UI for assets / stopsets needs to show that too)
+- [ ] Easier simple / standard / advanced view settings in client
+  - [ ] Build out "switch back to simple mode" feature a little better, comma separated times?
+- [ ] Better datetime picker in admin
+- [ ] Skip track in stopset when we get to it
+- [ ] Mark a bad asset? Interesting. Not sure how it would work.
 
 Other things
 - [ ] "Island Mode" with an embedded [standalone Python distribution](https://python-build-standalone.readthedocs.io/en/latest/)
