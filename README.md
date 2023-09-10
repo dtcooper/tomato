@@ -111,6 +111,7 @@ Changes for 2024 based on feedback
 - [ ] Better datetime picker in admin
 - [ ] Skip track in stopset when we get to it
 - [ ] Mark a bad asset? Interesting. Not sure how it would work.
+- [ ] Refresh playlist from backend. Connected client status from backend? Communicate what's in the playlist?
 
 Other things
 - [ ] "Island Mode" with an embedded [standalone Python distribution](https://python-build-standalone.readthedocs.io/en/latest/)
@@ -125,6 +126,7 @@ Other things
 - [ ] Client "Demo mode", requiring no backend with demo assets.
 - [x] Button to play an asset from a specific rotator (on Stream Deck too).
   - [x] Backend done as `SINGLE_PLAY_ROTATORS`
+- [ ] Cursor can be a fun thing?
 
 ## License
 
