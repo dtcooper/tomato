@@ -17,6 +17,7 @@ export const prettyDuration = (item, max) => {
 }
 
 export const humanDuration = (item) => {
+  item = Math.round(item)
   const seconds = Math.floor(item) % 60
   const minutes = Math.floor(item / 60) % 60
   const hours = Math.floor(item / 3600)

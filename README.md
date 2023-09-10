@@ -106,12 +106,15 @@ Head over to <http://localhost:8888/> in your web browser.
 
 Changes for 2024 based on feedback
 - [x] Make rotators able to disabled (UI for assets / stopsets needs to show that too)
-- [ ] Easier simple / standard / advanced view settings in client
+- [ ] Easier way to toggle, simple / standard / advanced view settings in client. Not in settings.
+      (Change advanced mode to "admin" mode)
   - [ ] Build out "switch back to simple mode" feature a little better, comma separated times?
 - [ ] Better datetime picker in admin
 - [ ] Skip track in stopset when we get to it
 - [ ] Mark a bad asset? Interesting. Not sure how it would work.
 - [ ] Refresh playlist from backend. Connected client status from backend? Communicate what's in the playlist?
+- [ ] Status updates, ie news and traffic? Fullscreen thing?
+- [ ] Custom UI labels unused labels that play every N times (ie for telling the DJ to do something)
 
 Other things
 - [ ] "Island Mode" with an embedded [standalone Python distribution](https://python-build-standalone.readthedocs.io/en/latest/)
@@ -121,7 +124,6 @@ Other things
 - [ ] Way to parse filename into rotator, start/end date
 - [ ] Export all audio assets as zip
   - [ ] Import as well (have to be careful with different `protocol.json:protocol_version`)
-- [ ] Custom UI labels unused labels that play every N times (ie for telling the DJ to do something)
 - [ ] Add configurable silence between ads
 - [ ] Client "Demo mode", requiring no backend with demo assets.
 - [x] Button to play an asset from a specific rotator (on Stream Deck too).
