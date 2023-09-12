@@ -24,10 +24,8 @@ The backend server is written in [Python](https://www.python.org/)'s
 [automatic admin interface](https://docs.djangoproject.com/en/4.1/ref/contrib/admin/).
 
 The desktop app is a native, cross-platform [Svelte](https://svelte.dev/) +
-[Electron](https://www.electronjs.org/) app and optionally uses the
-[Elgato Stream Deck](https://www.elgato.com/en/stream-deck) as a physical control
-pad. It communicates withs the backend via a websocket and supports intermittant
-connectivity loss.
+[Electron](https://www.electronjs.org/) app. It communicates with the backend
+via a websocket and supports intermittent connectivity loss.
 
 ## Running the Code
 
@@ -126,7 +124,7 @@ Other things
   - [ ] Import as well (have to be careful with different `protocol.json:protocol_version`)
 - [ ] Add configurable silence between ads
 - [ ] Client "Demo mode", requiring no backend with demo assets.
-- [x] Button to play an asset from a specific rotator (on Stream Deck too).
+- [x] Button to play an asset from a specific rotator
   - [x] Backend done as `SINGLE_PLAY_ROTATORS`
 - [ ] Cursor can be a fun thing?
 

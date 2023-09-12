@@ -3,7 +3,7 @@ const path = require("path")
 const process = require("process")
 
 const afterExtract = []
-const extraLinuxFiles = ["start-tomato.sh", "50-elgato.rules"]
+const extraLinuxFiles = ["start-tomato.sh"]
 
 if (process.platform === "linux") {
   afterExtract.push((buildPath, electronVersion, platform, arch, done) => {
@@ -41,12 +41,10 @@ module.exports = {
         options: {
           icon: "assets/icons/tomato.png",
           desktopTemplate: "./scripts/debian/tomato.desktop",
-          recommends: ["udev"],
           section: "sound",
           bin: "start-tomato.sh",
           scripts: {
-            postinst: "./scripts/debian/postinst.sh",
-            postrm: "./scripts/debian/postrm.sh"
+            postinst: "./scripts/debian/postinst.sh"
           }
         }
       }

@@ -33,7 +33,6 @@ if (squirrelCheck || !singleInstanceLock) {
   }).values
 
   let window = null
-  const elgatoVendorId = 4057
   let blocker = null
   const [minWidth, minHeight, defaultWidth, defaultHeight] = [800, 600, 1000, 800]
   const isDev = cmdArgs["enable-dev-mode"] || process.env.NODE_ENV === "development"
@@ -179,24 +178,8 @@ if (squirrelCheck || !singleInstanceLock) {
     ])
     Menu.setApplicationMenu(menu)
 
-    win.webContents.session.on("select-hid-device", (event, details, callback) => {
-      if (details.deviceList && details.deviceList.length > 0) {
-        callback(details.deviceList[0].deviceId)
-      }
-    })
-
     win.webContents.session.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
-      if (permission === "hid" || permission === "media") {
-        return true
-      }
-      return false
-    })
-
-    win.webContents.session.setDevicePermissionHandler((details) => {
-      if (details.deviceType === "hid" && details.device.vendorId === elgatoVendorId) {
-        return true
-      }
-      return false
+      return permission === "media"
     })
 
     if (!app.isPackaged && process.env.SVELTE_DEVTOOLS) {
