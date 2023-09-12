@@ -197,7 +197,10 @@
               {/if}
               <div class="flex flex-1 flex-col text-xl font-bold">
                 <div class:italic={item.overtime}>
-                  Wait{item.overtime ? "ed" : ""} for {humanDuration(item.remaining)}
+                  Wait{item.overtime ? "ed" : ""} for
+                  {humanDuration(item.overtime ? item.duration : item.remaining)}{#if isFirstItem}{item.overtime
+                      ? "!"
+                      : " more..."}{/if}
                 </div>
                 {#if item.overtime}
                   <div class="animate-pulse" class:text-success={!item.overdue} class:text-error={item.overdue}>

@@ -25,7 +25,7 @@ export const humanDuration = (item) => {
   const items = []
   if (hours) items.push(`${hours} hour${hours === 1 ? "" : "s"}`)
   if (minutes) items.push(`${minutes} minute${minutes === 1 ? "" : "s"}`)
-  if (seconds) items.push(`${seconds} second${seconds === 1 ? "" : "s"}`)
+  if (seconds || item === 0) items.push(`${seconds} second${seconds === 1 ? "" : "s"}`)
   return items.join(", ")
 }
 
