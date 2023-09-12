@@ -119,6 +119,7 @@ Changes for 2024 based on feedback
 - [ ] Refresh playlist from backend. Connected client status from backend? Communicate what's in the playlist?
 - [ ] Status updates, ie news and traffic? Fullscreen thing?
 - [ ] Custom UI labels unused labels that play every N times (ie for telling the DJ to do something)
+- [ ] Round-robin (or "cycle evenly") rotator scheduling, ignoring weight as an option for a rotator
 
 Other things
 - [ ] "Island Mode" with an embedded [standalone Python distribution](https://python-build-standalone.readthedocs.io/en/latest/)
