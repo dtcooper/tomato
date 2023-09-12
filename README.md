@@ -80,6 +80,12 @@ Head over to <http://localhost:8888/> in your web browser.
 * Documentation
   * [MkDocs](https://www.mkdocs.org/) and [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/)
 
+## Acknowledgements
+
+Tomato's UX and UI was designed in part by
+[Miranda Kay](mailto:miranda.e.kay@gmail.com). Testing and feedback was provided
+by the entire [Burning Man Information Radio (BMIR)](https://bmir.org) team.
+
 ## TODO List
 
 ### Version 1
