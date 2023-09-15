@@ -1,8 +1,27 @@
 const muiColors = require("material-ui-colors")
 const Color = require("color")
+const fs = require("fs")
+const path = require("path")
+
+const constants = require("../../server/constants.json")
+
+const contantsFilePath = path.normalize(path.join(__dirname, "../../server/constants.json"))
+
+// https://stackoverflow.com/a/43636793/1864783
+const sortKeysReplacer = (key, value) =>
+  value instanceof Object && !(value instanceof Array)
+    ? Object.keys(value)
+        .sort()
+        .reduce((sorted, key) => {
+          sorted[key] = value[key]
+          return sorted
+        }, {})
+    : value
+
+const stringify = (data) => JSON.stringify(data, sortKeysReplacer, 2) + "\n"
 
 const filter = ["common", "brown", "gray", "blue-gray"]
-const colors = []
+let colors = []
 
 // Borrowed front daisyUI
 const contentColor = (color, percentage = 0.8) => {
@@ -20,12 +39,7 @@ for (let [color, values] of Object.entries(muiColors)) {
   }
 }
 
-console.log("[")
-for (let i = 0; i < colors.length; i++) {
-  process.stdout.write("  " + JSON.stringify(colors[i]).replace(/[:,]/g, "$& "))
-  if (i < colors.length - 1) {
-    process.stdout.write(",")
-  }
-  process.stdout.write("\n")
-}
-console.log("]")
+// Replace colors
+fs.writeFileSync(contantsFilePath, stringify({ ...constants, colors }))
+
+console.log("Successfully wrote constants.json file!")

@@ -315,7 +315,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
         },
     ),
 }
-_constance_not_implemented_html = '<span style="color: red">(Currently not implemented.)</span>'
+
 CONSTANCE_CONFIG = {
     "STATION_NAME": ("Tomato Radio Automation", "The name of your station.", "short_text"),
     "BROADCAST_COMPRESSION": (
@@ -437,6 +437,7 @@ CONSTANCE_CONFIG = {
     ),
     "WARN_ON_EMPTY_ROTATORS": (True, "Warn when a rotator is disabled or has no eligible assets to choose from."),
 }
+
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
     (
         (
@@ -473,6 +474,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
         ),
     )
 )
+CONSTANCE_SERVER_ONLY_SETTINGS = set(CONSTANCE_CONFIG_FIELDSETS["Server processing audio options"])
 
 SHELL_PLUS_IMPORTS = [
     "from constance import config",

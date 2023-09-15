@@ -2,6 +2,7 @@ import decimal
 
 from asgiref.sync import sync_to_async
 
+from django.conf import settings
 from django.db.models import Prefetch
 
 from constance import config as constance_config
@@ -11,8 +12,12 @@ from .rotator import Rotator
 from .stopset import Stopset
 
 
-def get_constance_config(valid_rotator_ids):
-    config = {key: getattr(constance_config, key) for key in dir(constance_config)}
+def get_constance_config():
+    config = {
+        key: getattr(constance_config, key)
+        for key in dir(constance_config)
+        if key not in settings.CONSTANCE_SERVER_ONLY_SETTINGS
+    }
     config.update(
         {
             "UI_MODES": list(map(int, config["UI_MODES"])),
@@ -40,5 +45,5 @@ async def serialize_for_api():
         "assets": [a.serialize() async for a in assets],
         "rotators": [r.serialize() for r in rotators],
         "stopsets": [s.serialize() async for s in stopsets],
-        "config": await sync_to_async(get_constance_config)(rotator_ids),
+        "config": await sync_to_async(get_constance_config)(),
     }

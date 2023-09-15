@@ -1,5 +1,6 @@
 import decimal
 import sys
+from pathlib import Path
 from unittest.mock import Mock
 
 
@@ -19,11 +20,10 @@ TYPE_HINTS_TO_STRING = {
 def get_django_settings():
     global _django_settings
     if _django_settings is None:
-        sys.path.append("../server")
+        sys.path.append(str(Path(__file__).absolute().parent.parent / "server"))
         # Mock out imports
         sys.modules.update(
             {
-                "django.core.exceptions": Mock(ValidationError=None),
                 "django.utils.safestring": Mock(mark_safe=lambda s: s),
                 "environ": Mock(Env=lambda: Mock(bool=lambda *args, **kwargs: False), read_env=lambda s: None),
             }

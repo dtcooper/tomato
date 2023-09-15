@@ -6,8 +6,9 @@
 
   import cogOutline from "@iconify/icons-mdi/cog-outline"
 
-  import { IS_DEV } from "../utils"
+  import { IS_DEV, upperCaseFirst } from "../utils"
   import { db } from "../stores/db"
+  import { settings_descriptions } from "../../../server/constants.json"
   import { logout, protocolVersion, conn } from "../stores/connection"
   import { playStatus, speaker, setSpeaker } from "../stores/player"
   import { config, userConfig } from "../stores/config"
@@ -16,13 +17,21 @@
 
   export let show = true
   let showLogout = false
+  let showServerSettings = false
   let logoutStationName
   let showLogoutError
+
+  $: serverSettings = Object.entries($config).sort()
 
   const confirmLogout = () => {
     show = showLogoutError = false
     showLogout = true
     logoutStationName = ""
+  }
+
+  const openServerSettings = () => {
+    show = false
+    showServerSettings = true
   }
 
   const focus = async (el) => {
@@ -124,20 +133,15 @@
         </span>
       </div>
 
-      <div class="flex justify-end text-lg font-bold">Broadcast compression:</div>
-      <div class="w-full text-lg">
-        <span
-          class="font-bold"
-          class:text-error={!$config.BROADCAST_COMPRESSION}
-          class:text-success={$config.BROADCAST_COMPRESSION}
-        >
-          {$config.BROADCAST_COMPRESSION ? "Enabled" : "Disabled"}
-        </span>
-        (configured on server)
+      <div class="flex justify-end text-lg font-bold">Server settings:</div>
+      <div>
+        <button class="link-hover link-info link text-lg" on:click|preventDefault={openServerSettings}>
+          Click to view settings from server
+        </button>
       </div>
 
       <div class="flex justify-end text-lg font-bold">Station admin site:</div>
-      <a class="link-hover link-info link text-lg" href={$db.host}>Open in your web browser</a>
+      <a class="link-hover link-info link text-lg" href={$db.host}>Click to open in web browser</a>
 
       <div class="flex justify-end text-lg font-bold">Version:</div>
       <!-- svelte-ignore missing-declaration-->
@@ -183,6 +187,36 @@
   <svelte:fragment slot="extra-buttons">
     <div class="tooltip tooltip-error" data-tip="Are you SURE that you're SURE?!">
       <button type="button" class="btn btn-error" on:click={verifyLogout}>Log out</button>
+    </div>
+  </svelte:fragment>
+</Modal>
+
+<Modal bind:show={showServerSettings} class="w-[64rem] max-w-[calc(100vw-2rem)]">
+  <svelte:fragment slot="icon"><Icon icon={cogOutline} /></svelte:fragment>
+  <svelte:fragment slot="title">Server Settings</svelte:fragment>
+  <svelte:fragment slot="content">
+    <div
+      class="flex max-h-full w-full max-w-full flex-col items-baseline gap-3 overflow-y-auto p-2 text-sm md:text-base"
+    >
+      {#each serverSettings as [key, value], i}
+        <div class="flex gap-3">
+          <span class="font-bold"><span class="font-mono">{key}</span>:</span>
+          <span class="font-mono" class:text-success={value === true} class:text-error={value === false}>
+            {#if key === "UI_MODES"}
+              {value.map((mode) => ["simple", "standard", "advanced"][mode]).join(", ")}
+            {:else}
+              {value}
+              {#if value === 0}<span class="text-error">(disabled)</span>{/if}
+            {/if}
+          </span>
+        </div>
+        <div class="text-sm">
+          {settings_descriptions[key]}
+        </div>
+        {#if i < serverSettings.length - 1}
+          <div class="divider my-1"></div>
+        {/if}
+      {/each}
     </div>
   </svelte:fragment>
 </Modal>
