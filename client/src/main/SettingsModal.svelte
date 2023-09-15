@@ -210,9 +210,9 @@
             {/if}
           </span>
         </div>
-        <div class="text-sm">
-          {settings_descriptions[key]}
-        </div>
+        {#if settings_descriptions[key]}
+          <div class="text-sm">{settings_descriptions[key]}</div>
+        {/if}
         {#if i < serverSettings.length - 1}
           <div class="divider my-1"></div>
         {/if}
