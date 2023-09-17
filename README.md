@@ -118,8 +118,10 @@ Changes for 2024 based on feedback
 - [ ] Mark a bad asset? Interesting. Not sure how it would work.
 - [ ] Refresh playlist from backend. Connected client status from backend? Communicate what's in the playlist?
 - [ ] ~~Status updates, ie news and traffic? Fullscreen thing?~~ / ~~Custom UI labels unused labels that play every N times (ie for telling the DJ to do something)~~ -- Probably not
-- [ ] Speech synthesis weather
+- [ ] Ability to do speech synthesis / pull asset from API? / weather
 - [ ] Round-robin (or "cycle evenly") rotator scheduling, ignoring weight as an option for a rotator
+- [ ] Check / validate randomization algorithm
+- [ ] Mini-player column in asset list view
 
 Other things
 - [ ] KLOS color scheme: `#D91E75`, `#4B89BF`, `#8CBF3F`, `#F2D750`, and `#D95525`
@@ -130,7 +132,7 @@ Other things
 - [ ] Way to parse filename into rotator, start/end date
 - [ ] Export all audio assets as zip
   - [ ] Import as well (have to be careful with different `protocol.json:protocol_version`)
-- [ ] Add configurable silence between ads
+- [ ] Add configurable silence between ads. Crossfade, with fade points? Fancy!
 - [ ] Client "Demo mode", requiring no backend with demo assets.
 - [x] Button to play an asset from a specific rotator
   - [x] Backend done as `SINGLE_PLAY_ROTATORS`
