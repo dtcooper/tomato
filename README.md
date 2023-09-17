@@ -117,8 +117,8 @@ Changes for 2024 based on feedback
 - [ ] Skip track in stopset when we get to it
 - [ ] Mark a bad asset? Interesting. Not sure how it would work.
 - [ ] Refresh playlist from backend. Connected client status from backend? Communicate what's in the playlist?
-- [ ] Status updates, ie news and traffic? Fullscreen thing?
-- [ ] Custom UI labels unused labels that play every N times (ie for telling the DJ to do something)
+- [ ] ~~Status updates, ie news and traffic? Fullscreen thing?~~ / ~~Custom UI labels unused labels that play every N times (ie for telling the DJ to do something)~~ -- Probably not
+- [ ] Speech synthesis weather
 - [ ] Round-robin (or "cycle evenly") rotator scheduling, ignoring weight as an option for a rotator
 
 Other things
