@@ -6,6 +6,16 @@ const afterExtract = []
 const extraLinuxFiles = ["start-tomato.sh"]
 
 if (process.platform === "linux") {
+  // Override executable to start-tomato.sh for AppImage
+  const appBuilder = require("app-builder-lib/out/util/appBuilder")
+  const oldExecuteAppBuilderAsJson = appBuilder.executeAppBuilderAsJson
+  appBuilder.executeAppBuilderAsJson = (args) => {
+    const config = JSON.parse(args[args.length - 1])
+    config.executableName = "start-tomato.sh"
+    args[args.length - 1] = JSON.stringify(config)
+    return oldExecuteAppBuilderAsJson(args)
+  }
+
   afterExtract.push((buildPath, electronVersion, platform, arch, done) => {
     for (const file of extraLinuxFiles) {
       fs.copyFileSync(path.join("scripts/debian", file), path.join(buildPath, file))
@@ -48,6 +58,9 @@ module.exports = {
           }
         }
       }
+    },
+    {
+      name: "electron-forge-maker-appimage",
     }
   ]
 }
