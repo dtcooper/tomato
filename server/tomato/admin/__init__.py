@@ -42,7 +42,8 @@ class TomatoAdminSite(admin.AdminSite):
     @property
     def site_header(self):
         return format_html(
-            '<img src="{0}" width="32">&nbsp;&nbsp;{1}&nbsp;&nbsp;<img src="{0}" width="32">',
+            '<span style="display: flex; align-items: center; gap: 5px"><img src="{0}" width="28">{1}<img src="{0}"'
+            ' width="28"></span>',
             static("tomato/tomato.png"),
             self.site_title,
         )
