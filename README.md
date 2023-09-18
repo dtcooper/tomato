@@ -122,7 +122,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [ ] Ability to do speech synthesis / pull asset from API? / weather
 - [ ] Round-robin (or "cycle evenly") rotator scheduling, ignoring weight as an option for a rotator
 - [ ] Check / validate randomization algorithm
-- [ ] Mini-player column in asset list view
+- [x] Mini-player column in asset list view
 - [ ] Asset groups (single asset has 4-5 underlying audio files that are cycled through)
 
 Other things

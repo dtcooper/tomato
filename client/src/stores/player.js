@@ -160,7 +160,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
     if (this.audio) {
       this.audio.ondurationchange =
         this.audio.ontimeupdate =
-        this.audio.onended =
+        this.audio.onerror =
         this.audio.onended =
         this.audio.onpause =
           null

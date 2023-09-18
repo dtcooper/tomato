@@ -14,7 +14,7 @@ from django.utils.safestring import mark_safe
 
 from django_file_form.forms import FileFormMixin, MultipleUploadedFileField
 from django_file_form.model_admin import FileFormAdminMixin
-from safedelete.admin import SafeDeleteAdmin, SafeDeleteAdminFilter, highlight_deleted
+from safedelete.admin import SafeDeleteAdmin, SafeDeleteAdminFilter
 
 from ..models import Asset, Rotator
 from ..tasks import bulk_process_assets, process_asset
@@ -92,13 +92,24 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase, SafeDele
         ADDITIONAL_INFO_FIELDSET,
     )
     filter_horizontal = ("rotators",)
-    list_display = (highlight_deleted, "airing", "air_date", "weight", "duration", "rotators_display", "created_at")
+    field_to_highlight = "name"
+    list_display = (
+        "list_player",
+        "highlight_deleted_field",
+        "airing",
+        "air_date",
+        "weight",
+        "duration",
+        "rotators_display",
+        "created_at",
+    )
+    list_display_links = ("highlight_deleted_field",)
     list_filter = (
         AiringFilter,
-        SafeDeleteAdminFilter,
         "rotators",
         "enabled",
         StatusFilter,
+        SafeDeleteAdminFilter,
         ("created_by", NoNullRelatedOnlyFieldFilter),
     )
     list_prefetch_related = ("rotators",)
@@ -116,6 +127,17 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase, SafeDele
         "rotators_display",
         "airing",
     ) + TomatoModelAdminBase.readonly_fields
+
+    @admin.display(description="Play")
+    def list_player(self, obj):
+        if obj.file and obj.status == obj.Status.READY:
+            return format_html(
+                '<div style="text-align: center;"><a class="play-asset-list-display"'
+                ' href="{}">&#x25B6;&#xFE0F;</a></div>',
+                obj.file.url,
+            )
+        else:
+            return ""
 
     @admin.display(description="Filename")
     def filename_display(self, obj):
@@ -308,3 +330,6 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase, SafeDele
             path("<asset_id>/download/", self.admin_site.admin_view(self.download_view), name="tomato_asset_download"),
             path("upload/", self.admin_site.admin_view(self.upload_view), name="tomato_asset_upload"),
         ] + super().get_urls()
+
+
+AssetAdmin.highlight_deleted_field.short_description = "name"
