@@ -199,17 +199,6 @@ files = [
 django = ">=2.2"
 
 [[package]]
-name = "django-cleanup"
-version = "8.0.0"
-description = "Deletes old files."
-optional = false
-python-versions = "*"
-files = [
-    {file = "django-cleanup-8.0.0.tar.gz", hash = "sha256:c739a05544e1e48dc848871c870dbf1595f8533d24523bc67360e43562edaf0d"},
-    {file = "django_cleanup-8.0.0-py2.py3-none-any.whl", hash = "sha256:8cd8872d67fe1501b19a843d006cdb5673cfbb74ac3d6d8f2c60e8e7723a7f5b"},
-]
-
-[[package]]
 name = "django-constance"
 version = "3.0.0"
 description = "Django live settings with pluggable backends, including Redis."
@@ -1341,4 +1330,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "bacdced75592ee7180c7e5ff60068e0aeb9b8954684bd62ba1088f9c4cb1f4f2"
+content-hash = "45da5491412fefdb5a1ce5707c3648c7e4a41a13fedc34cd0f00f98aed3b5815"

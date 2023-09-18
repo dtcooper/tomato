@@ -85,8 +85,6 @@ INSTALLED_APPS.extend(
     [
         # Local
         "tomato",
-        # cleanup should be last
-        "django_cleanup",
     ]
 )
 
