@@ -122,6 +122,7 @@ Changes for 2024 based on feedback
 - [ ] Round-robin (or "cycle evenly") rotator scheduling, ignoring weight as an option for a rotator
 - [ ] Check / validate randomization algorithm
 - [ ] Mini-player column in asset list view
+- [ ] Asset groups (single asset has 4-5 underlying audio files that are cycled through)
 
 Other things
 - [ ] KLOS color scheme: `#D91E75`, `#4B89BF`, `#8CBF3F`, `#F2D750`, and `#D95525`
