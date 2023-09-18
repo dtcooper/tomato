@@ -10,6 +10,9 @@ from django.utils.safestring import mark_safe
 
 from constance import config
 from dirtyfields import DirtyFieldsMixin
+from safedelete.managers import SafeDeleteAllManager, SafeDeleteDeletedManager, SafeDeleteManager
+from safedelete.models import SafeDeleteModel
+from safedelete.queryset import SafeDeleteQueryset
 
 from .base import (
     FILE_MAX_LENGTH,
@@ -22,9 +25,9 @@ from .base import (
 from .rotator import Rotator
 
 
-class AssetEligibleToAirQuerySet(EligibleToAirQuerySet):
+class AssetEligibleToAirQuerySet(EligibleToAirQuerySet, SafeDeleteQueryset):
     def _get_currently_airing_Q(self, now=None):
-        return models.Q(status=Asset.Status.READY) & super()._get_currently_airing_Q(now)
+        return models.Q(status=Asset.Status.READY, deleted__isnull=True) & super()._get_currently_airing_Q(now)
 
 
 def generate_random_asset_filename(original_filename):
@@ -37,8 +40,10 @@ def asset_upload_to(instance, filename):
     return generate_random_asset_filename(filename)
 
 
-class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
-    objects = AssetEligibleToAirQuerySet.as_manager()
+class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase, SafeDeleteModel):
+    objects = SafeDeleteManager(AssetEligibleToAirQuerySet)
+    all_objects = SafeDeleteAllManager(AssetEligibleToAirQuerySet)
+    deleted_objects = SafeDeleteDeletedManager(AssetEligibleToAirQuerySet)
 
     class Status(models.IntegerChoices):
         PENDING = 0, "Pending processing"
@@ -111,6 +116,8 @@ class Asset(EnabledBeginEndWeightMixin, DirtyFieldsMixin, TomatoModelBase):
     def is_eligible_to_air(self, now=None, with_reason=False):
         if self.status != self.Status.READY:
             return (False, "Processing") if with_reason else False
+        if self.deleted is not None:
+            return (False, "Deleted") if with_reason else False
         return super().is_eligible_to_air(now, with_reason)
 
     def generate_md5sum(self):

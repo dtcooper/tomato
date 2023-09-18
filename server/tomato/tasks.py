@@ -10,6 +10,7 @@ from django.core.files import File
 from constance import config
 from django_file_form.models import TemporaryUploadedFile
 from huey.contrib import djhuey
+from safedelete.models import HARD_DELETE
 from user_messages import api as user_messages_api
 from user_messages.models import Message as UserMessage
 
@@ -32,7 +33,8 @@ def process_asset(
                 " check the server logs.",
                 deliver_once=False,
             )
-        asset.delete()
+        # Actually delete it from DB
+        asset.delete(force_policy=HARD_DELETE)
 
     try:
         asset.refresh_from_db()

@@ -26,7 +26,7 @@ class StopsetRotatorInline(admin.TabularInline):
 
 
 class StopsetAdmin(AiringMixin, NumAssetsMixin, TomatoModelAdminBase):
-    actions = ("enable", "disable")
+    actions = ("enable", "disable", "delete_selected")
     add_fieldsets = (
         (None, {"fields": ("name",)}),
         AiringMixin.AIRING_INFO_FIELDSET,

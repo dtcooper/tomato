@@ -108,8 +108,9 @@ by the entire [Burning Man Information Radio (BMIR)](https://bmir.org) team.
 
 ### Future Versions
 
-Changes for 2024 based on feedback
+Changes for 2024 based on real world usage in 2023 and feedback
 - [x] Make rotators able to disabled (UI for assets / stopsets needs to show that too)
+- [x] Implement soft delete for assets
 - [ ] Easier way to toggle, simple / standard / advanced view settings in client. Not in settings.
       (Change advanced mode to "admin" mode)
   - [ ] Build out "switch back to simple mode" feature a little better, comma separated times?

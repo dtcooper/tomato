@@ -70,8 +70,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Third-party
     "constance",
-    "huey.contrib.djhuey",
     "django_file_form",
+    "huey.contrib.djhuey",
+    "safedelete",
     "user_messages",
 ]
 if DEBUG:

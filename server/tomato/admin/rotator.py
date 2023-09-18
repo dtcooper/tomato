@@ -8,7 +8,7 @@ from .base import AiringEnabledMixin, NoNullRelatedOnlyFieldFilter, NumAssetsMix
 
 
 class RotatorAdmin(AiringEnabledMixin, NumAssetsMixin, TomatoModelAdminBase):
-    actions = ("enable", "disable", "enable_single_play", "disable_single_play")
+    actions = ("enable", "disable", "enable_single_play", "disable_single_play", "delete_selected")
     list_display = ("name", "enabled", "is_single_play", "color_display", "stopsets_display", "num_assets")
     list_prefetch_related = ("stopsets",)
     COLOR_FIELDSET = ("Color", {"fields": ("color", "color_preview")})

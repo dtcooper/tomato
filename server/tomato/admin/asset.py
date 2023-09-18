@@ -14,6 +14,7 @@ from django.utils.safestring import mark_safe
 
 from django_file_form.forms import FileFormMixin, MultipleUploadedFileField
 from django_file_form.model_admin import FileFormAdminMixin
+from safedelete.admin import SafeDeleteAdmin, SafeDeleteAdminFilter, highlight_deleted
 
 from ..models import Asset, Rotator
 from ..tasks import bulk_process_assets, process_asset
@@ -62,7 +63,7 @@ class StatusFilter(admin.SimpleListFilter):
             return queryset.exclude(status=Asset.Status.READY)
 
 
-class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
+class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase, SafeDeleteAdmin):
     ROTATORS_FIELDSET = ("Rotators", {"fields": ("rotators",)})
     NAME_AIRING_FIELDSET = (None, {"fields": ("name", "airing")})
     ADDITIONAL_INFO_FIELDSET = ("Additional information", {"fields": ("created_at", "created_by")})
@@ -74,7 +75,15 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
         AiringMixin.AIRING_INFO_FIELDSET,
     )
     action_form = AssetActionForm
-    actions = ("enable", "disable", "add_rotator", "remove_rotator")
+    actions = (
+        "enable",
+        "disable",
+        "add_rotator",
+        "remove_rotator",
+        "delete_selected",
+        "undelete_selected",
+        "hard_delete_soft_deleted",
+    )
     fieldsets = (
         NAME_AIRING_FIELDSET,
         ("Audio file", {"fields": ("file", "filename_display", "file_display", "duration")}),
@@ -83,8 +92,15 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
         ADDITIONAL_INFO_FIELDSET,
     )
     filter_horizontal = ("rotators",)
-    list_display = ("name", "airing", "air_date", "weight", "duration", "rotators_display", "created_at")
-    list_filter = (AiringFilter, "rotators", "enabled", StatusFilter, ("created_by", NoNullRelatedOnlyFieldFilter))
+    list_display = (highlight_deleted, "airing", "air_date", "weight", "duration", "rotators_display", "created_at")
+    list_filter = (
+        AiringFilter,
+        SafeDeleteAdminFilter,
+        "rotators",
+        "enabled",
+        StatusFilter,
+        ("created_by", NoNullRelatedOnlyFieldFilter),
+    )
     list_prefetch_related = ("rotators",)
     no_change_fieldsets = (
         NAME_AIRING_FIELDSET,
@@ -198,6 +214,27 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase):
             mark_models_dirty(request)
         else:
             self.message_user(request, "You must select a rotator to remove audio assets from.", messages.WARNING)
+
+    @admin.action(
+        description=SafeDeleteAdmin.undelete_selected.short_description, permissions=("add", "change", "delete")
+    )
+    def undelete_selected(self, request, queryset):
+        mark_models_dirty(request)
+        return super().undelete_selected(request, queryset)
+
+    @admin.action(
+        description=SafeDeleteAdmin.hard_delete_soft_deleted.short_description, permissions=("add", "change", "delete")
+    )
+    def hard_delete_soft_deleted(self, request, queryset):
+        if queryset.filter(deleted__isnull=False).exists():
+            mark_models_dirty(request)
+            return super().hard_delete_soft_deleted(request, queryset)
+        else:
+            self.message_user(
+                request,
+                mark_safe("You can only hard delete audio assets that are <em>already</em> deleted!"),
+                messages.WARNING,
+            )
 
     def download_view(self, request, asset_id):
         if not self.has_view_permission(request):

@@ -328,6 +328,24 @@ redis = [
 hiredis = ["redis[hiredis] (>=3,!=4.0.0,!=4.0.1)"]
 
 [[package]]
+name = "django-safedelete"
+version = "1.3.3.dev0"
+description = "Mask your objects instead of deleting them from your database."
+optional = false
+python-versions = "*"
+files = []
+develop = false
+
+[package.dependencies]
+Django = "*"
+
+[package.source]
+type = "git"
+url = "https://github.com/makinacorpus/django-safedelete.git"
+reference = "HEAD"
+resolved_reference = "ad7ef348426d0600aae9203dc1b6c7b6024d447a"
+
+[[package]]
 name = "django-user-messages"
 version = "1.0.0"
 description = "Offline addon for django.contrib.messages"
@@ -1330,4 +1348,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "45da5491412fefdb5a1ce5707c3648c7e4a41a13fedc34cd0f00f98aed3b5815"
+content-hash = "cfef77413bc5ffde2c151f50e4b094773dc548e74129dbbc3ea216b2ee5296fc"
