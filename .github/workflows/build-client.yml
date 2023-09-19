@@ -44,14 +44,14 @@ jobs:
             out_path: squirrel.windows/x64/*.exe
             filename_suffix: windows.exe
           -
-            title: Debian/Ubuntu Linux
+            title: Linux (amd64)
             os: ubuntu-22.04
             arch: x64
             platform: linux
             out_path: deb/x64/*.deb
             filename_suffix: linux_amd64.deb
           -
-            title: Raspberry Pi
+            title: Linux (arm64)
             os: ubuntu-22.04
             arch: arm64
             platform: linux
@@ -90,13 +90,17 @@ jobs:
           npm clean-install
           TOMATO_VERSION=${{ env.TOMATO_VERSION }}${{ env.TOMATO_VERSION_SUFFIX }} npm run build
           npx electron-forge make --arch ${{ matrix.arch }} --platform ${{ matrix.platform }}
-          mv -v out/make/${{ matrix.out_path }} "../${{ env.CLIENT_FILENAME }}"
+          mkdir ../client-build-files
+          mv -v out/make/${{ matrix.out_path }} ../client-build-files/${{ env.CLIENT_FILENAME }}
+          if [ "${{ matrix.platform }}" = "linux" ]; then
+            mv -v out/make/*.AppImage ../client-build-files/${CLIENT_FILENAME%%.*}.AppImage
+          fi
       -
         name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
           name: client-build-files
-          path: ${{ env.CLIENT_FILENAME }}
+          path: client-build-files
           retention-days: 2
 
   build-linux-arch:

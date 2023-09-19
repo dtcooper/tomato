@@ -79,13 +79,16 @@ or can be download below.
   * [:material-download: Windows :simple-windows:](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-windows.exe)
     &mdash; a Windows executable that automatically installs Tomato on first run (using
     [Squirrel.Windows](https://github.com/Squirrel/Squirrel.Windows))
-  * Linux :simple-linux:
-    * [:material-download: Ubuntu :simple-ubuntu: or Debian :simple-debian:](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_amd64.deb)
-    &mdash; package in `.deb` format (amd64 only)
-    * [:material-download: Arch :simple-archlinux: or Manjaro :simple-manjaro:](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux-x86_64.pkg.tar.zst)
-    &mdash; package in `.pkg.tar.zst` format (amd64 only)
-    * [:material-download: Raspberry Pi :simple-raspberrypi:](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_arm64.deb)
-    &mdash; arm64 `.deb` package suitable for Raspberry Pi
+  * Linux :simple-linux: downloads:
+      * Ubuntu :simple-ubuntu:, Debian :simple-debian: (and its derivatives), or Raspberry Pi :simple-raspberrypi:
+          * `.deb` package: [:material-download: x86_64 (64-bit)](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_amd64.deb)
+            or [:material-download: arm64 (Raspberry Pi)](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_arm64.deb)
+      * Arch :simple-archlinux: or Manjaro :simple-manjaro:
+          * `.pkg.tar.zst` package: [:material-download: x86_64 (64-bit)](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux-x86_64.pkg.tar.zst)
+            _only_
+      * Universal [AppImage](https://appimage.org/) format
+          * `.AppImage` file: [:material-download: x86_64 (64-bit)](#)
+            or [:material-download: arm64 (Raspberry Pi)](#)
 
 !!! danger "Unsigned Binaries"
     The above releases are **not signed** nor **notaraized**, which means
