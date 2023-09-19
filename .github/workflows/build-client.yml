@@ -44,7 +44,7 @@ jobs:
             out_paths: squirrel.windows/x64/*.exe
             filename_suffix: windows
           -
-            title: Debian/Ubuntu Linux
+            title: Linux (amd64)
             os: ubuntu-22.04
             arch: x64
             platform: linux
@@ -53,7 +53,7 @@ jobs:
               *.AppImage
             filename_suffix: linux_amd64
           -
-            title: Raspberry Pi
+            title: Linux (arm64)
             os: ubuntu-22.04
             arch: arm64
             platform: linux
@@ -95,7 +95,7 @@ jobs:
           TOMATO_VERSION=${{ env.TOMATO_VERSION }}${{ env.TOMATO_VERSION_SUFFIX }} npm run build
           npx electron-forge make --arch ${{ matrix.arch }} --platform ${{ matrix.platform }}
           mkdir ../client-build-files
-          for out_path in ${{ matrix.out_path }}; do
+          for out_path in ${{ matrix.out_paths }}; do
             mv -v out/make/${out_path} "../client-build-files/${{ env.CLIENT_FILENAME }}.${out_path##*.}"
           done
       -
