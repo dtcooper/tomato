@@ -34,29 +34,33 @@ jobs:
             os: macos-11
             arch: universal
             platform: darwin
-            out_path: "*.dmg"
-            filename_suffix: macos.dmg
+            out_paths: "*.dmg"
+            filename_suffix: macos
           -
             title: Windows
             os: windows-2022
             arch: x64
             platform: win32
-            out_path: squirrel.windows/x64/*.exe
-            filename_suffix: windows.exe
+            out_paths: squirrel.windows/x64/*.exe
+            filename_suffix: windows
           -
             title: Debian/Ubuntu Linux
             os: ubuntu-22.04
             arch: x64
             platform: linux
-            out_path: deb/x64/*.deb
-            filename_suffix: linux_amd64.deb
+            out_paths: |
+              deb/arm64/*.deb
+              *.AppImage
+            filename_suffix: linux_amd64
           -
             title: Raspberry Pi
             os: ubuntu-22.04
             arch: arm64
             platform: linux
-            out_path: deb/arm64/*.deb
-            filename_suffix: linux_arm64.deb
+            out_paths: |
+              deb/arm64/*.deb
+              *.AppImage
+            filename_suffix: linux_arm64
     steps:
       -
         name: Checkout
@@ -90,13 +94,16 @@ jobs:
           npm clean-install
           TOMATO_VERSION=${{ env.TOMATO_VERSION }}${{ env.TOMATO_VERSION_SUFFIX }} npm run build
           npx electron-forge make --arch ${{ matrix.arch }} --platform ${{ matrix.platform }}
-          mv -v out/make/${{ matrix.out_path }} "../${{ env.CLIENT_FILENAME }}"
+          mkdir ../client-build-files
+          for out_path in ${{ matrix.out_path }}; do
+            mv -v out/make/${out_path} "../client-build-files/${{ env.CLIENT_FILENAME }}.${out_path##*.}"
+          done
       -
         name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
           name: client-build-files
-          path: ${{ env.CLIENT_FILENAME }}
+          path: client-build-files
           retention-days: 2
 
   build-linux-arch:
