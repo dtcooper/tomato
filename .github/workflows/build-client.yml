@@ -48,18 +48,14 @@ jobs:
             os: ubuntu-22.04
             arch: x64
             platform: linux
-            out_paths: |
-              deb/arm64/*.deb
-              *.AppImage
+            out_paths: deb/arm64/*.deb *.AppImage
             filename_suffix: linux_amd64
           -
             title: Linux (arm64)
             os: ubuntu-22.04
             arch: arm64
             platform: linux
-            out_paths: |
-              deb/arm64/*.deb
-              *.AppImage
+            out_paths: deb/arm64/*.deb *.AppImage
             filename_suffix: linux_arm64
     steps:
       -
