@@ -48,7 +48,7 @@ jobs:
             os: ubuntu-22.04
             arch: x64
             platform: linux
-            out_path: deb/arm64/*.deb
+            out_path: deb/x64/*.deb
             filename_suffix: linux_amd64.deb
           -
             title: Linux (arm64)
