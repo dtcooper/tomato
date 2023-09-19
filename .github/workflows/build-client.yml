@@ -34,29 +34,29 @@ jobs:
             os: macos-11
             arch: universal
             platform: darwin
-            out_paths: "*.dmg"
-            filename_suffix: macos
+            out_path: "*.dmg"
+            filename_suffix: macos.dmg
           -
             title: Windows
             os: windows-2022
             arch: x64
             platform: win32
-            out_paths: squirrel.windows/x64/*.exe
-            filename_suffix: windows
+            out_path: squirrel.windows/x64/*.exe
+            filename_suffix: windows.exe
           -
             title: Linux (amd64)
             os: ubuntu-22.04
             arch: x64
             platform: linux
-            out_paths: deb/arm64/*.deb *.AppImage
-            filename_suffix: linux_amd64
+            out_path: deb/arm64/*.deb
+            filename_suffix: linux_amd64.deb
           -
             title: Linux (arm64)
             os: ubuntu-22.04
             arch: arm64
             platform: linux
-            out_paths: deb/arm64/*.deb *.AppImage
-            filename_suffix: linux_arm64
+            out_path: deb/arm64/*.deb
+            filename_suffix: linux_arm64.deb
     steps:
       -
         name: Checkout
@@ -91,9 +91,10 @@ jobs:
           TOMATO_VERSION=${{ env.TOMATO_VERSION }}${{ env.TOMATO_VERSION_SUFFIX }} npm run build
           npx electron-forge make --arch ${{ matrix.arch }} --platform ${{ matrix.platform }}
           mkdir ../client-build-files
-          for out_path in ${{ matrix.out_paths }}; do
-            mv -v out/make/${out_path} "../client-build-files/${{ env.CLIENT_FILENAME }}.${out_path##*.}"
-          done
+          mv -v out/make/${{ matrix.out_path }} ../client-build-files/${{ env.CLIENT_FILENAME }}
+          if [ "${{ matrix.platform }}" = "linux" ]; then
+            mv -v out/make/*.AppImage ../client-build-files/${CLIENT_FILENAME%%.*}.AppImage
+          fi
       -
         name: Upload build artifact
         uses: actions/upload-artifact@v3
