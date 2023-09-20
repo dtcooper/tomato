@@ -567,12 +567,12 @@ test = ["Cython (>=0.29.24,<0.30.0)"]
 
 [[package]]
 name = "huey"
-version = "2.4.5"
+version = "2.5.0"
 description = "huey, a little task queue"
 optional = false
 python-versions = "*"
 files = [
-    {file = "huey-2.4.5.tar.gz", hash = "sha256:760cf150deff1fa34b852da37701a5a750d1148f03ea07aa2b3764dc6060b4c3"},
+    {file = "huey-2.5.0.tar.gz", hash = "sha256:2ffb52fb5c46a1b0d53c79d59df3622312b27e2ab68d81a580985a8ea4ca3480"},
 ]
 
 [package.extras]
@@ -1348,4 +1348,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "cfef77413bc5ffde2c151f50e4b094773dc548e74129dbbc3ea216b2ee5296fc"
+content-hash = "9dfd7668576d1a4abb61930ae12162ddbdb98e69f7e668b704885438029a88bd"

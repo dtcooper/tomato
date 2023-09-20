@@ -19,7 +19,7 @@ django-redis = {extras = ["hiredis"], version = "^5.3.0"}
 django-safedelete = {git = "https://github.com/makinacorpus/django-safedelete.git"}
 django-user-messages = "^1.0.0"
 gunicorn = "^21.2.0"
-huey = "^2.4.5"
+huey = "^2.5.0"
 psycopg = "^3.1.10"
 python-dotenv = "^1.0.0"
 starlette = "^0.31.1"
