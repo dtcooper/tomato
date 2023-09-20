@@ -30,7 +30,7 @@ export const setServerConfig = ({ _numeric: numeric, ...newConfig }) => {
   if (newConfig.UI_MODES && newConfig.UI_MODES.indexOf(get(userConfig).uiMode) === -1) {
     resetUIMode()
   }
-  newConfig.WAIT_INTERVAL = 3
+
   config.set(newConfig)
 }
 
