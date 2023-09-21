@@ -144,6 +144,11 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
                 logger.info(f"Disconnecting user {endpoint.user} by request from backend")
                 await websocket.close()
 
+    @classmethod
+    async def reload_playlist(cls):
+        for websocket in cls.subscribers.keys():
+            await websocket.send_json({"type": "reload-playlist"})
+
 
 async def background_subscriber():
     conn = redis.Redis(host="redis")
@@ -174,9 +179,12 @@ async def background_subscriber():
             if message is not None:
                 message = json.loads(message["data"])
                 logger.debug(f"Got message: {message}")
-                if message["type"] in ("update", "force-update"):  # force-update for testing
-                    await update_from_api_and_broadcast(force=message["type"] == "force-update")
-                elif message["type"] == "logout":
+                message_type = message["type"]
+                if message_type in ("update", "force-update"):  # force-update for testing
+                    await update_from_api_and_broadcast(force=message_type == "force-update")
+                elif message_type == "reload-playlist":
+                    await APIWebSocketEndpoint.reload_playlist()
+                elif message_type == "logout":
                     await APIWebSocketEndpoint.logout_users(message["data"])
             elif got_first_none:
                 logger.info(f"Subscription timed out after {PUBSUB_TIMEOUT} seconds.")

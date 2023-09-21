@@ -1,6 +1,7 @@
 import { ipcRenderer } from "electron"
 import ReconnectingWebSocket from "reconnecting-websocket"
 import { persisted } from "svelte-local-storage-store"
+import { noop } from "svelte/internal"
 import { derived, get, writable } from "svelte/store"
 import { protocol_version } from "../../../server/constants.json"
 import { acknowledgeLog, log, sendPendingLogs } from "./client-logs"
@@ -88,6 +89,8 @@ ipcRenderer.on("is-ready", () => {
   ipcRenderer.invoke("is-ready", get(conn).ready)
 })
 
+export const reloadPlaylistCallback = writable(noop)
+
 // Functions defined for various message types we get from server after authentication
 const handleMessages = {
   data: async (data) => {
@@ -102,6 +105,10 @@ const handleMessages = {
       console.log(`Acknowledged log ${id}`)
       acknowledgeLog(id)
     }
+  },
+  "reload-playlist": () => {
+    console.log("Backend requested a playlist reload")
+    get(reloadPlaylistCallback)()
   }
 }
 

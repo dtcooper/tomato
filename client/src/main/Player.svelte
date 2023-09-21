@@ -7,6 +7,7 @@
   import SinglePlayRotators from "./player/SinglePlayRotators.svelte"
 
   import { IS_DEV } from "../utils"
+  import { reloadPlaylistCallback } from "../stores/connection"
   import { config, userConfig } from "../stores/config"
   import { singlePlayRotators, stop as stopSinglePlayRotator } from "../stores/single-play-rotators"
   import { db } from "../stores/db"
@@ -92,6 +93,21 @@
     }
     updateUI()
   }
+
+  const reloadPlaylist = () => {
+    while (items.length > 1) {
+      const item = items.pop()
+      // Skip all callbacks and logging
+      item.done(true, true)
+    }
+    // Regenerate stopsets
+    let numStopsetsToAdd = Math.max($config.STOPSET_PRELOAD_COUNT, 1)
+    while (numStopsetsToAdd-- > 0) {
+      addStopset()
+    }
+  }
+
+  $reloadPlaylistCallback = reloadPlaylist
 
   const regenerateNextStopset = () => {
     let nextStopset
