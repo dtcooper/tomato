@@ -60,7 +60,7 @@ module.exports = {
       }
     },
     {
-      name: "electron-forge-maker-appimage",
+      name: "electron-forge-maker-appimage"
     }
   ]
 }

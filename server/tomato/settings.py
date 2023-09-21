@@ -1,7 +1,10 @@
 from collections import OrderedDict
+import datetime
 from decimal import Decimal
 from pathlib import Path
+import re
 
+from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 
 import environ
@@ -239,6 +242,20 @@ if REQUIRE_STRONG_PASSWORDS:
     ]
 
 
+def validate_reset_times(values):
+    if values != "0":
+        values = (v.strip() for v in values.split("\n") if v.strip())
+        for value in values:
+            error = not re.search(r"^[0-9]{1,2}:[0-9]{2}$", value)
+            try:
+                datetime.datetime.strptime(value, "%H:%M")
+            except ValueError:
+                error = True
+
+            if error:
+                raise ValidationError(f'Error parsing time value: "{value}"')
+
+
 MIGRATION_MODULES = {"constance": None}  # Ignore constance models
 CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
 CONSTANCE_SUPERUSER_ONLY = False
@@ -305,12 +322,12 @@ CONSTANCE_ADDITIONAL_FIELDS = {
             "max_value": 24 * 60 * 60,
         },
     ),
-    "reset_hours": (
-        "django.forms.IntegerField",
+    "reset_times": (
+        "django.forms.CharField",
         {
-            "widget": "django.forms.TextInput",
-            "min_value": 0,
-            "max_value": 24,
+            "widget": "django.forms.Textarea",
+            "widget_kwargs": {"attrs": {"rows": 8, "cols": 8}},
+            "validators": (validate_reset_times,),
         },
     ),
 }
@@ -426,13 +443,14 @@ CONSTANCE_CONFIG = {
         "audio_bitrate",
     ),
     "UI_MODES": (["0", "1", "2"], "Restrict what user interface modes are available to the desktop app.", "ui_modes"),
-    "UI_MODE_RESET_HOURS": (
+    "UI_MODE_RESET_TIMES": (
         0,
         mark_safe(
-            "Reset UI mode every hour. For example, a value of 2 would reset the UI mode every two hours, on the hour"
-            " (midnight, 2am, 4am, etc). <strong>Set to 0 disable</strong>."
+            "Reset UI mode to the simplest enabled mode according to this setting. Enter a list of times"
+            " (<code>HH:MM</code> format) with each time on a single line. <strong>Set to 0 disable</strong>. The below"
+            " example would reset the UI mode at midnight, 6am, noon, and 6pm: <pre>00:00\n06:00\n12:00\n18:00</pre>"
         ),
-        "reset_hours",
+        "reset_times",
     ),
     "WARN_ON_EMPTY_ROTATORS": (True, "Warn when a rotator is disabled or has no eligible assets to choose from."),
 }
@@ -444,7 +462,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
             (
                 "STATION_NAME",
                 "UI_MODES",
-                "UI_MODE_RESET_HOURS",
+                "UI_MODE_RESET_TIMES",
             ),
         ),
         (

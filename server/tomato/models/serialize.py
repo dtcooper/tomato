@@ -18,11 +18,15 @@ def get_constance_config():
         for key in dir(constance_config)
         if key not in settings.CONSTANCE_SERVER_ONLY_SETTINGS
     }
-    config.update(
-        {
-            "UI_MODES": list(map(int, config["UI_MODES"])),
-        }
-    )
+
+    reset_times = []
+    for reset_time in config["UI_MODE_RESET_TIMES"].strip().split("\n"):
+        reset_time = reset_time.strip()
+        if reset_time:
+            hour, minute = reset_time.split(":")
+            reset_times.append({"hour": int(hour), "minute": int(minute)})
+
+    config.update({"UI_MODES": list(map(int, config["UI_MODES"])), "UI_MODE_RESET_TIMES": reset_times})
     config["_numeric"] = [key for key, value in config.items() if isinstance(value, decimal.Decimal)]
     return config
 

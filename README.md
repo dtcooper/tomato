@@ -113,7 +113,8 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [x] Implement soft delete for assets
 - [ ] Easier way to toggle, simple / standard / advanced view settings in client. Not in settings.
       (Change advanced mode to "admin" mode)
-  - [ ] Build out "switch back to simple mode" feature a little better, comma separated times?
+  - [x] Build out "switch back to simple mode" timer feature a little better, ie ~~comma separated times?~~ newline
+        separator
 - [ ] Better datetime picker in admin
 - [ ] Skip track in stopset when we get to it
 - [ ] Mark a bad asset? Interesting. Not sure how it would work.

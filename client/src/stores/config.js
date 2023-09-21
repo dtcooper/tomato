@@ -50,36 +50,23 @@ export const setFullscreen = (value) => {
   ipcRenderer.invoke("set-fullscreen", value)
 }
 
-const msToNextHour = () => {
-  // 15 seconds before the next hour
-  const nextHour = dayjs()
-    .add("1", "hour")
-    .set("minute", 0)
-    .set("second", 0)
-    .set("millsecond", 0)
-    .subtract(15, "seconds")
-  const diff = nextHour.diff(dayjs())
-  console.log(`Next hour happens in ${Math.round(diff / 60 / 1000)} minutes`)
-  return diff
-}
+const resetUIModeTimer = () => {
+  const now = dayjs()
 
-const doResetUIModeTimer = () => {
-  const resetHours = get(config).UI_MODE_RESET_HOURS || 0
-  if (resetHours > 0) {
-    const hour = dayjs().get("hour")
-    if (hour % resetHours === 0) {
-      console.log(`Resetting UI moded! hour=${hour} % resetHours=${resetHours} === 0`)
+  const currentHour = now.get("hour")
+  const currentMinute = now.get("minute")
+  for (const { hour, minute } of get(config).UI_MODE_RESET_TIMES || []) {
+    if (currentHour === hour && currentMinute === minute) {
+      console.log(`Resetting UI mode due to config (${hour}:${minute}) at ${dayjs().format()}`)
       resetUIMode()
-    } else {
-      console.log(`Not resetting UI mode due to hour=${hour} % resetHours=${resetHours} != 0`)
     }
-  } else {
-    console.log("Not resetting UI mode due to config")
   }
-  resetUIMode()
-  setTimeout(() => doResetUIModeTimer(), msToNextHour())
-}
 
-setTimeout(() => doResetUIModeTimer(), msToNextHour())
+  // Run every minute
+  const nextMinute = now.add(1, "minute").set("second", 0).set("millisecond", 0)
+  const whenToRunNext = nextMinute.diff(now)
+  setTimeout(() => resetUIModeTimer(), whenToRunNext)
+}
+resetUIModeTimer()
 
 export { readonlyConfig as config }
