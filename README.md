@@ -122,7 +122,8 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [ ] ~~Status updates, ie news and traffic? Fullscreen thing?~~ / ~~Custom UI labels unused labels that play every N times (ie for telling the DJ to do something)~~ -- Probably not
 - [ ] Ability to do speech synthesis / pull asset from API? / weather
 - [ ] Round-robin (or "cycle evenly") rotator scheduling, ignoring weight as an option for a rotator
-- [ ] Check / validate randomization algorithm
+- [x] Check / validate randomization algorithm
+  - [x] Validated! Review of algorithm provided by [Andy](https://github.com/sagittandy/)
 - [x] Mini-player column in asset list view
 - [ ] Asset groups (single asset has 4-5 underlying audio files that are cycled through)
 
