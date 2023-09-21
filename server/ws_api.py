@@ -65,9 +65,9 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
 
     async def on_receive(self, websocket, data):
         if self.user is None:
-            await self.on_recieve_unauthenticated(websocket, data)
+            await self.on_receive_unauthenticated(websocket, data)
         else:
-            await self.on_recieve_authenticated(websocket, data)
+            await self.on_receive_authenticated(websocket, data)
 
     async def process_log(self, data):
         uuid = data.pop("id")
@@ -80,7 +80,7 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
         else:
             return {"success": True, "id": uuid, "updated_existing": False, "ignored": True}
 
-    async def on_recieve_authenticated(self, websocket, data):
+    async def on_receive_authenticated(self, websocket, data):
         message_type = data.get("type")
         if message_type == "log":
             response = await self.process_log(data["data"])
@@ -89,7 +89,7 @@ class APIWebSocketEndpoint(WebSocketEndpoint):
             response = {"message": f"Invalid message type: {json.dumps(message_type)}"}
         await websocket.send_json({"type": message_type, "data": response})
 
-    async def on_recieve_unauthenticated(self, websocket, data):
+    async def on_receive_unauthenticated(self, websocket, data):
         protocol_version = data.pop("protocol_version", None)
         if protocol_version == PROTOCOL_VERSION:
             if set(data.keys()) == {"username", "password"}:
