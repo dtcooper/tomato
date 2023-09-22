@@ -200,24 +200,20 @@ django = ">=2.2"
 
 [[package]]
 name = "django-constance"
-version = "3.0.0"
+version = "3.1.0"
 description = "Django live settings with pluggable backends, including Redis."
 optional = false
 python-versions = ">=3.7"
-files = []
-develop = false
+files = [
+    {file = "django-constance-3.1.0.tar.gz", hash = "sha256:2b96e51de63751ef63f8f92f74e0f6aea30fb6453f3a736c21e1f8b3f6cf0b4f"},
+    {file = "django_constance-3.1.0-py3-none-any.whl", hash = "sha256:6242486a346e396d765a9333d17f3101c8613cabc92e0b98dcb70c2a391bc53b"},
+]
 
 [package.dependencies]
 django-picklefield = "*"
 
 [package.extras]
 redis = ["redis"]
-
-[package.source]
-type = "git"
-url = "https://github.com/jazzband/django-constance.git"
-reference = "3.0.0"
-resolved_reference = "831707089041e6143a8734a28c6e81241886397f"
 
 [[package]]
 name = "django-debug-toolbar"
@@ -1348,4 +1344,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "9dfd7668576d1a4abb61930ae12162ddbdb98e69f7e668b704885438029a88bd"
+content-hash = "062b4099d53fce4ec42d233cb7748d9c355757222321acf4fd8374c8a732b174"
