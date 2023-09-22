@@ -24,6 +24,7 @@ def get_django_settings():
         # Mock out imports
         sys.modules.update(
             {
+                "django.core.exceptions": Mock(ValidationError=None),
                 "django.utils.safestring": Mock(mark_safe=lambda s: s),
                 "environ": Mock(Env=lambda: Mock(bool=lambda *args, **kwargs: False), read_env=lambda s: None),
             }
