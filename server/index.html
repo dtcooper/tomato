@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../assets/tomato.ico">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.3.2">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.1">
     
     
       
@@ -28,10 +28,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.30068a00.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.72749a73.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.85d0ee34.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.a5377069.min.css">
       
       
 
@@ -631,13 +631,15 @@ heavily leveraging its automatic admin interface.</p>
 <p>Restrict what user interface modes are available to the desktop app.</p>
 <p>Default: <code>Simple &amp; standard mode</code></p>
 </dd>
-<dt><code>UI_MODE_RESET_HOURS</code> --- <strong>Type: Numeric</strong></dt>
-<dd>
-<p>Reset UI mode every hour. For example, a value of 2 would reset the UI mode every two hours, on the hour (midnight, 2am, 4am, etc). <strong>Set to 0 disable</strong>.</p>
-<p>Default: <code>0</code></p>
-</dd>
+<dt><code>UI_MODE_RESET_TIMES</code> --- <strong>Type: Numeric</strong></dt>
+<dd>Reset UI mode to the simplest enabled mode according to this setting. Enter a list of times (<code>HH:MM</code> format) with each time on a single line. <strong>Set to 0 disable</strong>. The below example would reset the UI mode at midnight, 6am, noon, and 6pm: <pre>00:00</dd>
 </dl>
 </div>
+<p>06:00
+12:00
+18:00</pre></p>
+<div class="highlight"><pre><span></span><code>    Default: `0`
+</code></pre></div>
 <h3 id="server-processing-audio-options">Server processing audio options<a class="headerlink" href="#server-processing-audio-options" title="Permanent link">←</a></h3>
 <div class="admonition info">
 <dl>
@@ -756,10 +758,10 @@ heavily leveraging its automatic admin interface.</p>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "navigation.expand", "navigation.instant", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "search.highlight", "search.suggest", "toc.integrate"], "search": "../assets/javascripts/workers/search.dfff1995.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.tabs.link", "navigation.expand", "navigation.instant", "navigation.sections", "navigation.tabs", "navigation.tabs.sticky", "search.highlight", "search.suggest", "toc.integrate"], "search": "../assets/javascripts/workers/search.a264c092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.dff1b7c8.min.js"></script>
+      <script src="../assets/javascripts/bundle.4e0fa4ba.min.js"></script>
       
         <script src="../assets/mathjax.js"></script>
       
