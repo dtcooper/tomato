@@ -19,7 +19,7 @@ django-safedelete = {git = "https://github.com/makinacorpus/django-safedelete.gi
 django-user-messages = "^1.0.0"
 gunicorn = "^21.2.0"
 huey = "^2.5.0"
-psycopg = "^3.1.10"
+psycopg = "^3.1.11"
 python-dotenv = "^1.0.0"
 starlette = "^0.31.1"
 uvicorn = {extras = ["standard"], version = "^0.23.2"}
