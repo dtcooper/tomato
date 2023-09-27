@@ -60,7 +60,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:  # For rev number in TOMATO_VERSION_SUFFIX
           fetch-depth: 0
       -
@@ -109,7 +109,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:  # For rev number in TOMATO_VERSION_SUFFIX
           fetch-depth: 0
       -
@@ -149,7 +149,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         name: Download build artifacts
         uses: actions/download-artifact@v3
