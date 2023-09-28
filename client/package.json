@@ -51,7 +51,7 @@
     "electron-forge-maker-appimage": "github:logseq/electron-forge-maker-appimage",
     "electron-squirrel-startup": "^1.0.0",
     "electron-window-state": "^5.0.3",
-    "esbuild": "^0.19.3",
+    "esbuild": "^0.19.4",
     "esbuild-svelte": "^0.8.0",
     "eslint": "^8.50.0",
     "eslint-plugin-svelte": "^2.33.2",

@@ -118,7 +118,8 @@ or can be download below.
 
 ## Run Development Code
 
-The development code runs on macOS :simple-apple: / Windows :simple-windows: / Linux :simple-linux:.
+The development code runs on macOS :simple-apple: / Windows :simple-windows: /
+Linux :simple-linux:.
 
 Prerequisites:
 
@@ -128,7 +129,7 @@ Prerequisites:
   * [Node.js v18+](https://nodejs.org/)
 
 To get the development code running, in your terminal run the following (use
-"Git Bash" on Windows :simple-windows:),
+"Git Bash" on Windows),
 
 ```bash
 # Clone the repo
