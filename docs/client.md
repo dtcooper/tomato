@@ -127,7 +127,8 @@ Prerequisites:
       **make sure to use its included "Git Bash" terminal.**
   * [Node.js v18+](https://nodejs.org/)
 
-To get the development code running, in your terminal run
+To get the development code running, in your terminal run the following (use
+"Git Bash" on Windows :simple-windows:),
 
 ```bash
 # Clone the repo
