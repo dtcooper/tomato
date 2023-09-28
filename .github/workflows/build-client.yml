@@ -92,7 +92,7 @@ jobs:
           npx electron-forge make --arch ${{ matrix.arch }} --platform ${{ matrix.platform }}
           mkdir ../client-build-files
           mv -v out/make/${{ matrix.out_path }} ../client-build-files/${{ env.CLIENT_FILENAME }}
-          if [ "${{ matrix.platform }}" = "linux" ]; then
+          if [ "${{ matrix.platform }}" = "linux" -a "${{ matrix.arch }}" = "x64" ]; then
             mv -v out/make/*.AppImage ../client-build-files/${CLIENT_FILENAME%%.*}.AppImage
           fi
       -

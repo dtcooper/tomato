@@ -91,11 +91,10 @@ or can be download below.
             _only_
 
       * Universal [AppImage](https://appimage.org/) format
-          * `.AppImage` file: [:material-download: x86_64 (64-bit)](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_amd64.AppImage)
-            or [:material-download: arm64 (Raspberry Pi)](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_arm64.AppImage)
+          * `.AppImage` file: [:material-download: x86_64 (64-bit)](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_amd64.AppImage) _only_
 
           * To run using an AppImage, do the following on whatever Linux :simple-linux: distribution
-            you're using (using x86_64 as an example),
+            you're using,
 
             ```bash
             wget https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_amd64.AppImage
