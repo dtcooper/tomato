@@ -314,35 +314,4 @@ if (squirrelCheck || !singleInstanceLock) {
     })
     playServer.listen(+cmdArgs["play-server-port"] || 8207, cmdArgs["play-server-host"])
   }
-
-  // Needed until https://github.com/electron/electron/pull/38977 is merged
-  // TODO: this is possibly already fixed @ https://github.com/electron/electron/pull/40011
-  if (IS_LINUX) {
-    const dbus = require("@homebridge/dbus-native") // Don't bundle on mac/windows
-
-    // Switch night and dark mode on Linux by subscribing to dbus
-    dbus
-      .sessionBus()
-      .getService("org.freedesktop.portal.Desktop")
-      .getInterface(
-        "/org/freedesktop/portal/desktop",
-        "org.freedesktop.portal.Settings",
-        function (err, notifications) {
-          notifications.Read("org.freedesktop.appearance", "color-scheme", function (err, resp) {
-            const colorScheme = resp[1][0][1][0] ? "dark" : "light"
-            nativeTheme.themeSource = colorScheme
-            console.log("(linux) Set initial color scheme to", colorScheme)
-          })
-
-          // dbus signals are EventEmitter events
-          notifications.on("SettingChanged", function () {
-            if (arguments["0"] == "org.freedesktop.appearance" && arguments["1"] == "color-scheme") {
-              const colorScheme = arguments["2"][1][0] ? "dark" : "light"
-              nativeTheme.themeSource = colorScheme
-              console.log("(linux) Updated color scheme to", colorScheme)
-            }
-          })
-        }
-      )
-  }
 }
