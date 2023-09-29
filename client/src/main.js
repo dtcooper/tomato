@@ -316,6 +316,7 @@ if (squirrelCheck || !singleInstanceLock) {
   }
 
   // Needed until https://github.com/electron/electron/pull/38977 is merged
+  // TODO: this is possibly already fixed @ https://github.com/electron/electron/pull/40011
   if (IS_LINUX) {
     const dbus = require("@homebridge/dbus-native") // Don't bundle on mac/windows
 
