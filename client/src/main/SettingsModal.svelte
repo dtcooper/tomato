@@ -81,7 +81,7 @@
       <div class="flex flex-col items-end">
         <div
           class:tooltip={speakerLocked}
-          class="tooltip-warning tooltip-bottom w-full"
+          class="tooltip-bottom tooltip-warning w-full"
           data-tip="Unlock device by clicking below"
         >
           <select
@@ -118,7 +118,7 @@
 
       <div class="flex items-center justify-end text-lg font-bold">Power save blocker:</div>
       <div
-        class="tooltip tooltip-warning tooltip-bottom flex w-max items-center justify-center gap-4 text-xl"
+        class="tooltip tooltip-bottom tooltip-warning flex w-max items-center justify-center gap-4 text-xl"
         data-tip="When set to ON, Tomato attempts to suppress your display from going to sleep and your system from suspending"
       >
         <span class="font-bold" class:text-error={!$userConfig.powerSaveBlocker}>OFF</span>
@@ -206,7 +206,7 @@
             {#if key === "UI_MODES"}
               {value.map((mode) => ["simple", "standard", "advanced"][mode]).join(", ")}
             {:else if key === "UI_MODE_RESET_TIMES"}
-              {value.map(({hour, minute}) => dayjs(`${hour}:${minute}`, "H:m").format("h:mma")).join(", ")}
+              {value.map(({ hour, minute }) => dayjs(`${hour}:${minute}`, "H:m").format("h:mma")).join(", ")}
             {:else}
               {value}
               {#if value === 0}<span class="text-error">(disabled)</span>{/if}

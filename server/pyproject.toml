@@ -31,7 +31,7 @@ django-debug-toolbar = "^4.2.0"
 django-extensions = "^3.2.3"
 flake8 = "^6.1.0"
 ipdb = "^0.13.13"
-ipython = "^8.15.0"
+ipython = "^8.16.0"
 isort = "^5.12.0"
 watchdog = {extras = ["watchmedo"], version = "^3.0.0"}
 

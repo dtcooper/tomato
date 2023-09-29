@@ -61,7 +61,7 @@
       <Icon icon={pauseCircleOutlineIcon} class="h-12 w-12" /> Pause
     </button>
     <div
-      class={firstItem.type === "stopset" && "tooltip tooltip-error tooltip-bottom"}
+      class={firstItem.type === "stopset" && "tooltip tooltip-bottom tooltip-error"}
       data-tip="Warning: this action will be logged!"
     >
       <button
@@ -79,7 +79,7 @@
       <div class="divider my-0 text-sm italic">Stop set control</div>
       <div class="flex justify-center gap-2">
         <div
-          class={firstItem.type === "stopset" && "tooltip tooltip-error tooltip-bottom"}
+          class={firstItem.type === "stopset" && "tooltip tooltip-bottom tooltip-error"}
           data-tip="Warning: this action will be logged!"
         >
           <button

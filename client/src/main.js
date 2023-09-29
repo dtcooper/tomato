@@ -8,9 +8,24 @@ const { check: squirrelCheck } = require("electron-squirrel-startup")
 const { protocol_version } = require("../../server/constants.json")
 const net = require("net")
 
-// Needs to happen before single instance lock check
+const cmdArgs = parseArgs({
+  options: {
+    "enable-dev-mode": { type: "boolean", default: false },
+    "disable-play-server": { type: "boolean", default: false },
+    "play-server-port": { type: "string", default: "8207" },
+    "play-server-host": { type: "string", default: "127.0.0.1" }
+  },
+  strict: false
+}).values
+const isDev = cmdArgs["enable-dev-mode"] || process.env.NODE_ENV === "development"
+
+// getting appData path *needs* to happen before single instance lock check (otherwise old path gets created)
 const appDataDir = app.getPath("appData")
-const userDataDir = path.join(appDataDir, `tomato-radio-automation-p${protocol_version}`)
+const getUserDataDir = (version = protocol_version) =>
+  path.join(appDataDir, `tomato-radio-automation-p${version}${isDev ? "-dev" : ""}`)
+
+const userDataDir = getUserDataDir()
+console.log(`Using user data dir: ${userDataDir}`)
 fs.mkdirSync(userDataDir, { recursive: true, permission: 0o700 })
 app.setPath("userData", userDataDir)
 
@@ -22,25 +37,14 @@ if (squirrelCheck || !singleInstanceLock) {
   }
   app.quit()
 } else {
-  const cmdArgs = parseArgs({
-    options: {
-      "enable-dev-mode": { type: "boolean", default: false },
-      "disable-play-server": { type: "boolean", default: false },
-      "play-server-port": { type: "string", default: "8207" },
-      "play-server-host": { type: "string", default: "127.0.0.1" }
-    },
-    strict: false
-  }).values
-
   let window = null
   let blocker = null
   const [minWidth, minHeight, defaultWidth, defaultHeight] = [800, 600, 1000, 800]
-  const isDev = cmdArgs["enable-dev-mode"] || process.env.NODE_ENV === "development"
   const iconPath = path.resolve(path.join(__dirname, "../assets/icons/tomato.png"))
 
   // Migrate when there's a protocol version bump
   for (let i = 0; i < protocol_version; i++) {
-    const oldUserDataDir = path.join(appDataDir, `tomato-radio-automation-p${i}`)
+    const oldUserDataDir = getUserDataDir(i)
     const oldAssetsDir = path.join(oldUserDataDir, "assets")
     if (fs.existsSync(oldUserDataDir)) {
       // Copy over old assets to new folder

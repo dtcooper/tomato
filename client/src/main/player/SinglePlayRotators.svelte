@@ -25,7 +25,7 @@
       {@const playing =
         $singlePlayRotators.isPlaying && $singlePlayRotators.rotator && $singlePlayRotators.rotator.id === rotator.id}
       <div
-        class="tooltip-error tooltip-bottom tooltip-open flex"
+        class="tooltip-bottom tooltip-open tooltip-error flex"
         data-tip={`${error}!`}
         class:tooltip-bottom={index < 4 || index + 1 != $singlePlayRotators.rotators.length}
         class:tooltip-top={index >= 4 && index + 1 == $singlePlayRotators.rotators.length}
