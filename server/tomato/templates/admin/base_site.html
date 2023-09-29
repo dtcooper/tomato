@@ -49,6 +49,10 @@
       text-transform: none;
       font-size: 13px
     }
+
+    .admin-flatpickr-datetime {
+      width: 350px;
+    }
   </style>
   {{ tomato_json_data|json_script:"tomato-json-data" }}
   <script>
@@ -98,6 +102,18 @@
           })
           dismissLink.parentElement.parentElement.remove()
         })
+      })
+
+      Array.from(document.querySelectorAll('.admin-flatpickr-datetime')).forEach(input => {
+        const clearBtn = document.createElement("a")
+        clearBtn.style.marginLeft = "5px"
+        clearBtn.href = "#"
+        clearBtn.textContent = "Clear"
+        clearBtn.onclick = (event) => {
+          event.preventDefault()
+          Array.from(input.parentElement.querySelectorAll('input')).forEach(clearInput => clearInput.value = '')
+        }
+        input.after(clearBtn)
       })
 
       if (window.DateTimeShortcuts) {

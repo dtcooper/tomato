@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     # Third-party
     "constance",
     "django_file_form",
+    "django_flatpickr",
     "huey.contrib.djhuey",
     "safedelete",
     "user_messages",

@@ -1,4 +1,6 @@
 from django.contrib import admin, messages
+from django.contrib.admin import options
+from django.db import models
 from django.db.models.functions import Coalesce
 from django.template.defaultfilters import pluralize
 from django.templatetags.static import static
@@ -6,6 +8,8 @@ from django.utils import timezone
 from django.utils.formats import date_format as django_date_format
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
+
+from django_flatpickr.widgets import DateTimePickerInput
 
 from ..models import Asset, Stopset
 from ..utils import mark_models_dirty
@@ -151,3 +155,10 @@ class TomatoModelAdminBase(ListPrefetchRelatedMixin, SaveCreatedByMixin, admin.M
     def delete_queryset(self, request, queryset):
         super().delete_queryset(request, queryset)
         mark_models_dirty(request)
+
+
+options.FORMFIELD_FOR_DBFIELD_DEFAULTS.update(
+    {
+        models.DateTimeField: {"widget": DateTimePickerInput(attrs={"class": "admin-flatpickr-datetime"})},
+    }
+)
