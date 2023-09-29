@@ -1,5 +1,6 @@
 <script>
   import { tick } from "svelte"
+  import dayjs from "dayjs"
 
   import Icon from "../components/Icon.svelte"
   import Modal from "../components/Modal.svelte"
@@ -204,6 +205,8 @@
           <span class="font-mono" class:text-success={value === true} class:text-error={value === false}>
             {#if key === "UI_MODES"}
               {value.map((mode) => ["simple", "standard", "advanced"][mode]).join(", ")}
+            {:else if key === "UI_MODE_RESET_TIMES"}
+              {value.map(({hour, minute}) => dayjs(`${hour}:${minute}`, "H:m").format("h:mma")).join(", ")}
             {:else}
               {value}
               {#if value === 0}<span class="text-error">(disabled)</span>{/if}
