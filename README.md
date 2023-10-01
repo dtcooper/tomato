@@ -126,6 +126,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
   - [x] Validated! Review of algorithm provided by [Andy](https://github.com/sagittandy/)
 - [x] Mini-player column in asset list view
 - [ ] Asset groups (single asset has 4-5 underlying audio files that are cycled through)
+- [ ] A large clock in thr UI
 
 Other things
 - [ ] KLOS color scheme: `#D91E75`, `#4B89BF`, `#8CBF3F`, `#F2D750`, and `#D95525`
