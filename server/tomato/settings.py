@@ -446,7 +446,8 @@ CONSTANCE_CONFIG = {
         mark_safe(
             "Reset UI mode to the simplest enabled mode according to this setting. Enter a list of times"
             " (<code>HH:MM</code> format) with each time on a single line. <strong>Set to 0 disable</strong>. The below"
-            " example would reset the UI mode at midnight, 6am, noon, and 6pm: <pre>00:00\n06:00\n12:00\n18:00</pre>"
+            " example would reset the UI mode at midnight, 6am, noon, and"
+            " 6pm:<br><br><code>00:00<br>06:00<br>12:00<br>18:00</code>"
         ),
         "reset_times",
     ),
