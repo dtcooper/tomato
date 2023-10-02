@@ -636,14 +636,14 @@ heavily leveraging its automatic admin interface.</p>
 <p>Restrict what user interface modes are available to the desktop app.</p>
 <p>Default: <code>Simple &amp; standard mode</code></p>
 </dd>
-<dt><code>UI_MODE_RESET_TIMES</code> --- <strong>Type: Numeric</strong></dt>
+<dt><code>UI_MODE_RESET_TIMES</code> --- <strong>Type: String</strong></dt>
 <dd>Reset UI mode to the simplest enabled mode according to this setting. Enter a list of times (<code>HH:MM</code> format) with each time on a single line. <strong>Set to 0 disable</strong>. The below example would reset the UI mode at midnight, 6am, noon, and 6pm: <pre>00:00</dd>
 </dl>
 </div>
 <p>06:00
 12:00
 18:00</pre></p>
-<div class="highlight"><pre><span></span><code>    Default: `0`
+<div class="highlight"><pre><span></span><code>    Default: `&#39;0&#39;`
 </code></pre></div>
 <h3 id="server-processing-audio-options">Server processing audio options<a class="headerlink" href="#server-processing-audio-options" title="Permanent link">←</a></h3>
 <div class="admonition info">
