@@ -20,11 +20,12 @@ def get_constance_config():
     }
 
     reset_times = []
-    for reset_time in config["UI_MODE_RESET_TIMES"].strip().split("\n"):
-        reset_time = reset_time.strip()
-        if reset_time:
-            hour, minute = reset_time.split(":")
-            reset_times.append({"hour": int(hour), "minute": int(minute)})
+    if config["UI_MODE_RESET_TIMES"].strip() != "0":
+        for reset_time in config["UI_MODE_RESET_TIMES"].strip().split("\n"):
+            reset_time = reset_time.strip()
+            if reset_time:
+                hour, minute = reset_time.split(":")
+                reset_times.append({"hour": int(hour), "minute": int(minute)})
 
     config.update({"UI_MODES": list(map(int, config["UI_MODES"])), "UI_MODE_RESET_TIMES": reset_times})
     config["_numeric"] = [key for key, value in config.items() if isinstance(value, decimal.Decimal)]
