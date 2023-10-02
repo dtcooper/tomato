@@ -371,6 +371,7 @@ class AssetAlternateAdmin(AssetAdminBase):
     ASSET_STATUS_FIELDSET = (None, {"fields": ("asset", "status_display")})
 
     add_fieldsets = ((None, {"fields": ("asset",)}), ("Audio file", {"fields": ("file",)}))
+    autocomplete_fields = ("asset",)
     fieldsets = (
         ASSET_STATUS_FIELDSET,
         ("Audio file", {"fields": ("file", "filename_display", "file_display", "duration")}),
@@ -418,5 +419,5 @@ class AssetAlternateAdmin(AssetAdminBase):
         formfield.widget.can_delete_related = False
         formfield.widget.can_change_related = False
         formfield.widget.can_add_related = False
-        formfield.widget.can_view_related = False
+        formfield.widget.can_view_related = True
         return formfield
