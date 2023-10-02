@@ -154,7 +154,7 @@ class Asset(EnabledBeginEndWeightMixin, AssetBase):
 
         return {
             "file": self.serialize_file(),
-            "alternates": [alternate.serialize_file() for alternate in alternates_qs],
+            "alternates": [alternate.serialize() for alternate in alternates_qs],
             "duration": round(self.duration.total_seconds()),
             "rotators": [rotator.id for rotator in self.rotators.all()],
             **super().serialize(),
@@ -171,6 +171,9 @@ class AssetAlternate(AssetBase):
     asset = models.ForeignKey(
         Asset, on_delete=models.CASCADE, related_name="alternates", verbose_name="alternate for asset"
     )
+
+    def serialize(self):
+        return {"duration": round(self.duration.total_seconds()), **super().serialize_file()}
 
     @property
     def name(self):
