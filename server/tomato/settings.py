@@ -57,11 +57,8 @@ if DOMAIN_NAME:
 ALLOWED_HOSTS = list(ALLOWED_HOSTS)
 
 if DEBUG:
-    # For django debug framework
-    import socket
-
-    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-    INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
+    # Show debug toolbar
+    DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda request: True}
 
 INSTALLED_APPS = [
     # Django
@@ -445,7 +442,7 @@ CONSTANCE_CONFIG = {
     ),
     "UI_MODES": (["0", "1", "2"], "Restrict what user interface modes are available to the desktop app.", "ui_modes"),
     "UI_MODE_RESET_TIMES": (
-        0,
+        "0",
         mark_safe(
             "Reset UI mode to the simplest enabled mode according to this setting. Enter a list of times"
             " (<code>HH:MM</code> format) with each time on a single line. <strong>Set to 0 disable</strong>. The below"
