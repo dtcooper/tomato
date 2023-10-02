@@ -78,7 +78,8 @@ class AssetAdminBase(FileFormAdminMixin, TomatoModelAdminBase):
             html = mark_safe('<div style="text-align: center; width: max-content; display: flex; gap: 3px;">')
             for obj in objs:
                 html += format_html(
-                    '<a class="play-asset-list-display" href="{}">&#x25B6;&#xFE0F;</a>',
+                    '<a class="play-asset-list-display{}" href="{}">&#x25B6;&#xFE0F;</a>',
+                    " play-asset-alternate" if isinstance(obj, AssetAlternate) else "",  # For colorization
                     obj.file.url,
                 )
             return html + mark_safe("</div>")
@@ -214,7 +215,7 @@ class AssetAdmin(AiringMixin, AssetAdminBase):
         StatusFilter,
         ("created_by", NoNullRelatedOnlyFieldFilter),
     )
-    list_prefetch_related = ("rotators",)
+    list_prefetch_related = ("rotators", "alternates")
     search_fields = ("name", "original_filename")
     no_change_fieldsets = (
         NAME_AIRING_FIELDSET,

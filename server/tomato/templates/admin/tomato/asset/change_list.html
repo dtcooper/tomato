@@ -1,5 +1,15 @@
 {% extends 'admin/tomato/change_list.html' %}
 
+{% block extrahead %}
+  {{ block.super }}
+  <style>
+    .play-asset-list-display.play-asset-alternate {
+      /* Rotate to be more yellow for alternates */
+      filter: hue-rotate(215deg);
+    }
+  </style>
+{% endblock %}
+
 {% block object-tools-items %}
   {% if has_add_permission %}
     <li>
