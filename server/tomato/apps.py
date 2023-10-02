@@ -26,6 +26,7 @@ class TomatoConfig(AppConfig):
     def create_groups(self, using=None, *args, **kwargs):
         all_groups = []
         Asset = apps.get_model("tomato.Asset")
+        AssetAlternate = apps.get_model("tomato.AssetAlternate")
         ClientLogEntry = apps.get_model("tomato.ClientLogEntry")
         ContentType = apps.get_model("contenttypes.ContentType")
         Group = apps.get_model("auth.Group")
@@ -35,13 +36,14 @@ class TomatoConfig(AppConfig):
         StopsetRotator = apps.get_model("tomato.StopsetRotator")
 
         asset = ContentType.objects.get_for_model(Asset)
+        asset_alternate = ContentType.objects.get_for_model(AssetAlternate)
         rotator = ContentType.objects.get_for_model(Rotator)
         stopset = ContentType.objects.get_for_model(Stopset)
         stopset_rotator = ContentType.objects.get_for_model(StopsetRotator)
         client_log_entry = ContentType.objects.get_for_model(ClientLogEntry)
 
         for name, content_types in (
-            (EDIT_ALL_GROUP_NAME, (asset, rotator, stopset, stopset_rotator)),
+            (EDIT_ALL_GROUP_NAME, (asset, asset_alternate, rotator, stopset, stopset_rotator)),
             (EDIT_ONLY_ASSETS_GROUP_NAME, (asset,)),
             (f"View and export {ClientLogEntry._meta.verbose_name_plural}", (client_log_entry,)),
         ):

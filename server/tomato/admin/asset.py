@@ -9,17 +9,16 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 
 from django_file_form.forms import FileFormMixin, MultipleUploadedFileField
 from django_file_form.model_admin import FileFormAdminMixin
-from safedelete.admin import SafeDeleteAdmin, SafeDeleteAdminFilter
 
-from ..models import Asset, Rotator
+from ..models import Asset, AssetAlternate, Rotator
 from ..tasks import bulk_process_assets, process_asset
 from ..utils import mark_models_dirty
-from .base import AiringFilter, AiringMixin, NoNullRelatedOnlyFieldFilter, TomatoModelAdminBase
+from .base import NO_ICON, YES_ICON, AiringFilter, AiringMixin, NoNullRelatedOnlyFieldFilter, TomatoModelAdminBase
 
 
 class AssetActionForm(ActionForm):
@@ -63,10 +62,116 @@ class StatusFilter(admin.SimpleListFilter):
             return queryset.exclude(status=Asset.Status.READY)
 
 
-class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase, SafeDeleteAdmin):
+class AssetAdminBase(FileFormAdminMixin, TomatoModelAdminBase):
+    ADDITIONAL_INFO_FIELDSET = ("Additional information", {"fields": ("created_at", "created_by")})
+
+    readonly_fields = ("duration", "file_display", "filename_display") + TomatoModelAdminBase.readonly_fields
+
+    @admin.display(description="Play")
+    def list_player(self, obj):
+        objs = [obj]
+        if isinstance(obj, Asset):
+            objs.extend(obj.alternates.all())
+        objs = list(filter(lambda o: o.file and o.status == o.Status.READY, objs))
+
+        if objs:
+            html = mark_safe('<div style="text-align: center; width: max-content; display: flex; gap: 3px;">')
+            for obj in objs:
+                html += format_html(
+                    '<a class="play-asset-list-display" href="{}">&#x25B6;&#xFE0F;</a>',
+                    obj.file.url,
+                )
+            return html + mark_safe("</div>")
+        else:
+            return ""
+
+    @staticmethod
+    def _get_player_html(obj):
+        return format_html(
+            '<audio src="{}" style="height: 45px; width: 450px; max-width: 100%" controlslist="noplaybackrate"'
+            ' preload="auto" controls />',
+            obj.file.url,
+        )
+
+    @admin.display(description="Player")
+    def file_display(self, obj):
+        if isinstance(obj, AssetAlternate) or not obj.alternates.exists():
+            return self._get_player_html(obj)
+        else:
+            objs = [obj]
+            objs.extend(obj.alternates.all())
+
+            html = mark_safe("<table><thead><th>File</th><th>Audio</th</thead><tbody>")
+            for n, obj in enumerate(objs):
+                html += format_html(
+                    '<tr><td style="vertical-align: middle;">{}</td><td>', "Primary" if n == 0 else f"Alternate #{n}"
+                )
+                if obj.file and obj.status == obj.Status.READY:
+                    html += self._get_player_html(obj)
+                else:
+                    html += mark_safe("<em>Being processed...</em>")
+                html += mark_safe("</td></tr>")
+            return html + mark_safe("</tbody></table>")
+
+    @admin.display(description="Filename")
+    def filename_display(self, obj):
+        return format_html(
+            '<a href="{}" target="_blank">{}</a>',
+            reverse(f"admin:tomato_{self.model._meta.model_name}_download", args=(obj.id,)),
+            obj.filename,
+        )
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = self.readonly_fields
+        if obj is not None and obj.status != Asset.Status.READY:
+            readonly_fields += ("file",)
+        return readonly_fields
+
+    def save_model(self, request, obj, form, change):
+        should_process = "file" in obj.get_dirty_fields()
+        if should_process:
+            obj.status = Asset.Status.PENDING
+
+        empty_name = False
+        if isinstance(obj, Asset):
+            empty_name = obj.name.strip()
+
+        super().save_model(request, obj, form, change)
+
+        if should_process:
+            process_asset(obj, empty_name=empty_name, user=request.user)
+            self.message_user(
+                request,
+                f'{obj._meta.verbose_name.capitalize()} "{obj.name}" is being processed. A message will appear when it'
+                " is ready. Refresh this page and you can edit it at that time.",
+                messages.WARNING,
+            )
+
+    def download_view(self, request, asset_id):
+        if not self.has_view_permission(request):
+            raise PermissionDenied
+
+        asset = get_object_or_404(self.model, id=asset_id)
+
+        # Use fancy feature of nginx to provide content disposition headers
+        response = HttpResponse()
+        response["X-Accel-Redirect"] = asset.file.url
+        response["Content-Disposition"] = f"attachment; filename*=utf-8''{urllib.parse.quote(asset.filename)}"
+        return response
+
+    def get_urls(self):
+        return [
+            path(
+                "<asset_id>/download/",
+                self.admin_site.admin_view(self.download_view),
+                name=f"tomato_{self.model._meta.model_name}_download",
+            ),
+        ] + super().get_urls()
+
+
+class AssetAdmin(AiringMixin, AssetAdminBase):
     ROTATORS_FIELDSET = ("Rotators", {"fields": ("rotators",)})
     NAME_AIRING_FIELDSET = (None, {"fields": ("name", "airing")})
-    ADDITIONAL_INFO_FIELDSET = ("Additional information", {"fields": ("created_at", "created_by")})
 
     add_fieldsets = (
         (None, {"fields": ("name",)}),
@@ -81,21 +186,19 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase, SafeDele
         "add_rotator",
         "remove_rotator",
         "delete_selected",
-        "undelete_selected",
-        "hard_delete_soft_deleted",
     )
     fieldsets = (
         NAME_AIRING_FIELDSET,
-        ("Audio file", {"fields": ("file", "filename_display", "file_display", "duration")}),
+        ("Audio file", {"fields": ("file", "filename_display", "file_display", "duration", "alternates_display")}),
         ROTATORS_FIELDSET,
         AiringMixin.AIRING_INFO_FIELDSET,
-        ADDITIONAL_INFO_FIELDSET,
+        AssetAdminBase.ADDITIONAL_INFO_FIELDSET,
     )
     filter_horizontal = ("rotators",)
     field_to_highlight = "name"
     list_display = (
         "list_player",
-        "highlight_deleted_field",
+        "name",
         "airing",
         "air_date",
         "weight",
@@ -103,82 +206,24 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase, SafeDele
         "rotators_display",
         "created_at",
     )
-    list_display_links = ("highlight_deleted_field",)
+    list_display_links = ("name",)
     list_filter = (
         AiringFilter,
         "rotators",
         "enabled",
         StatusFilter,
-        SafeDeleteAdminFilter,
         ("created_by", NoNullRelatedOnlyFieldFilter),
     )
     list_prefetch_related = ("rotators",)
+    search_fields = ("name", "original_filename")
     no_change_fieldsets = (
         NAME_AIRING_FIELDSET,
-        ("Audio file", {"fields": ("filename_display", "file_display", "duration")}),
+        ("Audio file", {"fields": ("filename_display", "file_display", "duration", "alternates_display_readonly")}),
         ("Rotators", {"fields": ("rotators_display",)}),
         AiringMixin.AIRING_INFO_FIELDSET,
-        ADDITIONAL_INFO_FIELDSET,
+        AssetAdminBase.ADDITIONAL_INFO_FIELDSET,
     )
-    readonly_fields = (
-        "duration",
-        "file_display",
-        "filename_display",
-        "rotators_display",
-        "airing",
-    ) + TomatoModelAdminBase.readonly_fields
-
-    @admin.display(description="Play")
-    def list_player(self, obj):
-        if obj.file and obj.status == obj.Status.READY:
-            return format_html(
-                '<div style="text-align: center;"><a class="play-asset-list-display"'
-                ' href="{}">&#x25B6;&#xFE0F;</a></div>',
-                obj.file.url,
-            )
-        else:
-            return ""
-
-    @admin.display(description="Filename")
-    def filename_display(self, obj):
-        return format_html(
-            '<a href="{}" target="_blank">{}</a>', reverse("admin:tomato_asset_download", args=(obj.id,)), obj.filename
-        )
-
-    @admin.display(description="Player")
-    def file_display(self, obj):
-        if obj.file:
-            if obj.status == obj.Status.READY:
-                return format_html(
-                    '<audio src="{}" style="height: 45px; width: 450px; max-width: 100%" '
-                    'controlslist="noplaybackrate" preload="auto" controls />',
-                    obj.file.url,
-                )
-            else:
-                return mark_safe("<em>Being processed...</em>")
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly_fields = self.readonly_fields
-        if obj is not None and obj.status != Asset.Status.READY:
-            readonly_fields += ("file",)
-        return readonly_fields
-
-    def save_model(self, request, obj, form, change):
-        should_process = "file" in obj.get_dirty_fields()
-        if should_process:
-            obj.status = Asset.Status.PENDING
-
-        empty_name = obj.name.strip()
-        super().save_model(request, obj, form, change)
-
-        if should_process:
-            process_asset(obj, empty_name=empty_name, user=request.user)
-            self.message_user(
-                request,
-                f'Audio asset "{obj.name}" is being processed. A message will appear when it is ready. Refresh this'
-                " page and you can edit it at that time.",
-                messages.WARNING,
-            )
+    readonly_fields = ("airing", "alternates_display", "rotators_display") + AssetAdminBase.readonly_fields
 
     @admin.display(description="Rotator(s)")
     def rotators_display(self, obj):
@@ -209,6 +254,30 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase, SafeDele
             return mark_safe('<span style="color: red"><strong>WARNING:</strong> not in any rotators</span>')
         return html
 
+    @admin.display(description="Alternate file(s)")
+    def alternates_display(self, obj, readonly=False):
+        alternates = list(obj.alternates.all())
+        html = mark_safe("")
+        if alternates:
+            files = format_html_join(
+                "\n",
+                '<li><a href="{}">{}</a></li>',
+                ((reverse("admin:tomato_assetalternate_change", args=(alt.id,)), alt.name) for alt in alternates),
+            )
+            html += format_html('<ol style="padding-inline-start: 0;">\n{}\n</ol>\n', files)
+        if readonly:
+            return html or mark_safe("<em>None</em>")
+        else:
+            return html + format_html(
+                '<a href="{}?asset_id={}" class="addlink">Add new alternate file</a>',
+                reverse("admin:tomato_assetalternate_add"),
+                obj.id,
+            )
+
+    @admin.display(description="Alternate file(s)")
+    def alternates_display_readonly(self, obj):
+        return self.alternates_display(obj, readonly=True)
+
     @admin.action(description="Add selected audio assets to rotator", permissions=("add", "change", "delete"))
     def add_rotator(self, request, queryset):
         rotator_id = request.POST.get("rotator")
@@ -236,39 +305,6 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase, SafeDele
             mark_models_dirty(request)
         else:
             self.message_user(request, "You must select a rotator to remove audio assets from.", messages.WARNING)
-
-    @admin.action(
-        description=SafeDeleteAdmin.undelete_selected.short_description, permissions=("add", "change", "delete")
-    )
-    def undelete_selected(self, request, queryset):
-        mark_models_dirty(request)
-        return super().undelete_selected(request, queryset)
-
-    @admin.action(
-        description=SafeDeleteAdmin.hard_delete_soft_deleted.short_description, permissions=("add", "change", "delete")
-    )
-    def hard_delete_soft_deleted(self, request, queryset):
-        if queryset.filter(deleted__isnull=False).exists():
-            mark_models_dirty(request)
-            return super().hard_delete_soft_deleted(request, queryset)
-        else:
-            self.message_user(
-                request,
-                mark_safe("You can only hard delete audio assets that are <em>already</em> deleted!"),
-                messages.WARNING,
-            )
-
-    def download_view(self, request, asset_id):
-        if not self.has_view_permission(request):
-            raise PermissionDenied
-
-        asset = get_object_or_404(Asset, id=asset_id)
-
-        # Use fancy feature of nginx to provide content disposition headers
-        response = HttpResponse()
-        response["X-Accel-Redirect"] = asset.file.url
-        response["Content-Disposition"] = f"attachment; filename*=utf-8''{urllib.parse.quote(asset.filename)}"
-        return response
 
     def upload_view(self, request):
         if not self.has_add_permission(request):
@@ -327,9 +363,60 @@ class AssetAdmin(FileFormAdminMixin, AiringMixin, TomatoModelAdminBase, SafeDele
 
     def get_urls(self):
         return [
-            path("<asset_id>/download/", self.admin_site.admin_view(self.download_view), name="tomato_asset_download"),
             path("upload/", self.admin_site.admin_view(self.upload_view), name="tomato_asset_upload"),
         ] + super().get_urls()
 
 
-AssetAdmin.highlight_deleted_field.short_description = "name"
+class AssetAlternateAdmin(AssetAdminBase):
+    ASSET_STATUS_FIELDSET = (None, {"fields": ("asset", "status_display")})
+
+    add_fieldsets = ((None, {"fields": ("asset",)}), ("Audio file", {"fields": ("file",)}))
+    fieldsets = (
+        ASSET_STATUS_FIELDSET,
+        ("Audio file", {"fields": ("file", "filename_display", "file_display", "duration")}),
+        AssetAdminBase.ADDITIONAL_INFO_FIELDSET,
+    )
+    list_display = ("list_player", "name", "status_display", "duration", "created_at", "asset_display")
+    list_display_links = ("name",)
+    list_filter = (StatusFilter, ("created_by", NoNullRelatedOnlyFieldFilter))
+    list_prefetch_related = ("asset",)
+    no_change_fieldsets = (
+        ASSET_STATUS_FIELDSET,
+        ("Audio file", {"fields": ("filename_display", "file_display", "duration")}),
+        AssetAdminBase.ADDITIONAL_INFO_FIELDSET,
+    )
+    ordering = ("asset__created_at", "asset__id", "id")
+    readonly_fields = ("status_display",) + AssetAdminBase.readonly_fields
+    search_fields = ("asset__name", "original_filename")
+
+    @admin.display(description="Status", ordering="status")
+    def status_display(self, obj):
+        if obj.status == obj.Status.READY:
+            return format_html('<img src="{}">', YES_ICON)
+        else:
+            return format_html('<img src="{}"> {}', NO_ICON, "Processing")
+
+    @admin.display(description=AssetAlternate._meta.get_field("asset").verbose_name, ordering="asset__name")
+    def asset_display(self, obj):
+        return format_html(
+            '<a href="{}">{}</a>', reverse("admin:tomato_asset_change", args=(obj.asset.id,)), obj.asset.name
+        )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return AssetAlternate.annotate_queryset_with_num_before(qs)
+
+    def get_changeform_initial_data(self, request):
+        form_data = super().get_changeform_initial_data(request)
+        asset_id = request.GET.get("asset_id")
+        if asset_id is not None:
+            form_data["asset"] = asset_id
+        return form_data
+
+    def formfield_for_dbfield(self, *args, **kwargs):
+        formfield = super().formfield_for_dbfield(*args, **kwargs)
+        formfield.widget.can_delete_related = False
+        formfield.widget.can_change_related = False
+        formfield.widget.can_add_related = False
+        formfield.widget.can_view_related = False
+        return formfield

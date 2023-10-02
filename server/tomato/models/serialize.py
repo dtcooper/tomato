@@ -7,7 +7,7 @@ from django.db.models import Prefetch
 
 from constance import config as constance_config
 
-from .asset import Asset
+from .asset import Asset, AssetAlternate
 from .rotator import Rotator
 from .stopset import Stopset
 
@@ -39,6 +39,9 @@ async def serialize_for_api():
     prefetch_qs = Rotator.objects.only("id").filter(id__in=rotator_ids)
     assets = (
         Asset.objects.prefetch_related(Prefetch("rotators", prefetch_qs.order_by("id")))
+        .prefetch_related(
+            Prefetch("alternates", AssetAlternate.objects.filter(status=AssetAlternate.Status.READY).order_by("id"))
+        )
         .filter(status=Asset.Status.READY)
         .order_by("id")
     )
@@ -47,7 +50,7 @@ async def serialize_for_api():
     ).order_by("id")
 
     return {
-        "assets": [a.serialize() async for a in assets],
+        "assets": [a.serialize(alternates_already_filtered_by_prefetch=True) async for a in assets],
         "rotators": [r.serialize() for r in rotators],
         "stopsets": [s.serialize() async for s in stopsets],
         "config": await sync_to_async(get_constance_config)(),

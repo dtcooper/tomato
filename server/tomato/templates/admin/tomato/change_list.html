@@ -1,0 +1,77 @@
+{% extends 'admin/change_list.html' %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <style>
+    .play-asset-list-display {
+      font-size: 1.5em;
+      font-family: var(--font-family-emoji);
+    }
+    .play-asset-list-display:focus {
+      text-decoration: none;
+      color: var(--link-fg);
+    }
+    .progress-container {
+      position: fixed;
+      z-index: 9999;
+      height: 7px;
+      width: 100vw;
+      top: 0;
+      background-color: #fff;
+      border-bottom: 1px #000 solid;
+    }
+    .progress {
+      height: 7px;
+      background-color: #000;
+    }
+    .progress-hidden {
+      display: none;
+    }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const progress = document.createElement('div')
+      progress.classList.add('progress-container', 'progress-hidden')
+      const progressBar = document.createElement('div')
+      progressBar.classList.add('progress')
+      progress.append(progressBar)
+      document.querySelector('body').prepend(progress)
+
+      const playIcon = '\u25B6\uFE0F'
+      const stopIcon = '\u23F9\uFE0F'
+
+      let last = null
+      const audio = new Audio()
+      audio.onerror = audio.onended = audio.onpause = () => {
+        progress.classList.add('progress-hidden')
+        if (last) {
+          last.textContent = playIcon
+        }
+      }
+      audio.ontimeupdate = () => {
+        progressBar.style.width = `${audio.currentTime / audio.duration * 100}%`
+      }
+      Array.from(document.querySelectorAll('.play-asset-list-display')).forEach(play => {
+        play.addEventListener('click', event => {
+          event.preventDefault()
+          audio.pause()
+
+          if (last === play) {
+            last = null
+            play.textContent = playIcon
+          } else {
+            if (last !== null) {
+              last.textContent = playIcon
+            }
+            last = play
+            audio.src = play.href
+            audio.play()
+            progressBar.style.width = '0'
+            progress.classList.remove('progress-hidden')
+            play.textContent = stopIcon
+          }
+        })
+      })
+    })
+  </script>
+{% endblock %}

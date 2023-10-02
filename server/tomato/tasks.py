@@ -10,7 +10,6 @@ from django.core.files import File
 from constance import config
 from django_file_form.models import TemporaryUploadedFile
 from huey.contrib import djhuey
-from safedelete.models import HARD_DELETE
 from user_messages import api as user_messages_api
 from user_messages.models import Message as UserMessage
 
@@ -33,8 +32,6 @@ def process_asset(
                 " check the server logs.",
                 deliver_once=False,
             )
-        # Actually delete it from DB
-        asset.delete(force_policy=HARD_DELETE)
 
     try:
         asset.refresh_from_db()
@@ -78,7 +75,7 @@ def process_asset(
             mark_models_dirty()
 
         if not no_success_message and user is not None:
-            user_messages_api.success(user, f'Audio asset "{asset.file.real_path.name}" processed!')
+            user_messages_api.success(user, f'Audio asset "{asset.name}" successfully processed!')
 
     except Exception:
         logger.exception("process_asset threw exception")

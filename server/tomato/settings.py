@@ -73,7 +73,6 @@ INSTALLED_APPS = [
     "django_file_form",
     "django_flatpickr",
     "huey.contrib.djhuey",
-    "safedelete",
     "user_messages",
 ]
 if DEBUG:
@@ -151,6 +150,7 @@ CACHES = {
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "CONNECTION_POOL_KWARGS": {"max_connections": 50},
+            "PARSER_CLASS": "redis.connection._HiredisParser",
             "PICKLE_VERSION": -1,
         },
         "KEY_PREFIX": "cache",

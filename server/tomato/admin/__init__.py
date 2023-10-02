@@ -10,8 +10,8 @@ from constance import config as constance_config
 from constance.admin import Config
 
 from ..constants import COLORS_DICT, HELP_DOCS_URL, PROTOCOL_VERSION
-from ..models import Asset, ClientLogEntry, Rotator, Stopset, User
-from .asset import AssetAdmin
+from ..models import Asset, AssetAlternate, ClientLogEntry, Rotator, Stopset, User
+from .asset import AssetAdmin, AssetAlternateAdmin
 from .client_log_entry import ClientLogEntryAdmin
 from .config import ConfigAdmin
 from .rotator import RotatorAdmin
@@ -69,6 +69,7 @@ class TomatoAdminSite(admin.AdminSite):
 admin_site = TomatoAdminSite()
 
 admin_site.register(Asset, AssetAdmin)
+admin_site.register(AssetAlternate, AssetAlternateAdmin)
 admin_site.register(ClientLogEntry, ClientLogEntryAdmin)
 admin_site.register([Config], ConfigAdmin)
 admin_site.register(Rotator, RotatorAdmin)
