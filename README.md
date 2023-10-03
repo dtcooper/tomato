@@ -125,7 +125,8 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [x] Check / validate randomization algorithm
   - [x] Validated! Review of algorithm provided by [Andy](https://github.com/sagittandy/)
 - [x] Mini-player column in asset list view
-- [ ] Asset groups (single asset has 4-5 underlying audio files that are cycled through)
+- [ ] Asset alternates (single asset has 4-5 underlying audio files that are cycled through)
+  - [x] Backend done
 - [ ] A large clock in thr UI
 
 Other things
