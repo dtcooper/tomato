@@ -52,7 +52,7 @@
     "electron-window-state": "^5.0.3",
     "esbuild": "^0.19.4",
     "esbuild-svelte": "^0.8.0",
-    "eslint": "^8.50.0",
+    "eslint": "^8.51.0",
     "eslint-plugin-svelte": "^2.34.0",
     "fs-extra": "^11.1.1",
     "material-ui-colors": "^1.0.0",
