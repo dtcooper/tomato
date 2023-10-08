@@ -36,10 +36,6 @@
       {% csrf_token %}
       <p>Using the form below, you can bulk upload {{ opts.verbose_name_plural }}.</p>
 
-      <div class="submit-row">
-        <input type="submit" value="Bulk Upload" class="default">
-      </div>
-
       <fieldset class="module aligned">
         {% for field in form %}
           {% if field.is_hidden %}
@@ -58,7 +54,7 @@
       </fieldset>
 
       <div class="submit-row">
-        <input type="submit" value="Bulk Upload" class="default">
+        <input type="submit" value="SAVE new audio assets" class="default">
       </div>
 
     </form>
