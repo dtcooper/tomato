@@ -457,7 +457,7 @@ export const setSpeaker = (choice) => {
     console.warn("speakers does NOT contain a default entry", speakers)
   }
 
-  console.log(`Set speaker to: ${choicePretty} (${choice})`)
+  console.log(`Set speaker to: ${choicePretty}${choice ? ` (${choice})` : ''}`)
   audioContext.setSinkId(choice)
 
   speaker.set(choice === "" ? "default" : choice)

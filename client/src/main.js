@@ -18,11 +18,12 @@ const cmdArgs = parseArgs({
   strict: false
 }).values
 const isDev = cmdArgs["enable-dev-mode"] || process.env.NODE_ENV === "development"
+const isNotPackagedAndDev = !app.isPackaged && isDev
 
 // getting appData path *needs* to happen before single instance lock check (otherwise old path gets created)
 const appDataDir = app.getPath("appData")
 const getUserDataDir = (version = protocol_version) =>
-  path.join(appDataDir, `tomato-radio-automation-p${version}${isDev ? "-dev" : ""}`)
+  path.join(appDataDir, `tomato-radio-automation-p${version}${isNotPackagedAndDev ? "-dev" : ""}`)
 
 const userDataDir = getUserDataDir()
 console.log(`Using user data dir: ${userDataDir}`)
@@ -68,7 +69,7 @@ if (squirrelCheck || !singleInstanceLock) {
   })
 
   const baseUrl =
-    !app.isPackaged && isDev
+    isNotPackagedAndDev
       ? "http://localhost:3000/"
       : `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
   const baseParams = new URLSearchParams({ userDataDir, dev: isDev ? "1" : "0" })
