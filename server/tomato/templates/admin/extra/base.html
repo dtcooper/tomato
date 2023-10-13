@@ -1,0 +1,14 @@
+{% extends 'admin/base_site.html' %}
+
+
+{% block nav-breadcrumbs %}
+  <nav aria-label="Breadcrumbs">
+    <div class="breadcrumbs">
+      <a href="{% url 'admin:index' %}">Home</a>
+      &rsaquo;
+      <a href="{% url 'admin:app_list_extra' %}">Utilities</a>
+      &rsaquo;
+      {{ title }}
+    </div>
+  </nav>
+{% endblock %}
