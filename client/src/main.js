@@ -68,10 +68,9 @@ if (squirrelCheck || !singleInstanceLock) {
     version: TOMATO_VERSION
   })
 
-  const baseUrl =
-    isNotPackagedAndDev
-      ? "http://localhost:3000/"
-      : `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
+  const baseUrl = isNotPackagedAndDev
+    ? "http://localhost:3000/"
+    : `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
   const baseParams = new URLSearchParams({ userDataDir, dev: isDev ? "1" : "0" })
   const url = `${baseUrl}?${baseParams.toString()}`
 

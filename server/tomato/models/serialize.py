@@ -1,4 +1,5 @@
 import decimal
+import logging
 
 from asgiref.sync import sync_to_async
 
@@ -12,6 +13,9 @@ from .rotator import Rotator
 from .stopset import Stopset
 
 
+logger = logging.getLogger(__name__)
+
+
 def get_constance_config():
     config = {
         key: getattr(constance_config, key)
@@ -20,12 +24,15 @@ def get_constance_config():
     }
 
     reset_times = []
-    if config["UI_MODE_RESET_TIMES"].strip() != "0":
-        for reset_time in config["UI_MODE_RESET_TIMES"].strip().split("\n"):
-            reset_time = reset_time.strip()
-            if reset_time:
-                hour, minute = reset_time.split(":")
-                reset_times.append({"hour": int(hour), "minute": int(minute)})
+    try:
+        if config["UI_MODE_RESET_TIMES"].strip() != "0":
+            for reset_time in config["UI_MODE_RESET_TIMES"].strip().split("\n"):
+                reset_time = reset_time.strip()
+                if reset_time:
+                    hour, minute = reset_time.split(":")
+                    reset_times.append((int(hour), int(minute)))
+    except Exception:
+        logger.exception("Error parsing UI_MODE_RESET_TIMES. Sending empty list.")
 
     config.update({"UI_MODES": list(map(int, config["UI_MODES"])), "UI_MODE_RESET_TIMES": reset_times})
     config["_numeric"] = [key for key, value in config.items() if isinstance(value, decimal.Decimal)]

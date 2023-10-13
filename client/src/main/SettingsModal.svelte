@@ -206,7 +206,7 @@
             {#if key === "UI_MODES"}
               {value.map((mode) => ["simple", "standard", "advanced"][mode]).join(", ")}
             {:else if key === "UI_MODE_RESET_TIMES"}
-              {value.map(({ hour, minute }) => dayjs(`${hour}:${minute}`, "H:m").format("h:mma")).join(", ")}
+              {value.map(([hour, minute]) => dayjs(`${hour}:${minute}`, "H:m").format("h:mma")).join(", ")}
             {:else}
               {value}
               {#if value === 0}<span class="text-error">(disabled)</span>{/if}

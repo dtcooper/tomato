@@ -55,7 +55,7 @@ const resetUIModeTimer = () => {
 
   const currentHour = now.get("hour")
   const currentMinute = now.get("minute")
-  for (const { hour, minute } of get(config).UI_MODE_RESET_TIMES || []) {
+  for (const [hour, minute] of get(config).UI_MODE_RESET_TIMES || []) {
     if (currentHour === hour && currentMinute === minute) {
       console.log(`Resetting UI mode due to config (${hour}:${minute}) at ${dayjs().format()}`)
       resetUIMode()
