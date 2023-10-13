@@ -465,7 +465,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
             ),
         ),
         (
-            "Server processing audio options",
+            "Server & Processing Audio Options",
             (
                 "AUDIO_BITRATE",
                 "EXTRACT_METADATA_FROM_FILE",
@@ -490,7 +490,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
         ),
     )
 )
-CONSTANCE_SERVER_ONLY_SETTINGS = set(CONSTANCE_CONFIG_FIELDSETS["Server processing audio options"])
+CONSTANCE_SERVER_ONLY_SETTINGS = set(CONSTANCE_CONFIG_FIELDSETS["Server & Processing Audio Options"])
 
 SHELL_PLUS_IMPORTS = [
     "from constance import config",
@@ -498,5 +498,5 @@ SHELL_PLUS_IMPORTS = [
     "from tomato import constants",
     "from tomato.ffmpeg import ffmpeg_convert, ffprobe",
     "from tomato.models import serialize_for_api",
-    "from tomato.tasks import bulk_process_assets, process_asset",
+    "from tomato.tasks import bulk_process_assets, process_asset, cleanup",
 ]

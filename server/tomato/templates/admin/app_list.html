@@ -1,0 +1,25 @@
+{% if request.resolver_match.view_name != "admin:app_list_extra" %}
+  {% include app_list_template_original %}
+{% endif %}
+
+{% if request.resolver_match.view_name != "admin:app_list" %}
+  <div class="module{% if app_list_extra_highlight %} current-app{% endif %}">
+    <table>
+      <caption>
+        <a href="{% url "admin:app_list_extra" %}" class="section">Utilities</a>
+      </caption>
+
+      <tbody>
+        {% for view in app_list_extra %}
+          <tr class="model-config {% if request.resolver_match.view_name == view.url %} current-model{% endif %}">
+            <th scope="row"><a href="{% url view.url %}">{{ view.title }}</a></th>
+            <td></td>
+            {% if request.resolver_match.view_name == "admin:app_list_extra" or request.resolver_match.view_name == "admin:index" %}
+              <td><a href="{% url view.url %}" class="changelink">Manage</a></td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}

@@ -1,5 +1,7 @@
 import datetime
 import json
+import os
+from pathlib import Path
 
 from huey import PriorityRedisHuey
 
@@ -43,3 +45,9 @@ class DjangoPriorityRedisHuey(PriorityRedisHuey):
         connection = get_redis_connection()
         kwargs["connection_pool"] = connection.connection_pool
         super().__init__(*args, **kwargs)
+
+
+def listdir_recursive(dirname):
+    dirname = Path(dirname)
+    files = (os.path.join(dp, f) for dp, _, fn in os.walk(dirname) for f in fn)
+    return [str(Path(file).relative_to(dirname)) for file in files]

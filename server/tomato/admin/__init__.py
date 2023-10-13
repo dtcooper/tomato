@@ -1,8 +1,11 @@
 import itertools
+from pathlib import Path
 
+from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.templatetags.static import static
+from django.urls import path
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
@@ -17,6 +20,7 @@ from .config import ConfigAdmin
 from .rotator import RotatorAdmin
 from .stopset import StopsetAdmin
 from .user import UserAdmin
+from .views import AdminDataView
 
 
 MODELS_HELP_DOCS_TEXT = {
@@ -31,9 +35,13 @@ MODELS_HELP_DOCS_TEXT = {
 
 
 class TomatoAdminSite(admin.AdminSite):
-    site_url = None
-    index_title = "Tomato administration"
+    app_list_template_original = str(
+        (Path(apps.get_app_config("admin").path) / "templates" / "admin" / "app_list.html").absolute()
+    )
     empty_value_display = mark_safe("<em>None</em>")
+    extra_views = (AdminDataView,)
+    index_title = "Tomato administration"
+    site_url = None
 
     @property
     def site_title(self):
@@ -47,6 +55,25 @@ class TomatoAdminSite(admin.AdminSite):
             self.site_title,
         )
 
+    def get_urls(self):
+        urls = [
+            path(
+                "utils/",
+                self.admin_view(self.app_index),
+                kwargs={
+                    "app_label": None,
+                    "extra_context": {"app_list": [{"name": "Utilities"}], "title": "Utilities administration"},
+                },
+                name="app_list_extra",
+            )
+        ]
+        urls.extend(
+            path(f"utils/{view.get_path()}", self.admin_view(view.as_view(self)), name=f"extra_{view.name}")
+            for view in self.extra_views
+        )
+        urls.extend(super().get_urls())
+        return urls
+
     def each_context(self, request):
         context = super().each_context(request)
 
@@ -57,11 +84,16 @@ class TomatoAdminSite(admin.AdminSite):
                 break
 
         return {
-            "help_docs_url": HELP_DOCS_URL,
+            "app_list_template_original": self.app_list_template_original,
+            "app_list_extra": [{"url": f"admin:extra_{view.name}", "title": view.title} for view in self.extra_views],
+            "app_list_extra_highlight": request.resolver_match.view_name in [
+                f"admin:extra_{view.name}" for view in self.extra_views
+            ],
             "help_docs_text": help_docs_text,
-            "tomato_version": settings.TOMATO_VERSION,
+            "help_docs_url": HELP_DOCS_URL,
             "protocol_version": PROTOCOL_VERSION,
             "tomato_json_data": {"colors": COLORS_DICT},
+            "tomato_version": settings.TOMATO_VERSION,
             **context,
         }
 

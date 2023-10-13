@@ -14,6 +14,7 @@ from user_messages import api as user_messages_api
 from user_messages.models import Message as UserMessage
 
 from .ffmpeg import ffmpeg_convert, ffprobe
+from .models import SavedAssetFile
 from .utils import mark_models_dirty, once_at_startup
 
 
@@ -71,6 +72,9 @@ def process_asset(
 
         asset.status = asset.Status.READY
         asset.save(dont_overwrite_original_filename=True)
+        SavedAssetFile.objects.update_or_create(
+            file=asset.file, defaults={"original_filename": asset.original_filename}
+        )
         if mark_dirty:
             mark_models_dirty()
 
@@ -104,11 +108,12 @@ def bulk_process_assets(assets, user=None, skip_trim=False):
 def cleanup():
     # Delete unused uploaded files
     deleted_files = TemporaryUploadedFile.objects.delete_unused_files()
-    if not deleted_files:
-        logger.info("No files deleted")
-    else:
-        logger.info(f"Deleted files: {', '.join(deleted_files)}")
+    logger.info(
+        f"Deleted temporary files: {', '.join(deleted_files)}" if deleted_files else "No temporary files deleted"
+    )
 
     # Cleanup read messages
     deleted_messages, _ = UserMessage.objects.filter(delivered_at__isnull=False).delete()
-    logger.info(f"Deleted {deleted_messages} already delievered user message(s)")
+    logger.info(f"Deleted {deleted_messages} already delivered user messages")
+
+    SavedAssetFile.cleanup_unreferenced_files()

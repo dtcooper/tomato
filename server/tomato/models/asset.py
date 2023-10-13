@@ -1,10 +1,14 @@
 import datetime
 import hashlib
+import itertools
+import logging
 from pathlib import Path
 import random
 import string
 
-from django.core.exceptions import ValidationError
+from django.apps import apps
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.db.models import Count, OuterRef, Subquery
 from django.db.models.functions import Coalesce
@@ -13,6 +17,7 @@ from django.utils.safestring import mark_safe
 from constance import config
 from dirtyfields import DirtyFieldsMixin
 
+from ..utils import listdir_recursive
 from .base import (
     FILE_MAX_LENGTH,
     NAME_MAX_LENGTH,
@@ -22,6 +27,9 @@ from .base import (
     TomatoModelBase,
 )
 from .rotator import Rotator
+
+
+logger = logging.getLogger(__name__)
 
 
 class AssetEligibleToAirQuerySet(EligibleToAirQuerySet):
@@ -219,3 +227,75 @@ for model_class in (Asset, AssetAlternate):
     created_at_field.verbose_name = "date uploaded"
     del created_at_field
 del model_class
+
+
+class SavedAssetFile(models.Model):
+    file = models.FileField(max_length=FILE_MAX_LENGTH)
+    original_filename = models.CharField(max_length=FILE_MAX_LENGTH)
+
+    @property
+    def filename(self):
+        return f"{self.original_filename}{Path(self.file.name).suffix}"
+
+    @classmethod
+    def cleanup_unreferenced_files(cls):
+        model_file_fields = []
+
+        # Cleanup untracked files below
+
+        # Figure out what models have file fields
+        for model_cls in apps.get_models():
+            if model_cls is not cls:
+                model_fields = model_cls._meta.get_fields()
+                for field in model_fields:
+                    if isinstance(field, models.FileField):
+                        model_file_fields.append((model_cls, field.name))
+
+        # Build our sets of files in the DB
+        recorded_db_files = set(cls.objects.values_list("file", flat=True))
+        all_db_files = (
+            set(
+                itertools.chain.from_iterable(
+                    model_cls.objects.values_list(file_field, flat=True) for model_cls, file_field in model_file_fields
+                )
+            )
+            | recorded_db_files
+        )
+        db_files_that_should_be_recorded = (
+            set(
+                itertools.chain.from_iterable(
+                    model_cls.objects.values_list("file", flat=True) for model_cls in (Asset, AssetAlternate)
+                )
+            )
+            - recorded_db_files
+        )
+
+        # Create missing SavedAssetFiles (potentially unrecorded because of older version of tomato)
+        for file in db_files_that_should_be_recorded:
+            for model_cls, file_field in model_file_fields:
+                try:
+                    obj = model_cls.objects.get(**{file_field: file})
+                except ObjectDoesNotExist:
+                    pass
+                else:
+                    break
+            else:
+                raise Exception("Should not have gotten here!")
+
+            cls.objects.create(file=obj.file, original_filename=obj.original_filename)
+
+        if db_files_that_should_be_recorded:
+            logger.warning(f"Now tracking {len(db_files_that_should_be_recorded)} files that should have been tracked")
+
+        all_files_on_disk = set(listdir_recursive(settings.MEDIA_ROOT))
+
+        logger.info(f"Tracking {len(all_db_files)} files, found {len(all_files_on_disk)} files on disk")
+        files_to_be_deleted = all_files_on_disk - all_db_files
+        media_root = Path(settings.MEDIA_ROOT)
+        for file_to_be_deleted in files_to_be_deleted:
+            file = media_root / file_to_be_deleted
+            file.unlink()
+        logger.info(f"Deleted {len(files_to_be_deleted)} untracked files")
+
+    def __str__(self):
+        return self.filename

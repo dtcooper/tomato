@@ -11,7 +11,7 @@ import zipfile
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
-from tomato.models import Asset, Rotator, Stopset, StopsetRotator, User
+from tomato.models import Asset, AssetAlternate, Rotator, SavedAssetFile, Stopset, StopsetRotator, User
 from tomato.models.asset import generate_random_asset_filename
 from tomato.tasks import bulk_process_assets
 
@@ -19,6 +19,7 @@ from tomato.tasks import bulk_process_assets
 SAMPLE_DATA_URL = "https://tomato.nyc3.digitaloceanspaces.com/bmir-sample-assets.zip"
 SAMPLE_DATA_FOLDER = Path(urlparse(SAMPLE_DATA_URL).path).with_suffix("").name
 ALL_MODELS_TEXT = "audio assets, rotators and stop sets"
+REQUIRED_EMPTY_MODEL_CLASSES = (Asset, AssetAlternate, SavedAssetFile, Rotator, Stopset)
 
 
 class Command(BaseCommand):
@@ -56,12 +57,12 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.ERROR("Aborting..."))
                 return
 
-            for model_cls in (Asset, Rotator, Stopset):
+            for model_cls in REQUIRED_EMPTY_MODEL_CLASSES:
                 model_cls.objects.all().delete()
 
             self.stdout.write(self.style.WARNING(f"Deleted all {ALL_MODELS_TEXT}!"))
 
-        for model_cls in (Asset, Rotator, Stopset):
+        for model_cls in REQUIRED_EMPTY_MODEL_CLASSES:
             if model_cls.objects.exists():
                 raise CommandError(
                     f"One or more {ALL_MODELS_TEXT} already exists! Run with --delete-all to delete them. Exiting."
