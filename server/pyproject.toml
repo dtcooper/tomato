@@ -6,7 +6,7 @@ authors = ["David Cooper <david.cooper@burningman.org>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 django = "^4.2.6"
 django-admin-notice = "^2.1.0"
 django-constance = "^3.1.0"

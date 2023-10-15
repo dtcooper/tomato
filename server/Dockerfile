@@ -1,4 +1,4 @@
-FROM python:3.11-bookworm
+FROM python:3.12-bookworm
 
 ENV DJANGO_SETTINGS_MODULE=tomato.settings \
     PYTHONDONTWRITEBYTECODE=1 \
