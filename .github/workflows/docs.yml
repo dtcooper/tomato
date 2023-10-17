@@ -30,10 +30,10 @@ jobs:
           # Get a full clone so there's a local copy of gh-pages to commit to
           fetch-depth: 0
       -
-        name: Setup Python 3.11
+        name: Setup Python 3.12
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.12'
       -
         name: Deploy docs
         run: |
