@@ -33,7 +33,7 @@ ARG POETRY_VERSION=1.6.1
 RUN curl -sSL https://install.python-poetry.org | python -
 ENV PATH="/root/.local/bin:${PATH}"
 
-COPY constants.json pyproject.toml poetry.lock /app/
+COPY pyproject.toml poetry.lock /app/
 WORKDIR /app
 RUN poetry install $([ -z "$DEBUG" -o "$DEBUG" = '0' ] && echo '--without=dev') \
     && if [ "$DEBUG" -a "$DEBUG" != 0 ]; then \
@@ -42,7 +42,7 @@ RUN poetry install $([ -z "$DEBUG" -o "$DEBUG" = '0' ] && echo '--without=dev') 
             "https://raw.githubusercontent.com/django/django/$(python -c 'import django; print(".".join(map(str, django.VERSION[:2])))')/extras/django_bash_completion" \
     ; fi
 
-COPY *.py *.sh /app/
+COPY *.py *.sh constants.json /app/
 COPY tomato/ /app/tomato/
 WORKDIR /app
 
