@@ -36,7 +36,7 @@ class AudioFileField(models.FileField):
     attr_class = AudioFieldFile
 
     def __init__(self, max_length=FILE_MAX_LENGTH, *args, **kwargs):
-        super().__init__(max_length=FILE_MAX_LENGTH, *args, **kwargs)
+        super().__init__(max_length=max_length, *args, **kwargs)
 
     def validate(self, value, model_instance):
         super().validate(value, model_instance)
@@ -117,9 +117,9 @@ class EnabledBeginEndWeightMixin(models.Model):
         if self.begin and self.end and self.begin > self.end:
             raise ValidationError({"end": "End air date before begin air date."})
 
-    def serialize(self, *args, **kwargs):
+    def serialize(self):
         return {
-            **super().serialize(*args, **kwargs),
+            **super().serialize(),
             "weight": round(float(self.weight), 2),
             "begin": self.begin,
             "end": self.end,

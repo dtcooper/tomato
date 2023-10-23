@@ -75,16 +75,14 @@ class AssetBase(DirtyFieldsMixin, TomatoModelBase):
     class Meta:
         abstract = True
 
-    def serialize(self, include_asset_url=True):
-        data = {
+    def serialize(self):
+        return {
             **super().serialize(),
             "duration": round(self.duration.total_seconds()),
             "md5sum": self.md5sum.hex(),
             "file": self.file.name,
+            "url": self.file.url,
         }
-        if include_asset_url:
-            data["url"] = self.file.url
-        return data
 
     def full_clean(self, *args, **kwargs):
         super().full_clean(*args, **kwargs)
@@ -166,14 +164,14 @@ class Asset(EnabledBeginEndWeightMixin, AssetBase):
             return (False, "Processing") if with_reason else False
         return super().is_eligible_to_air(now, with_reason)
 
-    def serialize(self, alternates_already_filtered_by_prefetch=False, include_asset_url=True):
+    def serialize(self, alternates_already_filtered_by_prefetch=False):
         alternates_qs = self.alternates.all()
         if not alternates_already_filtered_by_prefetch:
             alternates_qs = alternates_qs.filter(status=AssetAlternate.Status.READY).order_by("id")
 
         return {
-            **super().serialize(include_asset_url=include_asset_url),
-            "alternates": [alternate.serialize(include_asset_url=include_asset_url) for alternate in alternates_qs],
+            **super().serialize(),
+            "alternates": [alternate.serialize() for alternate in alternates_qs],
             "rotators": [rotator.id for rotator in self.rotators.all()],
         }
 
