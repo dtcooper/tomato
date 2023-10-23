@@ -143,7 +143,8 @@ class TomatoModelBase(models.Model):
 
     def serialize(self):
         return {
+            "created_at": self.created_at,
+            "enabled": self.enabled,
             "id": self.id,
             "name": self.name,
-            "enabled": self.enabled,
         }

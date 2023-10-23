@@ -2,7 +2,7 @@
   {% include app_list_template_original %}
 {% endif %}
 
-{% if request.resolver_match.view_name != "admin:app_list" %}
+{% if request.resolver_match.view_name != "admin:app_list" and app_list_extra %}
   <div class="module{% if app_list_extra_highlight %} current-app{% endif %}">
     <table>
       <caption>

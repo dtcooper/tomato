@@ -69,10 +69,11 @@ class AssetBase(DirtyFieldsMixin, TomatoModelBase):
 
     def serialize_file(self):
         return {
-            "filename": self.file.name,
-            "url": self.file.url,
-            "size": self.filesize,
+            "file": self.file.name,
             "md5sum": self.md5sum.hex(),
+            "original_filename": self.original_filename,
+            "filesize": self.filesize,
+            "url": self.file.url,
         }
 
     def full_clean(self, *args, **kwargs):
@@ -161,11 +162,11 @@ class Asset(EnabledBeginEndWeightMixin, AssetBase):
             alternates_qs = alternates_qs.filter(status=AssetAlternate.Status.READY).order_by("id")
 
         return {
-            "file": self.serialize_file(),
+            **super().serialize(),
+            **self.serialize_file(),
             "alternates": [alternate.serialize() for alternate in alternates_qs],
             "duration": round(self.duration.total_seconds()),
             "rotators": [rotator.id for rotator in self.rotators.all()],
-            **super().serialize(),
         }
 
     def clean(self):
@@ -180,12 +181,12 @@ class AssetAlternate(AssetBase):
         Asset, on_delete=models.CASCADE, related_name="alternates", verbose_name="alternate for asset"
     )
 
-    def serialize(self):
-        return {"duration": round(self.duration.total_seconds()), **super().serialize_file()}
-
     @property
     def name(self):
         return f"Alternate #{self.num_before} for {self.asset.name}"
+    
+    def serialize(self):
+        return self.serialize_file()
 
     @property
     def num_before(self):

@@ -1,1 +1,37 @@
 {% extends 'admin/extra/base.html' %}
+
+{% load static %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <script src="{% static "file_form/file_form.min.js" %}"></script>
+  <link rel="stylesheet" href="{% static "file_form/file_form.css" %}">
+{% endblock %}
+
+{% block content %}
+  <form method="POST">
+    {% csrf_token %}
+    <fieldset class="module aligned">
+      <h2>Export asset data</h2>
+      <input type="hidden" name="mode" value="export">
+      <div class="submit-row">
+        <input type="submit" class="default" value="Download export of all asset files">
+      </div>
+    </fieldset>
+  </form>
+
+  <form method="POST" id="file-form" enctype="multipart/form-data">
+    {% csrf_token %}
+    <fieldset class="module aligned">
+      <h2>Import asset data</h2>
+      <input type="hidden" name="mode" value="import">
+      {{ form.file }}
+      <div class="submit-row">
+        <input type="submit" class="default" value="Upload import of all asset files">
+      </div>
+    </fieldset>
+  </form>
+  <script>
+    initUploadFields(document.getElementById("file-form"))
+  </script>
+{% endblock %}

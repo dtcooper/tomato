@@ -32,6 +32,7 @@ MODELS_HELP_DOCS_TEXT = {
     )
     for model_cls in (Asset, Rotator, Stopset)
 }
+MODELS_HELP_DOCS_TEXT[AssetAlternate] = MODELS_HELP_DOCS_TEXT[Asset]
 
 
 class TomatoAdminSite(admin.AdminSite):
@@ -85,7 +86,11 @@ class TomatoAdminSite(admin.AdminSite):
 
         return {
             "app_list_template_original": self.app_list_template_original,
-            "app_list_extra": [{"url": f"admin:extra_{view.name}", "title": view.title} for view in self.extra_views],
+            "app_list_extra": [
+                {"url": f"admin:extra_{view.name}", "title": view.title}
+                for view in self.extra_views
+                if view.check_perms(request)
+            ],
             "app_list_extra_highlight": request.resolver_match.view_name in [
                 f"admin:extra_{view.name}" for view in self.extra_views
             ],

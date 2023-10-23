@@ -1,7 +1,7 @@
 import decimal
 import logging
 
-from asgiref.sync import sync_to_async
+from asgiref.sync import async_to_sync, sync_to_async
 
 from django.conf import settings
 from django.db.models import Prefetch
@@ -62,3 +62,6 @@ async def serialize_for_api():
         "stopsets": [s.serialize() async for s in stopsets],
         "config": await sync_to_async(get_constance_config)(),
     }
+
+
+serialize_for_api_sync = async_to_sync(serialize_for_api)
