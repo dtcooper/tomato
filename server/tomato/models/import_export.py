@@ -67,7 +67,7 @@ def import_data_from_zip(file, created_by=None):
     except zipfile.BadZipFile:
         raise ImportTomatoDataException("bad archive format!")
 
-    import_info = {"rotators": 0, "assets": 0, "stopsets": 0}
+    stats = {"rotators": 0, "assets": 0, "stopsets": 0}
 
     with tempfile.TemporaryDirectory(delete=True) as temp_dir:
         temp_dir = Path(temp_dir)
@@ -92,18 +92,18 @@ def import_data_from_zip(file, created_by=None):
         for kwargs in metadata["rotators"]:
             rotator_id = kwargs.pop("id")
             rotator_id_to_obj[rotator_id] = Rotator.objects.create(created_by=created_by, **kwargs)
-            import_info["rotators"] += 1
+            stats["rotators"] += 1
 
-        logger.info(f"Imported {import_info['rotators']} rotators.")
+        logger.info(f"Imported {stats['rotators']} rotators.")
 
         for kwargs in metadata["stopsets"]:
             rotators = [rotator_id_to_obj[rotator_id] for rotator_id in kwargs.pop("rotators")]
             stopset = Stopset.objects.create(created_by=created_by, **kwargs)
             for rotator in rotators:
                 StopsetRotator.objects.create(stopset=stopset, rotator=rotator)
-            import_info["stopsets"] += 1
+            stats["stopsets"] += 1
 
-        logger.info(f"Imported {import_info['stopsets']} stop sets.")
+        logger.info(f"Imported {stats['stopsets']} stop sets.")
 
         assets_to_process = []
         for kwargs in metadata["assets"]:
@@ -113,34 +113,33 @@ def import_data_from_zip(file, created_by=None):
 
             kwargs.update(
                 {
-                    "created_by": created_by,
                     "md5sum": bytes.fromhex(kwargs["md5sum"]),
                     "duration": datetime.timedelta(seconds=kwargs["duration"]),
                 }
             )
             alternates = kwargs.pop("alternates")
             rotators = [rotator_id_to_obj[rotator_id] for rotator_id in kwargs.pop("rotators")]
-            asset = Asset(**kwargs)
+            asset = Asset(created_by=created_by, **kwargs)
             asset.clean()
             asset.save(dont_overwrite_original_filename=True)
             asset.rotators.add(*rotators)
             assets_to_process.append(asset)
+            stats["assets"] += 1
 
             if alternates:
                 for alternate_kwargs in alternates:
                     alternate_kwargs.update(
                         {
-                            "asset": asset,
-                            "created_by": created_by,
                             "md5sum": bytes.fromhex(alternate_kwargs["md5sum"]),
                             "duration": datetime.timedelta(seconds=alternate_kwargs["duration"]),
                         }
                     )
-                    alternate = AssetAlternate(**alternate_kwargs)
+                    alternate = AssetAlternate(created_by=created_by, asset=asset, **alternate_kwargs)
                     alternate.clean()
                     alternate.save(dont_overwrite_original_filename=True)
                     assets_to_process.append(alternate)
+                    stats["assets"] += 1
 
         bulk_process_assets(assets_to_process, user=created_by, skip_trim=True)
 
-        return import_info
+        return stats

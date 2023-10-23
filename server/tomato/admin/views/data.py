@@ -47,24 +47,28 @@ class AdminDataView(AdminViewMixin, TemplateView):
     def do_export(self):
         zip_file = tempfile.NamedTemporaryFile("wb+")
         zip_filename = export_data_as_zip(zip_file)
-        zip_file.seek(0)
+        zip_file.seek(0)  # Go back to beginning of file
         response = HttpResponse(zip_file, content_type="application/octet-stream")
         response["Content-Disposition"] = f'attachment; filename="{zip_filename}"'
         return response
 
     def do_import(self, file):
         try:
-            import_data_from_zip(file, created_by=self.request.user)
+            info = import_data_from_zip(file, created_by=self.request.user)
         except ImportTomatoDataException as e:
             messages.add_message(self.request, messages.ERROR, f"Import error: {e}")
         except Exception as e:
-            error_str = "Unexpected import error!"
+            error_str = "Unexpected import error! Please try again."
             if settings.DEBUG:
-                error_str = f"{error_str} [Debug: {e}]"
+                error_str = f"{error_str} Debug: {e}"
             logger.exception("Unexpected import error!")
             messages.add_message(self.request, messages.ERROR, error_str)
         else:
-            messages.add_message(self.request, messages.INFO, "Successfully imported!")
+            messages.add_message(
+                self.request,
+                messages.INFO,
+                f"Successfully imported {', '.join(f'{num} {entity}' for entity, num in info.items())}!",
+            )
         return redirect("admin:extra_data")
 
     def post(self, request, *args, **kwargs):

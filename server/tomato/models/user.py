@@ -1,11 +1,12 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 
 from dirtyfields import DirtyFieldsMixin
 
 
 class User(DirtyFieldsMixin, AbstractUser):
-    created_at = models.DateTimeField("created at", auto_now_add=True, db_index=True)
+    created_at = models.DateTimeField("created at", default=timezone.localtime, db_index=True)
     created_by = models.ForeignKey("User", verbose_name="created by", on_delete=models.SET_NULL, null=True)
     enable_client_logs = models.BooleanField(
         "Write client logs",
