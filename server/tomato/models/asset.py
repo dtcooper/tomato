@@ -64,17 +64,27 @@ class AssetBase(DirtyFieldsMixin, TomatoModelBase):
     )
     duration = models.DurationField(default=datetime.timedelta(0))
 
+    SERIALIZE_FIELDS_TO_IGNORE = {
+        "pre_process_md5sum",
+        "md5sum",
+        "status",
+        "file",
+        "duration",
+    } | TomatoModelBase.SERIALIZE_FIELDS_TO_IGNORE
+
     class Meta:
         abstract = True
 
-    def serialize_file(self):
-        return {
-            "file": self.file.name,
+    def serialize(self, include_asset_url=True):
+        data = {
+            **super().serialize(),
+            "duration": round(self.duration.total_seconds()),
             "md5sum": self.md5sum.hex(),
-            "original_filename": self.original_filename,
-            "filesize": self.filesize,
-            "url": self.file.url,
+            "file": self.file.name,
         }
+        if include_asset_url:
+            data["url"] = self.file.url
+        return data
 
     def full_clean(self, *args, **kwargs):
         super().full_clean(*args, **kwargs)
@@ -156,16 +166,14 @@ class Asset(EnabledBeginEndWeightMixin, AssetBase):
             return (False, "Processing") if with_reason else False
         return super().is_eligible_to_air(now, with_reason)
 
-    def serialize(self, alternates_already_filtered_by_prefetch=False):
+    def serialize(self, alternates_already_filtered_by_prefetch=False, include_asset_url=True):
         alternates_qs = self.alternates.all()
         if not alternates_already_filtered_by_prefetch:
             alternates_qs = alternates_qs.filter(status=AssetAlternate.Status.READY).order_by("id")
 
         return {
-            **super().serialize(),
-            **self.serialize_file(),
-            "alternates": [alternate.serialize() for alternate in alternates_qs],
-            "duration": round(self.duration.total_seconds()),
+            **super().serialize(include_asset_url=include_asset_url),
+            "alternates": [alternate.serialize(include_asset_url=include_asset_url) for alternate in alternates_qs],
             "rotators": [rotator.id for rotator in self.rotators.all()],
         }
 
@@ -181,12 +189,10 @@ class AssetAlternate(AssetBase):
         Asset, on_delete=models.CASCADE, related_name="alternates", verbose_name="alternate for asset"
     )
 
+    # Property existing means there's no name field on this model
     @property
     def name(self):
         return f"Alternate #{self.num_before} for {self.asset.name}"
-    
-    def serialize(self):
-        return self.serialize_file()
 
     @property
     def num_before(self):

@@ -10,7 +10,7 @@ class Stopset(EnabledBeginEndWeightMixin, TomatoModelBase):
 
     def serialize(self):
         return {
-            "rotators": [r.id for r in self.rotators.all()],
+            "rotators": [rotator.id for rotator in self.rotators.all()],
             **super().serialize(),
         }
 

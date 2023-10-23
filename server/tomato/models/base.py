@@ -117,12 +117,12 @@ class EnabledBeginEndWeightMixin(models.Model):
         if self.begin and self.end and self.begin > self.end:
             raise ValidationError({"end": "End air date before begin air date."})
 
-    def serialize(self):
+    def serialize(self, *args, **kwargs):
         return {
+            **super().serialize(*args, **kwargs),
             "weight": round(float(self.weight), 2),
             "begin": self.begin,
             "end": self.end,
-            **super().serialize(),
         }
 
     class Meta:
@@ -134,6 +134,8 @@ class TomatoModelBase(models.Model):
     created_by = models.ForeignKey(User, verbose_name="created by", on_delete=models.SET_NULL, null=True)
     name = models.CharField("name", max_length=NAME_MAX_LENGTH, unique=True)
 
+    SERIALIZE_FIELDS_TO_IGNORE = {"id", "created_by"}
+
     class Meta:
         abstract = True
         ordering = ("name",)
@@ -143,8 +145,7 @@ class TomatoModelBase(models.Model):
 
     def serialize(self):
         return {
-            "created_at": self.created_at,
-            "enabled": self.enabled,
-            "id": self.id,
-            "name": self.name,
+            field.name: getattr(self, field.name)
+            for field in self._meta.get_fields()
+            if field.name not in self.SERIALIZE_FIELDS_TO_IGNORE and not field.is_relation
         }

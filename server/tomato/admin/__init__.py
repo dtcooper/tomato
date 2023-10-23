@@ -99,6 +99,7 @@ class TomatoAdminSite(admin.AdminSite):
             "protocol_version": PROTOCOL_VERSION,
             "tomato_json_data": {"colors": COLORS_DICT},
             "tomato_version": settings.TOMATO_VERSION,
+            "station_name": constance_config.STATION_NAME,
             **context,
         }
 

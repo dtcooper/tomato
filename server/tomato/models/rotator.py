@@ -38,8 +38,7 @@ class Rotator(TomatoModelBase):
         verbose_name="stop set",
     )
 
-    def serialize(self):
-        return {"color": self.color, "is_single_play": self.is_single_play, **super().serialize()}
+    SERIALIZE_FIELDS_TO_IGNORE = TomatoModelBase.SERIALIZE_FIELDS_TO_IGNORE - {"id"}
 
     def get_color(self, content=False):
         return COLORS_DICT[self.color]["content" if content else "value"]

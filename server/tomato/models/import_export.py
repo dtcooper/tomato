@@ -1,18 +1,17 @@
+import datetime
 import itertools
 import json
 import logging
-import shutil
 from pathlib import Path
+import shutil
 import tempfile
 import zipfile
-import datetime
 
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 
 from ..tasks import bulk_process_assets
-
 from .asset import Asset, AssetAlternate
 from .rotator import Rotator
 from .serialize import serialize_for_api_sync
@@ -28,39 +27,12 @@ class ImportTomatoDataException(Exception):
     pass
 
 
-def generate_metadata():
-    rotators_id_to_names = {}
-    metadata = {"rotators": {}, "stopsets": {}, "assets": []}
-
-    data = serialize_for_api_sync()
-    for entity in ("rotators", "stopsets"):
-        for obj in data[entity]:
-            name = obj.pop("name")
-            if entity == "rotators":
-                rotators_id_to_names[obj["id"]] = name
-            else:
-                obj["rotators"] = [rotators_id_to_names[id] for id in obj["rotators"]]
-            del obj["id"]
-            metadata[entity][name] = obj
-
-    for asset in data["assets"]:
-        asset["rotators"] = [rotators_id_to_names[id] for id in asset["rotators"]]
-        del asset["file"]["url"]
-        for alternate in asset["alternates"]:
-            del alternate["url"]
-
-        del asset["id"]
-        metadata["assets"].append(asset)
-
-    return metadata
-
-
 def export_data_as_zip(file):
     export_folder_name = Path(f"{EXPORT_FOLDER_NAME_PREFIX}-{timezone.localtime().strftime('%Y%m%d-%H%M%S')}")
 
     zip = zipfile.ZipFile(file, "w")
 
-    metadata = generate_metadata()
+    metadata = serialize_for_api_sync(skip_config=True, include_asset_url=False)
     zip.writestr(
         str(export_folder_name / "metadata.json"),
         f"{json.dumps(metadata, indent=2, sort_keys=True, cls=DjangoJSONEncoder)}\n",
@@ -70,9 +42,9 @@ def export_data_as_zip(file):
 
     for n, asset in enumerate(metadata["assets"], 1):
         logger.info(f"Exporting {n}/{len(metadata['assets'])} assets...")
-        for file in itertools.chain((asset["file"],), asset["alternates"]):
-            local_file_path = media_root / file["filename"]
-            export_file_path = export_folder_name / "assets" / file["filename"]
+        for file in itertools.chain((asset,), asset["alternates"]):
+            local_file_path = media_root / file["file"]
+            export_file_path = export_folder_name / "assets" / file["file"]
             zip.write(str(local_file_path), str(export_file_path))
 
     zip.close()
@@ -82,6 +54,7 @@ def export_data_as_zip(file):
 
 def import_data_from_zip(file, created_by=None):
     # XXXXXXX
+    logger.warning("DELETE THIS LINE OF CODE!!!!")
     for model_cls in REQUIRED_EMPTY_FOR_IMPORT_MODEL_CLASSES:
         model_cls.objects.all().delete()
 
@@ -93,7 +66,7 @@ def import_data_from_zip(file, created_by=None):
         zip = zipfile.ZipFile(file)
     except zipfile.BadZipFile:
         raise ImportTomatoDataException("bad archive format!")
-    
+
     import_info = {"rotators": 0, "assets": 0, "stopsets": 0}
 
     with tempfile.TemporaryDirectory(delete=True) as temp_dir:
@@ -103,7 +76,7 @@ def import_data_from_zip(file, created_by=None):
         temp_dir_contents = list(temp_dir.iterdir())
         if len(temp_dir_contents) != 1 or not temp_dir_contents[0].is_dir():
             raise ImportTomatoDataException("needs exactly one folder!")
-        
+
         temp_dir = temp_dir_contents[0]
         metadata_file = temp_dir / "metadata.json"
         assets_prefix = temp_dir / "assets"
@@ -111,68 +84,63 @@ def import_data_from_zip(file, created_by=None):
 
         if not metadata_file.exists():
             raise ImportTomatoDataException("no metadata file!")
-        
+
         with open(metadata_file, "r") as file:
             metadata = json.load(file)
-        
-        rotator_names_to_objs = {}
-        for name, kwargs in metadata["rotators"].items():
-            rotator = Rotator.objects.create(name=name, created_by=created_by, **kwargs)
-            rotator_names_to_objs[name] = rotator
+
+        rotator_id_to_obj = {}
+        for kwargs in metadata["rotators"]:
+            rotator_id = kwargs.pop("id")
+            rotator_id_to_obj[rotator_id] = Rotator.objects.create(created_by=created_by, **kwargs)
             import_info["rotators"] += 1
-        
+
         logger.info(f"Imported {import_info['rotators']} rotators.")
 
-        for name, kwargs in metadata["stopsets"].items():
-            rotators = [rotator_names_to_objs[rotator_name] for rotator_name in kwargs.pop("rotators")]
-            stopset = Stopset.objects.create(name=name, created_by=created_by, **kwargs)
+        for kwargs in metadata["stopsets"]:
+            rotators = [rotator_id_to_obj[rotator_id] for rotator_id in kwargs.pop("rotators")]
+            stopset = Stopset.objects.create(created_by=created_by, **kwargs)
             for rotator in rotators:
                 StopsetRotator.objects.create(stopset=stopset, rotator=rotator)
             import_info["stopsets"] += 1
 
         logger.info(f"Imported {import_info['stopsets']} stop sets.")
 
-        assets = []
+        assets_to_process = []
         for kwargs in metadata["assets"]:
-            for file in itertools.chain((kwargs["file"],), kwargs["alternates"]):
-                shutil.move(assets_prefix / file["filename"], media_root / file["filename"])
-                logger.info(f"Copying file for import: {file['filename']}")
-            
-            file = kwargs.pop("file")
-            kwargs.update({
-                "file": file["filename"],
-                "filesize": file["size"],
-                "md5sum": bytes.fromhex(file["md5sum"]),
-                "original_filename": file["original_filename"],
-                "duration": datetime.timedelta(seconds=kwargs["duration"]),
-            })
+            for file in itertools.chain((kwargs,), kwargs["alternates"]):
+                shutil.move(assets_prefix / file["file"], media_root / file["file"])
+                logger.info(f"Copying file for import: {file['file']}")
+
+            kwargs.update(
+                {
+                    "created_by": created_by,
+                    "md5sum": bytes.fromhex(kwargs["md5sum"]),
+                    "duration": datetime.timedelta(seconds=kwargs["duration"]),
+                }
+            )
             alternates = kwargs.pop("alternates")
-            rotators = [rotator_names_to_objs[rotator_name] for rotator_name in kwargs.pop("rotators")]
-            asset = Asset(created_by=created_by, **kwargs)
+            rotators = [rotator_id_to_obj[rotator_id] for rotator_id in kwargs.pop("rotators")]
+            asset = Asset(**kwargs)
             asset.clean()
             asset.save(dont_overwrite_original_filename=True)
             asset.rotators.add(*rotators)
-            assets.append(asset)
+            assets_to_process.append(asset)
 
             if alternates:
                 for alternate_kwargs in alternates:
-                    alternate = AssetAlternate(
-                        created_by=created_by,
-                        asset=asset,
-                        duration=datetime.timedelta(seconds=alternate_kwargs["duration"]),
-                        file=alternate_kwargs["filename"],
-                        filesize=alternate_kwargs["size"],
-                        md5sum=bytes.fromhex(alternate_kwargs["md5sum"]),
-                        original_filename=alternate_kwargs["original_filename"],
+                    alternate_kwargs.update(
+                        {
+                            "asset": asset,
+                            "created_by": created_by,
+                            "md5sum": bytes.fromhex(alternate_kwargs["md5sum"]),
+                            "duration": datetime.timedelta(seconds=alternate_kwargs["duration"]),
+                        }
                     )
+                    alternate = AssetAlternate(**alternate_kwargs)
                     alternate.clean()
                     alternate.save(dont_overwrite_original_filename=True)
-                    assets.append(alternate)
+                    assets_to_process.append(alternate)
 
-
-            
-
-        bulk_process_assets(assets, user=created_by, skip_trim=True)
+        bulk_process_assets(assets_to_process, user=created_by, skip_trim=True)
 
         return import_info
-    
