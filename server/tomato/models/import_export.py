@@ -18,6 +18,7 @@ from .serialize import serialize_for_api_sync
 from .stopset import Stopset, StopsetRotator
 
 
+EXPORT_FORMAT = 1  # In case we break compatibility
 EXPORT_FOLDER_NAME_PREFIX = "tomato-export-data"
 REQUIRED_EMPTY_FOR_IMPORT_MODEL_CLASSES = (Asset, AssetAlternate, Rotator, Stopset, StopsetRotator)
 logger = logging.getLogger(__name__)
@@ -33,6 +34,15 @@ def export_data_as_zip(file):
     zip = zipfile.ZipFile(file, "w")
 
     metadata = serialize_for_api_sync(skip_config=True, include_asset_url=False)
+    # Remove IDs from all but rotators (only they are needed for import)
+    for asset in metadata["assets"]:
+        del asset["id"]
+        for alternate in asset["alternates"]:
+            del alternate["id"]
+    for stopset in metadata["stopsets"]:
+        del stopset["id"]
+    metadata["export_format"] = EXPORT_FORMAT
+
     zip.writestr(
         str(export_folder_name / "metadata.json"),
         f"{json.dumps(metadata, indent=2, sort_keys=True, cls=DjangoJSONEncoder)}\n",
@@ -53,11 +63,6 @@ def export_data_as_zip(file):
 
 
 def import_data_from_zip(file, created_by=None):
-    # XXXXXXX
-    logger.warning("DELETE THIS LINE OF CODE!!!!")
-    for model_cls in REQUIRED_EMPTY_FOR_IMPORT_MODEL_CLASSES:
-        model_cls.objects.all().delete()
-
     for model_cls in REQUIRED_EMPTY_FOR_IMPORT_MODEL_CLASSES:
         if model_cls.objects.exists():
             raise ImportTomatoDataException(f"can't import data when {model_cls._meta.verbose_name_plural} exist!")
@@ -87,6 +92,9 @@ def import_data_from_zip(file, created_by=None):
 
         with open(metadata_file, "r") as file:
             metadata = json.load(file)
+
+        if metadata["export_format"] != EXPORT_FORMAT:
+            raise ImportTomatoDataException("Invalid format version!")
 
         rotator_id_to_obj = {}
         for kwargs in metadata["rotators"]:

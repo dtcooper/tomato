@@ -134,7 +134,7 @@ class TomatoModelBase(models.Model):
     created_by = models.ForeignKey(User, verbose_name="created by", on_delete=models.SET_NULL, null=True)
     name = models.CharField("name", max_length=NAME_MAX_LENGTH, unique=True)
 
-    SERIALIZE_FIELDS_TO_IGNORE = {"id", "created_by"}
+    SERIALIZE_FIELDS_TO_IGNORE = {"created_by"}
 
     class Meta:
         abstract = True
