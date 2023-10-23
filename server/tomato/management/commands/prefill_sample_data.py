@@ -1,32 +1,22 @@
 import argparse
-import json
 from pathlib import Path
-import shutil
 import tempfile
 import time
-from urllib.parse import urlparse
 from urllib.request import urlretrieve
-import zipfile
 
-from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
-from tomato.models import Asset, AssetAlternate, Rotator, SavedAssetFile, Stopset, StopsetRotator, User
-from tomato.models.asset import generate_random_asset_filename
-from tomato.tasks import bulk_process_assets
+from tomato.models import REQUIRED_EMPTY_FOR_IMPORT_MODEL_CLASSES, User, import_data_from_zip
 
 
-SAMPLE_DATA_URL = "https://tomato.nyc3.digitaloceanspaces.com/bmir-sample-assets.zip"
-SAMPLE_DATA_FOLDER = Path(urlparse(SAMPLE_DATA_URL).path).with_suffix("").name
-ALL_MODELS_TEXT = "audio assets, rotators and stop sets"
-REQUIRED_EMPTY_MODEL_CLASSES = (Asset, AssetAlternate, SavedAssetFile, Rotator, Stopset)
+SAMPLE_DATA_URL = "https://tomato.nyc3.digitaloceanspaces.com/bmir-sample-data-20231023-185614.zip"
 
 
 class Command(BaseCommand):
     help = "Setup project with sample assets"
 
     def add_arguments(self, parser):
-        parser.add_argument("--delete-all", action="store_true", help=f"Delete all {ALL_MODELS_TEXT} before proceeding")
+        parser.add_argument("--delete-all", action="store_true", help="Delete all asset data before proceeding")
         parser.add_argument(
             "--noinput",
             "--no-input",
@@ -52,99 +42,37 @@ class Command(BaseCommand):
         if options["delete_all"]:
             if (
                 options["interactive"]
-                and input(f"Are you SURE you want to delete all {ALL_MODELS_TEXT} [y/N]? ")[:1].lower() != "y"
+                and input("Are you SURE you want to delete all asset data before proceeding [y/N]? ")[:1].lower() != "y"
             ):
                 self.stdout.write(self.style.ERROR("Aborting..."))
                 return
 
-            for model_cls in REQUIRED_EMPTY_MODEL_CLASSES:
+            for model_cls in REQUIRED_EMPTY_FOR_IMPORT_MODEL_CLASSES:
                 model_cls.objects.all().delete()
 
-            self.stdout.write(self.style.WARNING(f"Deleted all {ALL_MODELS_TEXT}!"))
+            self.stdout.write(self.style.WARNING("Deleted all asset data!"))
 
-        for model_cls in REQUIRED_EMPTY_MODEL_CLASSES:
+        for model_cls in REQUIRED_EMPTY_FOR_IMPORT_MODEL_CLASSES:
             if model_cls.objects.exists():
                 raise CommandError(
-                    f"One or more {ALL_MODELS_TEXT} already exists! Run with --delete-all to delete them. Exiting."
+                    f"One or more {model_cls._meta.verbose_name_plural} already exists! Run with --delete-all to delete"
+                    " them. Exiting."
                 )
 
-        with tempfile.TemporaryDirectory() as temp_dir:
-            temp_dir = Path(temp_dir)
+        def download(zip_filename):
+            with open(zip_filename, "rb") as file:
+                return import_data_from_zip(file, created_by=created_by)
 
-            if options["zipfile"]:
-                zip_filename = options["zipfile"]
-                self.stdout.write(f"Using local archive {zip_filename}...")
-            else:
-                self.stdout.write(f"Downloading {SAMPLE_DATA_URL}...")
-                zip_filename = (temp_dir / SAMPLE_DATA_FOLDER).with_suffix(".zip")
+        if options["zipfile"]:
+            zip_filename = options["zipfile"]
+            self.stdout.write(f"Using local archive {zip_filename}...")
+            stats = download(zip_filename)
+        else:
+            self.stdout.write(f"Downloading {SAMPLE_DATA_URL}...")
+            with tempfile.TemporaryDirectory() as temp_dir:
+                zip_filename = Path(temp_dir) / "sample-data.zip"
                 urlretrieve(SAMPLE_DATA_URL, zip_filename)
+                stats = download(zip_filename)
 
-            self.stdout.write("Extracting zip archive...")
-            with zipfile.ZipFile(zip_filename, "r") as archive:
-                archive.extractall(temp_dir)
-
-            temp_dir = temp_dir / SAMPLE_DATA_FOLDER
-            if not temp_dir.exists():
-                raise CommandError(f"Archive didn't contain a folder named {SAMPLE_DATA_FOLDER}!")
-
-            self.stdout.write("Loading metadata...")
-
-            metadata_path = temp_dir / "metadata.json"
-            if not metadata_path.exists():
-                raise CommandError("No metadata JSON file found in archive!")
-
-            with open(metadata_path, "r") as metadata_file:
-                metadata = json.load(metadata_file)
-
-            rotator_names = [d.name for d in temp_dir.iterdir() if d.is_dir()]
-            num_audio_files = len(list(temp_dir.rglob("*/*.*")))
-
-            mp3_dir = Path(settings.MEDIA_ROOT) / "prefill"
-            shutil.rmtree(mp3_dir, ignore_errors=True)
-            mp3_dir.mkdir(parents=True, exist_ok=True)
-            rotators = {}
-            num = 1
-
-            assets = []
-
-            for rotator_name in rotator_names:
-                rotator_dir = temp_dir / rotator_name
-
-                self.stdout.write(f"Creating rotator {rotator_name}...")
-                rotator = rotators[rotator_name] = Rotator.objects.create(
-                    name=rotator_name,
-                    created_by=created_by,
-                    color=metadata["rotator_colors"][rotator_name],
-                )
-
-                for mp3_tmp_filename in rotator_dir.iterdir():
-                    # Functions the same as
-                    mp3_filename = mp3_dir / generate_random_asset_filename(mp3_tmp_filename)
-                    self.stdout.write(f" * {num}/{num_audio_files} - Importing {mp3_tmp_filename.name}...")
-
-                    shutil.move(mp3_tmp_filename, mp3_filename)
-                    asset = Asset(
-                        name=mp3_tmp_filename.stem,
-                        file=f"prefill/{mp3_filename.name}",
-                        original_filename=mp3_tmp_filename.with_suffix("").name,
-                        created_by=created_by,
-                    )
-                    asset.clean()
-                    asset.save(dont_overwrite_original_filename=True)
-
-                    asset.rotators.add(rotator)
-                    assets.append(asset)
-                    num += 1
-
-            bulk_process_assets(assets, user=created_by, skip_trim=not options["trim_if_enabled"])
-
-        for stopset_name, rotator_names in metadata["stopsets"].items():
-            self.stdout.write(f"Creating stop set {stopset_name} with {len(rotator_names)} rotators...")
-            stopset = Stopset.objects.create(name=stopset_name, created_by=created_by)
-            for rotator_name in rotator_names:
-                StopsetRotator.objects.create(
-                    stopset=stopset,
-                    rotator=rotators[rotator_name],
-                )
-
+        self.stdout.write(f"Successfully imported {', '.join(f'{num} {entity}' for entity, num in stats.items())}!")
         self.stdout.write(self.style.SUCCESS(f"Done! Took {time.time() - before_time:.3f} seconds."))

@@ -76,19 +76,19 @@ class AssetStopsetHydratableObject extends HydratableObject {
 }
 
 class Asset extends AssetStopsetHydratableObject {
-  constructor({ file, ...data }, db) {
+  constructor({ file, url, filesize, md5sum, ...data }, db) {
     super(data, db)
-    const filePath = path.join(assetsDir, file.filename)
+    const filePath = path.join(assetsDir, file)
     const dirname = path.dirname(filePath)
     const basename = path.basename(filePath)
     const tmpPath = path.join(dirname, `${basename}.tmp`)
     this.file = {
-      url: `${db.host}${file.url}`,
+      url: `${db.host}${url}`,
       localUrl: pathToFileURL(filePath),
       path: filePath,
       basename,
-      size: file.size,
-      md5sum: file.md5sum,
+      size: filesize,
+      md5sum: md5sum,
       dirname,
       tmpPath,
       tmpBasename: path.basename(tmpPath)

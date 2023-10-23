@@ -1,7 +1,7 @@
 import decimal
 import logging
 
-from asgiref.sync import sync_to_async
+from asgiref.sync import async_to_sync, sync_to_async
 
 from django.conf import settings
 from django.db.models import Prefetch
@@ -39,7 +39,7 @@ def get_constance_config():
     return config
 
 
-async def serialize_for_api():
+async def serialize_for_api(skip_config=False):
     rotators = [rotator async for rotator in Rotator.objects.order_by("id")]
     rotator_ids = [r.id for r in rotators]
     # Only select from rotators that existed at time query was made
@@ -56,9 +56,14 @@ async def serialize_for_api():
         Prefetch("rotators", prefetch_qs.order_by("stopsetrotator__id"))
     ).order_by("id")
 
-    return {
+    data = {
         "assets": [a.serialize(alternates_already_filtered_by_prefetch=True) async for a in assets],
         "rotators": [r.serialize() for r in rotators],
         "stopsets": [s.serialize() async for s in stopsets],
-        "config": await sync_to_async(get_constance_config)(),
     }
+    if not skip_config:
+        data["config"] = await sync_to_async(get_constance_config)()
+    return data
+
+
+serialize_for_api_sync = async_to_sync(serialize_for_api)

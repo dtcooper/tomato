@@ -1,5 +1,3 @@
-from asgiref.sync import async_to_sync
-
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.http.request import split_domain_port
@@ -9,7 +7,7 @@ from django.views.decorators.http import require_POST
 
 from user_messages.models import Message
 
-from .models import serialize_for_api
+from .models import serialize_for_api_sync
 
 
 def server_logs(request):
@@ -37,6 +35,6 @@ def dismiss_message(request):
 
 def debug_json(request):
     if request.user.is_superuser:
-        return JsonResponse(async_to_sync(serialize_for_api)())
+        return JsonResponse(serialize_for_api_sync())
     else:
         return HttpResponseForbidden()

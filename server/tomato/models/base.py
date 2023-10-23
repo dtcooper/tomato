@@ -35,8 +35,9 @@ class AudioFieldFile(FieldFile):
 class AudioFileField(models.FileField):
     attr_class = AudioFieldFile
 
-    def __init__(self, max_length=FILE_MAX_LENGTH, *args, **kwargs):
-        super().__init__(max_length=FILE_MAX_LENGTH, *args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        max_length = kwargs.pop("max_length", FILE_MAX_LENGTH)
+        super().__init__(max_length=max_length, *args, **kwargs)
 
     def validate(self, value, model_instance):
         super().validate(value, model_instance)
@@ -119,10 +120,10 @@ class EnabledBeginEndWeightMixin(models.Model):
 
     def serialize(self):
         return {
+            **super().serialize(),
             "weight": round(float(self.weight), 2),
             "begin": self.begin,
             "end": self.end,
-            **super().serialize(),
         }
 
     class Meta:
@@ -130,9 +131,11 @@ class EnabledBeginEndWeightMixin(models.Model):
 
 
 class TomatoModelBase(models.Model):
-    created_at = models.DateTimeField("created at", auto_now_add=True, db_index=True)
+    created_at = models.DateTimeField("created at", default=timezone.localtime, db_index=True)
     created_by = models.ForeignKey(User, verbose_name="created by", on_delete=models.SET_NULL, null=True)
     name = models.CharField("name", max_length=NAME_MAX_LENGTH, unique=True)
+
+    SERIALIZE_FIELDS_TO_IGNORE = {"created_by"}
 
     class Meta:
         abstract = True
@@ -143,7 +146,7 @@ class TomatoModelBase(models.Model):
 
     def serialize(self):
         return {
-            "id": self.id,
-            "name": self.name,
-            "enabled": self.enabled,
+            field.name: getattr(self, field.name)
+            for field in self._meta.get_fields()
+            if field.name not in self.SERIALIZE_FIELDS_TO_IGNORE and not field.is_relation
         }

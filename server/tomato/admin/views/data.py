@@ -1,14 +1,83 @@
-from django import forms
-from django.views.generic import FormView
+import logging
+import tempfile
 
+from django import forms
+from django.conf import settings
+from django.contrib import messages
+from django.http import HttpResponse
+from django.shortcuts import redirect
+from django.views.generic import TemplateView
+
+from django_file_form.forms import FileFormMixin, UploadedFileField
+
+from ...models import ImportTomatoDataException, export_data_as_zip, import_data_from_zip
 from .base import AdminViewMixin
 
 
-class AdminDataForm(forms.Form):
-    test = forms.TextInput()
+logger = logging.getLogger(__name__)
 
 
-class AdminDataView(AdminViewMixin, FormView):
-    form_class = AdminDataForm
+class ImportUploadForm(FileFormMixin, forms.Form):
+    file = UploadedFileField()
+
+
+class AdminDataView(AdminViewMixin, TemplateView):
     name = "data"
+    perms = (
+        "tomato.add_asset",
+        "tomato.add_assetalternate",
+        "tomato.add_rotator",
+        "tomato.add_stopset",
+        "tomato.add_stopsetrotator",
+    )
     title = "Manage asset data"
+
+    def get_context_data(self, **kwargs):
+        import_upload_form = ImportUploadForm()
+        if self.request.method == "POST":
+            action = self.request.POST.get("action")
+            if action == "import":
+                import_upload_form = ImportUploadForm(self.request.POST, self.request.FILES)
+
+        return {
+            "import_upload_form": import_upload_form,
+            **super().get_context_data(**kwargs),
+        }
+
+    def do_export(self):
+        zip_file = tempfile.NamedTemporaryFile("wb+")
+        zip_filename = export_data_as_zip(zip_file)
+        zip_file.seek(0)  # Go back to beginning of file
+        response = HttpResponse(zip_file, content_type="application/octet-stream")
+        response["Content-Disposition"] = f'attachment; filename="{zip_filename}"'
+        return response
+
+    def do_import(self, file):
+        try:
+            info = import_data_from_zip(file, created_by=self.request.user)
+        except ImportTomatoDataException as e:
+            messages.add_message(self.request, messages.ERROR, f"Import error: {e}")
+        except Exception as e:
+            error_str = "Unexpected import error! Please try again."
+            if settings.DEBUG:
+                error_str = f"{error_str} Debug: {e}"
+            logger.exception("Unexpected import error!")
+            messages.add_message(self.request, messages.ERROR, error_str)
+        else:
+            messages.add_message(
+                self.request,
+                messages.INFO,
+                f"Successfully imported {', '.join(f'{num} {entity}' for entity, num in info.items())}!",
+            )
+        return redirect("admin:extra_data")
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        action = self.request.POST.get("action")
+        if action == "import":
+            if context["import_upload_form"].is_valid():
+                uploaded_file = context["import_upload_form"].cleaned_data["file"]
+                return self.do_import(uploaded_file)
+        elif action == "export":
+            return self.do_export()
+        return self.render_to_response(context)

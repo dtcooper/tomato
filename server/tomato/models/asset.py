@@ -64,15 +64,24 @@ class AssetBase(DirtyFieldsMixin, TomatoModelBase):
     )
     duration = models.DurationField(default=datetime.timedelta(0))
 
+    SERIALIZE_FIELDS_TO_IGNORE = {
+        "pre_process_md5sum",
+        "md5sum",
+        "status",
+        "file",
+        "duration",
+    } | TomatoModelBase.SERIALIZE_FIELDS_TO_IGNORE
+
     class Meta:
         abstract = True
 
-    def serialize_file(self):
+    def serialize(self):
         return {
-            "filename": self.file.name,
-            "url": self.file.url,
-            "size": self.filesize,
+            **super().serialize(),
+            "duration": round(self.duration.total_seconds()),
             "md5sum": self.md5sum.hex(),
+            "file": self.file.name,
+            "url": self.file.url,
         }
 
     def full_clean(self, *args, **kwargs):
@@ -161,11 +170,9 @@ class Asset(EnabledBeginEndWeightMixin, AssetBase):
             alternates_qs = alternates_qs.filter(status=AssetAlternate.Status.READY).order_by("id")
 
         return {
-            "file": self.serialize_file(),
-            "alternates": [alternate.serialize() for alternate in alternates_qs],
-            "duration": round(self.duration.total_seconds()),
-            "rotators": [rotator.id for rotator in self.rotators.all()],
             **super().serialize(),
+            "alternates": [alternate.serialize() for alternate in alternates_qs],
+            "rotators": [rotator.id for rotator in self.rotators.all()],
         }
 
     def clean(self):
@@ -180,9 +187,7 @@ class AssetAlternate(AssetBase):
         Asset, on_delete=models.CASCADE, related_name="alternates", verbose_name="alternate for asset"
     )
 
-    def serialize(self):
-        return {"duration": round(self.duration.total_seconds()), **super().serialize_file()}
-
+    # Property existing means there's no name field on this model
     @property
     def name(self):
         return f"Alternate #{self.num_before} for {self.asset.name}"

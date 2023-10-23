@@ -141,8 +141,8 @@ Other things
 - [ ] Way to parse filename into rotator, start/end date
   - [ ] Submit form built into Tomato?
 - [ ] Silence detection REJECTs audio assets in backend (if there's more than 2 seconds?) (behind FEATURE flag)
-- [ ] Export all audio assets as zip
-  - [ ] Import as well (have to be careful with different `protocol.json:protocol_version`)
+- [x] Export all audio assets as zip
+  - [x] Import as well (have to be careful with different `protocol.json:protocol_version`)
 - [ ] Add configurable silence between ads. Crossfade, with fade points? Fancy!
 - [ ] Client "Demo mode", requiring no backend with demo assets.
 - [x] Button to play an asset from a specific rotator
