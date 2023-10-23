@@ -57,10 +57,7 @@ async def serialize_for_api(skip_config=False):
     ).order_by("id")
 
     data = {
-        "assets": [
-            a.serialize(alternates_already_filtered_by_prefetch=True)
-            async for a in assets
-        ],
+        "assets": [a.serialize(alternates_already_filtered_by_prefetch=True) async for a in assets],
         "rotators": [r.serialize() for r in rotators],
         "stopsets": [s.serialize() async for s in stopsets],
     }

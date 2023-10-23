@@ -35,7 +35,8 @@ class AudioFieldFile(FieldFile):
 class AudioFileField(models.FileField):
     attr_class = AudioFieldFile
 
-    def __init__(self, max_length=FILE_MAX_LENGTH, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        max_length = kwargs.pop("max_length", FILE_MAX_LENGTH)
         super().__init__(max_length=max_length, *args, **kwargs)
 
     def validate(self, value, model_instance):
