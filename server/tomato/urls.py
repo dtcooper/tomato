@@ -7,9 +7,9 @@ from tomato.admin import admin_site
 
 
 urlpatterns = [
-    path("dismiss-message", views.dismiss_message, name="dismiss_message"),
+    path("dismiss_message", views.dismiss_message, name="dismiss_message"),
     path("upload/", include("django_file_form.urls")),
-    re_path("^server-logs/", views.server_logs, name="server_logs"),
+    re_path("^server_logs/", views.server_logs, name="server_logs"),
 ]
 
 if settings.DEBUG:

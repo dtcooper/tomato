@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 
 
@@ -10,6 +11,9 @@ class AdminViewMixin:
     def __init__(self, admin_site, *args, **kwargs):
         self.admin_site = admin_site
         super().__init__(*args, **kwargs)
+
+    def message_user(self, message, level=messages.INFO):
+        messages.add_message(self.request, level, message)
 
     @classmethod
     def as_view(cls, admin_site, *args, **kwargs):

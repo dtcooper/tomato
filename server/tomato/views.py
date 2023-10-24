@@ -14,7 +14,7 @@ def server_logs(request):
     if request.user.is_superuser:
         if settings.DEBUG and not request.is_secure():
             domain, _ = split_domain_port(request.get_host())
-            return HttpResponseRedirect(f"http://{domain}:{settings.DEBUG_LOGS_PORT}/server-logs/")
+            return HttpResponseRedirect(f"http://{domain}:{settings.DEBUG_LOGS_PORT}/server_logs/")
         else:
             return HttpResponse(headers={"X-Accel-Redirect": f"/_internal{request.get_full_path()}"})
     else:

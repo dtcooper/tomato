@@ -1,4 +1,7 @@
-from .data import AdminDataView
+from .asset_data import AdminAssetDataView
 
 
-__all__ = (AdminDataView,)
+extra_views = (AdminAssetDataView,)
+
+
+__all__ = (extra_views,)

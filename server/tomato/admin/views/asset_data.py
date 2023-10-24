@@ -10,7 +10,12 @@ from django.views.generic import TemplateView
 
 from django_file_form.forms import FileFormMixin, UploadedFileField
 
-from ...models import ImportTomatoDataException, export_data_as_zip, import_data_from_zip
+from ...models import (
+    REQUIRED_EMPTY_FOR_IMPORT_MODEL_CLASSES,
+    ImportTomatoDataException,
+    export_data_as_zip,
+    import_data_from_zip,
+)
 from .base import AdminViewMixin
 
 
@@ -21,8 +26,8 @@ class ImportUploadForm(FileFormMixin, forms.Form):
     file = UploadedFileField()
 
 
-class AdminDataView(AdminViewMixin, TemplateView):
-    name = "data"
+class AdminAssetDataView(AdminViewMixin, TemplateView):
+    name = "asset_data"
     perms = (
         "tomato.add_asset",
         "tomato.add_assetalternate",
@@ -41,6 +46,8 @@ class AdminDataView(AdminViewMixin, TemplateView):
 
         return {
             "import_upload_form": import_upload_form,
+            "can_delete": self.request.user.is_superuser,
+            "can_import": not any(model_cls.objects.exists() for model_cls in REQUIRED_EMPTY_FOR_IMPORT_MODEL_CLASSES),
             **super().get_context_data(**kwargs),
         }
 
@@ -56,28 +63,34 @@ class AdminDataView(AdminViewMixin, TemplateView):
         try:
             info = import_data_from_zip(file, created_by=self.request.user)
         except ImportTomatoDataException as e:
-            messages.add_message(self.request, messages.ERROR, f"Import error: {e}")
+            self.message_user(f"Import error: {e}", messages.ERROR)
         except Exception as e:
             error_str = "Unexpected import error! Please try again."
             if settings.DEBUG:
                 error_str = f"{error_str} Debug: {e}"
             logger.exception("Unexpected import error!")
-            messages.add_message(self.request, messages.ERROR, error_str)
+            self.message_user(error_str, messages.ERROR)
         else:
-            messages.add_message(
-                self.request,
-                messages.INFO,
-                f"Successfully imported {', '.join(f'{num} {entity}' for entity, num in info.items())}!",
-            )
-        return redirect("admin:extra_data")
+            self.message_user(f"Successfully imported {', '.join(f'{num} {entity}' for entity, num in info.items())}!")
+        return redirect("admin:extra_asset_data")
+
+    def do_delete(self):
+        for model_cls in REQUIRED_EMPTY_FOR_IMPORT_MODEL_CLASSES:
+            model_cls.objects.all().delete()
+        self.message_user("All asset data completely deleted!", messages.WARNING)
+        return redirect("admin:extra_asset_data")
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
+        can_import, can_delete = context["can_import"], context["can_delete"]
         action = self.request.POST.get("action")
-        if action == "import":
+        if can_import and action == "import":
             if context["import_upload_form"].is_valid():
                 uploaded_file = context["import_upload_form"].cleaned_data["file"]
                 return self.do_import(uploaded_file)
         elif action == "export":
             return self.do_export()
+        elif can_delete and action == "delete":
+            return self.do_delete()
+
         return self.render_to_response(context)

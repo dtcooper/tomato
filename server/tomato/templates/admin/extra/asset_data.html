@@ -1,0 +1,115 @@
+{% extends 'admin/extra/base.html' %}
+
+{% load static %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static "admin/css/forms.css" %}">
+
+  <script src="{% static "file_form/file_form.min.js" %}"></script>
+  <script src="{% static "file_form/auto_init.js" %}"></script>
+  <link rel="stylesheet" href="{% static "file_form/file_form.css" %}">
+
+  {% if can_delete %}
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById("delete-form").onsubmit = (event) => {
+          let confirmInput = prompt(
+            'Are you SURE you want to completely delete all assets, rotators and stopsets for this station?\n\n'
+            + `If so, please enter the EXACT station name "${TOMATO_DATA.station_name}" in the prompt below\n`
+          )
+
+          if (confirmInput) {
+            confirmInput = confirmInput.trim().replace(/^['"]*(.*?)['"]*$/, '$1').toLowerCase()
+            const confirmExpected = TOMATO_DATA.station_name.trim().replace(/^['"]*(.*?)['"]*$/, '$1').toLowerCase()
+
+            if(confirmInput !== confirmExpected) {
+              alert(`You must enter the station name EXACTLY: ${TOMATO_DATA.station_name}\n\nNot deleting.`)
+              event.preventDefault()
+            }
+          } else {
+            event.preventDefault()
+          }
+        }
+      })
+    </script>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <form method="POST">
+    {% csrf_token %}
+    <fieldset class="module aligned">
+      <h2>Export asset data</h2>
+      <input type="hidden" name="action" value="export">
+      <div class="form-row">
+        <p>Click the button below to download an export of all asset data currently in {{ station_name }}.</p>
+      </div>
+    </fieldset>
+    <div class="submit-row">
+      <input type="submit" class="default" value="Download export of all asset files">
+    </div>
+  </form>
+
+  {% if can_import %}
+    <form method="POST" id="file-form" enctype="multipart/form-data">
+      {% csrf_token %}
+      <fieldset class="module aligned">
+        <h2>Import asset data</h2>
+        <input type="hidden" name="action" value="import">
+        <div class="form-row">
+          <p>Select a file that containers <em>previously exported</em> asset data.</p>
+        </div>
+        <div class="form-row">
+          {{ import_upload_form.file.errors }}
+          {{ import_upload_form.file }}
+          {% for hidden in import_upload_form.hidden_fields %}
+            {{ hidden }}
+          {% endfor %}
+        </div>
+      </fieldset>
+      <div class="submit-row">
+        <input type="submit" class="default" value="Upload a previous export of ALL data files">
+      </div>
+    </form>
+  {% else %}
+    <fieldset class="module aligned">
+      <h2>Import asset data</h2>
+      <div class="form-row">
+        <span class="errornote">
+          <strong>
+            You can only import asset data when the database is completely empty!
+          </strong>
+        </span>
+        <p>
+          Please delete all audio assets, rotators, and stop sets before importing assset data.
+        </p>
+      </div>
+    </fieldset>
+  {% endif %}
+
+  {% if can_delete %}
+  <div class="delete-confirmation">
+    <form method="POST" id="delete-form">
+      {% csrf_token %}
+      <fieldset class="module aligned">
+        <h2>Delete asset data</h2>
+        <input type="hidden" name="action" value="delete">
+        <div class="form-row">
+          <p>
+            Click the button below to <strong>COMPLETELY DELETE</strong> all assets, rotators and stop
+            in {{ station_name }}!
+          </p>
+          <span class="errornote">
+            <strong>WARNING:</strong> The operation below is <strong>NOT</strong> reversible. Make sure
+            you've taken a backup (an export) before performing this operation!
+          </span>
+        </div>
+      </fieldset>
+      <div class="submit-row">
+        <input type="submit" class="default" value="Delete all assets, rotators and stop sets in {{ station_name }}!">
+      </div>
+    </form>
+  </div>
+  {% endif %}
+{% endblock %}

@@ -20,7 +20,7 @@ from .config import ConfigAdmin
 from .rotator import RotatorAdmin
 from .stopset import StopsetAdmin
 from .user import UserAdmin
-from .views import AdminDataView
+from .views import extra_views
 
 
 MODELS_HELP_DOCS_TEXT = {
@@ -40,7 +40,6 @@ class TomatoAdminSite(admin.AdminSite):
         (Path(apps.get_app_config("admin").path) / "templates" / "admin" / "app_list.html").absolute()
     )
     empty_value_display = mark_safe("<em>None</em>")
-    extra_views = (AdminDataView,)
     index_title = "Tomato administration"
     site_url = None
 
@@ -70,7 +69,7 @@ class TomatoAdminSite(admin.AdminSite):
         ]
         urls.extend(
             path(f"utils/{view.get_path()}", self.admin_view(view.as_view(self)), name=f"extra_{view.name}")
-            for view in self.extra_views
+            for view in extra_views
         )
         urls.extend(super().get_urls())
         return urls
@@ -88,16 +87,16 @@ class TomatoAdminSite(admin.AdminSite):
             "app_list_template_original": self.app_list_template_original,
             "app_list_extra": [
                 {"url": f"admin:extra_{view.name}", "title": view.title}
-                for view in self.extra_views
+                for view in extra_views
                 if view.check_perms(request)
             ],
             "app_list_extra_highlight": request.resolver_match.view_name in [
-                f"admin:extra_{view.name}" for view in self.extra_views
+                f"admin:extra_{view.name}" for view in extra_views
             ],
             "help_docs_text": help_docs_text,
             "help_docs_url": HELP_DOCS_URL,
             "protocol_version": PROTOCOL_VERSION,
-            "tomato_json_data": {"colors": COLORS_DICT},
+            "tomato_json_data": {"colors": COLORS_DICT, "station_name": constance_config.STATION_NAME},
             "tomato_version": settings.TOMATO_VERSION,
             "station_name": constance_config.STATION_NAME,
             **context,
