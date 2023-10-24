@@ -116,7 +116,9 @@ def import_data_from_zip(file, created_by=None):
         assets_to_process = []
         for kwargs in metadata["assets"]:
             for file in itertools.chain((kwargs,), kwargs["alternates"]):
-                shutil.move(assets_prefix / file["file"], media_root / file["file"])
+                destination_path = media_root / file["file"]
+                destination_path.parent.mkdir(parents=True, exist_ok=True)  # Make sure parent dir exists
+                shutil.move(assets_prefix / file["file"], destination_path)
                 logger.info(f"Copying file for import: {file['file']}")
 
             kwargs.update(
