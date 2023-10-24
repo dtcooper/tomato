@@ -90,7 +90,8 @@ def process_asset(
 
 @djhuey.db_task()
 def bulk_process_assets(assets, user=None, skip_trim=False):
-    for asset in assets:
+    for n, asset in enumerate(assets):
+        logger.info(f"Bulk processing {n}/{len(assets)} assets...")
         try:
             process_asset.call_local(
                 asset, empty_name=True, user=user, no_success_message=True, skip_trim=skip_trim, mark_dirty=False
