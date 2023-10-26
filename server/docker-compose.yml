@@ -42,10 +42,6 @@ services:
       DOMAIN_NAME: "${DOMAIN_NAME:?DOMAIN_NAME needs to be set. See .env file.}"
       __NGINX_STATIC_FILES_CONF: |
         # Static files enabled via docker-compose.yml
-        location /assets/ {
-            alias /serve/assets/;
-        }
-
         location /static/ {
             alias /serve/static/;
         }
