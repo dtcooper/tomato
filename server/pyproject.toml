@@ -12,7 +12,7 @@ django-admin-notice = "^2.1.0"
 django-constance = "^3.1.0"
 django-dirtyfields = "^1.9.2"
 django-environ = "^0.11.2"
-django-file-form = "^3.5.3"
+django-file-form = "^3.5.4"
 django-flatpickr = "^2.0.1"
 django-redis = {extras = ["hiredis"], version = "^5.4.0"}
 # For hard_delete_soft_deleted action, once safedelete > 1.3.2, can pin again

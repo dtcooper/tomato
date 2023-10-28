@@ -133,6 +133,8 @@ Changes for 2024 based on real world usage in 2023 and feedback
 
 Other things
 - [ ] Ability to do speech synthesis / pull asset from API? / weather
+  - [ ] Best cross-platform way to do this might be to use [text2wav.node.js](https://github.com/abbr/text2wav.node.js)
+        to generate WAV files with a timeout
 - [ ] KLOS color scheme: `#D91E75`, `#4B89BF`, `#8CBF3F`, `#F2D750`, and `#D95525`
 - [ ] "Island Mode" with an embedded [standalone Python distribution](https://python-build-standalone.readthedocs.io/en/latest/)
 - [ ] Login interstitial to populate with demo data
