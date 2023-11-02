@@ -9,7 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.9"
 mkdocs = "^1.5.3"
-mkdocs-macros-plugin = "^1.0.4"
+mkdocs-macros-plugin = "^1.0.5"
 mkdocs-material = "^9.4.7"
 mkdocs-same-dir = "^0.1.2"
 
