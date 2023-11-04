@@ -31,7 +31,7 @@ jobs:
         include:
           -
             title: macOS
-            os: macos-11
+            os: macos-12
             arch: universal
             platform: darwin
             out_path: "*.dmg"
