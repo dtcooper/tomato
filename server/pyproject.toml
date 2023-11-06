@@ -21,8 +21,8 @@ gunicorn = "^21.2.0"
 huey = "^2.5.0"
 psycopg = "^3.1.12"
 python-dotenv = "^1.0.0"
-starlette = "^0.31.1"
-uvicorn = {extras = ["standard"], version = "^0.23.2"}
+starlette = "^0.32.0.post1"
+uvicorn = {extras = ["standard"], version = "^0.24.0.post1"}
 wait-for-it = "^2.2.2"
 
 [tool.poetry.group.dev.dependencies]
