@@ -65,7 +65,7 @@ services:
 
   logs:
     restart: always
-    image: amir20/dozzle:v5.3.0
+    image: amir20/dozzle:v5.3.1
     volumes:
       - "${DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock"
     environment:
