@@ -13,7 +13,8 @@ const cmdArgs = parseArgs({
     "enable-dev-mode": { type: "boolean", default: false },
     "disable-play-server": { type: "boolean", default: false },
     "play-server-port": { type: "string", default: "8207" },
-    "play-server-host": { type: "string", default: "127.0.0.1" }
+    "play-server-host": { type: "string", default: "127.0.0.1" },
+    "show-quit-dialog-when-unpackaged": { type: "boolean", default: false }
   },
   strict: false
 }).values
@@ -199,37 +200,21 @@ if (squirrelCheck || !singleInstanceLock) {
       }
     })
 
-    if (app.isPackaged) {
+    if (app.isPackaged || cmdArgs["show-quit-dialog-when-unpackaged"]) {
       // Prevent accidental closing (except when unpackaged, since electron-forge restart kills the app
-      win.on("close", async (event) => {
-        event.preventDefault()
-
-        const isReady = await new Promise((resolve) => {
-          if (win) {
-            ipcMain.handleOnce("is-ready", (event, value) => resolve(value))
-            win.webContents.send("is-ready")
-          } else {
-            resolve(false)
-          }
+      win.on("close", (event) => {
+        const choice = dialog.showMessageBoxSync(win, {
+          type: "question",
+          normalizeAccessKeys: false,
+          buttons: ["Quit", "Cancel & Keeping Running"],
+          defaultId: 1,
+          cancelId: 1,
+          title: "Quit Tomato",
+          message: "Are you SURE you want to quit Tomato Radio Automation?"
         })
 
-        if (isReady) {
-          const choice = await dialog.showMessageBox(win, {
-            type: "question",
-            normalizeAccessKeys: false,
-            buttons: ["Quit", "Cancel & Keeping Running"],
-            defaultId: 1,
-            cancelId: 1,
-            title: "Quit Tomato",
-            message: "Are you SURE you want to quit Tomato?"
-          })
-          if (choice.response === 0) {
-            window.destroy()
-            app.quit()
-          }
-        } else {
-          window.destroy()
-          app.quit()
+        if (choice === 1) {
+          event.preventDefault()
         }
       })
     }

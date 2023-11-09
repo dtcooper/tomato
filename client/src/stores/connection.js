@@ -85,10 +85,6 @@ export const logout = (error) => {
   }
 }
 
-ipcRenderer.on("is-ready", () => {
-  ipcRenderer.invoke("is-ready", get(conn).ready)
-})
-
 export const reloadPlaylistCallback = writable(noop)
 
 // Functions defined for various message types we get from server after authentication
