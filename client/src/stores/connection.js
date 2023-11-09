@@ -99,7 +99,7 @@ const handleMessages = {
     await syncAssetsDB(jsonData)
     updateConn({ didFirstSync: true })
   },
-  log: (data) => {
+  "ack-log": (data) => {
     const { success, id } = data
     if (success) {
       console.log(`Acknowledged log ${id}`)
@@ -159,7 +159,7 @@ export const login = (username, password, host) => {
         return
       }
 
-      url.pathname = `${url.pathname}api/`
+      url.pathname = `${url.pathname}api`
       host = url.toString()
     } else {
       // Called with no args = logging back in on first load
@@ -223,7 +223,7 @@ export const login = (username, password, host) => {
     ws.onopen = () => {
       gotAuthResponse = false
       updateConn({ connected: false, connecting: true })
-      ws.send(JSON.stringify({ username, password, protocol_version }))
+      ws.send(JSON.stringify({ username, password, protocol_version, tomato: "radio-automation" }))
       connTimeout = setTimeout(() => ws.close(), 15000)
     }
   })

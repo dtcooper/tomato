@@ -24,6 +24,7 @@ from .base import (
     AudioFileField,
     EligibleToAirQuerySet,
     EnabledBeginEndWeightMixin,
+    NotifyTrigger,
     TomatoModelBase,
 )
 from .rotator import Rotator
@@ -95,15 +96,13 @@ class AssetBase(DirtyFieldsMixin, TomatoModelBase):
             if self.id is not None:
                 querysets[self._meta.model] = querysets[self._meta.model].exclude(id=self.id)
             if any(qs.exists() for qs in querysets.values()):
-                raise ValidationError(
-                    {
-                        "__all__": mark_safe(
-                            "An audio asset already exists with this audio file. Rejecting duplicate. You can turn this"
-                            " feature off with setting <code>PREVENT_DUPLICATES</code>."
-                        ),
-                        "file": "A duplicate of this file already exists.",
-                    }
-                )
+                raise ValidationError({
+                    "__all__": mark_safe(
+                        "An audio asset already exists with this audio file. Rejecting duplicate. You can turn this"
+                        " feature off with setting <code>PREVENT_DUPLICATES</code>."
+                    ),
+                    "file": "A duplicate of this file already exists.",
+                })
 
     def save(self, dont_overwrite_original_filename=False, *args, **kwargs):
         if not dont_overwrite_original_filename and "file" in self.get_dirty_fields():
@@ -145,9 +144,10 @@ class Asset(EnabledBeginEndWeightMixin, AssetBase):
         blank=True,
         verbose_name="rotators",
         help_text="Rotators that this asset will be included in.",
+        db_table="asset_rotators",
     )
 
-    class Meta:
+    class Meta(TomatoModelBase.Meta):
         db_table = "assets"
         verbose_name = "audio asset"
         ordering = ("-created_at",)
@@ -179,6 +179,17 @@ class Asset(EnabledBeginEndWeightMixin, AssetBase):
         super().clean()
         if not self.name.strip():
             self.name = self.original_filename
+
+
+class AssetRotatorsProxy(Asset.rotators.through):
+    class Meta:
+        proxy = True
+        triggers = [NotifyTrigger()]
+
+
+Asset.rotators.through.__str__ = lambda self: f"{self.asset.name} in {self.rotator.name}"
+Asset.rotators.through._meta.verbose_name = "Asset in rotator relationship"
+Asset.rotators.through._meta.verbose_name_plural = "Asset in rotator relationships"
 
 
 class AssetAlternate(AssetBase):
@@ -214,20 +225,13 @@ class AssetAlternate(AssetBase):
         )
         return qs.annotate(_num_before=Coalesce(Subquery(num_before_subquery), 0) + 1)
 
-    class Meta:
+    class Meta(TomatoModelBase.Meta):
         db_table = "asset_alternates"
         ordering = ("id",)
         verbose_name = "audio asset alternate"
 
 
-Asset.rotators.through.__str__ = lambda self: f"{self.asset.name} in {self.rotator.name}"
-Asset.rotators.through._meta.verbose_name = "Asset in rotator relationship"
-Asset.rotators.through._meta.verbose_name_plural = "Asset in rotator relationships"
-
 for model_class in (Asset, AssetAlternate):
-    created_by_field = model_class._meta.get_field("created_by")
-    del created_by_field
-
     created_at_field = model_class._meta.get_field("created_at")
     created_at_field.verbose_name = "date uploaded"
     del created_at_field

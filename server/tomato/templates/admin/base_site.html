@@ -50,8 +50,8 @@
       font-size: 13px
     }
 
-    .admin-flatpickr-datetime {
-      width: 350px;
+    .vTimeField, .vDateField {
+      min-width: 10em;
     }
   </style>
   {{ tomato_json_data|json_script:"tomato-json-data" }}
@@ -104,9 +104,10 @@
         })
       })
 
-      Array.from(document.querySelectorAll('.admin-flatpickr-datetime')).forEach(input => {
+      Array.from(document.querySelectorAll('.vDateField')).forEach(input => input.type = "date")
+      Array.from(document.querySelectorAll('.vTimeField')).forEach(input => {
+        input.type = "time"
         const clearBtn = document.createElement("a")
-        clearBtn.style.marginLeft = "5px"
         clearBtn.href = "#"
         clearBtn.textContent = "Clear"
         clearBtn.onclick = (event) => {
@@ -115,25 +116,6 @@
         }
         input.after(clearBtn)
       })
-
-      if (window.DateTimeShortcuts) {
-        window.DateTimeShortcuts.clockHours.default_ = [];
-        for (let hour = 0; hour < 24; hour += 2) {
-          let verboseName
-          if (hour === 0) {
-            verboseName = "midnight"
-          } else if (hour === 12) {
-            verboseName = "noon"
-          } else {
-            verboseName = new Date(1970, 1, 1, hour, 0, 0).strftime('%I:%M %p').toLowerCase()
-            if (verboseName.charAt(0) === "0") {
-              verboseName = verboseName.slice(1)
-            }
-          }
-          window.DateTimeShortcuts.clockHours.default_.push([verboseName, hour])
-        }
-      }
-
     })
   </script>
 {% endblock %}

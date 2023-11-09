@@ -42,12 +42,10 @@ def ffprobe(infile):
     if cmd.returncode == 0:
         data = json.loads(cmd.stdout)
         if data and data["streams"] and data["format"]:
-            kwargs.update(
-                {
-                    "format": data["format"]["format_name"],
-                    "duration": datetime.timedelta(seconds=math.ceil(float(data["streams"][0].get("duration") or 0))),
-                }
-            )
+            kwargs.update({
+                "format": data["format"]["format_name"],
+                "duration": datetime.timedelta(seconds=math.ceil(float(data["streams"][0].get("duration") or 0))),
+            })
         else:
             logger.warning(f"ffprobe returned a bad or empty response: {cmd.stdout}")
             return None
@@ -75,17 +73,15 @@ def ffmpeg_convert(infile, outfile):
         infile,
     ]
     ARGS_INFILE_INDEX = len(base_args) - 1  # used below
-    base_args.extend(
-        [
-            "-hide_banner",
-            "-loglevel",
-            "error",
-            "-id3v2_version",
-            "3",
-            "-map",
-            "0:a:0",
-        ]
-    )
+    base_args.extend([
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-id3v2_version",
+        "3",
+        "-map",
+        "0:a:0",
+    ])
 
     if config.TRIM_SILENCE:
         trimmed_wav_file = outfile.with_suffix(".wav")

@@ -15,16 +15,14 @@ from user_messages.models import Message as UserMessage
 
 from .ffmpeg import ffmpeg_convert, ffprobe
 from .models import SavedAssetFile
-from .utils import mark_models_dirty, once_at_startup
+from .utils import once_at_startup
 
 
 logger = logging.getLogger(__name__)
 
 
 @djhuey.db_task(context=True, retries=3, retry_delay=5)
-def process_asset(
-    asset, empty_name=False, user=None, no_success_message=False, skip_trim=False, mark_dirty=True, task=None
-):
+def process_asset(asset, empty_name=False, user=None, no_success_message=False, skip_trim=False, task=None):
     def error(message):
         if user is not None:
             user_messages_api.error(
@@ -75,8 +73,6 @@ def process_asset(
         SavedAssetFile.objects.update_or_create(
             file=asset.file, defaults={"original_filename": asset.original_filename}
         )
-        if mark_dirty:
-            mark_models_dirty()
 
         if not no_success_message and user is not None:
             user_messages_api.success(user, f'Audio asset "{asset.name}" successfully processed!')
@@ -93,13 +89,9 @@ def bulk_process_assets(assets, user=None, skip_trim=False):
     for n, asset in enumerate(assets):
         logger.info(f"Bulk processing {n}/{len(assets)} assets...")
         try:
-            process_asset.call_local(
-                asset, empty_name=True, user=user, no_success_message=True, skip_trim=skip_trim, mark_dirty=False
-            )
+            process_asset.call_local(asset, empty_name=True, user=user, no_success_message=True, skip_trim=skip_trim)
         except Exception:
             pass
-
-    mark_models_dirty()
 
     if user is not None:
         user_messages_api.success(user, f"Finished processing {len(assets)} audio assets.")
