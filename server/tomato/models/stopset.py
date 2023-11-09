@@ -1,6 +1,6 @@
 from django.db import models
 
-from .base import EnabledBeginEndWeightMixin, TomatoModelBase
+from .base import EnabledBeginEndWeightMixin, NotifyTrigger, TomatoModelBase
 
 
 class Stopset(EnabledBeginEndWeightMixin, TomatoModelBase):
@@ -31,3 +31,4 @@ class StopsetRotator(models.Model):
         db_table = "stopset_rotators"
         verbose_name = "rotator in stop set relationship"
         ordering = ("id",)
+        triggers = [NotifyTrigger()]

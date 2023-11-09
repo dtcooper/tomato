@@ -32,6 +32,8 @@ RUN apt-get update \
 ARG POETRY_VERSION=1.7.0
 RUN curl -sSL https://install.python-poetry.org | python -
 ENV PATH="/root/.local/bin:${PATH}"
+# Add tomato to Python path permanently
+RUN echo '/app' > "$(python -c 'import site; print(site.getsitepackages()[0])')/tomato.pth"
 
 COPY pyproject.toml poetry.lock /app/
 WORKDIR /app
@@ -44,6 +46,7 @@ RUN poetry install $([ -z "$DEBUG" -o "$DEBUG" = '0' ] && echo '--without=dev') 
 
 COPY *.py *.sh constants.json /app/
 COPY tomato/ /app/tomato/
+COPY api/ /app/api/
 WORKDIR /app
 
 ENTRYPOINT ["/app/entrypoint.sh"]

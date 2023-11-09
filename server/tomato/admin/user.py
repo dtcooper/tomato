@@ -1,20 +1,11 @@
 from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
-from django.contrib.auth.forms import AdminPasswordChangeForm as DjangoAdminPasswordChangeForm
 from django.contrib.auth.models import Group
 from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
 
 from ..constants import EDIT_ALL_GROUP_NAME, EDIT_ONLY_ASSETS_GROUP_NAME
-from ..utils import mark_logged_out_users
 from .base import ListPrefetchRelatedMixin, NoNullRelatedOnlyFieldFilter
-
-
-class AdminPasswordChangeForm(DjangoAdminPasswordChangeForm):
-    def save(self, commit=True):
-        user = super().save(commit=commit)
-        mark_logged_out_users([user.id])
-        return user
 
 
 class UserAdmin(ListPrefetchRelatedMixin, DjangoUserAdmin):
@@ -23,7 +14,6 @@ class UserAdmin(ListPrefetchRelatedMixin, DjangoUserAdmin):
         ("Permissions", {"fields": ("is_superuser", "enable_client_logs", "groups")}),
     )
     add_form_template = None  # Removed the top of page warning
-    change_password_form = AdminPasswordChangeForm
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         ("Permissions", {"fields": ("is_active", "is_superuser", "enable_client_logs", "groups")}),
@@ -42,22 +32,6 @@ class UserAdmin(ListPrefetchRelatedMixin, DjangoUserAdmin):
     readonly_fields = ("last_login", "created_at", "created_by")
     save_on_top = True
     search_fields = ("username",)
-
-    def save_model(self, request, obj, form, change):
-        changed_password = "password" in obj.get_dirty_fields()
-        super().save_model(request, obj, form, change)
-        if not obj.is_active or changed_password:
-            mark_logged_out_users([obj.id])
-
-    def delete_model(self, request, obj):
-        user_id = obj.id
-        super().delete_model(request, obj)
-        mark_logged_out_users([user_id])
-
-    def delete_queryset(self, request, queryset):
-        user_ids = list(queryset.values_list("id", flat=True))
-        super().delete_queryset(request, queryset)
-        mark_logged_out_users(user_ids)
 
     @admin.display(description="Permissions")
     def groups_display(self, obj):

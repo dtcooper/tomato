@@ -1,6 +1,8 @@
 from pathlib import Path
 import zoneinfo
 
+import pgtrigger
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
@@ -10,9 +12,8 @@ from django.utils.html import format_html
 
 from django_file_form.uploaded_file import UploadedTusFile
 
-from ..constants import HELP_DOCS_URL
+from ..constants import HELP_DOCS_URL, POSTGRES_CHANGES_CHANNEL
 from ..ffmpeg import ffprobe
-from .user import User
 
 
 NAME_MAX_LENGTH = 120
@@ -23,6 +24,25 @@ UTC = zoneinfo.ZoneInfo("UTC")
 def greater_than_zero(value):
     if value <= 0:
         raise ValidationError("Value must be greater than 0")
+
+
+class NotifyTrigger(pgtrigger.Trigger):
+    name = "tomato_db_notify"
+    when = pgtrigger.After
+    operation = pgtrigger.Insert | pgtrigger.Delete | pgtrigger.Update
+    level = pgtrigger.Statement
+    extra_json = ""
+
+    def get_func(self, model):
+        return f"""
+            perform pg_notify('{POSTGRES_CHANGES_CHANNEL}',
+                json_build_object(
+                    'table', '{model._meta.db_table}',
+                    'op', LOWER(TG_OP){"," if self.extra_json else ""}{self.extra_json}
+                )::text
+            );
+            RETURN NEW;
+        """
 
 
 class AudioFieldFile(FieldFile):
@@ -132,7 +152,7 @@ class EnabledBeginEndWeightMixin(models.Model):
 
 class TomatoModelBase(models.Model):
     created_at = models.DateTimeField("created at", default=timezone.localtime, db_index=True)
-    created_by = models.ForeignKey(User, verbose_name="created by", on_delete=models.SET_NULL, null=True)
+    created_by = models.ForeignKey("tomato.User", verbose_name="created by", on_delete=models.SET_NULL, null=True)
     name = models.CharField("name", max_length=NAME_MAX_LENGTH, unique=True)
 
     SERIALIZE_FIELDS_TO_IGNORE = {"created_by"}
@@ -140,6 +160,7 @@ class TomatoModelBase(models.Model):
     class Meta:
         abstract = True
         ordering = ("name",)
+        triggers = [NotifyTrigger()]
 
     def __str__(self):
         return self.name

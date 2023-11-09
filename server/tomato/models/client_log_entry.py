@@ -41,6 +41,7 @@ class ClientLogEntry(models.Model):
         raise Exception("Log entry type without a category found")
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    ip_address = models.GenericIPAddressField("IP address", null=True, blank=True)
     created_at = models.DateTimeField(
         default=timezone.now, db_index=True
     )  # Dont use auto_now_add since client provides

@@ -3,7 +3,6 @@ from django.urls import reverse
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 
-from ..utils import mark_models_dirty
 from .base import AiringEnabledMixin, NoNullRelatedOnlyFieldFilter, NumAssetsMixin, TomatoModelAdminBase
 
 
@@ -13,13 +12,11 @@ class RotatorAdmin(AiringEnabledMixin, NumAssetsMixin, TomatoModelAdminBase):
     list_prefetch_related = ("stopsets",)
     COLOR_FIELDSET = ("Color", {"fields": ("color", "color_preview")})
     add_fieldsets = (
-        (None, {"fields": ("name", "is_single_play")}),
-        COLOR_FIELDSET,
-    )
-    fieldsets = (
         (None, {"fields": ("name",)}),
         ("Airing Information", {"fields": ("enabled", "is_single_play")}),
-        COLOR_FIELDSET,
+        ("Color", {"fields": ("color", "color_preview")}),
+    )
+    fieldsets = add_fieldsets + (
         ("Stop sets", {"fields": ("stopsets_display",)}),
         ("Additional information", {"fields": ("num_assets", "created_by", "created_at")}),
     )
@@ -37,7 +34,6 @@ class RotatorAdmin(AiringEnabledMixin, NumAssetsMixin, TomatoModelAdminBase):
             self.message_user(
                 request, f"Enabled single play for {num} {self.model._meta.verbose_name}(s) .", messages.SUCCESS
             )
-            mark_models_dirty(request)
 
     @admin.action(
         description="Disable single play for selected %(verbose_name_plural)s", permissions=("add", "change", "delete")
@@ -48,7 +44,6 @@ class RotatorAdmin(AiringEnabledMixin, NumAssetsMixin, TomatoModelAdminBase):
             self.message_user(
                 request, f"Disabled single play for {num} {self.model._meta.verbose_name}(s).", messages.SUCCESS
             )
-            mark_models_dirty(request)
 
     @admin.display(description="Color", ordering="color")
     def color_display(self, obj=None):

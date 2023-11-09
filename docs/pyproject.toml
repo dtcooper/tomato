@@ -4,7 +4,7 @@ version = "1.0.0"
 description = ""
 authors = ["David Cooper <david.cooper@burningman.org>"]
 license = "MIT"
-readme = "README.md"
+readme = "../README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -14,5 +14,5 @@ mkdocs-material = "^9.4.8"
 mkdocs-same-dir = "^0.1.2"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

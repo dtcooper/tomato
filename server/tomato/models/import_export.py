@@ -121,12 +121,10 @@ def import_data_from_zip(file, created_by=None):
                 shutil.move(assets_prefix / file["file"], destination_path)
                 logger.info(f"Copying file for import: {file['file']}")
 
-            kwargs.update(
-                {
-                    "md5sum": bytes.fromhex(kwargs["md5sum"]),
-                    "duration": datetime.timedelta(seconds=kwargs["duration"]),
-                }
-            )
+            kwargs.update({
+                "md5sum": bytes.fromhex(kwargs["md5sum"]),
+                "duration": datetime.timedelta(seconds=kwargs["duration"]),
+            })
             alternates = kwargs.pop("alternates")
             rotators = [rotator_id_to_obj[rotator_id] for rotator_id in kwargs.pop("rotators")]
             asset = Asset(created_by=created_by, **kwargs)
@@ -138,12 +136,10 @@ def import_data_from_zip(file, created_by=None):
 
             if alternates:
                 for alternate_kwargs in alternates:
-                    alternate_kwargs.update(
-                        {
-                            "md5sum": bytes.fromhex(alternate_kwargs["md5sum"]),
-                            "duration": datetime.timedelta(seconds=alternate_kwargs["duration"]),
-                        }
-                    )
+                    alternate_kwargs.update({
+                        "md5sum": bytes.fromhex(alternate_kwargs["md5sum"]),
+                        "duration": datetime.timedelta(seconds=alternate_kwargs["duration"]),
+                    })
                     alternate = AssetAlternate(created_by=created_by, asset=asset, **alternate_kwargs)
                     alternate.clean()
                     alternate.save(dont_overwrite_original_filename=True)

@@ -59,14 +59,11 @@ if [ $# = 0 ]; then
         fi
 
     elif [ "$__RUN_API" ]; then
-        CMD="uvicorn --host 0.0.0.0 --port 8000 --workers 1 --forwarded-allow-ips '*' --proxy-headers"
-        if [ "$DEBUG" -a "$DEBUG" != '0' ]; then
-            CMD="$CMD --reload"
-        else
+        if [ -z "$DEBUG" -o "$DEBUG" = '0' ]; then
             echo 'Delaying api startup for 10 seconds...'
             sleep 10
         fi
-        exec $CMD ws_api:app
+        exec python api
     else
         if [ "$DEBUG" -a "$DEBUG" != '0' ]; then
             exec ./manage.py runserver

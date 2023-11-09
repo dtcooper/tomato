@@ -1,8 +1,21 @@
+import pgtrigger
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
 from dirtyfields import DirtyFieldsMixin
+
+from .base import NotifyTrigger
+
+
+class UserNotifyTrigger(NotifyTrigger):
+    level = pgtrigger.Row
+    operation = pgtrigger.Delete | pgtrigger.Update
+    extra_json = """
+        'user_id', COALESCE(NEW.id, OLD.id),
+        'password_change', NEW.password != OLD.password
+    """
 
 
 class User(DirtyFieldsMixin, AbstractUser):
@@ -26,6 +39,7 @@ class User(DirtyFieldsMixin, AbstractUser):
 
     class Meta:
         db_table = "users"
+        triggers = [UserNotifyTrigger()]
 
     def __init__(self, *args, **kwargs):
         for field in self.REMOVED_FIELDS:

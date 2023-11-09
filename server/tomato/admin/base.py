@@ -1,6 +1,4 @@
 from django.contrib import admin, messages
-from django.contrib.admin import options
-from django.db import models
 from django.db.models.functions import Coalesce
 from django.template.defaultfilters import pluralize
 from django.templatetags.static import static
@@ -9,10 +7,7 @@ from django.utils.formats import date_format as django_date_format
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 
-from django_flatpickr.widgets import DateTimePickerInput
-
 from ..models import Asset, Stopset
-from ..utils import mark_models_dirty
 
 
 YES_ICON = static("admin/img/icon-yes.svg")
@@ -68,14 +63,12 @@ class AiringEnabledMixin:
         num = queryset.update(enabled=True)
         if num:
             self.message_user(request, f"Enabled {num} {self.model._meta.verbose_name}(s).", messages.SUCCESS)
-            mark_models_dirty(request)
 
     @admin.action(description="Disable selected %(verbose_name_plural)s", permissions=("add", "change", "delete"))
     def disable(self, request, queryset):
         num = queryset.update(enabled=False)
         if num:
             self.message_user(request, f"Disabled {num} {self.model._meta.verbose_name}(s).", messages.SUCCESS)
-            mark_models_dirty(request)
 
 
 class AiringMixin(AiringEnabledMixin):
@@ -146,19 +139,9 @@ class TomatoModelAdminBase(ListPrefetchRelatedMixin, SaveCreatedByMixin, admin.M
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
-        mark_models_dirty(request)
 
     def delete_model(self, request, obj):
         super().delete_model(request, obj)
-        mark_models_dirty(request)
 
     def delete_queryset(self, request, queryset):
         super().delete_queryset(request, queryset)
-        mark_models_dirty(request)
-
-
-options.FORMFIELD_FOR_DBFIELD_DEFAULTS.update(
-    {
-        models.DateTimeField: {"widget": DateTimePickerInput(attrs={"class": "admin-flatpickr-datetime"})},
-    }
-)

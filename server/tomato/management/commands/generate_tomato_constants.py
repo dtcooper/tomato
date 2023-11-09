@@ -21,16 +21,14 @@ class Command(BaseCommand):
         if options["bump_protocol_version"]:
             constants["protocol_version"] += 1
 
-        constants.update(
-            {
-                "client_log_entry_types": sorted(ClientLogEntry.Type.values),
-                "settings_descriptions": {
-                    key: strip_tags(value[1].replace("<br>", " "))
-                    for key, value in settings.CONSTANCE_CONFIG.items()
-                    if key not in settings.CONSTANCE_SERVER_ONLY_SETTINGS
-                },
-            }
-        )
+        constants.update({
+            "client_log_entry_types": sorted(ClientLogEntry.Type.values),
+            "settings_descriptions": {
+                key: strip_tags(value[1].replace("<br>", " "))
+                for key, value in settings.CONSTANCE_CONFIG.items()
+                if key not in settings.CONSTANCE_SERVER_ONLY_SETTINGS
+            },
+        })
 
         with open(self.CONSTANTS_FILE_PATH, "w") as file:
             json.dump(constants, file, indent=2, sort_keys=True)

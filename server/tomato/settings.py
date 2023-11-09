@@ -71,41 +71,34 @@ INSTALLED_APPS = [
     # Third-party
     "constance",
     "django_file_form",
-    "django_flatpickr",
     "huey.contrib.djhuey",
+    "pgtrigger",
     "user_messages",
 ]
 if DEBUG:
-    INSTALLED_APPS.extend(
-        [
-            "debug_toolbar",
-            "django_extensions",
-        ]
-    )
-INSTALLED_APPS.extend(
-    [
-        # Local
-        "tomato",
-    ]
-)
+    INSTALLED_APPS.extend([
+        "debug_toolbar",
+        "django_extensions",
+    ])
+INSTALLED_APPS.extend([
+    # Local
+    "tomato",
+])
 
 AUTH_USER_MODEL = "tomato.User"
 
 MIDDLEWARE = []
 if DEBUG:
     MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
-MIDDLEWARE.extend(
-    [
-        "django.middleware.security.SecurityMiddleware",
-        "django.contrib.sessions.middleware.SessionMiddleware",
-        "django.middleware.common.CommonMiddleware",
-        "django.middleware.csrf.CsrfViewMiddleware",
-        "django.contrib.auth.middleware.AuthenticationMiddleware",
-        "django.contrib.messages.middleware.MessageMiddleware",
-        "django.middleware.clickjacking.XFrameOptionsMiddleware",
-        "tomato.middleware.DirtyModelsToRedisMiddleware",
-    ]
-)
+MIDDLEWARE.extend([
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+])
 
 ROOT_URLCONF = "tomato.urls"
 

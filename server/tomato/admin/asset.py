@@ -17,7 +17,6 @@ from django_file_form.model_admin import FileFormAdminMixin
 
 from ..models import Asset, AssetAlternate, Rotator
 from ..tasks import bulk_process_assets, process_asset
-from ..utils import mark_models_dirty
 from .base import NO_ICON, YES_ICON, AiringFilter, AiringMixin, NoNullRelatedOnlyFieldFilter, TomatoModelAdminBase
 
 
@@ -289,7 +288,6 @@ class AssetAdmin(AiringMixin, AssetAdminBase):
             self.message_user(
                 request, f"Added {len(queryset)} audio assets to rotator {rotator.name}.", messages.SUCCESS
             )
-            mark_models_dirty(request)
         else:
             self.message_user(request, "You must select a rotator to add audio assets to.", messages.WARNING)
 
@@ -303,7 +301,6 @@ class AssetAdmin(AiringMixin, AssetAdminBase):
             self.message_user(
                 request, f"Removed {len(queryset)} audio assets from rotator {rotator.name}.", messages.SUCCESS
             )
-            mark_models_dirty(request)
         else:
             self.message_user(request, "You must select a rotator to remove audio assets from.", messages.WARNING)
 
@@ -339,7 +336,6 @@ class AssetAdmin(AiringMixin, AssetAdminBase):
                     asset.save()
                     if rotators:
                         asset.rotators.add(*rotators)
-                mark_models_dirty(request)
                 bulk_process_assets(assets, user=request.user)
 
                 form.delete_temporary_files()

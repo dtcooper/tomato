@@ -20,8 +20,8 @@ class ClientLogEntryAdmin(ListPrefetchRelatedMixin, admin.ModelAdmin):
     actions = ("csv",)
     date_hierarchy = "created_at"
     empty_value_display = mark_safe("<em>Unknown / deleted</em>")
-    fields = ("id", "created_at_display", "category", "type", "created_by", "description_display")
-    list_display = ("created_at_display", "category", "type", "created_by", "description_display")
+    fields = ("id", "created_at_display", "category", "type", "created_by", "ip_address", "description_display")
+    list_display = ("created_at_display", "category", "type", "created_by", "ip_address", "description_display")
     list_filter = ("created_by", "type")
     list_max_show_all = 2500
     list_per_page = 250

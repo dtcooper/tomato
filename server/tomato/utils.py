@@ -1,9 +1,10 @@
-import datetime
 import json
 import os
 from pathlib import Path
 
 from huey import PriorityRedisHuey
+
+from django.core.serializers.json import DjangoJSONEncoder
 
 from django_redis import get_redis_connection
 
@@ -24,20 +25,13 @@ def once_at_startup(crontab):
     return startup_crontab
 
 
-def send_redis_message(message_type, data):
+def django_json_dumps(obj):
+    return json.dumps(obj, separators=(",", ":"), cls=DjangoJSONEncoder)
+
+
+def send_redis_message(message_type, data=None):
     conn = get_redis_connection()
-    conn.publish(REDIS_PUBSUB_KEY, json.dumps({"type": message_type, "data": data}))
-
-
-def mark_models_dirty(request=None):
-    if request is not None:
-        request._models_dirty = True
-    else:
-        send_redis_message("update", datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"))
-
-
-def mark_logged_out_users(user_ids):
-    send_redis_message("logout", user_ids)
+    conn.publish(REDIS_PUBSUB_KEY, django_json_dumps({"type": message_type, "data": data}))
 
 
 class DjangoPriorityRedisHuey(PriorityRedisHuey):
