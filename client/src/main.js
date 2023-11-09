@@ -206,7 +206,7 @@ if (squirrelCheck || !singleInstanceLock) {
         const choice = dialog.showMessageBoxSync(win, {
           type: "question",
           normalizeAccessKeys: false,
-          buttons: ["Quit", "Cancel & Keeping Running"],
+          buttons: ["Quit", "Cancel and keeping running"],
           defaultId: 1,
           cancelId: 1,
           title: "Quit Tomato",
