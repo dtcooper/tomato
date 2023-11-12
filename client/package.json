@@ -6,6 +6,7 @@
   "main": "dist/main.js",
   "scripts": {
     "build": "node scripts/build.js",
+    "distclean": "git clean -fxd .",
     "clean": "rm -rf dist out",
     "dev": "NODE_ENV=development npm-run-all clean -p -r build dev:electron",
     "prod": "NODE_ENV=production npm-run-all clean build dev:electron:run",
