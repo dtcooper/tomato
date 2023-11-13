@@ -58,7 +58,7 @@
     "material-ui-colors": "^1.0.0",
     "md5-file": "^5.0.0",
     "npm-run-all": "^4.1.5",
-    "prettier": "^3.0.3",
+    "prettier": "^3.1.0",
     "prettier-plugin-organize-imports": "^3.2.4",
     "prettier-plugin-svelte": "^3.1.0",
     "prettier-plugin-tailwindcss": "^0.5.7",
