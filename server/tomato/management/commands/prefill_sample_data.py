@@ -12,6 +12,10 @@ from tomato.models import REQUIRED_EMPTY_FOR_IMPORT_MODEL_CLASSES, User, import_
 SAMPLE_DATA_URL = "https://tomato.nyc3.digitaloceanspaces.com/bmir-sample-data-20231023-185614.zip"
 
 
+def show_download_progress(block_num, block_size, total_size):
+    print(f"Retrieved {block_num * block_size / total_size * 100:.01f}%", end="\r", flush=True)
+
+
 class Command(BaseCommand):
     help = "Setup project with sample assets"
 
@@ -71,7 +75,8 @@ class Command(BaseCommand):
             self.stdout.write(f"Downloading {SAMPLE_DATA_URL}...")
             with tempfile.TemporaryDirectory() as temp_dir:
                 zip_filename = Path(temp_dir) / "sample-data.zip"
-                urlretrieve(SAMPLE_DATA_URL, zip_filename)
+                urlretrieve(SAMPLE_DATA_URL, zip_filename, reporthook=show_download_progress)
+                print("\nDownloaded!")
                 stats = download(zip_filename)
 
         self.stdout.write(f"Successfully imported {', '.join(f'{num} {entity}' for entity, num in stats.items())}!")
