@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import math
 
 import psycopg
 import redis.asyncio as redis
@@ -17,6 +18,8 @@ from .utils import task
 
 
 logger = logging.getLogger(__name__)
+DB_QUEUE_DEDUPE_TIMEOUT = 0.2
+DB_QUEUE_NUM_DEDUPE_TIMEOUTS_WITH_NO_MESSAGES_BEFORE_REFRESH = math.floor(90 / DB_QUEUE_DEDUPE_TIMEOUT)  # 90 seconds
 
 
 class ServerMessages(MessagesBase):
@@ -90,20 +93,27 @@ class ServerMessages(MessagesBase):
                 redis_message = await pubsub.get_message(ignore_subscribe_messages=True)
                 if redis_message:
                     message = json.loads(redis_message["data"])
-                    await self.process(message_type=message["type"], message=message["data"])
+                    await self.process(message["type"], message["data"])
 
     @task
     async def consume_db_notifications_debouncer(self):
         messages = []
+        num_timeouts_with_no_messages = 0
 
         while True:
             try:
-                messages.append(await asyncio.wait_for(self.pending_db_changes.get(), timeout=0.2))
+                messages.append(await asyncio.wait_for(self.pending_db_changes.get(), timeout=DB_QUEUE_DEDUPE_TIMEOUT))
             except asyncio.TimeoutError:
                 # When we have received at least one db change for the timeout, then process them (debounce)
                 if messages:
-                    await self.process(message_type=self.Types.DB_CHANGES, message=messages)
+                    await self.process(self.Types.DB_CHANGES, messages)
                     messages = []
+                    num_timeouts_with_no_messages = 0
+                elif num_timeouts_with_no_messages >= DB_QUEUE_NUM_DEDUPE_TIMEOUTS_WITH_NO_MESSAGES_BEFORE_REFRESH:
+                    await self.process(self.Types.DB_CHANGES, [{"table": "forced/update", "op": "update"}])
+                    num_timeouts_with_no_messages = 0
+                else:
+                    num_timeouts_with_no_messages += 1
 
     @task
     async def consume_db_notifications(self):
