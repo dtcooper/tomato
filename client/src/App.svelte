@@ -31,15 +31,6 @@
     .btn {
       @apply no-animation;
     }
-    .btn-warning:hover,
-    .btn-info:hover,
-    .btn-success:hover,
-    .btn-error:hover {
-      filter: brightness(110%);
-    }
-    .btn:active {
-      filter: brightness(97%);
-    }
   }
 
   :root {
@@ -50,10 +41,6 @@
     @apply h-16 w-16;
   }
 
-  :root {
-    --btn-text-case: normal;
-  }
-
   :global(.tomato-pulse) {
     animation: tomato-pulse 1.5s infinite;
     --pulse-color: var(--su);
@@ -62,15 +49,15 @@
 
   @keyframes tomato-pulse {
     0% {
-      box-shadow: 0 0 0 0 hsl(var(--pulse-color) / 0.85);
+      box-shadow: 0 0 0 0 oklch(var(--pulse-color) / 0.85);
     }
 
     85% {
-      box-shadow: 0 0 0 var(--pulse-size) hsl(var(--pulse-color) / 0);
+      box-shadow: 0 0 0 var(--pulse-size) oklch(var(--pulse-color) / 0);
     }
 
     100% {
-      box-shadow: 0 0 0 0 hsl(var(--pulse-color) / 0);
+      box-shadow: 0 0 0 0 oklch(var(--pulse-color) / 0);
     }
   }
 
@@ -84,7 +71,7 @@
       background-color: unset;
     }
     50% {
-      background-color: hsl(var(--flash-bg-color));
+      background-color: oklch(var(--flash-bg-color));
     }
     100% {
       background-color: unset;

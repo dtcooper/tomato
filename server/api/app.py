@@ -54,9 +54,7 @@ async def api(websocket: WebSocket):
         await websocket.close()
 
     except WebSocketDisconnect:
-        print("DISCONNECT....")
-        print(users.connections)
-        print(admins.connections)
+        pass
 
     else:
         await websocket.close()
