@@ -34,6 +34,10 @@ def send_redis_message(message_type, data=None):
     conn.publish(REDIS_PUBSUB_KEY, django_json_dumps({"type": message_type, "data": data}))
 
 
+def send_config_update_redis_message():
+    send_redis_message("db-change", {"table": "redis/config", "op": "update"})
+
+
 class DjangoPriorityRedisHuey(PriorityRedisHuey):
     def __init__(self, *args, **kwargs):
         connection = get_redis_connection()

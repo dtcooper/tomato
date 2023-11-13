@@ -69,7 +69,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Third-party
-    "constance",
     "django_file_form",
     "huey.contrib.djhuey",
     "pgtrigger",
@@ -83,6 +82,8 @@ if DEBUG:
 INSTALLED_APPS.extend([
     # Local
     "tomato",
+    # Third-party, constance needs to come after tomato, since we override a management command
+    "constance",
 ])
 
 AUTH_USER_MODEL = "tomato.User"
