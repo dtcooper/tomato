@@ -51,7 +51,7 @@ services:
 
   db:
     restart: always
-    image: postgres:15.4-alpine
+    image: postgres:15.5-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
