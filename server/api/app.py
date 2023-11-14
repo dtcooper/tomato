@@ -19,7 +19,7 @@ from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 django.setup()
 
 from .base import SERVER_STATUS
-from .connections import admins, users
+from .connections import CONNECTION_MODES_TO_CONNECTIONS
 from .schemas import greeting_schema
 from .server_messages import server_messages
 from .utils import RUNNING_TASKS, TomatoAuthError, init_logger
@@ -39,9 +39,11 @@ async def api(websocket: WebSocket):
         try:
             greeting = greeting_schema.validate(await websocket.receive_json())
         except SchemaError:
+            if settings.DEBUG:
+                logger.exception("Schema validation error")
             raise TomatoAuthError("Invalid handshake. Are you sure you're running Tomato?")
 
-        connections = admins if greeting["admin_mode"] else users
+        connections = CONNECTION_MODES_TO_CONNECTIONS[greeting["mode"]]
         await connections.authorize_and_process_new_websocket(greeting, websocket)
 
     except TomatoAuthError as auth_error:
@@ -67,7 +69,6 @@ async def status(request: Request):
 async def startup():
     init_logger()
 
-    server_messages.consume_redis_notifications()
     server_messages.consume_db_notifications()
     server_messages.consume_db_notifications_debouncer()
 

@@ -18,6 +18,7 @@ class OutgoingUserMessageTypes(enum.StrEnum):
     DATA = "data"
     ACKNOWLEDGE_LOG = "ack-log"
     RELOAD_PLAYLIST = "reload-playlist"
+    BROADCAST_NOTICE = "broadcast"
 
 
 class AdminMessageTypes(enum.StrEnum):
@@ -28,21 +29,36 @@ class OutgoingAdminMessageTypes(enum.StrEnum):
     pass
 
 
+class DjangoServerMessageTypes(enum.StrEnum):
+    BROADCAST_NOTICE = "broadcast"
+
+
+class OutgoingDjangoServerMessageTypes(enum.StrEnum):
+    RESPONSE = "response"
+
+
 greeting_schema = Schema(
     Or(
         {
-            "username": str,
-            "password": str,
             "tomato": "radio-automation",
             "protocol_version": Use(int),
-            Optional("admin_mode", default=False): Use(bool),
+            "username": str,
+            "password": str,
+            Optional("mode", default="user"): Or("user", "admin"),
             Optional("method", default="text"): "text",
         },
         {
             "tomato": "radio-automation",
             "protocol_version": Use(int),
-            Optional("admin_mode", default=False): Use(bool),
+            Optional("mode", default="user"): Or("user", "admin"),
             "method": "session",
+        },
+        {
+            "tomato": "radio-automation",
+            "protocol_version": Use(int),
+            "secret_key": str,
+            "mode": "server",
+            "method": "secret-key",
         },
     )
 )

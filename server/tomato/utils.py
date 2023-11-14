@@ -3,12 +3,14 @@ import os
 from pathlib import Path
 
 from huey import PriorityRedisHuey
+import websocket
 
+from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 
 from django_redis import get_redis_connection
 
-from .constants import REDIS_PUBSUB_KEY
+from .constants import PROTOCOL_VERSION
 
 
 def once_at_startup(crontab):
@@ -29,13 +31,23 @@ def django_json_dumps(obj):
     return json.dumps(obj, separators=(",", ":"), cls=DjangoJSONEncoder)
 
 
-def send_redis_message(message_type, data=None):
-    conn = get_redis_connection()
-    conn.publish(REDIS_PUBSUB_KEY, django_json_dumps({"type": message_type, "data": data}))
+def send_server_message(message_type, message=None):
+    ws = websocket.create_connection("ws://api:8000/api", timeout=5)
+    ws.send(
+        json.dumps({
+            "tomato": "radio-automation",
+            "protocol_version": PROTOCOL_VERSION,
+            "mode": "server",
+            "method": "secret-key",
+            "secret_key": settings.SECRET_KEY,
+        })
+    )
+    auth_response = json.loads(ws.recv())
+    if not auth_response["success"]:
+        raise Exception(f'Websocket error: {auth_response["error"]}')
 
-
-def send_config_update_redis_message():
-    send_redis_message("db-change", {"table": "redis/config", "op": "update"})
+    ws.send(json.dumps({"type": message_type, "data": message}))
+    return json.loads(ws.recv())
 
 
 class DjangoPriorityRedisHuey(PriorityRedisHuey):

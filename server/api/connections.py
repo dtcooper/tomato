@@ -4,16 +4,32 @@ from tomato.constants import CLIENT_LOG_ENTRY_TYPES
 from tomato.models import ClientLogEntry, serialize_for_api
 
 from .base import Connection, ConnectionsBase
-from .schemas import AdminMessageTypes, OutgoingUserMessageTypes, UserMessageTypes
+from .schemas import (
+    AdminMessageTypes,
+    DjangoServerMessageTypes,
+    OutgoingDjangoServerMessageTypes,
+    OutgoingUserMessageTypes,
+    UserMessageTypes,
+)
 from .utils import retry_on_failure
 
 
 logger = logging.getLogger(__name__)
 
 
+class DjangoServerConnections(ConnectionsBase):
+    Types = DjangoServerMessageTypes
+    mode = "server"
+
+    async def process_broadcast(self, connection: Connection, data):
+        assert isinstance(data, str), "Message should be a string"
+        await users.broadcast(OutgoingUserMessageTypes.BROADCAST_NOTICE, data)
+        await connection.message(OutgoingDjangoServerMessageTypes.RESPONSE, {"success": True, "message": data})
+
+
 class AdminConnections(ConnectionsBase):
     Types = AdminMessageTypes
-    is_admin = True
+    mode = "admin"
 
     async def hello(self, connection: Connection):
         await connection.send({"test": "You are an admin!"})
@@ -21,7 +37,7 @@ class AdminConnections(ConnectionsBase):
 
 class UserConnections(ConnectionsBase):
     Types = UserMessageTypes
-    is_admin = False
+    mode = "user"
 
     def __init__(self):
         self._last_serialized_data = None
@@ -64,3 +80,11 @@ class UserConnections(ConnectionsBase):
 
 admins: AdminConnections = AdminConnections()
 users: UserConnections = UserConnections()
+django_servers: DjangoServerConnections = DjangoServerConnections()
+
+
+CONNECTION_MODES_TO_CONNECTIONS = {
+    admins.mode: admins,
+    users.mode: users,
+    django_servers.mode: django_servers,
+}
