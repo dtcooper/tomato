@@ -110,7 +110,7 @@ class ServerMessages(MessagesBase):
                     messages = []
                     num_timeouts_with_no_messages = 0
                 elif num_timeouts_with_no_messages >= DB_QUEUE_NUM_DEDUPE_TIMEOUTS_WITH_NO_MESSAGES_BEFORE_REFRESH:
-                    await self.process(self.Types.DB_CHANGES, [{"table": "forced/update", "op": "update"}])
+                    await self.process(self.Types.DB_CHANGES, [{"table": "periodic/update", "op": "update"}])
                     num_timeouts_with_no_messages = 0
                 else:
                     num_timeouts_with_no_messages += 1

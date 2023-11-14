@@ -55,7 +55,7 @@
                 <div
                   class="flex min-h-[5rem] items-center gap-3 overflow-hidden px-3 py-1"
                   style={asset.playable && !asset.error && !asset.finished
-                    ? `background: linear-gradient(to right, color-mix(in oklab, oklch(var(--s)) 80%, black) 0%, color-mix(in oklab, oklch(var(--s)) 80%, black) ${asset.percentDone}%, oklch(var(--s)) ${asset.percentDone}%, oklch(var(--s)) 100%);`
+                    ? `background: linear-gradient(to right, color-mix(in oklab, oklch(var(--s)) 90%, black) 0%, color-mix(in oklab, oklch(var(--s)) 90%, black) ${asset.percentDone}%, oklch(var(--s)) ${asset.percentDone}%, oklch(var(--s)) 100%);`
                     : ""}
                   class:text-secondary-content={asset.playable && !asset.error && !asset.finished}
                   class:text-error-content={asset.error && !asset.finished}
@@ -172,7 +172,7 @@
           <div class="border-l-4 pl-2" class:border-base-content={!isFirstItem} class:border-success={isFirstItem}>
             <div
               class="flex min-h-[5rem] items-center gap-3 overflow-hidden px-3 py-1 text-neutral-content"
-              style:background-image={`linear-gradient(to right, color-mix(in oklab, oklch(var(--n)) 80%, black) 0%, color-mix(in oklab, oklch(var(--n)) 80%, black) ${item.percentDone}%, oklch(var(--n)) ${item.percentDone}%, oklch(var(--n)) 100%)`}
+              style:background-image={`linear-gradient(to right, color-mix(in oklab, oklch(var(--n)) 90%, black) 0%, color-mix(in oklab, oklch(var(--n)) 90%, black) ${item.percentDone}%, oklch(var(--n)) ${item.percentDone}%, oklch(var(--n)) 100%)`}
             >
               {#if $userConfig.uiMode >= 2}
                 <div class="flex items-center">
