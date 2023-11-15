@@ -247,11 +247,9 @@ def validate_reset_times(values):
                 raise ValidationError(f'Error parsing time value: "{value}"')
 
 
-MIGRATION_MODULES = {"constance": None}  # Ignore constance models
-CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
+CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 CONSTANCE_SUPERUSER_ONLY = False
 CONSTANCE_IGNORE_ADMIN_VERSION_CHECK = True
-CONSTANCE_REDIS_CONNECTION = "redis://redis"
 CONSTANCE_ADDITIONAL_FIELDS = {
     "ui_modes": (
         "django.forms.MultipleChoiceField",
@@ -445,6 +443,7 @@ CONSTANCE_CONFIG = {
         "reset_times",
     ),
     "WARN_ON_EMPTY_ROTATORS": (True, "Warn when a rotator is disabled or has no eligible assets to choose from."),
+    "RELOAD_PLAYLIST_AFTER_DATA_CHANGES": (False, "Reload all connected client playlists when a data change occurs."),
 }
 
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
@@ -464,6 +463,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
                 "EXTRACT_METADATA_FROM_FILE",
                 "PREVENT_DUPLICATE_ASSETS",
                 "TRIM_SILENCE",
+                "RELOAD_PLAYLIST_AFTER_DATA_CHANGES",
             ),
         ),
         (

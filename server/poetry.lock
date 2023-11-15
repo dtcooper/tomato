@@ -208,7 +208,6 @@ files = [
 
 [package.dependencies]
 django-picklefield = "*"
-redis = {version = "*", optional = true, markers = "extra == \"redis\""}
 
 [package.extras]
 redis = ["redis"]
@@ -1395,4 +1394,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "4382a2229bd2a15d3ec3e2cf26236690ac4ef1429510e791896a896a16c79f91"
+content-hash = "ff281f88245c2b58e10da083e83af9297a42b253f70f947893060037b9154593"

@@ -39,6 +39,8 @@ async def api(websocket: WebSocket):
         try:
             greeting = greeting_schema.validate(await websocket.receive_json())
         except SchemaError:
+            if settings.DEBUG:
+                logger.exception("Schema validation error")
             raise TomatoAuthError("Invalid handshake. Are you sure you're running Tomato?")
 
         connections = admins if greeting["admin_mode"] else users
@@ -67,6 +69,7 @@ async def status(request: Request):
 async def startup():
     init_logger()
 
+    await users.init_last_serialized_data()
     server_messages.consume_redis_notifications()
     server_messages.consume_db_notifications()
     server_messages.consume_db_notifications_debouncer()

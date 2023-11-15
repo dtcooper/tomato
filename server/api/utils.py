@@ -21,17 +21,22 @@ class TomatoAuthError(Exception):
 
 async def retry_on_failure(coro, *args, **kwargs):
     running = True
+    try_num = 1
     while running:
         try:
+            logger.debug(f"Running try #{try_num + 1} of {coro.__name__}()")
             value = await coro(*args, **kwargs)
-            return value
         except asyncio.CancelledError:
             logger.info(f"Cancelled task {coro.__name__}()")
             running = False
         except Exception:
-            sleep_time = random.uniform(0.75, 1.25)
-            logger.exception(f"An error occurred, retrying in {round(sleep_time, 3)} seconds")
+            sleep_time = random.uniform(0.75, 1.5)
+            logger.exception(f"Error in try #{try_num} of {coro.__name__}(), running again in {round(sleep_time, 3)}s")
+            try_num += 1
             await asyncio.sleep(sleep_time)
+        else:
+            logger.debug(f"{coro.__name__}() cleanly exited. Exiting retry loop.")
+            return value
 
 
 RUNNING_TASKS = []

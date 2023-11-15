@@ -8,7 +8,7 @@ from .import_export import (
     import_data_from_zip,
 )
 from .rotator import Rotator
-from .serialize import serialize_for_api, serialize_for_api_sync
+from .serialize import get_config_async, serialize_for_api, serialize_for_api_sync
 from .stopset import Stopset, StopsetRotator
 from .user import User
 
@@ -18,6 +18,7 @@ __all__ = (
     AssetAlternate,
     ClientLogEntry,
     export_data_as_zip,
+    get_config_async,
     ImportTomatoDataException,
     import_data_from_zip,
     NAME_MAX_LENGTH,

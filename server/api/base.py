@@ -29,9 +29,6 @@ class Connection:
         self._ws: WebSocket = websocket
         self.user: User = user
 
-    def set_user(self, user: User):
-        self.user = user
-
     @property
     def addr(self):
         return self._ws.client.host

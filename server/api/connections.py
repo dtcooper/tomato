@@ -1,7 +1,7 @@
 import logging
 
 from tomato.constants import CLIENT_LOG_ENTRY_TYPES
-from tomato.models import ClientLogEntry, serialize_for_api
+from tomato.models import ClientLogEntry, get_config_async, serialize_for_api
 
 from .base import Connection, ConnectionsBase
 from .schemas import AdminMessageTypes, OutgoingUserMessageTypes, UserMessageTypes
@@ -24,22 +24,23 @@ class UserConnections(ConnectionsBase):
     is_admin = False
 
     def __init__(self):
-        self._last_serialized_data = None
+        self.last_serialized_data = None
         super().__init__()
 
     async def hello(self, connection: Connection):
-        await connection.message(OutgoingUserMessageTypes.DATA, await self.get_last_serialized_data())
+        await connection.message(OutgoingUserMessageTypes.DATA, self.last_serialized_data)
 
-    async def get_last_serialized_data(self):
-        if self._last_serialized_data is None:
-            self._last_serialized_data = await retry_on_failure(serialize_for_api)
-        return self._last_serialized_data
+    async def init_last_serialized_data(self):
+        logger.info("Initializing serialized data for clients")
+        self.last_serialized_data = await retry_on_failure(serialize_for_api)
 
     async def broadcast_data_change(self, force=False):
         serialized_data = await serialize_for_api()
-        if force or serialized_data != self._last_serialized_data:
+        if force or serialized_data != self.last_serialized_data:
             await self.broadcast(OutgoingUserMessageTypes.DATA, serialized_data)
-            self._last_serialized_data = serialized_data
+            if await get_config_async("RELOAD_PLAYLIST_AFTER_DATA_CHANGES"):
+                await self.broadcast(OutgoingUserMessageTypes.RELOAD_PLAYLIST)
+            self.last_serialized_data = serialized_data
         else:
             logger.debug("No change to DB data. Not broadcasting.")
 
