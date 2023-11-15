@@ -27,8 +27,10 @@ SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 class Connection:
     def __init__(self, websocket: WebSocket, user: User):
         self._ws: WebSocket = websocket
-        if user is not None:
-            self.user: User = user
+        self.user: User = user
+
+    def set_user(self, user: User):
+        self.user = user
 
     @property
     def addr(self):
@@ -77,28 +79,18 @@ class MessagesBase:
 class ConnectionsBase(MessagesBase):
     def __init__(self):
         self.connections: WeakSet[Connection] = WeakSet()
-        if not self.is_server:
-            self.user_ids_to_connections: defaultdict[int, WeakSet[Connection]] = defaultdict(WeakSet)
+        self.user_ids_to_connections: defaultdict[int, WeakSet[Connection]] = defaultdict(WeakSet)
         super().__init__()
 
     @property
-    def mode(self):
+    def is_admin(self):
         raise NotImplementedError()
 
-    @property
-    def is_user(self):
-        return self.mode == "user"
-
-    @property
-    def is_server(self):
-        return self.mode == "server"
-
-    @property
-    def is_admin(self):
-        return self.mode == "admin"
-
     async def hello(self, connection: Connection):
-        pass
+        raise NotImplementedError()
+
+    async def authorize_extra(self, user: User) -> bool:
+        raise NotImplementedError()
 
     def cleanup_user_ids_to_connections(self):
         for user_id in list(self.user_ids_to_connections.keys()):
@@ -111,13 +103,6 @@ class ConnectionsBase(MessagesBase):
                 ("an older", "downgrade") if greeting["protocol_version"] > PROTOCOL_VERSION else ("a newer", "upgrade")
             )
             raise TomatoAuthError(f"Server running {what} protocol than you. You'll need to {action} Tomato.")
-
-        if self.is_server and greeting["method"] == "secret-key":
-            if constant_time_compare(greeting["secret_key"], settings.SECRET_KEY):
-                logger.info(f"Authorized {self.mode} session via secret key")
-                return Connection(websocket, user=None)
-            else:
-                raise TomatoAuthError("Invalid secret key!")
 
         is_session = greeting["method"] == "session"
 
@@ -134,14 +119,14 @@ class ConnectionsBase(MessagesBase):
         except User.DoesNotExist:
             pass
         else:
-            if user.is_active and (self.is_user or user.is_superuser):
+            if user.is_active and (not self.is_admin or user.is_superuser):
                 if is_session:
                     session_hash = store.get(HASH_SESSION_KEY)
                     if session_hash and constant_time_compare(session_hash, user.get_session_auth_hash()):
-                        logger.info(f"Authorized {self.mode} session for {user}")
+                        logger.info(f"Authorized admin session for {user}")
                         return Connection(websocket, user)
                 elif await sync_to_async(user.check_password)(greeting["password"]):
-                    logger.info(f"Authorized {self.mode} connection for {user}")
+                    logger.info(f"Authorized user connection for {user}")
                     return Connection(websocket, user)
         raise TomatoAuthError("Invalid username or password.", should_sleep=True, field="userpass")
 
@@ -152,13 +137,13 @@ class ConnectionsBase(MessagesBase):
                     await connection.disconnect()
                 except Exception:
                     logger.exception(f"Error disconnecting websocket {user_id=}")
-        logger.debug(f"Disconnected {user_id=}, {self.mode=}")
+        logger.debug(f"Disconnected {user_id=}, {self.is_admin=}")
 
     async def refresh_user(self, user: User):
         if user.id in self.user_ids_to_connections:
             for connection in self.user_ids_to_connections[user.id]:
                 connection.user = user
-        logger.debug(f"Refreshed {user}, {self.mode=}")
+        logger.debug(f"Refreshed {user}, {self.is_admin=}")
 
     async def broadcast(self, message_type, message=None):
         raw_message = django_json_dumps({"type": message_type, "data": message})  # No sense serializing more than once
@@ -168,7 +153,7 @@ class ConnectionsBase(MessagesBase):
                 await connection.send_raw(raw_message)
             except Exception:
                 logger.exception("Error sending to websocket")
-        logger.info(f"Broadcasted {message_type} message to {count} {self.mode}s")
+        logger.info(f"Broadcasted {message_type} message to {count} {'admins' if self.is_admin else 'users'}")
 
     async def message(self, user_id: int, message_type, message=None):
         raw_message = django_json_dumps({"type": message_type, "data": message})  # No sense serializing more than once
@@ -183,17 +168,13 @@ class ConnectionsBase(MessagesBase):
     async def authorize_and_process_new_websocket(self, greeting: dict, websocket: WebSocket):
         connection: Connection = await self.authorize(greeting, websocket)
         await connection.send({
-            "success": True,
-            "mode": self.mode,
-            "user": None if self.is_server else connection.user.username,
-            **SERVER_STATUS,
+            "success": True, "admin_mode": self.is_admin, "user": connection.user.username, **SERVER_STATUS
         })
         await self.hello(connection)
         self.connections.add(connection)
-        if not self.is_server:
-            self.user_ids_to_connections[connection.user.id].add(connection)
-            self.cleanup_user_ids_to_connections()
+        self.user_ids_to_connections[connection.user.id].add(connection)
 
+        self.cleanup_user_ids_to_connections()
         await self.run_for_connection(connection)
 
     async def process(self, connection, message_type, message):

@@ -1,13 +1,12 @@
 import decimal
 import logging
 
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
 
 from django.conf import settings
 from django.db.models import Prefetch
 
 from constance import config as constance_config
-from constance.models import Constance
 
 from .asset import Asset, AssetAlternate
 from .rotator import Rotator
@@ -17,17 +16,12 @@ from .stopset import Stopset
 logger = logging.getLogger(__name__)
 
 
-async def get_constance_config():
-    config = {}
-
-    for key in dir(constance_config):
-        if key not in settings.CONSTANCE_SERVER_ONLY_SETTINGS:
-            try:
-                obj = await Constance.objects.aget(key=key)
-            except Constance.DoesNotExist:
-                config[key] = settings.CONSTANCE_CONFIG[key][0]
-            else:
-                config[key] = obj.value
+def get_constance_config():
+    config = {
+        key: getattr(constance_config, key)
+        for key in dir(constance_config)
+        if key not in settings.CONSTANCE_SERVER_ONLY_SETTINGS
+    }
 
     reset_times = []
     try:
@@ -68,7 +62,7 @@ async def serialize_for_api(skip_config=False):
         "stopsets": [s.serialize() async for s in stopsets],
     }
     if not skip_config:
-        data["config"] = await get_constance_config()
+        data["config"] = await sync_to_async(get_constance_config)()
     return data
 
 

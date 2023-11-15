@@ -247,9 +247,11 @@ def validate_reset_times(values):
                 raise ValidationError(f'Error parsing time value: "{value}"')
 
 
-CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
+MIGRATION_MODULES = {"constance": None}  # Ignore constance models
+CONSTANCE_BACKEND = "constance.backends.redisd.RedisBackend"
 CONSTANCE_SUPERUSER_ONLY = False
 CONSTANCE_IGNORE_ADMIN_VERSION_CHECK = True
+CONSTANCE_REDIS_CONNECTION = "redis://redis"
 CONSTANCE_ADDITIONAL_FIELDS = {
     "ui_modes": (
         "django.forms.MultipleChoiceField",
@@ -490,5 +492,4 @@ SHELL_PLUS_IMPORTS = [
     "from tomato.ffmpeg import ffmpeg_convert, ffprobe",
     "from tomato.models import export_data_as_zip, import_data_from_zip, serialize_for_api",
     "from tomato.tasks import bulk_process_assets, process_asset, cleanup",
-    "from tomato.utils import send_server_message",
 ]

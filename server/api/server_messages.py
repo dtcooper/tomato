@@ -4,10 +4,11 @@ import logging
 import math
 
 import psycopg
+import redis.asyncio as redis
 
 from django.conf import settings
 
-from tomato.constants import POSTGRES_CHANGES_CHANNEL
+from tomato.constants import POSTGRES_CHANGES_CHANNEL, REDIS_PUBSUB_KEY
 from tomato.models import User
 
 from .base import MessagesBase
@@ -79,6 +80,20 @@ class ServerMessages(MessagesBase):
             await users.broadcast(OutgoingUserMessageTypes.RELOAD_PLAYLIST)
         else:
             await users.message(user_id, OutgoingUserMessageTypes.RELOAD_PLAYLIST)
+
+    @task
+    async def consume_redis_notifications(self):
+        conn = redis.Redis(host="redis")
+
+        async with conn.pubsub() as pubsub:
+            await pubsub.subscribe(REDIS_PUBSUB_KEY)
+            logger.info(f"Subscribed to redis key {REDIS_PUBSUB_KEY!r}")
+
+            while True:
+                redis_message = await pubsub.get_message(ignore_subscribe_messages=True)
+                if redis_message:
+                    message = json.loads(redis_message["data"])
+                    await self.process(message["type"], message["data"])
 
     @task
     async def consume_db_notifications_debouncer(self):

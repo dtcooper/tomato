@@ -9,7 +9,7 @@ license = "MIT"
 python = "^3.11"
 django = "^4.2.7"
 django-admin-notice = "^2.1.0"
-django-constance = "^3.1.0"
+django-constance = {extras = ["redis"], version = "^3.1.0"}
 django-dirtyfields = "^1.9.2"
 django-environ = "^0.11.2"
 django-file-form = "^3.5.4"
@@ -25,7 +25,6 @@ schema = "^0.7.5"
 starlette = "^0.32.0.post1"
 uvicorn = {extras = ["standard"], version = "^0.24.0.post1"}
 wait-for-it = "^2.2.2"
-websocket-client = "^1.6.4"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.11.0"

@@ -10,7 +10,6 @@ from django.db.models.fields.files import FieldFile
 from django.utils import timezone
 from django.utils.html import format_html
 
-from constance.models import Constance
 from django_file_form.uploaded_file import UploadedTusFile
 
 from ..constants import HELP_DOCS_URL, POSTGRES_CHANGES_CHANNEL
@@ -172,9 +171,3 @@ class TomatoModelBase(models.Model):
             for field in self._meta.get_fields()
             if field.name not in self.SERIALIZE_FIELDS_TO_IGNORE and not field.is_relation
         }
-
-
-class ConstanceProxy(Constance):
-    class Meta:
-        proxy = True
-        triggers = [NotifyTrigger()]
