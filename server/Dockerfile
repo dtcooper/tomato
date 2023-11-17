@@ -29,7 +29,7 @@ RUN apt-get update \
         && echo '. /etc/bash_completion' >> /root/.bashrc \
     ; fi
 
-ARG POETRY_VERSION=1.7.0
+ARG POETRY_VERSION=1.7.1
 RUN curl -sSL https://install.python-poetry.org | python -
 ENV PATH="/root/.local/bin:${PATH}"
 # Add tomato to Python path permanently
