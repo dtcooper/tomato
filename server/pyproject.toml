@@ -19,7 +19,7 @@ django-redis = {extras = ["hiredis"], version = "^5.4.0"}
 django-user-messages = "^1.0.0"
 gunicorn = "^21.2.0"
 huey = "^2.5.0"
-psycopg = "^3.1.12"
+psycopg = "^3.1.13"
 python-dotenv = "^1.0.0"
 schema = "^0.7.5"
 starlette = "^0.32.0.post1"
