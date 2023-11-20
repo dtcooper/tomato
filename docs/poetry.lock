@@ -368,13 +368,13 @@ test = ["mkdocs-include-markdown-plugin", "mkdocs-macros-test", "mkdocs-material
 
 [[package]]
 name = "mkdocs-material"
-version = "9.4.9"
+version = "9.4.10"
 description = "Documentation that simply works"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "mkdocs_material-9.4.9-py3-none-any.whl", hash = "sha256:b93d6e916b93346d433bfb2a00148efed0b545aaf0092cef31c2da27ad4169e6"},
-    {file = "mkdocs_material-9.4.9.tar.gz", hash = "sha256:dd9ce8b48c5284578224d34992357d0b7bb86c35cb31d0f9fee0ad90c81a2a44"},
+    {file = "mkdocs_material-9.4.10-py3-none-any.whl", hash = "sha256:207c4ebc07faebb220437d2c626edb0c9760c82ccfc484500bd3eb30dfce988c"},
+    {file = "mkdocs_material-9.4.10.tar.gz", hash = "sha256:421adedaeaa461dcaf55b8d406673934ade3d4f05ed9819e4cc7b4ee1d646a62"},
 ]
 
 [package.dependencies]
@@ -469,13 +469,13 @@ test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=7.4)", "pytest-co
 
 [[package]]
 name = "pygments"
-version = "2.17.0"
+version = "2.17.1"
 description = "Pygments is a syntax highlighting package written in Python."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pygments-2.17.0-py3-none-any.whl", hash = "sha256:cd0c46944b2551af02ecc15961050182ea120d3895000e2676160820f3421527"},
-    {file = "pygments-2.17.0.tar.gz", hash = "sha256:edaa0fa2453d055d0ac94449d1f73ec7bc52c5e318204da1377c1392978c4a8d"},
+    {file = "pygments-2.17.1-py3-none-any.whl", hash = "sha256:1b37f1b1e1bff2af52ecaf28cc601e2ef7077000b227a0675da25aef85784bc4"},
+    {file = "pygments-2.17.1.tar.gz", hash = "sha256:e45a0e74bf9c530f564ca81b8952343be986a29f6afe7f5ad95c5f06b7bdf5e8"},
 ]
 
 [package.extras]
@@ -819,4 +819,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "7231042455ce3495090ba896ec0c93b27a4697fc34b55e1fe7263c0b0205b8f6"
+content-hash = "094e75d4164568c0a3bf71dd9b18fb67419d42d0028d503b13b8c0004b5fc780"
