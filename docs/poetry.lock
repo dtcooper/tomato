@@ -171,13 +171,13 @@ dev = ["flake8", "markdown", "twine", "wheel"]
 
 [[package]]
 name = "idna"
-version = "3.4"
+version = "3.6"
 description = "Internationalized Domain Names in Applications (IDNA)"
 optional = false
 python-versions = ">=3.5"
 files = [
-    {file = "idna-3.4-py3-none-any.whl", hash = "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"},
-    {file = "idna-3.4.tar.gz", hash = "sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4"},
+    {file = "idna-3.6-py3-none-any.whl", hash = "sha256:c05567e9c24a6b9faaa835c4821bad0590fbb9d5779e7caa6e1cc4978e7eb24f"},
+    {file = "idna-3.6.tar.gz", hash = "sha256:9ecdbbd083b06798ae1e86adcbfe8ab1479cf864e4ee30fe4e46a003d12491ca"},
 ]
 
 [[package]]
@@ -368,13 +368,13 @@ test = ["mkdocs-include-markdown-plugin", "mkdocs-macros-test", "mkdocs-material
 
 [[package]]
 name = "mkdocs-material"
-version = "9.4.10"
+version = "9.4.12"
 description = "Documentation that simply works"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "mkdocs_material-9.4.10-py3-none-any.whl", hash = "sha256:207c4ebc07faebb220437d2c626edb0c9760c82ccfc484500bd3eb30dfce988c"},
-    {file = "mkdocs_material-9.4.10.tar.gz", hash = "sha256:421adedaeaa461dcaf55b8d406673934ade3d4f05ed9819e4cc7b4ee1d646a62"},
+    {file = "mkdocs_material-9.4.12-py3-none-any.whl", hash = "sha256:1adf4e49a6ae59b333d82acedef176f381c27be808bba82074f88dfefc4a5b01"},
+    {file = "mkdocs_material-9.4.12.tar.gz", hash = "sha256:378fae65dbd47e422cabb912f417b3a67db087d150a601dc7b94dbcc26981cbe"},
 ]
 
 [package.dependencies]
@@ -397,13 +397,13 @@ recommended = ["mkdocs-minify-plugin (>=0.7,<1.0)", "mkdocs-redirects (>=1.2,<2.
 
 [[package]]
 name = "mkdocs-material-extensions"
-version = "1.3"
+version = "1.3.1"
 description = "Extension pack for Python Markdown and MkDocs Material."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "mkdocs_material_extensions-1.3-py3-none-any.whl", hash = "sha256:0297cc48ba68a9fdd1ef3780a3b41b534b0d0df1d1181a44676fda5f464eeadc"},
-    {file = "mkdocs_material_extensions-1.3.tar.gz", hash = "sha256:f0446091503acb110a7cab9349cbc90eeac51b58d1caa92a704a81ca1e24ddbd"},
+    {file = "mkdocs_material_extensions-1.3.1-py3-none-any.whl", hash = "sha256:adff8b62700b25cb77b53358dad940f3ef973dd6db797907c49e3c2ef3ab4e31"},
+    {file = "mkdocs_material_extensions-1.3.1.tar.gz", hash = "sha256:10c9511cea88f568257f960358a467d12b970e1f7b2c0e5fb2bb48cab1928443"},
 ]
 
 [[package]]
@@ -484,17 +484,17 @@ windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "pymdown-extensions"
-version = "10.4"
+version = "10.5"
 description = "Extension pack for Python Markdown."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pymdown_extensions-10.4-py3-none-any.whl", hash = "sha256:cfc28d6a09d19448bcbf8eee3ce098c7d17ff99f7bd3069db4819af181212037"},
-    {file = "pymdown_extensions-10.4.tar.gz", hash = "sha256:bc46f11749ecd4d6b71cf62396104b4a200bad3498cb0f5dad1b8502fe461a35"},
+    {file = "pymdown_extensions-10.5-py3-none-any.whl", hash = "sha256:1f0ca8bb5beff091315f793ee17683bc1390731f6ac4c5eb01e27464b80fe879"},
+    {file = "pymdown_extensions-10.5.tar.gz", hash = "sha256:1b60f1e462adbec5a1ed79dac91f666c9c0d241fa294de1989f29d20096cfd0b"},
 ]
 
 [package.dependencies]
-markdown = ">=3.2"
+markdown = ">=3.5"
 pyyaml = "*"
 
 [package.extras]
@@ -819,4 +819,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "094e75d4164568c0a3bf71dd9b18fb67419d42d0028d503b13b8c0004b5fc780"
+content-hash = "2f09edd65b19c9dad712b9e22fb8fdbc3f5d6912b979081575706e5c895628ae"
