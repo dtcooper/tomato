@@ -273,13 +273,13 @@ files = [
 
 [[package]]
 name = "django-pgtrigger"
-version = "4.10.0"
+version = "4.10.1"
 description = "Postgres trigger support integrated with Django models."
 optional = false
 python-versions = ">=3.8.0,<4"
 files = [
-    {file = "django_pgtrigger-4.10.0-py3-none-any.whl", hash = "sha256:78bbb159f1d1d556ddf479761925c778d9bb3c439ace90be2f3ccad243fa2ec1"},
-    {file = "django_pgtrigger-4.10.0.tar.gz", hash = "sha256:37b545306619915f8104f7d888cbb6ee124d9ee3fba74ad30f9e631d0298a974"},
+    {file = "django_pgtrigger-4.10.1-py3-none-any.whl", hash = "sha256:7ee09d4944a5e9b9111782a0e55adc2856c6701f412787d566813c73104f7be4"},
+    {file = "django_pgtrigger-4.10.1.tar.gz", hash = "sha256:bc80cb16d40c9edd5251595bc369250c94e6f426827a8caf0f64c3eb816e7c0c"},
 ]
 
 [package.dependencies]
@@ -1383,4 +1383,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "1402d1b0bcae37d98a762932c9b221cdd915ee40fe8b0b794372290e9b608e82"
+content-hash = "afe51e07089373827415d3d3f942602c03679f37d2de811079a3d5cb848691ba"
