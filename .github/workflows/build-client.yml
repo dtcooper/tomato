@@ -15,7 +15,6 @@ on:
 
 env:
   TOMATO_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || 'preview' }}
-  # Arch package should match this (nodejs-lts-hydrogen = v18 below)
   NODE_VERSION: 18
 
 concurrency:
@@ -110,49 +109,11 @@ jobs:
           path: client-build-files
           retention-days: 2
 
-  build-linux-arch:
-    runs-on: ubuntu-22.04
-    name: Build Arch Linux
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v4
-        with:  # For rev number in TOMATO_VERSION_SUFFIX
-          fetch-depth: 0
-      -
-        name: Set variables
-        shell: bash
-        run: |
-          echo "CLIENT_FILENAME=tomato-client-${{ env.TOMATO_VERSION }}-linux-x86_64.pkg.tar.zst" >> "$GITHUB_ENV"
-          if [ "$GITHUB_REF_TYPE" = tag ]; then
-            echo "TOMATO_VERSION_SUFFIX=" >> "$GITHUB_ENV"
-          else
-            echo "TOMATO_VERSION_SUFFIX=-r$(git rev-list --count HEAD).$(git rev-parse --short=8 HEAD)" >> "$GITHUB_ENV"
-          fi
-      -
-        name: Setup rootless Docker
-        uses: ScribeMD/rootless-docker@0.2.2
-      -
-        name: Build package
-        shell: bash
-        # nodejs-lts-hydrogen = Node v18
-        run: |
-          docker run --rm -v "$PWD:/build" -w /build/client/scripts/arch -e "TOMATO_VERSION=${{ env.TOMATO_VERSION }}${{ env.TOMATO_VERSION_SUFFIX }}" archlinux:base-devel \
-              sh -c 'pacman -Syu --noconfirm nodejs-lts-hydrogen && env EUID=1 makepkg -s --noconfirm'
-          mv client/scripts/arch/*.pkg.tar.zst "${{ env.CLIENT_FILENAME }}"
-      -
-        name: Upload build artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: client-build-files
-          path: ${{ env.CLIENT_FILENAME }}
-          retention-days: 2
-
   tag:
     runs-on: ubuntu-22.04
     name: Tag release
     if: github.ref_type == 'tag' || github.ref_name == 'main'
-    needs: [build, build-linux-arch]
+    needs: build
     steps:
       -
         name: Checkout

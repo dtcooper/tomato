@@ -86,9 +86,12 @@ or can be download below.
           * `.deb` package: [:material-download: x86_64 (64-bit)](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_amd64.deb)
             or [:material-download: arm64 (Raspberry Pi)](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_arm64.deb)
 
-      * Arch :simple-archlinux: or Manjaro :simple-manjaro:
-          * `.pkg.tar.zst` package: [:material-download: x86_64 (64-bit)](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux-x86_64.pkg.tar.zst)
-            _only_
+      * Arch :simple-archlinux: or Manjaro :simple-manjaro: &mdash; Packages for Tomato are available in the
+        [Arch User Repository (AUR)](https://aur.archlinux.org/)
+          * [Latest preview build (`tomato-radio-automation-git`)](https://aur.archlinux.org/packages/tomato-radio-automation-git)
+
+          * [Latest stable release (`tomato-radio-automation`)](https://aur.archlinux.org/packages/tomato-radio-automation)
+            &mdash; may ***NOT*** be compatible with the latest server version
 
       * Universal [AppImage](https://appimage.org/) format
           * `.AppImage` file: [:material-download: x86_64 (64-bit)](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_amd64.AppImage) _only_
