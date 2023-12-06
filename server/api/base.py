@@ -4,8 +4,6 @@ from inspect import iscoroutinefunction
 import logging
 from weakref import WeakSet
 
-from asgiref.sync import sync_to_async
-
 from django.conf import settings
 from django.contrib.auth import HASH_SESSION_KEY, SESSION_KEY
 from django.utils.crypto import constant_time_compare
@@ -122,7 +120,7 @@ class ConnectionsBase(MessagesBase):
                     if session_hash and constant_time_compare(session_hash, user.get_session_auth_hash()):
                         logger.info(f"Authorized admin session for {user}")
                         return Connection(websocket, user)
-                elif await sync_to_async(user.check_password)(greeting["password"]):
+                elif await user.acheck_password(greeting["password"]):
                     logger.info(f"Authorized user connection for {user}")
                     return Connection(websocket, user)
         raise TomatoAuthError("Invalid username or password.", should_sleep=True, field="userpass")

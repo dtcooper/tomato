@@ -32,6 +32,7 @@ class UserAdmin(ListPrefetchRelatedMixin, DjangoUserAdmin):
     readonly_fields = ("last_login", "created_at", "created_by")
     save_on_top = True
     search_fields = ("username",)
+    show_facets = admin.ShowFacets.ALWAYS
 
     @admin.display(description="Permissions")
     def groups_display(self, obj):

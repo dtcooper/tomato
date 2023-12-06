@@ -39,7 +39,7 @@ class TomatoAdminSite(admin.AdminSite):
     app_list_template_original = str(
         (Path(apps.get_app_config("admin").path) / "templates" / "admin" / "app_list.html").absolute()
     )
-    empty_value_display = mark_safe("<em>None</em>")
+    empty_value_display = mark_safe("None")
     index_title = "Tomato administration"
     site_url = None
 

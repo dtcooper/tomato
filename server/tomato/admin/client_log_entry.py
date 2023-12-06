@@ -19,7 +19,7 @@ class CSVBuffer:
 class ClientLogEntryAdmin(ListPrefetchRelatedMixin, admin.ModelAdmin):
     actions = ("csv",)
     date_hierarchy = "created_at"
-    empty_value_display = mark_safe("<em>Unknown / deleted</em>")
+    empty_value_display = mark_safe("Unknown / deleted")
     fields = ("id", "created_at_display", "category", "type", "created_by", "ip_address", "description_display")
     list_display = ("created_at_display", "category", "type", "created_by", "ip_address", "description_display")
     list_filter = ("created_by", "type")
@@ -29,6 +29,7 @@ class ClientLogEntryAdmin(ListPrefetchRelatedMixin, admin.ModelAdmin):
     readonly_fields = ("created_at_display", "category", "description_display")
     save_on_top = True
     search_fields = ("description",)
+    show_facets = admin.ShowFacets.ALWAYS
 
     @admin.display(ordering="-created_at", description="Created at")
     def created_at_display(self, obj):

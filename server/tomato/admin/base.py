@@ -123,6 +123,7 @@ class TomatoModelAdminBase(ListPrefetchRelatedMixin, SaveCreatedByMixin, admin.M
     readonly_fields = ("created_by", "created_at")
     save_on_top = True
     search_fields = ("name",)
+    show_facets = admin.ShowFacets.ALWAYS
 
     def get_fieldsets(self, request, obj=None):
         if obj is None and self.add_fieldsets is not None:
