@@ -368,13 +368,13 @@ test = ["mkdocs-include-markdown-plugin", "mkdocs-macros-test", "mkdocs-material
 
 [[package]]
 name = "mkdocs-material"
-version = "9.5.0"
+version = "9.5.1"
 description = "Documentation that simply works"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "mkdocs_material-9.5.0-py3-none-any.whl", hash = "sha256:47323c9943756ced14487d0607caa283e350e8fd4c724b224bd69ccb0b0731f2"},
-    {file = "mkdocs_material-9.5.0.tar.gz", hash = "sha256:f8f9ccb526bd8a8ac2e5ec2e64e1a167cfb53cf6a84c8924dbb607f0a70e74ae"},
+    {file = "mkdocs_material-9.5.1-py3-none-any.whl", hash = "sha256:2e01249bc41813afe2479a4a659f8ba899c3355ccaf9310b5b782952df9c1dea"},
+    {file = "mkdocs_material-9.5.1.tar.gz", hash = "sha256:7ec5d20ed5eee97bb090823a33b33e177ad0704d74bad5937b53acca571ddb3d"},
 ]
 
 [package.dependencies]
@@ -443,13 +443,13 @@ files = [
 
 [[package]]
 name = "pathspec"
-version = "0.11.2"
+version = "0.12.0"
 description = "Utility library for gitignore style pattern matching of file paths."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "pathspec-0.11.2-py3-none-any.whl", hash = "sha256:1d6ed233af05e679efb96b1851550ea95bbb64b7c490b0f5aa52996c11e92a20"},
-    {file = "pathspec-0.11.2.tar.gz", hash = "sha256:e0d8d0ac2f12da61956eb2306b69f9469b42f4deb0f3cb6ed47b9cce9996ced3"},
+    {file = "pathspec-0.12.0-py3-none-any.whl", hash = "sha256:f1f8a7eab698c357945c85ed79715e014612b8584faebe209dca4558e2b09513"},
+    {file = "pathspec-0.12.0.tar.gz", hash = "sha256:c57e16065a97b7beb175f13c84d27cb05f7b7315741c2fbd5de541042f4ea6e1"},
 ]
 
 [[package]]
@@ -819,4 +819,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "9da4f79ebc384b53ba897690f80b1883377caf06fb538323f78f14c2393ccce2"
+content-hash = "b2fffa3a3cd21ec5094fc134f67b74c602565dceaea266087d93c71b7a26b684"
