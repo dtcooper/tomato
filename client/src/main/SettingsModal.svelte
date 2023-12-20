@@ -136,13 +136,13 @@
 
       <div class="flex justify-end text-lg font-bold">Server settings:</div>
       <div>
-        <button class="link-hover link-info link text-lg" on:click|preventDefault={openServerSettings}>
+        <button class="link-hover link link-info text-lg" on:click|preventDefault={openServerSettings}>
           Click to view settings from server
         </button>
       </div>
 
       <div class="flex justify-end text-lg font-bold">Station admin site:</div>
-      <a class="link-hover link-info link text-lg" href={$db.host}>Click to open in web browser</a>
+      <a class="link-hover link link-info text-lg" href={$db.host}>Click to open in web browser</a>
 
       <div class="flex justify-end text-lg font-bold">Version:</div>
       <!-- svelte-ignore missing-declaration-->

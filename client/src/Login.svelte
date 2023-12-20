@@ -167,13 +167,13 @@
         >
       </div>
       <div class="text-center text-xs">
-        <a class="link-hover link-secondary link" href="https://dtcooper.github.io/tomato/">Tomato Radio Automation</a>,
+        <a class="link-hover link link-secondary" href="https://dtcooper.github.io/tomato/">Tomato Radio Automation</a>,
         <!-- svelte-ignore missing-declaration-->
         version: {TOMATO_VERSION} / protocol: {protocolVersion}
         <br />
         Copyright &copy; 2019-{dayjs().year()}
-        <a class="link-hover link-secondary link" href="https://jew.pizza/">David Cooper</a>
-        &amp; <a class="link-hover link-secondary link" href="https://bmir.org">BMIR</a>.<br />
+        <a class="link-hover link link-secondary" href="https://jew.pizza/">David Cooper</a>
+        &amp; <a class="link-hover link link-secondary" href="https://bmir.org">BMIR</a>.<br />
         All rights reserved.
       </div>
     </form>

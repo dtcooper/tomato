@@ -20,23 +20,21 @@ def run_command(args):
 
 def ffprobe(infile):
     # We want at least one audio channel
-    cmd = run_command(
-        (
-            "ffprobe",
-            "-i",
-            infile,
-            "-print_format",
-            "json",
-            "-hide_banner",
-            "-loglevel",
-            "error",
-            "-show_format",
-            "-show_error",
-            "-show_streams",
-            "-select_streams",
-            "a:0",
-        )
-    )
+    cmd = run_command((
+        "ffprobe",
+        "-i",
+        infile,
+        "-print_format",
+        "json",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-show_format",
+        "-show_error",
+        "-show_streams",
+        "-select_streams",
+        "a:0",
+    ))
 
     kwargs = {}
     if cmd.returncode == 0:

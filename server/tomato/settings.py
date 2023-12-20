@@ -446,43 +446,41 @@ CONSTANCE_CONFIG = {
     "RELOAD_PLAYLIST_AFTER_DATA_CHANGES": (False, "Reload all connected client playlists when a data change occurs."),
 }
 
-CONSTANCE_CONFIG_FIELDSETS = OrderedDict(
+CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
     (
+        "User Interface Options",
         (
-            "User Interface Options",
-            (
-                "STATION_NAME",
-                "UI_MODES",
-                "UI_MODE_RESET_TIMES",
-            ),
+            "STATION_NAME",
+            "UI_MODES",
+            "UI_MODE_RESET_TIMES",
         ),
+    ),
+    (
+        "Server & Processing Audio Options",
         (
-            "Server & Processing Audio Options",
-            (
-                "AUDIO_BITRATE",
-                "EXTRACT_METADATA_FROM_FILE",
-                "PREVENT_DUPLICATE_ASSETS",
-                "TRIM_SILENCE",
-                "RELOAD_PLAYLIST_AFTER_DATA_CHANGES",
-            ),
+            "AUDIO_BITRATE",
+            "EXTRACT_METADATA_FROM_FILE",
+            "PREVENT_DUPLICATE_ASSETS",
+            "TRIM_SILENCE",
+            "RELOAD_PLAYLIST_AFTER_DATA_CHANGES",
         ),
+    ),
+    (
+        "Desktop client options",
         (
-            "Desktop client options",
-            (
-                "BROADCAST_COMPRESSION",
-                "WARN_ON_EMPTY_ROTATORS",
-                "WAIT_INTERVAL",
-                "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME",
-                "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME_MIN_LENGTH",
-                "NO_REPEAT_ASSETS_TIME",
-                "STOPSET_OVERDUE_TIME",
-                "STOPSET_PRELOAD_COUNT",
-                "ALLOW_REPEATS_IN_STOPSET",
-                "END_DATE_PRIORITY_WEIGHT_MULTIPLIER",
-            ),
+            "BROADCAST_COMPRESSION",
+            "WARN_ON_EMPTY_ROTATORS",
+            "WAIT_INTERVAL",
+            "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME",
+            "WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME_MIN_LENGTH",
+            "NO_REPEAT_ASSETS_TIME",
+            "STOPSET_OVERDUE_TIME",
+            "STOPSET_PRELOAD_COUNT",
+            "ALLOW_REPEATS_IN_STOPSET",
+            "END_DATE_PRIORITY_WEIGHT_MULTIPLIER",
         ),
-    )
-)
+    ),
+))
 CONSTANCE_SERVER_ONLY_SETTINGS = set(CONSTANCE_CONFIG_FIELDSETS["Server & Processing Audio Options"])
 
 SHELL_PLUS_IMPORTS = [

@@ -162,9 +162,9 @@ class ConnectionsBase(MessagesBase):
 
     async def authorize_and_process_new_websocket(self, greeting: dict, websocket: WebSocket):
         connection: Connection = await self.authorize(greeting, websocket)
-        await connection.send({
-            "success": True, "admin_mode": self.is_admin, "user": connection.user.username, **SERVER_STATUS
-        })
+        await connection.send(
+            {"success": True, "admin_mode": self.is_admin, "user": connection.user.username, **SERVER_STATUS}
+        )
         await self.hello(connection)
         self.connections.add(connection)
         self.user_ids_to_connections[connection.user.id].add(connection)

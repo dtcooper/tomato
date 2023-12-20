@@ -60,16 +60,14 @@ class ClientLogEntryAdmin(ListPrefetchRelatedMixin, admin.ModelAdmin):
         writer.writerow(("ID", "Created At", "Category", "Type", "Created By", "Description"))
 
         for entry in queryset.order_by("created_at").prefetch_related("created_by"):
-            writer.writerow(
-                (
-                    str(entry.id),
-                    localtime(entry.created_at).strftime("%Y/%m/%d %H:%M:%S"),
-                    entry.category(),
-                    entry.type,
-                    "unknown/deleted" if entry.created_by is None else entry.created_by.username,
-                    entry.description,
-                )
-            )
+            writer.writerow((
+                str(entry.id),
+                localtime(entry.created_at).strftime("%Y/%m/%d %H:%M:%S"),
+                entry.category(),
+                entry.type,
+                "unknown/deleted" if entry.created_by is None else entry.created_by.username,
+                entry.description,
+            ))
 
         return response
 
