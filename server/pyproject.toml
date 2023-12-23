@@ -23,16 +23,16 @@ psycopg = "^3.1.16"
 python-dotenv = "^1.0.0"
 schema = "^0.7.5"
 starlette = "^0.34.0"
-uvicorn = {extras = ["standard"], version = "^0.24.0.post1"}
+uvicorn = {extras = ["standard"], version = "^0.25.0"}
 wait-for-it = "^2.2.2"
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.12.0"
+black = "^23.12.1"
 django-debug-toolbar = "^4.2.0"
 django-extensions = "^3.2.3"
 flake8 = "^6.1.0"
 ipdb = "^0.13.13"
-ipython = "^8.18.1"
+ipython = "^8.19.0"
 isort = "^5.13.2"
 watchdog = {extras = ["watchmedo"], version = "^3.0.0"}
 
