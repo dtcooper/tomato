@@ -103,7 +103,7 @@ jobs:
           fi
       -
         name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: client-build-files
           path: client-build-files
