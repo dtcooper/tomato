@@ -43,7 +43,7 @@ runs:
       uses: docker/setup-qemu-action@v3
     -
       name: Login to Github Container Registry
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         registry: ghcr.io
         username: ${{ env.USERNAME }}
