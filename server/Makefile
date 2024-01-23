@@ -41,5 +41,5 @@ distclean:
 	rm -rf serve
 
 .PHONY: outdated
-outdated:
+outdated: build
 	$(COMPOSE) run --rm --no-deps --entrypoint /bin/sh app -c "poetry show -o"
