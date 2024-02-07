@@ -156,13 +156,13 @@ files = [
 
 [[package]]
 name = "django"
-version = "5.0.1"
+version = "5.0.2"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "Django-5.0.1-py3-none-any.whl", hash = "sha256:f47a37a90b9bbe2c8ec360235192c7fddfdc832206fcf618bb849b39256affc1"},
-    {file = "Django-5.0.1.tar.gz", hash = "sha256:8c8659665bc6e3a44fefe1ab0a291e5a3fb3979f9a8230be29de975e57e8f854"},
+    {file = "Django-5.0.2-py3-none-any.whl", hash = "sha256:56ab63a105e8bb06ee67381d7b65fe6774f057e41a8bab06c8020c8882d8ecd4"},
+    {file = "Django-5.0.2.tar.gz", hash = "sha256:b5bb1d11b2518a5f91372a282f24662f58f66749666b0a286ab057029f728080"},
 ]
 
 [package.dependencies]
@@ -207,13 +207,13 @@ redis = ["redis"]
 
 [[package]]
 name = "django-debug-toolbar"
-version = "4.2.0"
+version = "4.3.0"
 description = "A configurable set of panels that display various debug information about the current request/response."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "django_debug_toolbar-4.2.0-py3-none-any.whl", hash = "sha256:af99128c06e8e794479e65ab62cc6c7d1e74e1c19beb44dcbf9bad7a9c017327"},
-    {file = "django_debug_toolbar-4.2.0.tar.gz", hash = "sha256:bc7fdaafafcdedefcc67a4a5ad9dac96efd6e41db15bc74d402a54a2ba4854dc"},
+    {file = "django_debug_toolbar-4.3.0-py3-none-any.whl", hash = "sha256:e09b7dcb8417b743234dfc57c95a7c1d1d87a88844abd13b4c5387f807b31bf6"},
+    {file = "django_debug_toolbar-4.3.0.tar.gz", hash = "sha256:0b0dddee5ea29b9cb678593bc0d7a6d76b21d7799cb68e091a2148341a80f3c4"},
 ]
 
 [package.dependencies]
@@ -610,13 +610,13 @@ ipython = {version = ">=7.31.1", markers = "python_version >= \"3.11\""}
 
 [[package]]
 name = "ipython"
-version = "8.20.0"
+version = "8.21.0"
 description = "IPython: Productive Interactive Computing"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "ipython-8.20.0-py3-none-any.whl", hash = "sha256:bc9716aad6f29f36c449e30821c9dd0c1c1a7b59ddcc26931685b87b4c569619"},
-    {file = "ipython-8.20.0.tar.gz", hash = "sha256:2f21bd3fc1d51550c89ee3944ae04bbc7bc79e129ea0937da6e6c68bfdbf117a"},
+    {file = "ipython-8.21.0-py3-none-any.whl", hash = "sha256:1050a3ab8473488d7eee163796b02e511d0735cf43a04ba2a8348bd0f2eaf8a5"},
+    {file = "ipython-8.21.0.tar.gz", hash = "sha256:48fbc236fbe0e138b88773fa0437751f14c3645fb483f1d4c5dee58b37e5ce73"},
 ]
 
 [package.dependencies]
@@ -631,17 +631,17 @@ stack-data = "*"
 traitlets = ">=5"
 
 [package.extras]
-all = ["black", "curio", "docrepr", "exceptiongroup", "ipykernel", "ipyparallel", "ipywidgets", "matplotlib", "matplotlib (!=3.2.0)", "nbconvert", "nbformat", "notebook", "numpy (>=1.23)", "pandas", "pickleshare", "pytest", "pytest-asyncio (<0.22)", "qtconsole", "setuptools (>=18.5)", "sphinx (>=1.3)", "sphinx-rtd-theme", "stack-data", "testpath", "trio", "typing-extensions"]
+all = ["black", "curio", "docrepr", "exceptiongroup", "ipykernel", "ipyparallel", "ipywidgets", "matplotlib", "matplotlib (!=3.2.0)", "nbconvert", "nbformat", "notebook", "numpy (>=1.23)", "pandas", "pickleshare", "pytest (<8)", "pytest-asyncio (<0.22)", "qtconsole", "setuptools (>=18.5)", "sphinx (>=1.3)", "sphinx-rtd-theme", "stack-data", "testpath", "trio", "typing-extensions"]
 black = ["black"]
-doc = ["docrepr", "exceptiongroup", "ipykernel", "matplotlib", "pickleshare", "pytest", "pytest-asyncio (<0.22)", "setuptools (>=18.5)", "sphinx (>=1.3)", "sphinx-rtd-theme", "stack-data", "testpath", "typing-extensions"]
+doc = ["docrepr", "exceptiongroup", "ipykernel", "matplotlib", "pickleshare", "pytest (<8)", "pytest-asyncio (<0.22)", "setuptools (>=18.5)", "sphinx (>=1.3)", "sphinx-rtd-theme", "stack-data", "testpath", "typing-extensions"]
 kernel = ["ipykernel"]
 nbconvert = ["nbconvert"]
 nbformat = ["nbformat"]
 notebook = ["ipywidgets", "notebook"]
 parallel = ["ipyparallel"]
 qtconsole = ["qtconsole"]
-test = ["pickleshare", "pytest", "pytest-asyncio (<0.22)", "testpath"]
-test-extra = ["curio", "matplotlib (!=3.2.0)", "nbformat", "numpy (>=1.23)", "pandas", "pickleshare", "pytest", "pytest-asyncio (<0.22)", "testpath", "trio"]
+test = ["pickleshare", "pytest (<8)", "pytest-asyncio (<0.22)", "testpath"]
+test-extra = ["curio", "matplotlib (!=3.2.0)", "nbformat", "numpy (>=1.23)", "pandas", "pickleshare", "pytest (<8)", "pytest-asyncio (<0.22)", "testpath", "trio"]
 
 [[package]]
 name = "isort"
@@ -765,18 +765,18 @@ ptyprocess = ">=0.5"
 
 [[package]]
 name = "platformdirs"
-version = "4.1.0"
+version = "4.2.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "platformdirs-4.1.0-py3-none-any.whl", hash = "sha256:11c8f37bcca40db96d8144522d925583bdb7a31f7b0e37e3ed4318400a8e2380"},
-    {file = "platformdirs-4.1.0.tar.gz", hash = "sha256:906d548203468492d432bcb294d4bc2fff751bf84971fbb2c10918cc206ee420"},
+    {file = "platformdirs-4.2.0-py3-none-any.whl", hash = "sha256:0614df2a2f37e1a662acbd8e2b25b92ccf8632929bc6d43467e17fe89c75e068"},
+    {file = "platformdirs-4.2.0.tar.gz", hash = "sha256:ef0cc731df711022c174543cb70a9b5bd22e5a9337c8624ef2c2ceb8ddad8768"},
 ]
 
 [package.extras]
-docs = ["furo (>=2023.7.26)", "proselint (>=0.13)", "sphinx (>=7.1.1)", "sphinx-autodoc-typehints (>=1.24)"]
-test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=7.4)", "pytest-cov (>=4.1)", "pytest-mock (>=3.11.1)"]
+docs = ["furo (>=2023.9.10)", "proselint (>=0.13)", "sphinx (>=7.2.6)", "sphinx-autodoc-typehints (>=1.25.2)"]
+test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=7.4.3)", "pytest-cov (>=4.1)", "pytest-mock (>=3.12)"]
 
 [[package]]
 name = "prompt-toolkit"
@@ -794,13 +794,13 @@ wcwidth = "*"
 
 [[package]]
 name = "psycopg"
-version = "3.1.17"
+version = "3.1.18"
 description = "PostgreSQL database adapter for Python"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "psycopg-3.1.17-py3-none-any.whl", hash = "sha256:96b7b13af6d5a514118b759a66b2799a8a4aa78675fa6bb0d3f7d52d67eff002"},
-    {file = "psycopg-3.1.17.tar.gz", hash = "sha256:437e7d7925459f21de570383e2e10542aceb3b9cb972ce957fdd3826ca47edc6"},
+    {file = "psycopg-3.1.18-py3-none-any.whl", hash = "sha256:4d5a0a5a8590906daa58ebd5f3cfc34091377354a1acced269dd10faf55da60e"},
+    {file = "psycopg-3.1.18.tar.gz", hash = "sha256:31144d3fb4c17d78094d9e579826f047d4af1da6a10427d91dfcfb6ecdf6f12b"},
 ]
 
 [package.dependencies]
@@ -808,9 +808,9 @@ typing-extensions = ">=4.1"
 tzdata = {version = "*", markers = "sys_platform == \"win32\""}
 
 [package.extras]
-binary = ["psycopg-binary (==3.1.17)"]
-c = ["psycopg-c (==3.1.17)"]
-dev = ["black (>=23.1.0)", "codespell (>=2.2)", "dnspython (>=2.1)", "flake8 (>=4.0)", "mypy (>=1.4.1)", "types-setuptools (>=57.4)", "wheel (>=0.37)"]
+binary = ["psycopg-binary (==3.1.18)"]
+c = ["psycopg-c (==3.1.18)"]
+dev = ["black (>=24.1.0)", "codespell (>=2.2)", "dnspython (>=2.1)", "flake8 (>=4.0)", "mypy (>=1.4.1)", "types-setuptools (>=57.4)", "wheel (>=0.37)"]
 docs = ["Sphinx (>=5.0)", "furo (==2022.6.21)", "sphinx-autobuild (>=2021.3.14)", "sphinx-autodoc-typehints (>=1.12)"]
 pool = ["psycopg-pool"]
 test = ["anyio (>=3.6.2,<4.0)", "mypy (>=1.4.1)", "pproxy (>=2.7)", "pytest (>=6.2.5)", "pytest-cov (>=3.0)", "pytest-randomly (>=3.5)"]
@@ -1043,20 +1043,20 @@ tests = ["cython", "littleutils", "pygments", "pytest", "typeguard"]
 
 [[package]]
 name = "starlette"
-version = "0.36.1"
+version = "0.37.0"
 description = "The little ASGI library that shines."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "starlette-0.36.1-py3-none-any.whl", hash = "sha256:d5b43a72f475fd1b9707f661aa66da42d59ae16c9b2a5845b4edee4309c425ee"},
-    {file = "starlette-0.36.1.tar.gz", hash = "sha256:96df8541093dfd37624b5bf980802b99750db6718dd3ca341618fbbcdd6136fb"},
+    {file = "starlette-0.37.0-py3-none-any.whl", hash = "sha256:53a95037cf6a563fca942ea16ba0260edce10258c213cbd554adc263fad22dfc"},
+    {file = "starlette-0.37.0.tar.gz", hash = "sha256:d1ec71a84fd1f691b800361a6a64ecb0e9c17ab308507ccc7f911727888293c7"},
 ]
 
 [package.dependencies]
 anyio = ">=3.4.0,<5"
 
 [package.extras]
-full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart", "pyyaml"]
+full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.7)", "pyyaml"]
 
 [[package]]
 name = "traitlets"
@@ -1183,42 +1183,41 @@ dev = ["black", "click", "flake8", "parameterized", "pytest", "pytest-cov", "twi
 
 [[package]]
 name = "watchdog"
-version = "3.0.0"
+version = "4.0.0"
 description = "Filesystem events monitoring"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "watchdog-3.0.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:336adfc6f5cc4e037d52db31194f7581ff744b67382eb6021c868322e32eef41"},
-    {file = "watchdog-3.0.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:a70a8dcde91be523c35b2bf96196edc5730edb347e374c7de7cd20c43ed95397"},
-    {file = "watchdog-3.0.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:adfdeab2da79ea2f76f87eb42a3ab1966a5313e5a69a0213a3cc06ef692b0e96"},
-    {file = "watchdog-3.0.0-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:2b57a1e730af3156d13b7fdddfc23dea6487fceca29fc75c5a868beed29177ae"},
-    {file = "watchdog-3.0.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:7ade88d0d778b1b222adebcc0927428f883db07017618a5e684fd03b83342bd9"},
-    {file = "watchdog-3.0.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:7e447d172af52ad204d19982739aa2346245cc5ba6f579d16dac4bfec226d2e7"},
-    {file = "watchdog-3.0.0-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:9fac43a7466eb73e64a9940ac9ed6369baa39b3bf221ae23493a9ec4d0022674"},
-    {file = "watchdog-3.0.0-cp38-cp38-macosx_10_9_universal2.whl", hash = "sha256:8ae9cda41fa114e28faf86cb137d751a17ffd0316d1c34ccf2235e8a84365c7f"},
-    {file = "watchdog-3.0.0-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:25f70b4aa53bd743729c7475d7ec41093a580528b100e9a8c5b5efe8899592fc"},
-    {file = "watchdog-3.0.0-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:4f94069eb16657d2c6faada4624c39464f65c05606af50bb7902e036e3219be3"},
-    {file = "watchdog-3.0.0-cp39-cp39-macosx_10_9_universal2.whl", hash = "sha256:7c5f84b5194c24dd573fa6472685b2a27cc5a17fe5f7b6fd40345378ca6812e3"},
-    {file = "watchdog-3.0.0-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:3aa7f6a12e831ddfe78cdd4f8996af9cf334fd6346531b16cec61c3b3c0d8da0"},
-    {file = "watchdog-3.0.0-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:233b5817932685d39a7896b1090353fc8efc1ef99c9c054e46c8002561252fb8"},
-    {file = "watchdog-3.0.0-pp37-pypy37_pp73-macosx_10_9_x86_64.whl", hash = "sha256:13bbbb462ee42ec3c5723e1205be8ced776f05b100e4737518c67c8325cf6100"},
-    {file = "watchdog-3.0.0-pp38-pypy38_pp73-macosx_10_9_x86_64.whl", hash = "sha256:8f3ceecd20d71067c7fd4c9e832d4e22584318983cabc013dbf3f70ea95de346"},
-    {file = "watchdog-3.0.0-pp39-pypy39_pp73-macosx_10_9_x86_64.whl", hash = "sha256:c9d8c8ec7efb887333cf71e328e39cffbf771d8f8f95d308ea4125bf5f90ba64"},
-    {file = "watchdog-3.0.0-py3-none-manylinux2014_aarch64.whl", hash = "sha256:0e06ab8858a76e1219e68c7573dfeba9dd1c0219476c5a44d5333b01d7e1743a"},
-    {file = "watchdog-3.0.0-py3-none-manylinux2014_armv7l.whl", hash = "sha256:d00e6be486affb5781468457b21a6cbe848c33ef43f9ea4a73b4882e5f188a44"},
-    {file = "watchdog-3.0.0-py3-none-manylinux2014_i686.whl", hash = "sha256:c07253088265c363d1ddf4b3cdb808d59a0468ecd017770ed716991620b8f77a"},
-    {file = "watchdog-3.0.0-py3-none-manylinux2014_ppc64.whl", hash = "sha256:5113334cf8cf0ac8cd45e1f8309a603291b614191c9add34d33075727a967709"},
-    {file = "watchdog-3.0.0-py3-none-manylinux2014_ppc64le.whl", hash = "sha256:51f90f73b4697bac9c9a78394c3acbbd331ccd3655c11be1a15ae6fe289a8c83"},
-    {file = "watchdog-3.0.0-py3-none-manylinux2014_s390x.whl", hash = "sha256:ba07e92756c97e3aca0912b5cbc4e5ad802f4557212788e72a72a47ff376950d"},
-    {file = "watchdog-3.0.0-py3-none-manylinux2014_x86_64.whl", hash = "sha256:d429c2430c93b7903914e4db9a966c7f2b068dd2ebdd2fa9b9ce094c7d459f33"},
-    {file = "watchdog-3.0.0-py3-none-win32.whl", hash = "sha256:3ed7c71a9dccfe838c2f0b6314ed0d9b22e77d268c67e015450a29036a81f60f"},
-    {file = "watchdog-3.0.0-py3-none-win_amd64.whl", hash = "sha256:4c9956d27be0bb08fc5f30d9d0179a855436e655f046d288e2bcc11adfae893c"},
-    {file = "watchdog-3.0.0-py3-none-win_ia64.whl", hash = "sha256:5d9f3a10e02d7371cd929b5d8f11e87d4bad890212ed3901f9b4d68767bee759"},
-    {file = "watchdog-3.0.0.tar.gz", hash = "sha256:4d98a320595da7a7c5a18fc48cb633c2e73cda78f93cac2ef42d42bf609a33f9"},
+    {file = "watchdog-4.0.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:39cb34b1f1afbf23e9562501673e7146777efe95da24fab5707b88f7fb11649b"},
+    {file = "watchdog-4.0.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:c522392acc5e962bcac3b22b9592493ffd06d1fc5d755954e6be9f4990de932b"},
+    {file = "watchdog-4.0.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:6c47bdd680009b11c9ac382163e05ca43baf4127954c5f6d0250e7d772d2b80c"},
+    {file = "watchdog-4.0.0-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:8350d4055505412a426b6ad8c521bc7d367d1637a762c70fdd93a3a0d595990b"},
+    {file = "watchdog-4.0.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:c17d98799f32e3f55f181f19dd2021d762eb38fdd381b4a748b9f5a36738e935"},
+    {file = "watchdog-4.0.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:4986db5e8880b0e6b7cd52ba36255d4793bf5cdc95bd6264806c233173b1ec0b"},
+    {file = "watchdog-4.0.0-cp312-cp312-macosx_10_9_universal2.whl", hash = "sha256:11e12fafb13372e18ca1bbf12d50f593e7280646687463dd47730fd4f4d5d257"},
+    {file = "watchdog-4.0.0-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:5369136a6474678e02426bd984466343924d1df8e2fd94a9b443cb7e3aa20d19"},
+    {file = "watchdog-4.0.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:76ad8484379695f3fe46228962017a7e1337e9acadafed67eb20aabb175df98b"},
+    {file = "watchdog-4.0.0-cp38-cp38-macosx_10_9_universal2.whl", hash = "sha256:45cc09cc4c3b43fb10b59ef4d07318d9a3ecdbff03abd2e36e77b6dd9f9a5c85"},
+    {file = "watchdog-4.0.0-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:eed82cdf79cd7f0232e2fdc1ad05b06a5e102a43e331f7d041e5f0e0a34a51c4"},
+    {file = "watchdog-4.0.0-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:ba30a896166f0fee83183cec913298151b73164160d965af2e93a20bbd2ab605"},
+    {file = "watchdog-4.0.0-cp39-cp39-macosx_10_9_universal2.whl", hash = "sha256:d18d7f18a47de6863cd480734613502904611730f8def45fc52a5d97503e5101"},
+    {file = "watchdog-4.0.0-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:2895bf0518361a9728773083908801a376743bcc37dfa252b801af8fd281b1ca"},
+    {file = "watchdog-4.0.0-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:87e9df830022488e235dd601478c15ad73a0389628588ba0b028cb74eb72fed8"},
+    {file = "watchdog-4.0.0-pp310-pypy310_pp73-macosx_10_9_x86_64.whl", hash = "sha256:6e949a8a94186bced05b6508faa61b7adacc911115664ccb1923b9ad1f1ccf7b"},
+    {file = "watchdog-4.0.0-pp38-pypy38_pp73-macosx_10_9_x86_64.whl", hash = "sha256:6a4db54edea37d1058b08947c789a2354ee02972ed5d1e0dca9b0b820f4c7f92"},
+    {file = "watchdog-4.0.0-pp39-pypy39_pp73-macosx_10_9_x86_64.whl", hash = "sha256:d31481ccf4694a8416b681544c23bd271f5a123162ab603c7d7d2dd7dd901a07"},
+    {file = "watchdog-4.0.0-py3-none-manylinux2014_aarch64.whl", hash = "sha256:8fec441f5adcf81dd240a5fe78e3d83767999771630b5ddfc5867827a34fa3d3"},
+    {file = "watchdog-4.0.0-py3-none-manylinux2014_armv7l.whl", hash = "sha256:6a9c71a0b02985b4b0b6d14b875a6c86ddea2fdbebd0c9a720a806a8bbffc69f"},
+    {file = "watchdog-4.0.0-py3-none-manylinux2014_i686.whl", hash = "sha256:557ba04c816d23ce98a06e70af6abaa0485f6d94994ec78a42b05d1c03dcbd50"},
+    {file = "watchdog-4.0.0-py3-none-manylinux2014_ppc64.whl", hash = "sha256:d0f9bd1fd919134d459d8abf954f63886745f4660ef66480b9d753a7c9d40927"},
+    {file = "watchdog-4.0.0-py3-none-manylinux2014_ppc64le.whl", hash = "sha256:f9b2fdca47dc855516b2d66eef3c39f2672cbf7e7a42e7e67ad2cbfcd6ba107d"},
+    {file = "watchdog-4.0.0-py3-none-manylinux2014_s390x.whl", hash = "sha256:73c7a935e62033bd5e8f0da33a4dcb763da2361921a69a5a95aaf6c93aa03a87"},
+    {file = "watchdog-4.0.0-py3-none-manylinux2014_x86_64.whl", hash = "sha256:6a80d5cae8c265842c7419c560b9961561556c4361b297b4c431903f8c33b269"},
+    {file = "watchdog-4.0.0-py3-none-win32.whl", hash = "sha256:8f9a542c979df62098ae9c58b19e03ad3df1c9d8c6895d96c0d51da17b243b1c"},
+    {file = "watchdog-4.0.0-py3-none-win_amd64.whl", hash = "sha256:f970663fa4f7e80401a7b0cbeec00fa801bf0287d93d48368fc3e6fa32716245"},
+    {file = "watchdog-4.0.0-py3-none-win_ia64.whl", hash = "sha256:9a03e16e55465177d416699331b0f3564138f1807ecc5f2de9d55d8f188d08c7"},
+    {file = "watchdog-4.0.0.tar.gz", hash = "sha256:e3e7065cbdabe6183ab82199d7a4f6b3ba0a438c5a512a68559846ccb76a78ec"},
 ]
-
-[package.dependencies]
-PyYAML = {version = ">=3.10", optional = true, markers = "extra == \"watchmedo\""}
 
 [package.extras]
 watchmedo = ["PyYAML (>=3.10)"]
@@ -1405,4 +1404,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "59b197ac29c3ffde6ce6f906acc63e2d96fc52bc18d674be82c00f52f809d23b"
+content-hash = "138a6a8f409a1d2715237053092f1e9482b1540e3383b8faf1780cf5fd0438e8"
