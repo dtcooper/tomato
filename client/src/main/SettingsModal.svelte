@@ -182,7 +182,7 @@
       type="text"
       placeholder="Enter station name"
       class:input-error={showLogoutError}
-      class="input input-bordered input-lg font-mono"
+      class="input input-lg input-bordered font-mono"
     />
   </div>
   <svelte:fragment slot="extra-buttons">
