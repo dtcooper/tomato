@@ -90,9 +90,8 @@ class TomatoAdminSite(admin.AdminSite):
                 for view in extra_views
                 if view.check_perms(request)
             ],
-            "app_list_extra_highlight": request.resolver_match.view_name in [
-                f"admin:extra_{view.name}" for view in extra_views
-            ],
+            "app_list_extra_highlight": request.resolver_match.view_name
+            in [f"admin:extra_{view.name}" for view in extra_views],
             "help_docs_text": help_docs_text,
             "help_docs_url": HELP_DOCS_URL,
             "protocol_version": PROTOCOL_VERSION,
