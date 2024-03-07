@@ -7,7 +7,7 @@ license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-django = "^5.0.2"
+django = "^5.0.3"
 django-admin-notice = "^2.1.0"
 django-constance = "^3.1.0"
 django-dirtyfields = "^1.9.2"
@@ -22,17 +22,17 @@ huey = "^2.5.0"
 psycopg = "^3.1.18"
 python-dotenv = "^1.0.1"
 schema = "^0.7.5"
-starlette = "^0.37.0"
-uvicorn = {extras = ["standard"], version = "^0.27.0.post1"}
+starlette = "^0.37.2"
+uvicorn = {extras = ["standard"], version = "^0.27.1"}
 wait-for-it = "^2.2.2"
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.1.1"
+black = "^24.2.0"
 django-debug-toolbar = "^4.3.0"
 django-extensions = "^3.2.3"
 flake8 = "^7.0.0"
 ipdb = "^0.13.13"
-ipython = "^8.21.0"
+ipython = "^8.22.2"
 isort = "^5.13.2"
 watchdog = "^4.0.0"
 
@@ -42,9 +42,12 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 120
-target-version = ['py310']
-exclude = '/migrations/'
+target-version = ["py312"]
 preview = true
+enable-unstable-feature = [
+    "multiline_string_handling", "string_processing", "wrap_long_dict_values_in_parens",
+    "hex_codes_in_unicode_sequences", "hug_parens_with_braces_and_square_brackets"
+]
 
 [tool.isort]
 multi_line_output = 3
