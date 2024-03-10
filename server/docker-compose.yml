@@ -51,7 +51,7 @@ services:
 
   db:
     restart: always
-    image: postgres:15.5-alpine
+    image: postgres:15.6-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
@@ -65,7 +65,7 @@ services:
 
   logs:
     restart: always
-    image: amir20/dozzle:v6.2.2
+    image: amir20/dozzle:v6.2.7
     volumes:
       - "${DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock"
     environment:
