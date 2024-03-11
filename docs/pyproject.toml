@@ -5,12 +5,13 @@ description = ""
 authors = ["David Cooper <david.cooper@burningman.org>"]
 license = "MIT"
 readme = "../README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.9"
 mkdocs = "^1.5.3"
 mkdocs-macros-plugin = "^1.0.5"
-mkdocs-material = "^9.5.8"
+mkdocs-material = "^9.5.13"
 mkdocs-same-dir = "^0.1.3"
 
 [build-system]
