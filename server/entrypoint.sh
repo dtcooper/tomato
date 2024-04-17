@@ -27,6 +27,7 @@ if [ -z "$__RUN_HUEY" -a -z "$__RUN_API" ]; then
         . /.env
     fi
 
+    ./manage.py createcachetable -v0
     ./manage.py migrate
     if [ "$DEBUG" -a "$DEBUG" != '0' ]; then
         if [ "$(./manage.py shell -c 'from tomato.models import User; print("" if User.objects.exists() else "1")')" = 1 ]; then

@@ -145,6 +145,13 @@ HUEY = {
     "name": "tomato",
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "cache",
+    }
+}
+
 LANGUAGE_CODE = "en-us"
 USE_I18N = True
 USE_TZ = True
