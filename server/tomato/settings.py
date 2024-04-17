@@ -136,8 +136,6 @@ DATABASES = {
     }
 }
 
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-
 HUEY = {
     "results": False,
     "huey_class": "huey.SqliteHuey",
