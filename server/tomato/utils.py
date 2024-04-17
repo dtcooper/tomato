@@ -2,13 +2,7 @@ import json
 import os
 from pathlib import Path
 
-from huey import PriorityRedisHuey
-
 from django.core.serializers.json import DjangoJSONEncoder
-
-from django_redis import get_redis_connection
-
-from .constants import REDIS_PUBSUB_KEY
 
 
 def once_at_startup(crontab):
@@ -27,18 +21,6 @@ def once_at_startup(crontab):
 
 def django_json_dumps(obj):
     return json.dumps(obj, separators=(",", ":"), cls=DjangoJSONEncoder)
-
-
-def send_redis_message(message_type, data=None):
-    conn = get_redis_connection()
-    conn.publish(REDIS_PUBSUB_KEY, django_json_dumps({"type": message_type, "data": data}))
-
-
-class DjangoPriorityRedisHuey(PriorityRedisHuey):
-    def __init__(self, *args, **kwargs):
-        connection = get_redis_connection()
-        kwargs["connection_pool"] = connection.connection_pool
-        super().__init__(*args, **kwargs)
 
 
 def listdir_recursive(dirname):

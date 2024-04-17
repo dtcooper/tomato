@@ -13,17 +13,16 @@ RUN apt-get update \
         sox \
         $([ "$DEBUG" -a "$DEBUG" != '0' ] && echo \
             bash-completion \
-            less \
             iputils-ping \
+            less \
             nano \
             netcat-openbsd \
             postgresql-client \
-            redis-tools \
+            sqlite3 \
         ) \
     && rm -rf /var/lib/apt/lists/* \
     && if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
-        echo "alias redis-cli='redis-cli -h redis'" >> /root/.bashrc \
-        && echo "alias ls='ls --color=auto'" >> /root/.bashrc \
+        echo "alias ls='ls --color=auto'" >> /root/.bashrc \
         && echo "alias rs='[ -z \"\$__RUN_API\" -a -z \"\$__RUN_HUEY\" ] && ./manage.py runserver || /app/entrypoint.sh'" >> /root/.bashrc \
         && echo "alias sp='./manage.py shell_plus'" >> /root/.bashrc \
         && echo '. /etc/bash_completion' >> /root/.bashrc \

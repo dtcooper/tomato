@@ -14,9 +14,9 @@ if [ -z "$SECRET_KEY" ]; then
     NO_SECRET_KEY=1
 fi
 
-wait-for-it --timeout 0 --service db:5432 --service redis:6379
+wait-for-it --timeout 0 --service db:5432
 
-# If we're not running huey, migration and create tomato:tomato when DEBUG=1
+# If we're not running huey, migration and create tomato:tomato user when DEBUG=1
 if [ -z "$__RUN_HUEY" -a -z "$__RUN_API" ]; then
     if [ "$NO_SECRET_KEY" ]; then
         echo 'Generating SECRET_KEY...'

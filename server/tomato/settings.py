@@ -136,25 +136,12 @@ DATABASES = {
     }
 }
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "CONNECTION_POOL_KWARGS": {"max_connections": 50},
-            "PARSER_CLASS": "redis.connection._HiredisParser",
-            "PICKLE_VERSION": -1,
-        },
-        "KEY_PREFIX": "cache",
-    }
-}
-
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 HUEY = {
     "results": False,
-    "huey_class": "tomato.utils.DjangoPriorityRedisHuey",
+    "huey_class": "huey.SqliteHuey",
+    "filename": "/huey/huey.db",
     "immediate": HUEY_IMMEDIATE_MODE,
     "name": "tomato",
 }
