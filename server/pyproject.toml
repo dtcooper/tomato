@@ -32,6 +32,7 @@ flake8 = "^7.0.0"
 ipdb = "^0.13.13"
 ipython = "^8.23.0"
 isort = "^5.13.2"
+pywatchman = "^2.0.0"
 watchdog = {extras = ["watchmedo"], version = "^4.0.0"}
 
 [build-system]
@@ -60,5 +61,5 @@ combine_as_imports = true
 sections = ['FUTURE', 'STDLIB', 'THIRDPARTY', 'DJANGO', 'STARLETTE', 'DJANGOTHIRDPARTY', 'FIRSTPARTY', 'LOCALFOLDER']
 known_starlette = ['starlette', 'uvicorn']
 known_django = ['django']
-known_djangothirdparty = ['constance', 'dirtyfields', 'django_redis', 'django_file_form', 'environ', 'huey.contrib', 'safedelete', 'user_messages']
+known_djangothirdparty = ['constance', 'dirtyfields', 'django_file_form', 'environ', 'huey.contrib', 'safedelete', 'user_messages']
 skip = ['migrations']

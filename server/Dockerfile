@@ -19,6 +19,7 @@ RUN apt-get update \
             netcat-openbsd \
             postgresql-client \
             sqlite3 \
+            watchman \
         ) \
     && rm -rf /var/lib/apt/lists/* \
     && if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \

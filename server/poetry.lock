@@ -745,6 +745,21 @@ files = [
 cli = ["click (>=5.0)"]
 
 [[package]]
+name = "pywatchman"
+version = "2.0.0"
+description = "Watchman client for Python"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pywatchman-2.0.0-cp310-cp310-macosx_14_0_arm64.whl", hash = "sha256:a8b531a9276c1dc8897510824cbb3290e4a5775793889758020593aedb97015b"},
+    {file = "pywatchman-2.0.0-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:44217f0a38f40e64f975bd13eed91c73a076c0fb7e9e9908b96917389f53371e"},
+    {file = "pywatchman-2.0.0-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:51c2b4c72bea6b9fd90caf20759f5bc47febf0fd27bf2f247b87c66e2f6bab02"},
+    {file = "pywatchman-2.0.0-cp38-cp38-macosx_14_0_arm64.whl", hash = "sha256:ed905338952db01f6506104295a3176adf0d8c2575e4f00505cb123ae09a2755"},
+    {file = "pywatchman-2.0.0-cp39-cp39-macosx_14_0_arm64.whl", hash = "sha256:4183ea206be46cb45d48f59ef7540b849582798ccd51ce54e1e400237b7dbf43"},
+    {file = "pywatchman-2.0.0.tar.gz", hash = "sha256:25354d9e3647f94411a4c13e510c83a1ceecc17977b0525ba41b16e7019c7b0c"},
+]
+
+[[package]]
 name = "pyyaml"
 version = "6.0.1"
 description = "YAML parser and emitter for Python"
@@ -1240,4 +1255,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "3e19ddcdcb88333c92661bea9a63b6618167ea8070687d60c0665f58c9ff3728"
+content-hash = "65185d91bbb323623d74a0e2c5a69f01490b8dd32fda84e43423f1a7f1e27dd8"
