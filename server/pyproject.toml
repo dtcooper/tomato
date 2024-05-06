@@ -25,12 +25,12 @@ uvicorn = {extras = ["standard"], version = "^0.29.0"}
 wait-for-it = "^2.2.2"
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.4.0"
+black = "^24.4.2"
 django-debug-toolbar = "^4.3.0"
 django-extensions = "^3.2.3"
 flake8 = "^7.0.0"
 ipdb = "^0.13.13"
-ipython = "^8.23.0"
+ipython = "^8.24.0"
 isort = "^5.13.2"
 pywatchman = "^2.0.0"
 watchdog = {extras = ["watchmedo"], version = "^4.0.0"}
