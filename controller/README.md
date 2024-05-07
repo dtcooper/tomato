@@ -25,3 +25,8 @@ LED_PIN = 22  # GPIO pin number for LED
 
 Note: when turning device on, if the button is pressed then `ENABLE_DEBUG` will
 be set to ON regardless of value in `settings.toml`.
+
+## Debugging Tools
+
+1. [Google Labs web serial tester](https://googlechromelabs.github.io/serial-terminal/)
+2. [WebMIDI tester](https://studiocode.dev/webmidi-tester/)
