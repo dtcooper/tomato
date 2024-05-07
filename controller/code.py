@@ -1,12 +1,14 @@
 from adafruit_debouncer import Debouncer
 import adafruit_midi
 from adafruit_midi.control_change import ControlChange
+from adafruit_midi.system_exclusive import SystemExclusive
 import board
 import digitalio
 import microcontroller
 import pwmio
 import re
 import supervisor
+import sys
 import time
 import usb_midi
 
@@ -95,30 +97,36 @@ def process_keypress(on=True):
 
 
 print("Running main loop...\n")
+cmd = ""
+
 while True:
     if supervisor.runtime.serial_bytes_available:
-        cmd = input().strip().lower()
-        if match := CMD_LED_RE.match(cmd):
-            num = int(match.group(1))
-            process_led_command(num)
-        elif match := CMD_PRESS_RE.match(cmd):
-            action = match.group(2)
-            if action == "on":
-                process_keypress(on=True)
-            elif action == "off":
-                process_keypress(on=False)
+        read = sys.stdin.read(1)
+        cmd += read
+        sys.stdout.write(read)
+        if cmd.endswith("\n") or len(cmd) >= 100:  # No need to store more than 100 chars
+            cmd = cmd.strip().lower()
+            if match := CMD_LED_RE.match(cmd):
+                num = int(match.group(1))
+                process_led_command(num)
+            elif match := CMD_PRESS_RE.match(cmd):
+                action = match.group(2)
+                if action == "on":
+                    process_keypress(on=True)
+                elif action == "off":
+                    process_keypress(on=False)
+                else:
+                    process_keypress(on=True)
+                    time.sleep(0.1)
+                    process_keypress(on=False)
+            elif cmd == "reset":
+                print("Resetting...")
+                microcontroller.reset()
             else:
-                process_keypress(on=True)
-                time.sleep(0.1)
-                process_keypress(on=False)
-        elif cmd == "reset":
-            print("Resetting...")
-            microcontroller.reset()
-        else:
-            print("Invalid command. Usage:")
-            print(" * led <digit>")
-            print(" * press [ON | OFF]")
-            print(" * reset")
+                if cmd != "help":
+                    print(f"Invalid command: {cmd}")
+                print("Usage:\n" " * led <digit>\n" " * press [ON | OFF]\n" " * reset")
+            cmd = ""
 
     button.update()
     if button.fell:
@@ -128,10 +136,26 @@ while True:
         process_keypress(on=False)
 
     msg = midi.receive()
-    if msg is not None and isinstance(msg, ControlChange):
-        if msg.control == LED_CTRL:
-            process_led_command(msg.value)
+    if msg is not None:
+        if isinstance(msg, ControlChange):
+            if msg.control == LED_CTRL:
+                process_led_command(msg.value)
+            else:
+                print(f"WARNING: Unrecognized control message: {hex(msg.control)} / {hex(msg.value)}")
+        elif isinstance(msg, SystemExclusive):
+            # Send 0xF0 0x7D 0x64 0x65 0x62 0x75 0x67 0xF7
+            # 0xF0 = sysex
+            # 0x7D = non-commercial use manufactorer ID
+            # 0x64 0x65 0x62 0x75 0x67 = b"debug"
+            # 0xF7 = end message
+            if msg.data == b"debug":
+                print("Got debug system exclusive message. Setting nvm[0] = 1 and resetting.")
+                if microcontroller.nvm:
+                    microcontroller.nvm[0] = 1  # Run in debug mode
+                microcontroller.reset()
+            else:
+                print(f"Unrecognized system exclusive message: {msg}")
         else:
-            print(f"WARNING: Unrecognized control message: {hex(msg.control)} / {hex(msg.value)}")
+            print(f"Unrecognized midi message: {msg}")
 
     pulsate_update()

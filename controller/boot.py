@@ -1,4 +1,5 @@
 import digitalio
+import microcontroller
 import storage
 import supervisor
 import usb_cdc
@@ -29,10 +30,16 @@ if not debug:
     button.pull = digitalio.Pull.UP
     debug = not button.value
     if debug:
-        print("Forcing debug mode on (button pressed)")
+        print("Forcing debug via button press")
+
+if microcontroller.nvm and microcontroller.nvm[0] == 1:
+    if not debug:
+        debug = True
+        print("Forcing debug via nvm")
+    microcontroller.nvm[0] = 0  # Set to 0 for next boot
 
 if debug:
-    print("Debug mode on")
+    print("Running with debug mode on")
 else:
     storage.disable_usb_drive()
     usb_cdc.disable()
