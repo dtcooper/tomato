@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tomato MIDI Controller Tester</title>
+  <link rel="stylesheet" href="https://unpkg.com/simpledotcss/simple.min.css">
+  <style>
+    [x-cloak] {
+      display: none;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/webmidi@latest/dist/iife/webmidi.iife.js"></script>
+  <script src="https://unpkg.com/alpinejs" defer></script>
+  <script>
+    document.addEventListener('alpine:init', () => {
+      let midi
+
+      Alpine.data('main', () => ({
+        connected: false,
+        ledNum: 0,
+        logLines: [],
+        log(s) {
+          const date = new Date()
+          this.logLines.unshift(`${date.toLocaleDateString()} ${date.toLocaleTimeString()} - ${s}`)
+        },
+        async init() {
+          window.midi = midi = await WebMidi.enable({sysex: true})
+          midi.addListener("connected", (event) => {
+            const port = event.port
+            if (port instanceof Input) {
+              this.registerInput(port)
+            }
+          })
+          midi.inputs.forEach(input => this.registerInput(input))
+          this.connected = true
+          this.log("Connected!")
+        },
+        led() {
+          if (isNaN(this.ledNum) || (this.ledNum < 0) || (this.ledNum > 127)) {
+            this.log("Invalid LED number")
+          } else {
+            this.log(`Setting LED to ${this.ledNum}`)
+            midi.outputs.forEach((output) => {
+              output.channels[1].sendControlChange(0x11, this.ledNum)
+            })
+          }
+        },
+        sysex(data) {
+          this.log(`Sending sysex message: ${data}`)
+          midi.outputs.forEach((output) => {
+            output.sendSysex(0x7D, new TextEncoder().encode(`tomato:${data}`))
+          })
+        },
+        debug() {
+          if (confirm("Are you SURE you want to reset into DEBUG mode?")) {
+            this.sysex("debug")
+          }
+        },
+        registerInput(input) {
+          input.channels[1].removeListener() // Remove all existing listeners
+          input.removeListener()
+          input.channels[1].addListener("controlchange", (event) => {
+            if (event.controller.number === 16) {
+              this.log(`Button ${event.rawValue === 0 ? "released" : "pressed"}`)
+            }
+          })
+          input.addListener("sysex", (event) => {
+            const message = new TextDecoder().decode(event.message.rawDataBytes)
+            this.log(`Recieving sysex: ${message.substr(7)}`)
+          })
+        }
+      }))
+    })
+  </script>
+</head>
+<body x-data="main">
+  <header>
+    <h1>Tomato MIDI Controller Tester</h1>
+  </header>
+
+  <main x-show="connected" x-cloak>
+    <p>
+      <button @click="sysex('ping')">Ping</button>
+      <button @click="sysex('uptime')">Uptime</button>
+      <button @click="sysex('reset')">Reset</button>
+      <button @click="logLines = []">Clear Log</button>
+      <button @click="debug">Reset into DEBUG mode</button>
+    </p>
+    <p>
+      <input x-model.number="ledNum" type="number"> <button @click="led">Set LED</button>
+    </p>
+    <pre x-text="logLines.join('\n')"></pre>
+  </main>
+</body>
+</html>

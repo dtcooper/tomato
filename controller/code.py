@@ -74,32 +74,43 @@ def pulsate_update():
 
 
 def process_led_command(num):
-    print(f"Received LED control message: {num}")
+    print(f"Received LED control msg: {num}")
     if num in (ON, OFF):
         set_led_solid(num == ON)
     elif PULSATE_RANGE_START <= num <= PULSATE_RANGE_END:
         period = PULSATE_PERIODS[num - PULSATE_RANGE_START]
         set_led_pulsate(period=period)
     else:
-        print(f"WARNING: Unrecognized LED control message: {num}")
+        print(f"WARNING: Unrecognized LED control msg: {num}")
 
 
 def process_keypress(on=True):
     if on:
         midi.send(ControlChange(BUTTON_CTRL, PRESSED))
-        print("Sending button pressed MIDI message")
+        print("Sending button pressed MIDI msg")
         set_led_solid(False)
         builtin_led.value = True
     else:
         midi.send(ControlChange(BUTTON_CTRL, RELEASED))
-        print("Sending button released MIDI message")
+        print("Sending button released MIDI msg")
         builtin_led.value = False
 
 
+def uptime():
+    return round(time.monotonic() - boot_time)
+
+
+def send_tomato_sysex(data):
+    midi.send(SystemExclusive((0x7D,), b"tomato:%s" % data))
+
+
+boot_time = time.monotonic()
 print("Running main loop...\n")
+send_tomato_sysex(b"starting")
 cmd = ""
 
 while True:
+    # Process serial input
     if supervisor.runtime.serial_bytes_available:
         read = sys.stdin.read(1)
         cmd += read
@@ -119,43 +130,56 @@ while True:
                     process_keypress(on=True)
                     time.sleep(0.1)
                     process_keypress(on=False)
+            elif cmd == "uptime":
+                print(f"Uptime: {uptime()}s")
             elif cmd == "reset":
                 print("Resetting...")
                 microcontroller.reset()
             else:
                 if cmd != "help":
                     print(f"Invalid command: {cmd}")
-                print("Usage:\n" " * led <digit>\n" " * press [ON | OFF]\n" " * reset")
+                print("Usage:\n * led <digit>\n * press [ON | OFF]\n * uptime\n * reset")
             cmd = ""
 
+    # Process button
     button.update()
     if button.fell:
         process_keypress(on=True)
-
     if button.rose:
         process_keypress(on=False)
 
+    # Process midi messages
     msg = midi.receive()
     if msg is not None:
         if isinstance(msg, ControlChange):
             if msg.control == LED_CTRL:
                 process_led_command(msg.value)
             else:
-                print(f"WARNING: Unrecognized control message: {hex(msg.control)} / {hex(msg.value)}")
-        elif isinstance(msg, SystemExclusive):
-            # Send 0xF0 0x7D 0x64 0x65 0x62 0x75 0x67 0xF7
+                print(f"WARNING: Unrecognized ctrl MIDI msg: {hex(msg.control)} / {hex(msg.value)}")
+
+        elif isinstance(msg, SystemExclusive) and msg.data.startswith(b"tomato:"):
             # 0xF0 = sysex
             # 0x7D = non-commercial use manufactorer ID
-            # 0x64 0x65 0x62 0x75 0x67 = b"debug"
+            # 0x64 0x74 0x6f 0x6d 0x61 0x74 0x6f / b"tomato:" <command>
             # 0xF7 = end message
-            if msg.data == b"debug":
-                print("Got debug system exclusive message. Setting nvm[0] = 1 and resetting.")
+            cmd = msg.data[7:]
+            if cmd == b"debug":
+                print("Got debug sysex MIDI msg. Set nvm[0] = 1 and reset.")
                 if microcontroller.nvm:
-                    microcontroller.nvm[0] = 1  # Run in debug mode
+                    microcontroller.nvm[0] = 1  # Set nvm to run in debug mode next boot
                 microcontroller.reset()
+            elif cmd == b"reset":
+                print("Restarting microcontroller")
+                microcontroller.reset()
+            elif cmd == b"ping":
+                print("Responding to ping sysex MIDI msg")
+                send_tomato_sysex(b"pong")
+            elif cmd == b"uptime":
+                print("Reponding to uptime sys MIDI msg")
+                send_tomato_sysex(b"uptime:%d" % uptime())
             else:
-                print(f"Unrecognized system exclusive message: {msg}")
+                print(f"Unrecognized sysex MIDI msg: {cmd}")
         else:
-            print(f"Unrecognized midi message: {msg}")
+            print(f"Unrecognized MIDI msg: {msg}")
 
     pulsate_update()
