@@ -1,6 +1,5 @@
-import os
-
 import board
+import os
 
 
 def config_bool(name: str, default: bool = False) -> bool:

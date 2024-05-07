@@ -23,9 +23,7 @@ usb_midi.set_names(
 
 debug = config_bool("enable_debug")
 
-if debug:
-    print("Debug mode on")
-else:
+if not debug:
     button = digitalio.DigitalInOut(config_gpio_pin("button"))
     button.direction = digitalio.Direction.INPUT
     button.pull = digitalio.Pull.UP
@@ -33,6 +31,8 @@ else:
     if debug:
         print("Forcing debug mode on (button pressed)")
 
-if not debug:
+if debug:
+    print("Debug mode on")
+else:
     storage.disable_usb_drive()
     usb_cdc.disable()

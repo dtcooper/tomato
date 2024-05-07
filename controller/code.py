@@ -1,9 +1,12 @@
 from adafruit_debouncer import Debouncer
-from adafruit_midi.control_change import ControlChange
 import adafruit_midi
+from adafruit_midi.control_change import ControlChange
 import board
 import digitalio
+import microcontroller
 import pwmio
+import re
+import supervisor
 import time
 import usb_midi
 
@@ -16,10 +19,12 @@ PRESSED = 0x7F
 RELEASED = 0
 OFF = 0
 ON = 1
-PULSATE_SLOW = 2
-PULSATE_FAST = 3
-PULSATE_SLOW_PERIOD = 2.5
-PULSATE_FAST_PERIOD = 1
+PULSATE_PERIODS = (2.5, 1.75, 1.0, 0.6, 0.4, 0.25, 0.175)
+PULSATE_RANGE_START = 2
+PULSATE_RANGE_END = 2 + len(PULSATE_PERIODS) - 1
+
+CMD_LED_RE = re.compile(r"^led (\d+)$")
+CMD_PRESS_RE = re.compile(r"^press(\s+(on|off))?")
 
 print("Configuring pins")
 button = digitalio.DigitalInOut(config_gpio_pin("button"))
@@ -66,29 +71,66 @@ def pulsate_update():
             led.duty_cycle = int(0xFFFF - 0xFFFF * ((elapsed_time - half_period) / half_period))
 
 
-print("Running main loop...\n")
-while True:
-    button.update()
-    if button.fell:
+def process_led_command(num):
+    print(f"Received LED control message: {num}")
+    if num in (ON, OFF):
+        set_led_solid(num == ON)
+    elif PULSATE_RANGE_START <= num <= PULSATE_RANGE_END:
+        period = PULSATE_PERIODS[num - PULSATE_RANGE_START]
+        set_led_pulsate(period=period)
+    else:
+        print(f"WARNING: Unrecognized LED control message: {num}")
+
+
+def process_keypress(on=True):
+    if on:
         midi.send(ControlChange(BUTTON_CTRL, PRESSED))
         print("Sending button pressed MIDI message")
         set_led_solid(False)
         builtin_led.value = True
-    if button.rose:
+    else:
         midi.send(ControlChange(BUTTON_CTRL, RELEASED))
         print("Sending button released MIDI message")
         builtin_led.value = False
 
+
+print("Running main loop...\n")
+while True:
+    if supervisor.runtime.serial_bytes_available:
+        cmd = input().strip().lower()
+        if match := CMD_LED_RE.match(cmd):
+            num = int(match.group(1))
+            process_led_command(num)
+        elif match := CMD_PRESS_RE.match(cmd):
+            action = match.group(2)
+            if action == "on":
+                process_keypress(on=True)
+            elif action == "off":
+                process_keypress(on=False)
+            else:
+                process_keypress(on=True)
+                time.sleep(0.1)
+                process_keypress(on=False)
+        elif cmd == "reset":
+            print("Resetting...")
+            microcontroller.reset()
+        else:
+            print("Invalid command. Usage:")
+            print(" * led <digit>")
+            print(" * press [ON | OFF]")
+            print(" * reset")
+
+    button.update()
+    if button.fell:
+        process_keypress(on=True)
+
+    if button.rose:
+        process_keypress(on=False)
+
     msg = midi.receive()
     if msg is not None and isinstance(msg, ControlChange):
         if msg.control == LED_CTRL:
-            print("Received LED control message")
-            if msg.value in (ON, OFF):
-                set_led_solid(msg.value == ON)
-            elif msg.value in (PULSATE_SLOW, PULSATE_FAST):
-                set_led_pulsate(PULSATE_FAST_PERIOD if msg.value == PULSATE_FAST else PULSATE_SLOW_PERIOD)
-            else:
-                print(f"WARNING: Unrecognized LED control message: {msg.value}")
+            process_led_command(msg.value)
         else:
             print(f"WARNING: Unrecognized control message: {hex(msg.control)} / {hex(msg.value)}")
 
