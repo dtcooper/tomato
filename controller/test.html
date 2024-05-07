@@ -58,6 +58,7 @@
           }
         },
         registerInput(input) {
+          this.log(`Input: ${input.manufacturer}`)
           input.channels[1].removeListener() // Remove all existing listeners
           input.removeListener()
           input.channels[1].addListener("controlchange", (event) => {
@@ -67,7 +68,7 @@
           })
           input.addListener("sysex", (event) => {
             const message = new TextDecoder().decode(event.message.rawDataBytes)
-            this.log(`Recieving sysex: ${message.substr(7)}`)
+            this.log(`Received sysex: ${message.substr(7)}`)
           })
         }
       }))

@@ -82,6 +82,7 @@ def process_led_command(num):
         set_led_pulsate(period=period)
     else:
         print(f"WARNING: Unrecognized LED control msg: {num}")
+        send_tomato_sysex("bad-led-msg")
 
 
 def process_keypress(on=True):
@@ -156,6 +157,7 @@ while True:
                 process_led_command(msg.value)
             else:
                 print(f"WARNING: Unrecognized ctrl MIDI msg: {hex(msg.control)} / {hex(msg.value)}")
+                send_tomato_sysex("bad-ctrl-msg")
 
         elif isinstance(msg, SystemExclusive) and msg.data.startswith(b"tomato:"):
             # 0xF0 = sysex
@@ -178,8 +180,10 @@ while True:
                 print("Reponding to uptime sys MIDI msg")
                 send_tomato_sysex(b"uptime:%d" % uptime())
             else:
-                print(f"Unrecognized sysex MIDI msg: {cmd}")
+                print(f"WARNING: Unrecognized sysex MIDI msg: {cmd}")
+                send_tomato_sysex("bad-sysex-msg")
         else:
-            print(f"Unrecognized MIDI msg: {msg}")
+            print(f"WARNING: Unrecognized MIDI msg: {msg}")
+            send_tomato_sysex("bad-msg")
 
     pulsate_update()
