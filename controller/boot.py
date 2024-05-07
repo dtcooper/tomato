@@ -16,10 +16,9 @@ supervisor.set_usb_identification(
     product="Tomato Button Box",
 )
 usb_midi.set_names(
-    streaming_interface_name="streaming interface",
-    audio_control_interface_name="audio control",
-    in_jack_name="in jack",
-    out_jack_name="out jack",
+    audio_control_interface_name="Tomato Button Box",
+    in_jack_name="input",
+    out_jack_name="output",
 )
 
 debug = config_bool("enable_debug")

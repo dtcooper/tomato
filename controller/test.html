@@ -58,7 +58,7 @@
           }
         },
         registerInput(input) {
-          this.log(`Input: ${input.manufacturer}`)
+          this.log(`Input: ${input.name}`)
           input.channels[1].removeListener() // Remove all existing listeners
           input.removeListener()
           input.channels[1].addListener("controlchange", (event) => {
