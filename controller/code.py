@@ -5,14 +5,13 @@ from adafruit_midi.system_exclusive import SystemExclusive
 import board
 import digitalio
 import microcontroller
-import pwmio
 import re
 import supervisor
 import sys
 import time
 import usb_midi
 
-from utils import config_gpio_pin
+from utils import config_gpio_pin, PulsatingLED
 
 
 BUTTON_CTRL = 0x10
@@ -21,7 +20,7 @@ PRESSED = 0x7F
 RELEASED = 0
 OFF = 0
 ON = 1
-PULSATE_PERIODS = (2.5, 1.75, 1.0, 0.6, 0.4, 0.25, 0.175)
+PULSATE_PERIODS = (1.75, 1, 0.6)
 PULSATE_RANGE_START = 2
 PULSATE_RANGE_END = 2 + len(PULSATE_PERIODS) - 1
 
@@ -33,8 +32,7 @@ button = digitalio.DigitalInOut(config_gpio_pin("button"))
 button.pull = digitalio.Pull.UP
 button = Debouncer(button)
 
-led = pwmio.PWMOut(config_gpio_pin("led"), frequency=60)
-pulsate_period = 0
+led = PulsatingLED(pin=config_gpio_pin("led"))
 
 builtin_led = digitalio.DigitalInOut(board.LED)
 builtin_led.direction = digitalio.Direction.OUTPUT
@@ -48,38 +46,13 @@ midi = adafruit_midi.MIDI(
 )
 
 
-def set_led_solid(value=True):
-    global pulsate_period
-    led.duty_cycle = 0xFFFF if value else 0x0000
-    pulsate_period = 0
-    print(f"Turned LED {'on' if value else 'off'}")
-
-
-def set_led_pulsate(period):
-    global pulsate_period
-    pulsate_period = period
-    print(f"Set LED to pulsate with period of {period}s")
-
-
-def pulsate_update():
-    if pulsate_period > 0:
-        current_time = time.monotonic()
-        elapsed_time = current_time % pulsate_period
-        half_period = pulsate_period / 2
-
-        if elapsed_time < half_period:
-            led.duty_cycle = int(0xFFFF * (elapsed_time / half_period))
-        else:
-            led.duty_cycle = int(0xFFFF - 0xFFFF * ((elapsed_time - half_period) / half_period))
-
-
 def process_led_command(num):
     print(f"Received LED control msg: {num}")
     if num in (ON, OFF):
-        set_led_solid(num == ON)
+        led.solid(num == ON)
     elif PULSATE_RANGE_START <= num <= PULSATE_RANGE_END:
         period = PULSATE_PERIODS[num - PULSATE_RANGE_START]
-        set_led_pulsate(period=period)
+        led.pulsate(period=period)
     else:
         print(f"WARNING: Unrecognized LED control msg: {num}")
         send_tomato_sysex("bad-led-msg")
@@ -89,7 +62,7 @@ def process_keypress(on=True):
     if on:
         midi.send(ControlChange(BUTTON_CTRL, PRESSED))
         print("Sending button pressed MIDI msg")
-        set_led_solid(False)
+        led.off()
         builtin_led.value = True
     else:
         midi.send(ControlChange(BUTTON_CTRL, RELEASED))
@@ -118,28 +91,29 @@ while True:
         sys.stdout.write(read)
         if cmd.endswith("\n") or len(cmd) >= 100:  # No need to store more than 100 chars
             cmd = cmd.strip().lower()
-            if match := CMD_LED_RE.match(cmd):
-                num = int(match.group(1))
-                process_led_command(num)
-            elif match := CMD_PRESS_RE.match(cmd):
-                action = match.group(2)
-                if action == "on":
-                    process_keypress(on=True)
-                elif action == "off":
-                    process_keypress(on=False)
+            if cmd:
+                if match := CMD_LED_RE.match(cmd):
+                    num = int(match.group(1))
+                    process_led_command(num)
+                elif match := CMD_PRESS_RE.match(cmd):
+                    action = match.group(2)
+                    if action == "on":
+                        process_keypress(on=True)
+                    elif action == "off":
+                        process_keypress(on=False)
+                    else:
+                        process_keypress(on=True)
+                        time.sleep(0.1)
+                        process_keypress(on=False)
+                elif cmd == "uptime":
+                    print(f"Uptime: {uptime()}s")
+                elif cmd == "reset":
+                    print("Resetting...")
+                    microcontroller.reset()
                 else:
-                    process_keypress(on=True)
-                    time.sleep(0.1)
-                    process_keypress(on=False)
-            elif cmd == "uptime":
-                print(f"Uptime: {uptime()}s")
-            elif cmd == "reset":
-                print("Resetting...")
-                microcontroller.reset()
-            else:
-                if cmd != "help":
-                    print(f"Invalid command: {cmd}")
-                print("Usage:\n * led <digit>\n * press [ON | OFF]\n * uptime\n * reset")
+                    if cmd != "help":
+                        print(f"Invalid command: {cmd}")
+                    print("Usage:\n * led <digit>\n * press [ON | OFF]\n * uptime\n * reset")
             cmd = ""
 
     # Process button
@@ -186,4 +160,4 @@ while True:
             print(f"WARNING: Unrecognized MIDI msg: {msg}")
             send_tomato_sysex("bad-msg")
 
-    pulsate_update()
+    led.update()
