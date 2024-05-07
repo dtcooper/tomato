@@ -26,6 +26,33 @@ LED_PIN = 22  # GPIO pin number for LED
 Note: when turning device on, if the button is pressed then `ENABLE_DEBUG` will
 be set to ON regardless of value in `settings.toml`.
 
+## Basic MIDI Protocol
+
+### Button Presses (Receive from Device)
+
+Receive from the device **change control on channel 1** (`0xB0`) with purpose
+byte **general purpose #1** (`0x10`) with a value as defined below to register
+button presses,
+
+| Bytes                           | Button Press State |
+|---------------------------------|--------------------|
+| <code>0xB0 0x10 **0x7F**</code> | **Pressed**        |
+| <code>0xB0 0x10 **0x00**</code> | **Released**       |
+
+### LED Control (Send to Device)
+
+Send to the device **change control on channel 1** (`0xB0`) with purpose byte
+**general purpose #2** (`0x11`) with a value as defined below to achieve the
+following LED control actions,
+
+| Bytes                           | LED Control Action                        |
+|---------------------------------|-------------------------------------------|
+| <code>0xB0 0x11 **0x00**</code> | **OFF**                                   |
+| <code>0xB0 0x11 **0x01**</code> | **ON** (solid)                            |
+| <code>0xB0 0x11 **0x02**</code> | **Pulsate SLOW** (period = 1.75 seconds)  |
+| <code>0xB0 0x11 **0x03**</code> | **Pulsate MEDIUM** (period = 1.0 seconds) |
+| <code>0xB0 0x11 **0x04**</code> | **Pulsate FAST** (period = 0.6 seconds)   |
+
 ## Debugging Tools
 
 1. [Google Labs web serial tester](https://googlechromelabs.github.io/serial-terminal/)

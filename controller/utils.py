@@ -38,11 +38,11 @@ class PulsatingLED:
     def update(self):
         if self._period > 0:
             current_time = time.monotonic()
-            elapsed_time = current_time % self._period
+            elapsed = current_time % self._period
             half_period = self._period / 2
 
-            if elapsed_time < half_period:
-                duty_cycle = int(self._min_duty + (self._max_duty - self._min_duty) * (elapsed_time / half_period))
+            if elapsed < half_period:
+                duty = int(self._min_duty + (self._max_duty - self._min_duty) * (elapsed / half_period))
             else:
-                duty_cycle = int(self._max_duty - (self._max_duty - self._min_duty) * ((elapsed_time - half_period) / half_period))
-            self._pwm.duty_cycle = duty_cycle
+                duty = int(self._max_duty - (self._max_duty - self._min_duty) * ((elapsed - half_period) / half_period))
+            self._pwm.duty_cycle = duty
