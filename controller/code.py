@@ -158,10 +158,13 @@ def process_midi():
             if cmd.startswith(SYSEX_PREFIX):
                 cmd = cmd[len(SYSEX_PREFIX) :]
                 if cmd == b"debug":
+                    send_tomato_sysex("reset:debug")
                     reset(debug_mode=True)
                 elif cmd == b"reset":
+                    send_tomato_sysex("reset")
                     reset()
                 elif cmd == b"!flash!":
+                    send_tomato_sysex("reset:flash")
                     reset(uf2_mode=True)
                 elif cmd == b"ping":
                     debug("Responding to ping sysex MIDI msg")

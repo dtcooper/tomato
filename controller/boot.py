@@ -11,13 +11,15 @@ from config import AUTORELOAD, BUTTON_PIN, DEBUG
 
 usb_hid.disable()
 
-product_name = "Tomato Button Box"
+PRODUCT_NAME = "Tomato Button Box"
+MOUNT_NAME = "TOMATOBOX"
+
 supervisor.set_usb_identification(
     manufacturer="Tomato Radio Automation",
-    product=product_name,
+    product=PRODUCT_NAME,
 )
 usb_midi.set_names(
-    audio_control_interface_name=product_name,
+    audio_control_interface_name=PRODUCT_NAME,
     in_jack_name="input",
     out_jack_name="output",
 )
@@ -41,6 +43,13 @@ if not DEBUG:
         print("Button pressed, running in DEBUG mode")
         microcontroller.nvm[0:2] = b"\x00\x01"
         DEBUG = True
+
+mount = storage.getmount("/")
+if mount.label != MOUNT_NAME:
+    print(f"Renaming mount {mount.label} => {MOUNT_NAME}")
+    storage.remount("/", readonly=False)
+    mount.label = MOUNT_NAME
+    storage.remount("/", readonly=True)
 
 if DEBUG:
     if not AUTORELOAD:
