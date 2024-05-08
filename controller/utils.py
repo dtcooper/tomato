@@ -1,20 +1,11 @@
-import board
-import os
 import pwmio
 import time
 
-
-def config_bool(name: str, default: bool = False) -> bool:
-    return bool(os.getenv(name.upper(), default))
-
-
-def config_gpio_pin(name):
-    number = os.getenv(f"{name.upper()}_PIN")
-    return getattr(board, f"GP{number}")
+from config import DEBUG
 
 
 class PulsatingLED:
-    def __init__(self, pin, min_duty_cycle=0x2222, max_duty_cycle=0xFFFF, frequency=60):
+    def __init__(self, pin, *, min_duty_cycle=0x2222, max_duty_cycle=0xFFFF, frequency=60):
         self._min_duty = max(min(min_duty_cycle, 0xFFFF), 0x0000)
         self._max_duty = max(min(max_duty_cycle, 0xFFFF), 0x0000)
         self._pwm = pwmio.PWMOut(pin, frequency=frequency)
@@ -23,7 +14,8 @@ class PulsatingLED:
     def solid(self, on=True):
         self._period = 0
         self._pwm.duty_cycle = 0xFFFF if on else 0x0000
-        print(f"Turned LED {'on' if on else 'off'}")
+        if DEBUG:
+            print(f"Turned LED {'on' if on else 'off'}")
 
     def on(self):
         self.solid(on=True)
@@ -32,7 +24,8 @@ class PulsatingLED:
         self.solid(on=False)
 
     def pulsate(self, period):
-        print(f"Set LED to pulsate with period of {period}s (0x{self._min_duty:04x} <> 0x{self._max_duty:04X})")
+        if DEBUG:
+            print(f"Set LED to pulsate with period of {period}s (0x{self._min_duty:04x} <> 0x{self._max_duty:04X})")
         self._period = period
 
     def update(self):

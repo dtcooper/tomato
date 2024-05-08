@@ -1,3 +1,0 @@
-ENABLE_DEBUG = 0  # Debug mode, mounts drive and turns on serial console.
-BUTTON_PIN = 15  # GPIO pin number for button
-LED_PIN = 22  # GPIO pin number for LED

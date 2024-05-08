@@ -52,9 +52,9 @@
             output.sendSysex(0x7D, new TextEncoder().encode(`tomato:${data}`))
           })
         },
-        debug() {
-          if (confirm("Are you SURE you want to reset into DEBUG mode?")) {
-            this.sysex("debug")
+        sysexResetConfirm(data, message) {
+          if (confirm(`Are you SURE you want to RESET ${message}?`)) {
+            this.sysex(data)
           }
         },
         registerInput(input) {
@@ -84,9 +84,12 @@
     <p>
       <button @click="sysex('ping')">Ping</button>
       <button @click="sysex('uptime')">Uptime</button>
-      <button @click="sysex('reset')">Reset</button>
       <button @click="logLines = []">Clear Log</button>
-      <button @click="debug">Reset into DEBUG mode</button>
+    </p>
+    <p>
+      <button @click="sysexResetConfirm('reset', 'the device')">Reset</button>
+      <button @click="sysexResetConfirm('debug', 'into DEBUG mode')">Reset into DEBUG mode</button>
+      <button @click="sysexResetConfirm('!flash!', 'into FLASH mode')">Reset into FLASH mode</button>
     </p>
     <p>
       <input x-model.number="ledNum" type="number"> <button @click="led">Set LED</button>

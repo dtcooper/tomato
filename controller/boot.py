@@ -6,39 +6,47 @@ import usb_cdc
 import usb_hid
 import usb_midi
 
-from utils import config_bool, config_gpio_pin
+from config import BUTTON_PIN, AUTORELOAD, DEBUG
 
 
 usb_hid.disable()
 
+product_name = "Tomato Button Box"
 supervisor.set_usb_identification(
     manufacturer="Tomato Radio Automation",
-    product="Tomato Button Box",
+    product=product_name,
 )
 usb_midi.set_names(
-    audio_control_interface_name="Tomato Button Box",
+    audio_control_interface_name=product_name,
     in_jack_name="input",
     out_jack_name="output",
 )
 
-debug = config_bool("enable_debug")
+if DEBUG:
+    print("Running in DEBUG mode")
 
-if not debug:
-    button = digitalio.DigitalInOut(config_gpio_pin("button"))
+if microcontroller.nvm[0] == 1:
+    microcontroller.nvm[0:2] = b"\x00\x01"
+    if not DEBUG:
+        print("nvm flag set, running in DEBUG mode")
+        DEBUG = True
+else:
+    microcontroller.nvm[1] = 0
+
+if not DEBUG:
+    button = digitalio.DigitalInOut(BUTTON_PIN)
     button.direction = digitalio.Direction.INPUT
     button.pull = digitalio.Pull.UP
-    debug = not button.value
-    if debug:
-        print("Forcing debug via button press")
+    if not button.value:
+        print("Button pressed, running in DEBUG mode")
+        microcontroller.nvm[0:2] = b"\x00\x01"
+        DEBUG = True
 
-if microcontroller.nvm and microcontroller.nvm[0] == 1:
-    if not debug:
-        debug = True
-        print("Forcing debug via nvm")
-    microcontroller.nvm[0] = 0  # Set to 0 for next boot
-
-if debug:
-    print("Running with debug mode on")
+if DEBUG:
+    if not AUTORELOAD:
+        print("Turning off autoreload")
+        supervisor.runtime.autoreload = False
 else:
     storage.disable_usb_drive()
     usb_cdc.disable()
+    supervisor.runtime.autoreload = False
