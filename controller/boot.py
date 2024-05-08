@@ -6,7 +6,7 @@ import usb_cdc
 import usb_hid
 import usb_midi
 
-from config import BUTTON_PIN, AUTORELOAD, DEBUG
+from config import AUTORELOAD, BUTTON_PIN, DEBUG
 
 
 usb_hid.disable()

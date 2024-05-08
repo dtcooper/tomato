@@ -1,5 +1,6 @@
 import board
 
+
 # Debug mode, mounts drive and turns on serial console.
 # Will be true if button is pressed or "debug" is sent via serial/MIDI command
 DEBUG = False

@@ -1,7 +1,4 @@
 from adafruit_debouncer import Debouncer
-import adafruit_midi
-from adafruit_midi.control_change import ControlChange
-from adafruit_midi.system_exclusive import SystemExclusive
 import board
 import digitalio
 import microcontroller
@@ -10,6 +7,7 @@ import supervisor
 import sys
 import time
 import usb_midi
+import winterbloom_smolmidi as midi
 
 from config import BUTTON_PIN, DEBUG, LED_PIN
 from utils import PulsatingLED
@@ -18,11 +16,6 @@ from utils import PulsatingLED
 if not DEBUG and microcontroller.nvm[1] == 1:
     DEBUG = True
 
-
-BUTTON_CTRL = 0x10
-LED_CTRL = 0x11
-PRESSED = 0x7F
-RELEASED = 0
 OFF = 0
 ON = 1
 PULSATE_PERIODS = (1.75, 1, 0.6)
@@ -32,6 +25,13 @@ PULSATE_RANGE_END = 2 + len(PULSATE_PERIODS) - 1
 SERIAL_COMMAND_LED_RE = re.compile(rb"^led (\d+)$")
 SERIAL_COMMAND_PRESS_RE = re.compile(rb"^press(\s+(on|off))?")
 SERIAL_COMMANDS = ("help", "led <digit>", "press [ON | OFF]", "uptime", "reset", "debug", "!flash!")
+
+SYSEX_NON_COMMERCIAL = 0x7D
+SYSEX_PREFIX = b"\x7dtomato:"
+BUTTON_CTRL = 0x10
+LED_CTRL = 0x11
+PRESSED = 0x7F
+RELEASED = 0
 
 
 def debug(s):
@@ -50,12 +50,8 @@ builtin_led = digitalio.DigitalInOut(board.LED)
 builtin_led.direction = digitalio.Direction.OUTPUT
 
 debug("Initializing MIDI")
-midi = adafruit_midi.MIDI(
-    midi_in=usb_midi.ports[0],
-    in_channel=0,
-    midi_out=usb_midi.ports[1],
-    out_channel=0,
-)
+midi_in = midi.MidiIn(usb_midi.ports[0])
+midi_out = usb_midi.ports[1]
 
 
 def uptime():
@@ -75,14 +71,13 @@ def do_led_change(num):
 
 
 def do_keypress(on=True):
+    midi_out.write(b"%c%c%c" % (midi.CC, BUTTON_CTRL, PRESSED if on else RELEASED))
     if on:
-        midi.send(ControlChange(BUTTON_CTRL, PRESSED))
-        debug("Sending button pressed MIDI msg")
+        debug("Sent button pressed MIDI msg")
         led.off()
         builtin_led.value = True
     else:
-        midi.send(ControlChange(BUTTON_CTRL, RELEASED))
-        debug("Sending button released MIDI msg")
+        debug("Sent button released MIDI msg")
         builtin_led.value = False
 
 
@@ -144,43 +139,45 @@ def process_button():
         do_keypress(on=False)
 
 
-def send_tomato_sysex(data):
-    midi.send(SystemExclusive((0x7D,), b"tomato:%s" % data))
+def send_tomato_sysex(msg):
+    midi_out.write(b"%c%s%s%c" % (midi.SYSEX, SYSEX_PREFIX, msg, midi.SYSEX_END))
 
 
 def process_midi():
-    msg = midi.receive()
+    msg = midi_in.receive()
     if msg is not None:
-        if isinstance(msg, ControlChange):
-            if msg.control == LED_CTRL:
-                do_led_change(msg.value)
+        if msg.type == midi.CC and msg.channel == 0:
+            if msg.data[0] == LED_CTRL:
+                do_led_change(msg.data[1])
             else:
-                debug(f"WARNING: Unrecognized ctrl MIDI msg: {hex(msg.control)} / {hex(msg.value)}")
+                debug(f"WARNING: Unrecognized ctrl MIDI msg: {bytes(msg)}")
                 send_tomato_sysex("bad-ctrl-msg")
 
-        elif isinstance(msg, SystemExclusive) and msg.data.startswith(b"tomato:"):
-            # 0xF0 = sysex
-            # 0x7D = non-commercial use manufactorer ID
-            # 0x64 0x74 0x6f 0x6d 0x61 0x74 0x6f / b"tomato:" <command>
-            # 0xF7 = end message
-            cmd = msg.data[7:]
-            if cmd == b"debug":
-                reset(debug_mode=True)
-            elif cmd == b"reset":
-                reset()
-            elif cmd == b"!flash!":
-                reset(uf2_mode=True)
-            elif cmd == b"ping":
-                debug("Responding to ping sysex MIDI msg")
-                send_tomato_sysex(b"pong")
-            elif cmd == b"uptime":
-                debug("Responding to uptime sys MIDI msg")
-                send_tomato_sysex(b"uptime:%d" % uptime())
+        elif msg.type == midi.SYSEX:
+            cmd, _ = midi_in.receive_sysex(128)
+            if cmd.startswith(SYSEX_PREFIX):
+                cmd = cmd[len(SYSEX_PREFIX) :]
+                if cmd == b"debug":
+                    reset(debug_mode=True)
+                elif cmd == b"reset":
+                    reset()
+                elif cmd == b"!flash!":
+                    reset(uf2_mode=True)
+                elif cmd == b"ping":
+                    debug("Responding to ping sysex MIDI msg")
+                    send_tomato_sysex(b"pong")
+                elif cmd == b"uptime":
+                    debug("Responding to uptime sys MIDI msg")
+                    send_tomato_sysex(b"uptime:%d" % uptime())
+                else:
+                    debug(f"WARNING: Unrecognized command MIDI msg: {cmd}")
+                    send_tomato_sysex("bad-cmd-msg")
             else:
                 debug(f"WARNING: Unrecognized sysex MIDI msg: {cmd}")
                 send_tomato_sysex("bad-sysex-msg")
+
         else:
-            debug(f"WARNING: Unrecognized MIDI msg: {msg}")
+            debug(f"WARNING: Unrecognized MIDI msg: {bytes(msg)}")
             if DEBUG:
                 send_tomato_sysex("bad-msg-debug")
 

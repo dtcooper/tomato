@@ -10,7 +10,7 @@ Here's the button box firmware for a Raspberry Pi Pico flashed with CircuitPytho
    [CircuitPython Libraries](https://circuitpython.org/libraries),
     - [`adafruit_ticks`](https://docs.circuitpython.org/projects/ticks/) (required for `adafruit_debouncer`)
     - [`adafruit_debouncer`](https://docs.circuitpython.org/projects/debouncer/)
-    - [`adafruit_midi`](https://docs.circuitpython.org/projects/midi/)
+    - [`winterbloom_smolmidi`](https://github.com/wntrblm/Winterbloom_SmolMIDI/)
 3. Copy python (`*.py`) files and `settings.toml` in this folder on to your device
 
 ## Configuration
