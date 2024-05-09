@@ -58,7 +58,11 @@
           input.removeListener()
           input.channels[1].addListener("controlchange", (event) => {
             if (event.controller.number === 16) {
-              this.log(`Button ${event.rawValue === 0 ? "released" : "pressed"}`)
+              const pressed = event.rawValue === 0
+              this.log(`Button ${pressed ? "released" : "pressed"}`)
+              if (pressed) {
+                this.led(0, 'off, button press')
+              }
             }
           })
           input.addListener("sysex", (event) => {
@@ -90,9 +94,10 @@
       <strong>LED Control:</strong>
       <button @click="led(0, 'off')">OFF</button>
       <button @click="led(1, 'on')">ON</button>
-      <button @click="led(2, 'pulsate slow')">Pulsate (slow)</button>
-      <button @click="led(3, 'pulsate medium')">Pulsate (medium)</button>
-      <button @click="led(4, 'pulsate fast')">Pulsate (fast)</button>
+      <button @click="led(2, 'pulsate slow')">Pulse/slow</button>
+      <button @click="led(3, 'pulsate medium')">Pulse/medium</button>
+      <button @click="led(4, 'pulsate fast')">Pulse/fast</button>
+      <button @click="led(5, 'flash')">Flash</button>
     </p>
     <pre x-text="logLines.join('\n')"></pre>
   </main>

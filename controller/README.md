@@ -52,6 +52,7 @@ following LED control actions,
 | <code>0xB0 0x11 **0x02**</code> | **Pulsate SLOW** (period = 1.75 seconds)  |
 | <code>0xB0 0x11 **0x03**</code> | **Pulsate MEDIUM** (period = 1.0 seconds) |
 | <code>0xB0 0x11 **0x04**</code> | **Pulsate FAST** (period = 0.6 seconds)   |
+| <code>0xB0 0x11 **0x05**</code> | **Flash** (period = 1.0 seconds)          |
 
 ## Debugging Tools
 

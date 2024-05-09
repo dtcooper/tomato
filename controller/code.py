@@ -16,22 +16,26 @@ from utils import PulsatingLED
 if not DEBUG and microcontroller.nvm[1] == 1:
     DEBUG = True
 
-OFF = 0
-ON = 1
-PULSATE_PERIODS = (1.75, 1, 0.6)
-PULSATE_RANGE_START = 2
-PULSATE_RANGE_END = 2 + len(PULSATE_PERIODS) - 1
+# LED commands
+MIDI_LED_CTRL = 0x11
+LED_OFF = 0
+LED_ON = 1
+LED_PULSATE_PERIODS = (1.75, 1, 0.6)
+LED_PULSATE_RANGE_START = 2
+LED_PULSATE_RANGE_END = 2 + len(LED_PULSATE_PERIODS) - 1
+LED_FLASH_PERIOD = 1
+LED_FLASH = LED_PULSATE_RANGE_END + 1
 
 SERIAL_COMMAND_LED_RE = re.compile(rb"^led (\d+)$")
 SERIAL_COMMAND_PRESS_RE = re.compile(rb"^press(\s+(on|off))?")
 SERIAL_COMMANDS = ("help", "led <digit>", "press [ON | OFF]", "uptime", "reset", "debug", "!flash!")
 
+MIDI_BTN_CTRL = 0x10
+BTN_PRESSED = 0x7F
+BTN_RELEASED = 0
+
 SYSEX_NON_COMMERCIAL = 0x7D
-SYSEX_PREFIX = b"\x7dtomato:"
-BUTTON_CTRL = 0x10
-LED_CTRL = 0x11
-PRESSED = 0x7F
-RELEASED = 0
+SYSEX_PREFIX = b"%ctomato:" % SYSEX_NON_COMMERCIAL
 
 
 def debug(s):
@@ -60,21 +64,22 @@ def uptime():
 
 def do_led_change(num):
     debug(f"Received LED control msg: {num}")
-    if num in (ON, OFF):
-        led.solid(num == ON)
-    elif PULSATE_RANGE_START <= num <= PULSATE_RANGE_END:
-        period = PULSATE_PERIODS[num - PULSATE_RANGE_START]
+    if num in (LED_ON, LED_OFF):
+        led.solid(num == LED_ON)
+    elif LED_PULSATE_RANGE_START <= num <= LED_PULSATE_RANGE_END:
+        period = LED_PULSATE_PERIODS[num - LED_PULSATE_RANGE_START]
         led.pulsate(period=period)
+    elif num == LED_FLASH:
+        led.pulsate(period=LED_FLASH_PERIOD, flash=True)
     else:
         debug(f"WARNING: Unrecognized LED control msg: {num}")
         send_tomato_sysex("bad-led-msg")
 
 
 def do_keypress(on=True):
-    midi_out.write(b"%c%c%c" % (midi.CC, BUTTON_CTRL, PRESSED if on else RELEASED))
+    midi_out.write(b"%c%c%c" % (midi.CC, MIDI_BTN_CTRL, BTN_PRESSED if on else BTN_RELEASED))
     if on:
         debug("Sent button pressed MIDI msg")
-        led.off()
         builtin_led.value = True
     else:
         debug("Sent button released MIDI msg")
@@ -147,7 +152,7 @@ def process_midi():
     msg = midi_in.receive()
     if msg is not None:
         if msg.type == midi.CC and msg.channel == 0:
-            if msg.data[0] == LED_CTRL:
+            if msg.data[0] == MIDI_LED_CTRL:
                 do_led_change(msg.data[1])
             else:
                 debug(f"WARNING: Unrecognized ctrl MIDI msg: {bytes(msg)}")
@@ -187,12 +192,23 @@ def process_midi():
 
 boot_time = time.monotonic()
 serial_command = ""
+usb_was_connected = supervisor.runtime.usb_connected
 debug("Running main loop...\n")
 send_tomato_sysex(b"starting")
+
 
 while True:
     if DEBUG:
         process_serial()
+
+    if supervisor.runtime.usb_connected:
+        if not usb_was_connected:
+            do_led_change(LED_OFF)
+            send_tomato_sysex(b"reconnected")
+            usb_was_connected = True
+    elif usb_was_connected:
+        do_led_change(LED_FLASH)
+        usb_was_connected = False
 
     process_button()
     process_midi()
