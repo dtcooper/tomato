@@ -55,7 +55,7 @@ midi_out = usb_midi.ports[1]
 
 
 def uptime():
-    return round(time.monotonic() - boot_time)
+    return time.monotonic() - boot_time
 
 
 def do_led_change(num):
@@ -116,7 +116,7 @@ def process_serial():
                         time.sleep(0.1)
                         do_keypress(on=False)
                 elif serial_command == "uptime":
-                    debug(f"Uptime: {uptime()}s")
+                    debug(f"Uptime: {uptime():.5f}s")
                 elif serial_command == "reset":
                     reset()
                 elif serial_command == "debug":
@@ -171,7 +171,7 @@ def process_midi():
                     send_tomato_sysex(b"pong")
                 elif cmd == b"uptime":
                     debug("Responding to uptime sys MIDI msg")
-                    send_tomato_sysex(b"uptime:%d" % uptime())
+                    send_tomato_sysex(b"uptime:%.5fs" % uptime())
                 else:
                     debug(f"WARNING: Unrecognized command MIDI msg: {cmd}")
                     send_tomato_sysex("bad-cmd-msg")
