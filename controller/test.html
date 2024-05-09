@@ -18,7 +18,6 @@
 
       Alpine.data('main', () => ({
         connected: false,
-        ledNum: 0,
         logLines: [],
         log(s) {
           const date = new Date()
@@ -36,15 +35,11 @@
           this.connected = true
           this.log("Connected!")
         },
-        led() {
-          if (isNaN(this.ledNum) || (this.ledNum < 0) || (this.ledNum > 127)) {
-            this.log("Invalid LED number")
-          } else {
-            this.log(`Setting LED to ${this.ledNum}`)
-            midi.outputs.forEach((output) => {
-              output.channels[1].sendControlChange(0x11, this.ledNum)
-            })
-          }
+        led(num, description) {
+          this.log(`Setting LED to ${num} (${description})`)
+          midi.outputs.forEach((output) => {
+            output.channels[1].sendControlChange(0x11, num)
+          })
         },
         sysex(data) {
           this.log(`Sending sysex message: ${data}`)
@@ -52,8 +47,8 @@
             output.sendSysex(0x7D, new TextEncoder().encode(`tomato:${data}`))
           })
         },
-        sysexResetConfirm(data, message) {
-          if (confirm(`Are you SURE you want to RESET ${message}?`)) {
+        sysexResetConfirm(data, confirmMessage) {
+          if (confirm(`Are you SURE you want to RESET ${confirmMessage}?`)) {
             this.sysex(data)
           }
         },
@@ -92,7 +87,12 @@
       <button @click="sysexResetConfirm('!flash!', 'into FLASH mode')">Reset into FLASH mode</button>
     </p>
     <p>
-      <input x-model.number="ledNum" type="number"> <button @click="led">Set LED</button>
+      <strong>LED Control:</strong>
+      <button @click="led(0, 'off')">OFF</button>
+      <button @click="led(1, 'on')">ON</button>
+      <button @click="led(2, 'pulsate slow')">Pulsate (slow)</button>
+      <button @click="led(3, 'pulsate medium')">Pulsate (medium)</button>
+      <button @click="led(4, 'pulsate fast')">Pulsate (fast)</button>
     </p>
     <pre x-text="logLines.join('\n')"></pre>
   </main>
