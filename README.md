@@ -76,6 +76,10 @@ Head over to <http://localhost:8888/> in your web browser.
   * Tools, Databases, and Containers: [PostgreSQL](https://www.postgresql.org/),
     [docker-nginx-certbot](https://github.com/JonasAlfredsson/docker-nginx-certbot),
     and [Dozzle](https://dozzle.dev/).
+* Button Box (Controller) &mdash;
+  [Raspberry Pi Pico](https://www.raspberrypi.com/documentation/microcontrollers/raspberry-pi-pico.html)
+  (or similar) and [CircuitPython](https://circuitpython.org/)
+  * See [`controller/README.md`](controller/README.md) for firmware/setup instructions
 * Documentation
   * [MkDocs](https://www.mkdocs.org/) and [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/)
 
