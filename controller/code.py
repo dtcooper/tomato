@@ -7,9 +7,10 @@ import supervisor
 import sys
 import time
 import usb_midi
+
 import winterbloom_smolmidi as midi
 
-from config import BUTTON_PIN, DEBUG, LED_PIN
+from config import BUTTON_PIN, DEBUG, LED_PIN, LED_PWM_FREQUENCY, LED_PWM_MAX_DUTY_CYCLE, LED_PWM_MIN_DUTY_CYCLE
 from utils import PulsatingLED
 
 
@@ -48,7 +49,12 @@ button = digitalio.DigitalInOut(BUTTON_PIN)
 button.pull = digitalio.Pull.UP
 button = Debouncer(button)
 
-led = PulsatingLED(LED_PIN)
+led = PulsatingLED(
+    LED_PIN,
+    min_duty_cycle=LED_PWM_MIN_DUTY_CYCLE,
+    max_duty_cycle=LED_PWM_MAX_DUTY_CYCLE,
+    frequency=LED_PWM_FREQUENCY,
+)
 
 builtin_led = digitalio.DigitalInOut(board.LED)
 builtin_led.direction = digitalio.Direction.OUTPUT
@@ -161,7 +167,7 @@ def process_midi():
         elif msg.type == midi.SYSEX:
             cmd, _ = midi_in.receive_sysex(128)
             if cmd.startswith(SYSEX_PREFIX):
-                cmd = cmd[len(SYSEX_PREFIX) :]
+                cmd = cmd[len(SYSEX_PREFIX):]
                 if cmd == b"debug":
                     send_tomato_sysex("reset:debug")
                     reset(debug_mode=True)

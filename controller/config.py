@@ -13,3 +13,8 @@ BUTTON_PIN = board.GP15
 
 # Pin number for LED
 LED_PIN = board.GP22
+
+# Brightness settings for LED (these defaults should be okay)
+LED_PWM_MIN_DUTY_CYCLE = 0x1000
+LED_PWM_MAX_DUTY_CYCLE = 0xFFFF
+LED_PWM_FREQUENCY = 60
