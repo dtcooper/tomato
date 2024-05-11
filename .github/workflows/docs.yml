@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-22.04
     name: Publish
     env:
-      POETRY_VERSION: 1.8.2
+      POETRY_VERSION: 1.8.3
       PYTHONDONTWRITEBYTECODE: 1
       PYTHONUNBUFFERED: 1
     steps:
@@ -31,7 +31,7 @@ jobs:
           fetch-depth: 0
       -
         name: Setup Python 3.12
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       -

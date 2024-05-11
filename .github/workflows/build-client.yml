@@ -15,7 +15,7 @@ on:
 
 env:
   TOMATO_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || 'preview' }}
-  NODE_VERSION: 18
+  NODE_VERSION: 20
 
 concurrency:
   group: client-build-${{ github.ref_type }}-${{ github.ref_name }}
@@ -73,13 +73,13 @@ jobs:
             echo "TOMATO_VERSION_SUFFIX=-r$(git rev-list --count HEAD).$(git rev-parse --short=8 HEAD)" >> "$GITHUB_ENV"
           fi
       -
-        name: Setup Node v18
+        name: Setup Node v${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       -
         # macOS: appears to fix https://github.com/electron/forge/issues/2807
-        name: Setup Python 3.11 (macOS)
+        name: Fix macOS build
         uses: actions/setup-python@v5
         if: matrix.platform == 'darwin'
         with:
@@ -103,7 +103,7 @@ jobs:
           fi
       -
         name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3  # Can't update to v4, doesn't support merging files
         with:
           name: client-build-files
           path: client-build-files
@@ -120,13 +120,13 @@ jobs:
         uses: actions/checkout@v4
       -
         name: Download build artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v3  # Can't update to v4, doesn't support merging files
         with:
           name: client-build-files
           path: client-build-files
       -
         name: Remove old preview release
-        uses: dev-drprasad/delete-tag-and-release@v0.2.1
+        uses: dev-drprasad/delete-tag-and-release@v1.1
         if: github.ref_type != 'tag'
         with:
           delete_release: true
