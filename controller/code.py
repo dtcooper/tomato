@@ -20,7 +20,7 @@ if not DEBUG and microcontroller.nvm[1] == 1:
 MIDI_LED_CTRL = 0x11
 LED_OFF = 0
 LED_ON = 1
-LED_PULSATE_PERIODS = (1.75, 1, 0.6)
+LED_PULSATE_PERIODS = (2.25, 1.25, 0.6)
 LED_PULSATE_RANGE_START = 2
 LED_PULSATE_RANGE_END = 2 + len(LED_PULSATE_PERIODS) - 1
 LED_FLASH_PERIOD = 1
@@ -204,7 +204,7 @@ while True:
     if supervisor.runtime.usb_connected:
         if not usb_was_connected:
             do_led_change(LED_OFF)
-            send_tomato_sysex(b"reconnected")
+            send_tomato_sysex(b"connected")
             usb_was_connected = True
     elif usb_was_connected:
         do_led_change(LED_FLASH)
