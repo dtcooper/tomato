@@ -21,7 +21,7 @@ if not DEBUG and microcontroller.nvm[1] == 1:
 MIDI_LED_CTRL = 0x11
 LED_OFF = 0
 LED_ON = 1
-LED_PULSATE_PERIODS = (2.25, 1.25, 0.6)
+LED_PULSATE_PERIODS = (2.25, 1.25, 0.6)  # slow, medium, fast
 LED_PULSATE_RANGE_START = 2
 LED_PULSATE_RANGE_END = 2 + len(LED_PULSATE_PERIODS) - 1
 LED_FLASH_PERIOD = 1
@@ -198,7 +198,12 @@ def process_midi():
 
 boot_time = time.monotonic()
 serial_command = ""
-usb_was_connected = supervisor.runtime.usb_connected
+
+if usb_was_connected := supervisor.runtime.usb_connected:
+    send_tomato_sysex(b"connected")
+else:
+    do_led_change(LED_FLASH)
+
 debug("Running main loop...\n")
 send_tomato_sysex(b"starting")
 

@@ -45,14 +45,14 @@ Send to the device **change control on channel 1** (`0xB0`) with purpose byte
 **general purpose #2** (`0x11`) with a value as defined below to achieve the
 following LED control actions,
 
-| Bytes                           | LED Control Action                        |
-|---------------------------------|-------------------------------------------|
-| <code>0xB0 0x11 **0x00**</code> | **OFF**                                   |
-| <code>0xB0 0x11 **0x01**</code> | **ON** (solid)                            |
-| <code>0xB0 0x11 **0x02**</code> | **Pulsate SLOW** (period = 1.75 seconds)  |
-| <code>0xB0 0x11 **0x03**</code> | **Pulsate MEDIUM** (period = 1.0 seconds) |
-| <code>0xB0 0x11 **0x04**</code> | **Pulsate FAST** (period = 0.6 seconds)   |
-| <code>0xB0 0x11 **0x05**</code> | **Flash** (period = 1.0 seconds)          |
+| Bytes                           | LED Control Action                         |
+|---------------------------------|--------------------------------------------|
+| <code>0xB0 0x11 **0x00**</code> | **OFF**                                    |
+| <code>0xB0 0x11 **0x01**</code> | **ON** (solid)                             |
+| <code>0xB0 0x11 **0x02**</code> | **Pulsate SLOW** (period = 2.25 seconds)   |
+| <code>0xB0 0x11 **0x03**</code> | **Pulsate MEDIUM** (period = 1.25 seconds) |
+| <code>0xB0 0x11 **0x04**</code> | **Pulsate FAST** (period = 0.6 seconds)    |
+| <code>0xB0 0x11 **0x05**</code> | **Flash** (period = 1.0 seconds)           |
 
 ## Debugging Tools
 
