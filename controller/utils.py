@@ -1,23 +1,26 @@
-import pwmio
 import time
+import pwmio
 
-from config import DEBUG
+
+__version__ = "0.0.1-dev"
+PRODUCT_NAME = "Tomato Button Box"
 
 
 class PulsatingLED:
-    def __init__(self, pin, *, min_duty_cycle=0x1000, max_duty_cycle=0xFFFF, frequency=60):
+    def __init__(self, pin, *, min_duty_cycle=0x1000, max_duty_cycle=0xFFFF, frequency=60, debug=False):
         self._min_duty = max(min(min_duty_cycle, 0xFFFF), 0x0000)
         self._max_duty = max(min(max_duty_cycle, 0xFFFF), 0x0000)
         self._duty_delta = self._max_duty - self._min_duty
         self._pwm = pwmio.PWMOut(pin, frequency=frequency)
         self._period = self._pulsate_started = 0.0
         self._flash_while_pulsating = False
+        self._debug = debug
 
     def solid(self, on=True):
         self._period = 0
         self._flash_while_pulsating = False
         self._pwm.duty_cycle = 0xFFFF if on else 0x0000
-        if DEBUG:
+        if self._debug:
             print(f"Turned LED {'on' if on else 'off'}")
 
     def on(self):
@@ -27,7 +30,7 @@ class PulsatingLED:
         self.solid(on=False)
 
     def pulsate(self, period, *, flash=False):
-        if DEBUG:
+        if self._debug:
             print(f"Set LED to pulsate, {period=}s (0x{self._min_duty:04x} <> 0x{self._max_duty:04X}), {flash=}")
         self._flash_while_pulsating = flash
         self._period = period

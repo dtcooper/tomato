@@ -11,11 +11,16 @@ import usb_midi
 import winterbloom_smolmidi as midi
 
 from config import BUTTON_PIN, DEBUG, LED_PIN, LED_PWM_FREQUENCY, LED_PWM_MAX_DUTY_CYCLE, LED_PWM_MIN_DUTY_CYCLE
-from utils import PulsatingLED
+from utils import PRODUCT_NAME, PulsatingLED, __version__
 
 
 if not DEBUG and microcontroller.nvm[1] == 1:
     DEBUG = True
+
+# Button commands
+MIDI_BTN_CTRL = 0x10
+BTN_PRESSED = 0x7F
+BTN_RELEASED = 0
 
 # LED commands
 MIDI_LED_CTRL = 0x11
@@ -27,14 +32,12 @@ LED_PULSATE_RANGE_END = 2 + len(LED_PULSATE_PERIODS) - 1
 LED_FLASH_PERIOD = 1
 LED_FLASH = LED_PULSATE_RANGE_END + 1
 
+# Serial
 SERIAL_COMMAND_LED_RE = re.compile(rb"^led (\d+)$")
 SERIAL_COMMAND_PRESS_RE = re.compile(rb"^press(\s+(on|off))?")
-SERIAL_COMMANDS = ("help", "led <digit>", "press [ON | OFF]", "uptime", "reset", "debug", "!flash!")
+SERIAL_COMMANDS = ("help", "led <digit>", "press [ON | OFF]", "version", "ping", "uptime", "reset", "debug", "!flash!")
 
-MIDI_BTN_CTRL = 0x10
-BTN_PRESSED = 0x7F
-BTN_RELEASED = 0
-
+# Sysex prefix
 SYSEX_NON_COMMERCIAL = 0x7D
 SYSEX_PREFIX = b"%ctomato:" % SYSEX_NON_COMMERCIAL
 
@@ -42,6 +45,9 @@ SYSEX_PREFIX = b"%ctomato:" % SYSEX_NON_COMMERCIAL
 def debug(s):
     if DEBUG:
         print(s)
+
+
+debug(f"Running {PRODUCT_NAME} v{__version__}")
 
 
 debug("Configuring pins")
@@ -54,6 +60,7 @@ led = PulsatingLED(
     min_duty_cycle=LED_PWM_MIN_DUTY_CYCLE,
     max_duty_cycle=LED_PWM_MAX_DUTY_CYCLE,
     frequency=LED_PWM_FREQUENCY,
+    debug=DEBUG,
 )
 
 builtin_led = digitalio.DigitalInOut(board.LED)
@@ -62,10 +69,6 @@ builtin_led.direction = digitalio.Direction.OUTPUT
 debug("Initializing MIDI")
 midi_in = midi.MidiIn(usb_midi.ports[0])
 midi_out = usb_midi.ports[1]
-
-
-def uptime():
-    return time.monotonic() - boot_time
 
 
 def do_led_change(num):
@@ -103,6 +106,30 @@ def reset(*, uf2_mode=False, debug_mode=False):
     microcontroller.reset()
 
 
+def process_cmd(cmd: bytes):  # None = error, False = no response
+    if cmd == b"uptime":
+        return b"%.5fs" % (time.monotonic() - boot_time)
+    elif cmd == b"temp":
+        return b"%.2f'C" % microcontroller.cpu.temperature
+    elif cmd == b"ping":
+        return b"pong"
+    elif cmd == b"version":
+        return "v%s" % __version__
+    elif cmd == b"reset":
+        send_tomato_sysex("reset")
+        reset()
+        return False
+    elif cmd == b"debug":
+        send_tomato_sysex("reset:debug")
+        reset(debug_mode=True)
+        return False
+    elif cmd == b"!flash!":
+        send_tomato_sysex("reset:flash")
+        reset(uf2_mode=True)
+        return False
+    return None
+
+
 def process_serial():
     global serial_command
 
@@ -113,6 +140,7 @@ def process_serial():
         if serial_command.endswith("\n") or len(serial_command) >= 100:  # No need to store more than 100 chars
             serial_command = serial_command.strip().lower()
             if serial_command:
+                help = f"Usage:\n * {'\n * '.join(SERIAL_COMMANDS)}"
                 if match := SERIAL_COMMAND_LED_RE.match(serial_command):
                     num = int(match.group(1))
                     do_led_change(num)
@@ -126,19 +154,15 @@ def process_serial():
                         do_keypress(on=True)
                         time.sleep(0.1)
                         do_keypress(on=False)
-                elif serial_command == "uptime":
-                    debug(f"Uptime: {uptime():.5f}s")
-                elif serial_command == "reset":
-                    reset()
-                elif serial_command == "debug":
-                    reset(debug_mode=True)
-                elif serial_command == "!flash!":
-                    reset(uf2_mode=True)
+                elif serial_command == "help":
+                    debug(help)
                 else:
-                    if serial_command != "help":
+                    value = process_cmd(serial_command.encode()).decode()
+                    if value is None:
                         debug(f"Invalid command: {serial_command}")
-                    cmds = "\n * ".join(SERIAL_COMMANDS)
-                    debug(f"Usage:\n * {cmds}")
+                        debug(help)
+                    elif value:
+                        debug(f"{serial_command}: {value}")
             serial_command = ""
 
 
@@ -168,24 +192,13 @@ def process_midi():
             cmd, _ = midi_in.receive_sysex(128)
             if cmd.startswith(SYSEX_PREFIX):
                 cmd = cmd[len(SYSEX_PREFIX):]
-                if cmd == b"debug":
-                    send_tomato_sysex("reset:debug")
-                    reset(debug_mode=True)
-                elif cmd == b"reset":
-                    send_tomato_sysex("reset")
-                    reset()
-                elif cmd == b"!flash!":
-                    send_tomato_sysex("reset:flash")
-                    reset(uf2_mode=True)
-                elif cmd == b"ping":
-                    debug("Responding to ping sysex MIDI msg")
-                    send_tomato_sysex(b"pong")
-                elif cmd == b"uptime":
-                    debug("Responding to uptime sys MIDI msg")
-                    send_tomato_sysex(b"uptime:%.5fs" % uptime())
-                else:
-                    debug(f"WARNING: Unrecognized command MIDI msg: {cmd}")
+                value = process_cmd(cmd)
+                if value is None:
+                    debug(f"WARNING: Unrecognized command MIDI msg: {cmd.decode()}")
                     send_tomato_sysex("bad-cmd-msg")
+                elif value:
+                    debug(f"Responding to {cmd.decode()} sysex message")
+                    send_tomato_sysex(b"%s:%s" % (bytes(cmd), value))
             else:
                 debug(f"WARNING: Unrecognized sysex MIDI msg: {cmd}")
                 send_tomato_sysex("bad-sysex-msg")

@@ -7,12 +7,14 @@ import usb_hid
 import usb_midi
 
 from config import AUTORELOAD, BUTTON_PIN, DEBUG
+from utils import PRODUCT_NAME, __version__
 
 
 usb_hid.disable()
 
-PRODUCT_NAME = "Tomato Button Box"
 MOUNT_NAME = "TOMATOBOX"
+
+print(f"Booting {PRODUCT_NAME} v{__version__}")
 
 supervisor.set_usb_identification(
     manufacturer="Tomato Radio Automation",
