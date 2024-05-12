@@ -85,11 +85,12 @@
       <button @click="sysex('uptime')">Uptime</button>
       <button @click="sysex('temp')">Temp</button>
       <button @click="sysex('version')">Version</button>
+      <button @click="sysex('is-debug')">Is DEBUG?</button>
       <button @click="logLines = []">Clear Log</button>
     </p>
     <p>
       <button @click="sysexResetConfirm('reset', 'the device')">Reset</button>
-      <button @click="sysexResetConfirm('debug', 'into DEBUG mode')">Reset into DEBUG mode</button>
+      <button @click="sysexResetConfirm('!debug!', 'into DEBUG mode')">Reset into DEBUG mode</button>
       <button @click="sysexResetConfirm('!flash!', 'into FLASH mode')">Reset into FLASH mode</button>
     </p>
     <p>

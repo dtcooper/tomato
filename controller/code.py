@@ -35,7 +35,18 @@ LED_FLASH = LED_PULSATE_RANGE_END + 1
 # Serial
 SERIAL_COMMAND_LED_RE = re.compile(rb"^led (\d+)$")
 SERIAL_COMMAND_PRESS_RE = re.compile(rb"^press(\s+(on|off))?")
-SERIAL_COMMANDS = ("help", "led <digit>", "press [ON | OFF]", "version", "ping", "uptime", "reset", "debug", "!flash!")
+SERIAL_COMMANDS = (
+    "help",
+    "led <digit>",
+    "press [ON | OFF]",
+    "is-debug",
+    "version",
+    "ping",
+    "uptime",
+    "reset",
+    "!debug!",
+    "!flash!",
+)
 
 # Sysex prefix
 SYSEX_NON_COMMERCIAL = 0x7D
@@ -113,11 +124,13 @@ def process_cmd(cmd: bytes):  # None = error, False = no response
         return b"pong"
     elif cmd == b"version":
         return "v%s" % __version__
+    elif cmd == b"is-debug":
+        return b"on" if DEBUG else b"off"
     elif cmd == b"reset":
         send_tomato_sysex("reset")
         reset()
         return False
-    elif cmd == b"debug":
+    elif cmd == b"!debug!":
         send_tomato_sysex("reset:debug")
         reset(debug_mode=True)
         return False
