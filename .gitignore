@@ -21,3 +21,6 @@ __pycache__/
 /server/docker-compose.override.yml
 /server/local-ca/
 /server/serve/
+
+# controller
+/controller/lib/
