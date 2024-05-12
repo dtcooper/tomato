@@ -48,8 +48,6 @@ def debug(s):
 
 
 debug(f"Running {PRODUCT_NAME} v{__version__}")
-
-
 debug("Configuring pins")
 button = digitalio.DigitalInOut(BUTTON_PIN)
 button.pull = digitalio.Pull.UP
