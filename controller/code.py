@@ -2,16 +2,25 @@ from adafruit_debouncer import Debouncer
 import board
 import digitalio
 import microcontroller
+import pwmio
 import re
 import supervisor
 import sys
 import time
 import usb_midi
-
 import winterbloom_smolmidi as midi
 
-from config import BUTTON_PIN, DEBUG, LED_PIN, LED_PWM_FREQUENCY, LED_PWM_MAX_DUTY_CYCLE, LED_PWM_MIN_DUTY_CYCLE
-from utils import PRODUCT_NAME, PulsatingLED, __version__
+from common import LAST_MODIFIED, PRODUCT_NAME, __version__
+from config import (
+    BUTTON_PIN,
+    DEBUG,
+    LED_FLASH_PERIOD,
+    LED_PIN,
+    LED_PULSATE_PERIODS,
+    LED_PWM_FREQUENCY,
+    LED_PWM_MAX_DUTY_CYCLE,
+    LED_PWM_MIN_DUTY_CYCLE,
+)
 
 
 if not DEBUG and microcontroller.nvm[1] == 1:
@@ -26,11 +35,9 @@ BTN_RELEASED = 0
 MIDI_LED_CTRL = 0x11
 LED_OFF = 0
 LED_ON = 1
-LED_PULSATE_PERIODS = (2.25, 1.25, 0.6)  # slow, medium, fast
-LED_PULSATE_RANGE_START = 2
-LED_PULSATE_RANGE_END = 2 + len(LED_PULSATE_PERIODS) - 1
-LED_FLASH_PERIOD = 1
-LED_FLASH = LED_PULSATE_RANGE_END + 1
+LED_FLASH = 2
+LED_PULSATE_RANGE_START = 3
+LED_PULSATE_RANGE_END = LED_PULSATE_RANGE_START + len(LED_PULSATE_PERIODS) - 1
 
 # Serial
 SERIAL_COMMAND_LED_RE = re.compile(rb"^led (\d+)$")
@@ -41,6 +48,7 @@ SERIAL_COMMANDS = (
     "press [ON | OFF]",
     "is-debug",
     "version",
+    "modified",
     "ping",
     "uptime",
     "reset",
@@ -58,7 +66,53 @@ def debug(s):
         print(s)
 
 
-debug(f"Running {PRODUCT_NAME} v{__version__}")
+debug(f"Running {PRODUCT_NAME} v{__version__}. Last modified {LAST_MODIFIED}.")
+
+
+class PulsatingLED:
+    def __init__(self, pin, *, min_duty_cycle=0x1000, max_duty_cycle=0xFFFF, frequency=60):
+        self._min_duty = max(min(min_duty_cycle, 0xFFFF), 0x0000)
+        self._max_duty = max(min(max_duty_cycle, 0xFFFF), 0x0000)
+        self._duty_delta = self._max_duty - self._min_duty
+        self._pwm = pwmio.PWMOut(pin, frequency=frequency)
+        self._period = self._pulsate_started = 0.0
+        self._flash_while_pulsating = False
+
+    def solid(self, on=True):
+        self._period = 0
+        self._flash_while_pulsating = False
+        self._pwm.duty_cycle = 0xFFFF if on else 0x0000
+        debug(f"Turned LED {'on' if on else 'off'}")
+
+    def on(self):
+        self.solid(on=True)
+
+    def off(self):
+        self.solid(on=False)
+
+    def pulsate(self, period, *, flash=False):
+        debug(f"Set LED to pulsate, {period=}s (0x{self._min_duty:04x} <> 0x{self._max_duty:04X}), {flash=}")
+        self._flash_while_pulsating = flash
+        self._period = period
+        self._pulsate_started = time.monotonic()
+
+    def update(self):
+        if self._period > 0:
+            current_time = time.monotonic()
+            elapsed = (current_time - self._pulsate_started) % self._period
+            half_period = self._period / 2
+            fading_in = elapsed < half_period
+
+            if self._flash_while_pulsating:
+                duty = 0xFFFF if fading_in else 0x0000
+            else:
+                if fading_in:
+                    duty = int(self._min_duty + self._duty_delta * (elapsed / half_period))
+                else:
+                    duty = int(self._max_duty - self._duty_delta * ((elapsed - half_period) / half_period))
+            self._pwm.duty_cycle = duty
+
+
 debug("Configuring pins")
 button = digitalio.DigitalInOut(BUTTON_PIN)
 button.pull = digitalio.Pull.UP
@@ -69,7 +123,6 @@ led = PulsatingLED(
     min_duty_cycle=LED_PWM_MIN_DUTY_CYCLE,
     max_duty_cycle=LED_PWM_MAX_DUTY_CYCLE,
     frequency=LED_PWM_FREQUENCY,
-    debug=DEBUG,
 )
 
 builtin_led = digitalio.DigitalInOut(board.LED)
@@ -84,11 +137,11 @@ def do_led_change(num):
     debug(f"Received LED control msg: {num}")
     if num in (LED_ON, LED_OFF):
         led.solid(num == LED_ON)
+    elif num == LED_FLASH:
+        led.pulsate(period=LED_FLASH_PERIOD, flash=True)
     elif LED_PULSATE_RANGE_START <= num <= LED_PULSATE_RANGE_END:
         period = LED_PULSATE_PERIODS[num - LED_PULSATE_RANGE_START]
         led.pulsate(period=period)
-    elif num == LED_FLASH:
-        led.pulsate(period=LED_FLASH_PERIOD, flash=True)
     else:
         debug(f"WARNING: Unrecognized LED control msg: {num}")
         send_tomato_sysex("bad-led-msg")
@@ -123,7 +176,9 @@ def process_cmd(cmd: bytes):  # None = error, False = no response
     elif cmd == b"ping":
         return b"pong"
     elif cmd == b"version":
-        return "v%s" % __version__
+        return b"v%s" % __version__
+    elif cmd == b"modified":
+        return LAST_MODIFIED.encode()
     elif cmd == b"is-debug":
         return b"on" if DEBUG else b"off"
     elif cmd == b"reset":
@@ -168,12 +223,12 @@ def process_serial():
                 elif serial_command == "help":
                     debug(help)
                 else:
-                    value = process_cmd(serial_command.encode()).decode()
+                    value = process_cmd(serial_command.encode())
                     if value is None:
                         debug(f"Invalid command: {serial_command}")
                         debug(help)
                     elif value:
-                        debug(f"{serial_command}: {value}")
+                        debug(f"{serial_command}: {value.decode()}")
             serial_command = ""
 
 
@@ -223,13 +278,20 @@ def process_midi():
 boot_time = time.monotonic()
 serial_command = ""
 
-if usb_was_connected := supervisor.runtime.usb_connected:
-    send_tomato_sysex(b"connected")
-else:
-    do_led_change(LED_FLASH)
+for first_try in (True, False):
+    if usb_was_connected := supervisor.runtime.usb_connected:
+        send_tomato_sysex(b"connected")
+        break
+    else:
+        if first_try:  # Sleep on first try, to prevent LED flicker
+            time.sleep(1)
+        else:  # Otherwise "flash"
+            do_led_change(LED_FLASH)
 
 debug("Running main loop...\n")
 send_tomato_sysex(b"starting")
+send_tomato_sysex(b"version:%s" % process_cmd(b"version"))
+send_tomato_sysex(b"modified:%s" % process_cmd(b"modified"))
 
 
 while True:

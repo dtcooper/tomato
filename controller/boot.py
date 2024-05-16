@@ -6,15 +6,15 @@ import usb_cdc
 import usb_hid
 import usb_midi
 
+from common import LAST_MODIFIED, PRODUCT_NAME, __version__
 from config import AUTORELOAD, BUTTON_PIN, DEBUG
-from utils import PRODUCT_NAME, __version__
 
 
 usb_hid.disable()
 
 MOUNT_NAME = "TOMATOBOX"
 
-print(f"Booting {PRODUCT_NAME} v{__version__}")
+print(f"Booting {PRODUCT_NAME} v{__version__}. Last modified {LAST_MODIFIED}.")
 
 supervisor.set_usb_identification(
     manufacturer="Tomato Radio Automation",

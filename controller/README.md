@@ -3,7 +3,7 @@
 Here's the button box firmware for a Raspberry Pi Pico flashed with CircuitPython.
 
 <div align="center">
-  <img src="https://raw.github.com/dtcooper/tomato/main/.github/tomato-controller.jpg" width="850">
+  <img src="https://raw.github.com/dtcooper/tomato/main/.github/tomato-controller.jpg" width="400">
 </div>
 
 ## Installation
@@ -12,6 +12,7 @@ Here's the button box firmware for a Raspberry Pi Pico flashed with CircuitPytho
    or greater onto your Pi Pico
 2. In the `lib/` folder on your device copy the following,
    [CircuitPython Libraries](https://circuitpython.org/libraries),
+    - [`adafruit_datetime`](https://docs.circuitpython.org/projects/datetime/)
     - [`adafruit_ticks`](https://docs.circuitpython.org/projects/ticks/) (required
       for `adafruit_debouncer`)
     - [`adafruit_debouncer`](https://docs.circuitpython.org/projects/debouncer/)
@@ -22,16 +23,15 @@ Here's the button box firmware for a Raspberry Pi Pico flashed with CircuitPytho
 
 ## Configuration
 
-Edit `settings.toml`,
+Edit `config.py`,
 
-```
-ENABLE_DEBUG = 0  # Debug mode, mounts drive and turns on serial console.
-BUTTON_PIN = 15  # GPIO pin number for button
-LED_PIN = 22  # GPIO pin number for LED
+```python
+# Configure pin numbers
+BUTTON_PIN = board.GP17  # Pin number for button
+LED_PIN = board.GP16  # Pin number for LED
 ```
 
-Note: when turning device on, if the button is pressed then `ENABLE_DEBUG` will
-be set to ON regardless of value in `settings.toml`.
+For additional settings, see [`config.py`](config.py)
 
 ## Basic MIDI Protocol
 
@@ -56,10 +56,10 @@ following LED control actions,
 |---------------------------------|--------------------------------------------|
 | <code>0xB0 0x11 **0x00**</code> | **OFF**                                    |
 | <code>0xB0 0x11 **0x01**</code> | **ON** (solid)                             |
-| <code>0xB0 0x11 **0x02**</code> | **Pulsate SLOW** (period = 2.25 seconds)   |
-| <code>0xB0 0x11 **0x03**</code> | **Pulsate MEDIUM** (period = 1.25 seconds) |
-| <code>0xB0 0x11 **0x04**</code> | **Pulsate FAST** (period = 0.6 seconds)    |
-| <code>0xB0 0x11 **0x05**</code> | **Flash** (period = 1.0 seconds)           |
+| <code>0xB0 0x11 **0x02**</code> | **Flash** (period = 1.0 seconds)           |
+| <code>0xB0 0x11 **0x03**</code> | **Pulsate SLOW** (period = 2.25 seconds)   |
+| <code>0xB0 0x11 **0x04**</code> | **Pulsate MEDIUM** (period = 1.25 seconds) |
+| <code>0xB0 0x11 **0x05**</code> | **Pulsate FAST** (period = 0.6 seconds)    |
 
 ## Debugging Tools
 

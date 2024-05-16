@@ -85,6 +85,7 @@
       <button @click="sysex('uptime')">Uptime</button>
       <button @click="sysex('temp')">Temp</button>
       <button @click="sysex('version')">Version</button>
+      <button @click="sysex('modified')">Modified</button>
       <button @click="sysex('is-debug')">Is DEBUG?</button>
       <button @click="logLines = []">Clear Log</button>
     </p>
@@ -97,10 +98,10 @@
       <strong>LED Control:</strong>
       <button @click="led(0, 'off')">OFF</button>
       <button @click="led(1, 'on')">ON</button>
-      <button @click="led(2, 'pulsate slow')">Pulse/slow</button>
-      <button @click="led(3, 'pulsate medium')">Pulse/medium</button>
-      <button @click="led(4, 'pulsate fast')">Pulse/fast</button>
-      <button @click="led(5, 'flash')">Flash</button>
+      <button @click="led(2, 'flash')">Flash</button>
+      <button @click="led(3, 'pulsate slow')">Pulse/slow</button>
+      <button @click="led(4, 'pulsate medium')">Pulse/medium</button>
+      <button @click="led(5, 'pulsate fast')">Pulse/fast</button>
     </p>
     <pre x-text="logLines.join('\n')"></pre>
   </main>
