@@ -2,6 +2,10 @@
 
 Here's the button box firmware for a Raspberry Pi Pico flashed with CircuitPython.
 
+<div align="center">
+  <img src="https://raw.github.com/dtcooper/tomato/main/.github/tomato-controller.jpg" width="850">
+</div>
+
 ## Installation
 
 1. Install [CircuitPython v9.1](https://circuitpython.org/board/raspberry_pi_pico/)
