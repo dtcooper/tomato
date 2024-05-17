@@ -257,22 +257,19 @@ def process_midi():
         elif msg.type == midi.SYSEX:
             cmd, _ = midi_in.receive_sysex(128)
             if cmd.startswith(SYSEX_PREFIX):
-                cmd = cmd[len(SYSEX_PREFIX):]
+                cmd = bytes(cmd[len(SYSEX_PREFIX):])
                 value = process_cmd(cmd)
                 if value is None:
                     debug(f"WARNING: Unrecognized command MIDI msg: {cmd.decode()}")
-                    send_tomato_sysex("bad-cmd-msg")
+                    send_tomato_sysex(b"bad-command:%s" % cmd)
                 elif value:
                     debug(f"Responding to {cmd.decode()} sysex message")
-                    send_tomato_sysex(b"%s:%s" % (bytes(cmd), value))
+                    send_tomato_sysex(b"%s:%s" % (cmd, value))
             else:
-                debug(f"WARNING: Unrecognized sysex MIDI msg: {cmd}")
-                send_tomato_sysex("bad-sysex-msg")
+                debug(f"WARNING: Unrecognized sysex MIDI msg: {cmd.decode()}")
 
         else:
             debug(f"WARNING: Unrecognized MIDI msg: {bytes(msg)}")
-            if DEBUG:
-                send_tomato_sysex("bad-msg-debug")
 
 
 boot_time = time.monotonic()
@@ -284,7 +281,7 @@ for first_try in (True, False):
         break
     else:
         if first_try:  # Sleep on first try, to prevent LED flicker
-            time.sleep(1)
+            time.sleep(3)
         else:  # Otherwise "flash"
             do_led_change(LED_FLASH)
 
