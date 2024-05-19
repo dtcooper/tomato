@@ -82,14 +82,12 @@
   <main x-show="connected" x-cloak>
     <p>
       <small>
-        <button @click="sysex('ping')">Ping</button>
-        <button @click="sysex('uptime')">Uptime</button>
-        <button @click="sysex('temp')">Temp</button>
-        <button @click="sysex('state')">State</button>
-        <button @click="sysex('version')">Version</button>
-        <button @click="sysex('modified')">Modified</button>
-        <button @click="sysex('is-debug')">Is DEBUG?</button>
-        <button @click="logLines = []">Clear Log</button>
+        <template x-for="action in ['ping', 'uptime', 'stats', 'state', 'version', 'modified', 'is-debug']">
+          <span>
+            <button @click="sysex(action)" x-text="action.charAt(0).toUpperCase() + action.substr(1).replace('-', ' ')"></button>
+          </span>
+        </template>
+        <button @click="logLines = []">Clear log</button>
       </small>
     </p>
     <p>

@@ -1,6 +1,7 @@
 from adafruit_debouncer import Debouncer
 import board
 import digitalio
+import gc
 import microcontroller
 import pwmio
 import re
@@ -52,6 +53,7 @@ SERIAL_COMMANDS = (
     "modified",
     "ping",
     "uptime",
+    "stats",
     "reset",
     "!debug!",
     "!flash!",
@@ -180,8 +182,8 @@ def reset(*, uf2_mode=False, debug_mode=False):
 def process_cmd(cmd: bytes):  # None = error, False = no response
     if cmd == b"uptime":
         return b"%.5fs" % (time.monotonic() - boot_time)
-    elif cmd == b"temp":
-        return b"%.2f'C" % microcontroller.cpu.temperature
+    elif cmd == b"stats":
+        return b"temp=%.2f'C/mem-free=%.1fkB" % (microcontroller.cpu.temperature, gc.mem_free() / 1024)
     elif cmd == b"ping":
         return b"pong"
     elif cmd == b"version":
