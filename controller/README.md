@@ -3,7 +3,7 @@
 Here's the button box firmware for a Raspberry Pi Pico flashed with CircuitPython.
 
 <div align="center">
-  <img src="https://raw.github.com/dtcooper/tomato/main/.github/tomato-controller.jpg" width="400">
+  <img src="https://raw.github.com/dtcooper/tomato/main/.github/tomato-controller.jpg" width="300">
 </div>
 
 ## Installation
@@ -60,6 +60,12 @@ following LED control actions,
 | <code>0xB0 0x11 **0x03**</code> | **Pulsate SLOW** (period = 2.25 seconds)   |
 | <code>0xB0 0x11 **0x04**</code> | **Pulsate MEDIUM** (period = 1.25 seconds) |
 | <code>0xB0 0x11 **0x05**</code> | **Pulsate FAST** (period = 0.6 seconds)    |
+
+## Circuit Diagram
+
+<div align="center">
+  <img src="https://raw.github.com/dtcooper/tomato/main/.github/tomato-controller-circuit.svg" width="400">
+</div>
 
 ## Debugging Tools
 
