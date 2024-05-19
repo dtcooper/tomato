@@ -81,13 +81,16 @@
 
   <main x-show="connected" x-cloak>
     <p>
-      <button @click="sysex('ping')">Ping</button>
-      <button @click="sysex('uptime')">Uptime</button>
-      <button @click="sysex('temp')">Temp</button>
-      <button @click="sysex('version')">Version</button>
-      <button @click="sysex('modified')">Modified</button>
-      <button @click="sysex('is-debug')">Is DEBUG?</button>
-      <button @click="logLines = []">Clear Log</button>
+      <small>
+        <button @click="sysex('ping')">Ping</button>
+        <button @click="sysex('uptime')">Uptime</button>
+        <button @click="sysex('temp')">Temp</button>
+        <button @click="sysex('state')">State</button>
+        <button @click="sysex('version')">Version</button>
+        <button @click="sysex('modified')">Modified</button>
+        <button @click="sysex('is-debug')">Is DEBUG?</button>
+        <button @click="logLines = []">Clear Log</button>
+      </small>
     </p>
     <p>
       <button @click="sysexResetConfirm('reset', 'the device')">Reset</button>

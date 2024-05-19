@@ -46,6 +46,7 @@ SERIAL_COMMANDS = (
     "help",
     "led <digit>",
     "press [ON | OFF]",
+    "state",
     "is-debug",
     "version",
     "modified",
@@ -133,15 +134,23 @@ midi_in = midi.MidiIn(usb_midi.ports[0])
 midi_out = usb_midi.ports[1]
 
 
+led_state_global = b"off"
+
+
 def do_led_change(num):
+    global led_state_global
+
     debug(f"Received LED control msg: {num}")
     if num in (LED_ON, LED_OFF):
         led.solid(num == LED_ON)
+        led_state_global = b"on" if num == LED_ON else b"off"
     elif num == LED_FLASH:
         led.pulsate(period=LED_FLASH_PERIOD, flash=True)
+        led_state_global = b"flash"
     elif LED_PULSATE_RANGE_START <= num <= LED_PULSATE_RANGE_END:
         period = LED_PULSATE_PERIODS[num - LED_PULSATE_RANGE_START]
         led.pulsate(period=period)
+        led_state_global = b"pulsate[%.2fs]" % period
     else:
         debug(f"WARNING: Unrecognized LED control msg: {num}")
         send_tomato_sysex("bad-led-msg")
@@ -181,6 +190,8 @@ def process_cmd(cmd: bytes):  # None = error, False = no response
         return LAST_MODIFIED.encode()
     elif cmd == b"is-debug":
         return b"on" if DEBUG else b"off"
+    elif cmd == b"state":
+        return b"led=%s/button=%s" % (led_state_global, b"released" if button.value else b"pressed")
     elif cmd == b"reset":
         send_tomato_sysex("reset")
         reset()
