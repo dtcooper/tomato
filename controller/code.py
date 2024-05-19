@@ -270,7 +270,7 @@ def process_midi():
         elif msg.type == midi.SYSEX:
             cmd, _ = midi_in.receive_sysex(128)
             if cmd.startswith(SYSEX_PREFIX):
-                cmd = bytes(cmd[len(SYSEX_PREFIX):])
+                cmd = bytes(cmd[len(SYSEX_PREFIX) :])
                 value = process_cmd(cmd)
                 if value is None:
                     debug(f"WARNING: Unrecognized command MIDI msg: {cmd.decode()}")
@@ -299,7 +299,8 @@ for first_try in (True, False):
             do_led_change(LED_FLASH)
 
 debug("Running main loop...\n")
-send_tomato_sysex(b"starting")
+debug("Sent MIDI reset msg")
+midi_out.write(b"\xff")  # Device just reset
 send_tomato_sysex(b"version:%s" % process_cmd(b"version"))
 send_tomato_sysex(b"modified:%s" % process_cmd(b"modified"))
 
