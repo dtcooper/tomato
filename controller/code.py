@@ -312,7 +312,7 @@ while True:
     if supervisor.runtime.usb_connected:
         if not usb_was_connected:
             do_led_change(LED_OFF)
-            send_tomato_sysex(b"connected")
+            midi_out.write(b"\xff")  # Device just reset
             usb_was_connected = True
     elif usb_was_connected:
         do_led_change(LED_FLASH)
