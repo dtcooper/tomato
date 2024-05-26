@@ -8,7 +8,8 @@
 <p align="center">
   <a href="https://dtcooper.github.io/tomato/">Documentation</a> |
   <a href="https://dtcooper.github.io/tomato/client/">Desktop App</a> |
-  <a href="https://dtcooper.github.io/tomato/server/">Server</a>
+  <a href="https://dtcooper.github.io/tomato/server/">Server</a> |
+  <a href="https://github.com/dtcooper/tomato/blob/main/controller/">Controller</a>
 </p>
 
 Client and server for Tomato Radio Automation software. Tomato is easy to use,
