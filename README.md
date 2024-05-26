@@ -133,6 +133,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [ ] A large clock in the UI
 - [ ] Make weights for previous 24 hours... AND reflect that in front-end (day-of
       pill) and back-end (sortable)... will require change to `END_DATE_PRIORITY_WEIGHT_MULTIPLIER`
+- [ ] Stop playing at end of current asset. (Stop playing in 3s with fadeout as well?)
 
 Other things
 - [ ] Ability to do speech synthesis / pull asset from API? / weather
