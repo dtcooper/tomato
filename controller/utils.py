@@ -15,7 +15,7 @@ FORCED_DEBUG = microcontroller.nvm[1] == 1
 
 
 def debug(s):
-    if DEBUG:
+    if DEBUG or FORCED_DEBUG:
         print(f"t={time.monotonic() - BOOT_TIME:.03f} - {s}")
 
 
