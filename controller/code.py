@@ -8,44 +8,40 @@ import time
 import usb_midi
 import winterbloom_smolmidi as midi
 
-from common import __version__, LAST_MODIFIED, PRODUCT_NAME
 from config import (
     BUTTON_PIN,
     DEBUG,
     LED_FLASH_PERIOD,
     LED_PIN,
-    LED_PULSATE_PERIODS,
     LED_PWM_FREQUENCY,
     LED_PWM_MAX_DUTY_CYCLE,
     LED_PWM_MIN_DUTY_CYCLE,
 )
-from utils import b64_json_encode, debug, PulsatingLED, uptime
+from constants import (
+    BTN_PRESSED,
+    BTN_RELEASED,
+    LED_FLASH,
+    LED_OFF,
+    LED_ON,
+    LED_PULSATE_PERIODS,
+    LED_PULSATE_RANGE_END,
+    LED_PULSATE_RANGE_START,
+    MIDI_BTN_CTRL,
+    MIDI_LED_CTRL,
+    PRODUCT_NAME,
+    SYSEX_MAX_LEN,
+    SYSEX_PREFIX,
+    SYSEX_PREFIX_LEN,
+    VERSION,
+)
+from utils import debug, encode_stats_sysex, PulsatingLED, uptime
 
 
-debug(f"Running {PRODUCT_NAME} v{__version__}. Last modified {LAST_MODIFIED}.")
+debug(f"Running {PRODUCT_NAME} v{VERSION}.")
 
 
-# System Exclusive
-SYSEX_PREFIX = b"\x7d!T~"  # 0x7D is the non-commercial sysex prefix
-SYSEX_PREFIX_LEN = len(SYSEX_PREFIX)
-SYSEX_MAX_LEN = 128
-
-# Button commands
-MIDI_BTN_CTRL = 0x10
-BTN_PRESSED = 0x7F
-BTN_RELEASED = 0
-
-# LED commands
-MIDI_LED_CTRL = 0x11
-LED_OFF = 0
-LED_ON = 1
-LED_FLASH = 2
-LED_PULSATE_RANGE_START = 3
-LED_PULSATE_RANGE_END = LED_PULSATE_RANGE_START + len(LED_PULSATE_PERIODS) - 1
-
-
-def do_keypress(on=True, *, midi_send_now=False):
-    midi_send(b"%c%c%c" % (midi.CC, MIDI_BTN_CTRL, BTN_PRESSED if on else BTN_RELEASED), now=midi_send_now)
+def do_keypress(on=True, *, now=False):
+    send_midi_bytes(b"%c%c%c" % (midi.CC, MIDI_BTN_CTRL, BTN_PRESSED if on else BTN_RELEASED), now=now)
     if on:
         debug("Button pressed. Sending MIDI message.")
         builtin_led.value = True
@@ -83,8 +79,9 @@ def reset(*, mode=None):
     microcontroller.reset()
 
 
-def send_sysex(msg, *, now=False):
-    midi_send(b"%c%s%s%c" % (midi.SYSEX, SYSEX_PREFIX, msg, midi.SYSEX_END), now=now)
+def send_sysex(msg, *, now=False, name=None):
+    debug(f"Sending {msg if name is None else name} sysex")
+    send_midi_bytes(b"%c%s%s%c" % (midi.SYSEX, SYSEX_PREFIX, msg, midi.SYSEX_END), now=now)
 
 
 def write_outgoing_midi_data():
@@ -96,7 +93,7 @@ def write_outgoing_midi_data():
     return False
 
 
-def midi_send(msg, *, now=False):
+def send_midi_bytes(msg, *, now=False):
     midi_outgoing_data.extend(msg)
     if now:
         while write_outgoing_midi_data():
@@ -123,19 +120,18 @@ def process_midi_sysex(msg):
         send_sysex("pong")
     elif msg == b"stats":
         send_sysex(
-            b"stats/%s"
-            % b64_json_encode(
+            encode_stats_sysex(
                 {
                     "is-debug": DEBUG,
                     "led": led.state,
                     "mem-free": f"{gc.mem_free() / 1024:.1f}kB",
-                    "last-modified": LAST_MODIFIED,
                     "pressed": not button.value,
                     "temp": f"{microcontroller.cpu.temperature:.2f}'C",
                     "uptime": uptime(),
-                    "version": __version__,
-                }
-            )
+                    "version": VERSION,
+                },
+            ),
+            name="stats",
         )
     elif msg.startswith(b"simulate-keypress"):
         if msg.endswith(b"/on"):
@@ -143,9 +139,10 @@ def process_midi_sysex(msg):
         elif msg.endswith(b"/off"):
             do_keypress(on=False)
         else:  # Full
-            do_keypress(on=True, midi_send_now=True)
+            do_keypress(on=True, now=True)
             time.sleep(0.125)
             do_keypress(on=False)
+        debug(f"Responded to {msg.decode()} sysex")
     elif msg == b"!debug!":
         reset(mode="debug")
     elif msg == b"!flash!":
@@ -157,10 +154,10 @@ def process_midi_sysex(msg):
 def process_midi():
     msg = midi_in.receive()
     if msg is not None:
-        if msg.type == midi.CC and msg.channel == 0:
+        if msg.type == midi.CC and msg.channel == 0 and msg.data[0] == MIDI_LED_CTRL:
             do_led_change(msg.data[1])
 
-        if msg.type == midi.SYSTEM_RESET:
+        elif msg.type == midi.SYSTEM_RESET:
             reset()
 
         elif msg.type == midi.SYSEX:
@@ -168,7 +165,7 @@ def process_midi():
             if truncated:
                 debug("WARNING: truncated sysex message. Skipping!")
             elif msg.startswith(SYSEX_PREFIX):
-                process_midi_sysex(msg[len(SYSEX_PREFIX) :])
+                process_midi_sysex(msg[SYSEX_PREFIX_LEN:])
 
         else:
             debug(f"WARNING: Unrecognized MIDI msg: {bytes(msg)}")

@@ -12,7 +12,6 @@ Here's the button box firmware for a Raspberry Pi Pico flashed with CircuitPytho
    or greater onto your Pi Pico
 2. In the `lib/` folder on your device copy the following,
    [CircuitPython Libraries](https://circuitpython.org/libraries),
-    - [`adafruit_datetime`](https://docs.circuitpython.org/projects/datetime/)
     - [`adafruit_ticks`](https://docs.circuitpython.org/projects/ticks/) (required
       for `adafruit_debouncer`)
     - [`adafruit_debouncer`](https://docs.circuitpython.org/projects/debouncer/)

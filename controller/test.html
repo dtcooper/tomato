@@ -12,11 +12,24 @@
       display: none;
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/webmidi@latest/dist/iife/webmidi.iife.js"></script>
+  <script crossorigin src="https://unpkg.com/@msgpack/msgpack"></script>
+  <script src="https://unpkg.com/webmidi/dist/iife/webmidi.iife.js"></script>
   <script src="https://unpkg.com/alpinejs" defer></script>
   <script>
-    const SYSEX_PREFIX = '!T~'
-    const STATS_PREFIX = 'stats/'
+    const SYSEX_PREFIX = '!T~'  // From constants.py
+    const SYSEX_STATS_PREFIX = 'S~'
+
+    const unpackMsgPackMessage = (msg) => {
+      const unpacked = []
+      for (let index = 0; index < msg.length; index += 8) {
+        const chunk = msg.slice(index + 1, index + 8)
+        const msbByte = msg[index]
+        for (let chunkIndex = 0; chunkIndex < chunk.length; chunkIndex++) {
+          unpacked.push(chunk[chunkIndex] | (msbByte << (7 - chunkIndex)) & 0x80)
+        }
+      }
+      return MessagePack.decode(new Uint8Array(unpacked))
+    }
 
     document.addEventListener('alpine:init', () => {
       let midi
@@ -55,6 +68,7 @@
         resetConfirm(data, confirmMessage) {
           if (confirm(`Are you SURE you want to RESET ${confirmMessage}?`)) {
             if (data === 'reset') {
+              this.log("Sent system reset byte")
               midi.outputs.forEach((output) => {
                 output.sendReset()
               })
@@ -80,9 +94,9 @@
             let message = new TextDecoder().decode(event.message.rawDataBytes)
             if (message.startsWith(SYSEX_PREFIX)) {
               message = message.substr(SYSEX_PREFIX.length)
-              if (message.startsWith(STATS_PREFIX)) {
-                message = message.substr(STATS_PREFIX.length)
-                const stats = JSON.parse(atob(message))
+              if (message.startsWith(SYSEX_STATS_PREFIX)) {
+                const bytes = event.message.rawDataBytes.slice(SYSEX_PREFIX.length + SYSEX_STATS_PREFIX.length)
+                const stats = unpackMsgPackMessage(bytes)
                 this.log(`Received stats sysex: ${JSON.stringify(stats, null, 2)}`)
               } else {
                 this.log(`Received sysex: ${message}`)

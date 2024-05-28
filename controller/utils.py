@@ -1,11 +1,11 @@
-import binascii
 import io
-import json
 import microcontroller
+import msgpack
 import pwmio
 import time
 
 from config import DEBUG
+from constants import SYSEX_STATS_PREFIX
 
 
 # Utilities for code.py (not boot.py)
@@ -70,11 +70,21 @@ class PulsatingLED:
             self._pwm.duty_cycle = duty
 
 
-def b64_json_encode(obj):
-    json_bytes = io.BytesIO()
-    json.dump(obj, json_bytes)
-    json_bytes.getvalue()
-    return binascii.b2a_base64(json_bytes.getvalue(), newline=False)
+def encode_stats_sysex(obj):
+    bytes_io = io.BytesIO()
+    msgpack.pack(obj, bytes_io)
+    unpacked = bytes_io.getvalue()
+    packed = bytearray(SYSEX_STATS_PREFIX)
+
+    for index in range(0, len(unpacked), 7):
+        chunk = unpacked[index : index + 7]
+        msb_byte = 0
+        for chunk_index, byte in enumerate(chunk):
+            msb_byte |= ((byte & 0x80) >> 7) << chunk_index
+        packed.append(msb_byte)
+        packed.extend(byte & 0x7F for byte in chunk)
+
+    return bytes(packed)
 
 
 def uptime():
