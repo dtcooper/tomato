@@ -106,7 +106,7 @@ def midi_send(msg, *, now=False):
 
 class ProcessUSBConnected:
     def __init__(self):
-        self.usb_was_connected = True  # Assume we were connected, that way we'll process the transition
+        self.usb_was_connected = True  # Assume we were connected, that way we'll process the first call to flash
 
     def __call__(self):
         if supervisor.runtime.usb_connected:
@@ -130,7 +130,7 @@ def process_midi_sysex(msg):
                     "is-debug": DEBUG,
                     "led": led.state,
                     "mem-free": f"{gc.mem_free() / 1024:.1f}kB",
-                    "modified": LAST_MODIFIED,
+                    "last-modified": LAST_MODIFIED,
                     "pressed": not button.value,
                     "temp": f"{microcontroller.cpu.temperature:.2f}'C",
                     "uptime": uptime(),
@@ -207,6 +207,8 @@ midi_in = midi.MidiIn(usb_midi.ports[0])
 midi_out = usb_midi.ports[1]
 midi_outgoing_data = bytearray()
 
+if not supervisor.runtime.usb_connected:
+    time.sleep(3)
 
 while True:
     process_usb_connected()
