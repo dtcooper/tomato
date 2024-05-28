@@ -5,7 +5,6 @@ import microcontroller
 import pwmio
 import time
 
-from common import __version__
 from config import DEBUG
 
 
