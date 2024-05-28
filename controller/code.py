@@ -29,6 +29,7 @@ from constants import (
     MIDI_BTN_CTRL,
     MIDI_LED_CTRL,
     PRODUCT_NAME,
+    SYSEX_CONNECTED_MSG,
     SYSEX_MAX_LEN,
     SYSEX_PREFIX,
     SYSEX_PREFIX_LEN,
@@ -102,16 +103,26 @@ def send_midi_bytes(msg, *, now=False):
 
 class ProcessUSBConnected:
     def __init__(self):
-        self.usb_was_connected = True  # Assume we were connected, that way we'll process the first call to flash
+        if not supervisor.runtime.usb_connected:
+            time.sleep(3)
+        if supervisor.runtime.usb_connected:
+            send_sysex(SYSEX_CONNECTED_MSG)
+        self.usb_was_connected = True  # Always act like it was connected, so LEDs flashes if it's not
 
-    def __call__(self):
+    def on_connect(self):
+        do_led_change(LED_OFF)
+        send_sysex(SYSEX_CONNECTED_MSG)
+
+    def on_disconnect(self):
+        do_led_change(LED_FLASH)
+
+    def update(self):
         if supervisor.runtime.usb_connected:
             if not self.usb_was_connected:
-                do_led_change(LED_OFF)
-                send_sysex("connected")
+                self.on_connect()
                 self.usb_was_connected = True
         elif self.usb_was_connected:
-            do_led_change(LED_FLASH)
+            self.on_disconnect()
             self.usb_was_connected = False
 
 
@@ -181,9 +192,6 @@ def process_button():
         do_keypress(on=False)
 
 
-process_usb_connected = ProcessUSBConnected()
-
-
 debug("Configuring pins...")
 button = digitalio.DigitalInOut(BUTTON_PIN)
 button.pull = digitalio.Pull.UP
@@ -204,11 +212,10 @@ midi_in = midi.MidiIn(usb_midi.ports[0])
 midi_out = usb_midi.ports[1]
 midi_outgoing_data = bytearray()
 
-if not supervisor.runtime.usb_connected:
-    time.sleep(3)
+process_usb_connected = ProcessUSBConnected()
 
 while True:
-    process_usb_connected()
+    process_usb_connected.update()
     process_midi()
     process_button()
     led.update()

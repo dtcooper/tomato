@@ -2,7 +2,7 @@ from config import LED_PULSATE_PERIOD_FAST, LED_PULSATE_PERIOD_MEDIUM, LED_PULSA
 
 
 # General
-VERSION = "0.0.7-dev"
+VERSION = "0.0.8-dev"
 PRODUCT_NAME = "Tomato Button Box"
 
 # Button commands
@@ -20,7 +20,9 @@ LED_PULSATE_RANGE_START = 3
 LED_PULSATE_RANGE_END = LED_PULSATE_RANGE_START + len(LED_PULSATE_PERIODS) - 1
 
 # System Exclusive
-SYSEX_PREFIX = b"\x7d!T~"  # 0x7D is the non-commercial sysex prefix
+SYSEX_NON_COMMERCIAL = 0x7D
+SYSEX_PREFIX = b"%c!T~" % SYSEX_NON_COMMERCIAL  # 0x7D is the non-commercial sysex prefix
 SYSEX_PREFIX_LEN = len(SYSEX_PREFIX)
 SYSEX_STATS_PREFIX = b"S~"
 SYSEX_MAX_LEN = 128
+SYSEX_CONNECTED_MSG = f"{PRODUCT_NAME.lower().replace(' ', '-')}/{VERSION}"

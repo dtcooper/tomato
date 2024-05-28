@@ -18,7 +18,7 @@ Here's the button box firmware for a Raspberry Pi Pico flashed with CircuitPytho
     - [`winterbloom_smolmidi`](https://github.com/wntrblm/Winterbloom_SmolMIDI/)
       (optionally compile with
       [`mpy-cross`](https://adafruit-circuit-python.s3.amazonaws.com/index.html?prefix=bin/mpy-cross/))
-3. Copy python (`*.py`) files and `settings.toml` in this folder on to your device
+3. Copy python (`*.py`) files in this folder on to your device
 
 ## Configuration
 
@@ -64,13 +64,18 @@ following LED control actions,
 
 To reset the device, send it the **system reset** byte (`0xFF`).
 
+## Development
+
+Head to the [tester web page here](https://dtcooper.github.io/tomato/controller-test.html).
+(This is known to work in Google Chrome)
+
 ## Circuit Diagram
 
 <div align="center">
   <img src="https://raw.github.com/dtcooper/tomato/main/.github/tomato-controller-circuit.svg" width="400">
 </div>
 
-## Debugging Tools
+## Add'l Debugging Tools
 
 1. [Google Labs web serial tester](https://googlechromelabs.github.io/serial-terminal/)
 2. [WebMIDI tester](https://studiocode.dev/webmidi-tester/)

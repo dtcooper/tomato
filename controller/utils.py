@@ -88,4 +88,4 @@ def encode_stats_sysex(obj):
 
 
 def uptime():
-    return time.monotonic() - BOOT_TIME
+    return round(time.monotonic() - BOOT_TIME)

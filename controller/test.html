@@ -16,8 +16,12 @@
   <script src="https://unpkg.com/webmidi/dist/iife/webmidi.iife.js"></script>
   <script src="https://unpkg.com/alpinejs" defer></script>
   <script>
-    const SYSEX_PREFIX = '!T~'  // From constants.py
+    // From constants.py
+    const SYSEX_NON_COMMERCIAL = 0x7D
+    const SYSEX_PREFIX = '!T~'
     const SYSEX_STATS_PREFIX = 'S~'
+    const MIDI_BTN_CTRL = 0x10
+    const MIDI_LED_CTRL = 0x11
 
     const unpackMsgPackMessage = (msg) => {
       const unpacked = []
@@ -28,7 +32,7 @@
           unpacked.push(chunk[chunkIndex] | (msbByte << (7 - chunkIndex)) & 0x80)
         }
       }
-      return MessagePack.decode(new Uint8Array(unpacked))
+      return MessagePack.decode(unpacked)
     }
 
     document.addEventListener('alpine:init', () => {
@@ -56,13 +60,13 @@
         led(num, description) {
           this.log(`Setting LED to ${num} (${description})`)
           midi.outputs.forEach((output) => {
-            output.channels[1].sendControlChange(0x11, num)
+            output.channels[1].sendControlChange(MIDI_LED_CTRL, num)
           })
         },
         sysex(data) {
           this.log(`Sending sysex: ${data}`)
           midi.outputs.forEach((output) => {
-            output.sendSysex(0x7D, new TextEncoder().encode(`${SYSEX_PREFIX}${data}`))
+            output.sendSysex(SYSEX_NON_COMMERCIAL, new TextEncoder().encode(`${SYSEX_PREFIX}${data}`))
           })
         },
         resetConfirm(data, confirmMessage) {
@@ -82,7 +86,7 @@
           input.channels[1].removeListener() // Remove all existing listeners
           input.removeListener()
           input.channels[1].addListener("controlchange", (event) => {
-            if (event.controller.number === 16) {
+            if (event.controller.number === MIDI_BTN_CTRL) {
               const pressed = event.rawValue === 0
               this.log(`Button ${pressed ? "released" : "pressed"}`)
               if (pressed) {

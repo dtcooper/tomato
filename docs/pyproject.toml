@@ -11,7 +11,7 @@ package-mode = false
 python = "^3.9"
 mkdocs = "^1.6.0"
 mkdocs-macros-plugin = "^1.0.5"
-mkdocs-material = "^9.5.23"
+mkdocs-material = "^9.5.25"
 mkdocs-same-dir = "^0.1.3"
 
 [build-system]
