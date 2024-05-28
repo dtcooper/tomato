@@ -6,7 +6,7 @@ import usb_cdc
 import usb_hid
 import usb_midi
 
-from common import LAST_MODIFIED, PRODUCT_NAME, __version__
+from common import __version__, LAST_MODIFIED, PRODUCT_NAME
 from config import AUTORELOAD, BUTTON_PIN, DEBUG
 
 

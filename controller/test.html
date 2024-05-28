@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="en">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tomato MIDI Controller Tester</title>
   <link rel="stylesheet" href="https://unpkg.com/simpledotcss/simple.min.css">
@@ -13,6 +15,9 @@
   <script src="https://cdn.jsdelivr.net/npm/webmidi@latest/dist/iife/webmidi.iife.js"></script>
   <script src="https://unpkg.com/alpinejs" defer></script>
   <script>
+    const SYSEX_PREFIX = '!T~'
+    const STATS_PREFIX = 'stats/'
+
     document.addEventListener('alpine:init', () => {
       let midi
 
@@ -42,9 +47,9 @@
           })
         },
         sysex(data) {
-          this.log(`Sending sysex message: ${data}`)
+          this.log(`Sending sysex: ${data}`)
           midi.outputs.forEach((output) => {
-            output.sendSysex(0x7D, new TextEncoder().encode(`tomato:${data}`))
+            output.sendSysex(0x7D, new TextEncoder().encode(`${SYSEX_PREFIX}${data}`))
           })
         },
         sysexResetConfirm(data, confirmMessage) {
@@ -66,8 +71,19 @@
             }
           })
           input.addListener("sysex", (event) => {
-            const message = new TextDecoder().decode(event.message.rawDataBytes)
-            this.log(`Received sysex: ${message.substr(7)}`)
+            let message = new TextDecoder().decode(event.message.rawDataBytes)
+            if (message.startsWith(SYSEX_PREFIX)) {
+              message = message.substr(SYSEX_PREFIX.length)
+              if (message.startsWith(STATS_PREFIX)) {
+                message = message.substr(STATS_PREFIX.length)
+                const stats = JSON.parse(atob(message))
+                this.log(`Received stats sysex: ${JSON.stringify(stats, null, 2)}`)
+              } else {
+                this.log(`Received sysex: ${message}`)
+              }
+            } else {
+              this.log(`Received INVALID sysex: ${message}`)
+            }
           })
           input.addListener("reset", (event) => {
             this.log("Device sent reset message")
@@ -84,16 +100,12 @@
 
   <main x-show="connected" x-cloak>
     <p>
-      <small>
-        <template x-for="action in ['ping', 'uptime', 'stats', 'state', 'version', 'modified', 'is-debug']">
-          <span>
-            <button @click="sysex(action)" x-text="action.charAt(0).toUpperCase() + action.substr(1).replace('-', ' ')"></button>
-          </span>
-        </template>
-        <button @click="logLines = []">Clear log</button>
-      </small>
+      <button @click="sysex('ping')">Ping</button>
+      <button @click="sysex('stats')">Stats</button>
+      <button @click="logLines = []">Clear log</button>
     </p>
     <p>
+      <strong>Reset:</strong>
       <button @click="sysexResetConfirm('reset', 'the device')">Reset</button>
       <button @click="sysexResetConfirm('!debug!', 'into DEBUG mode')">Reset into DEBUG mode</button>
       <button @click="sysexResetConfirm('!flash!', 'into FLASH mode')">Reset into FLASH mode</button>
@@ -106,6 +118,11 @@
       <button @click="led(3, 'pulsate slow')">Pulse/slow</button>
       <button @click="led(4, 'pulsate medium')">Pulse/medium</button>
       <button @click="led(5, 'pulsate fast')">Pulse/fast</button>
+      <br>
+      <strong>Simulate Keypress:</strong>
+      <button @click="sysex('simulate-keypress/on')">ON</button>
+      <button @click="sysex('simulate-keypress/off')">OFF</button>
+      <button @click="sysex('simulate-keypress/full')">Full</button>
     </p>
     <pre x-text="logLines.join('\n')"></pre>
   </main>
