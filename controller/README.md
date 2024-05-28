@@ -61,6 +61,10 @@ following LED control actions,
 | <code>0xB0 0x11 **0x04**</code> | **Pulsate MEDIUM** (period = 1.25 seconds) |
 | <code>0xB0 0x11 **0x05**</code> | **Pulsate FAST** (period = 0.6 seconds)    |
 
+### Reset device
+
+To reset the device, send it the **system reset** byte (`0xFF`).
+
 ## Circuit Diagram
 
 <div align="center">
