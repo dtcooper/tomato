@@ -91,7 +91,6 @@ def write_outgoing_midi_data():
     # Return False when there's nothing else to write
     while len(midi_outgoing_data) > 0:
         n = midi_out.write(midi_outgoing_data)
-        debug(f"Wrote {n} bytes to midi")
         midi_outgoing_data[:] = midi_outgoing_data[n:]  # Modify in place
         return len(midi_outgoing_data) > 0
     return False
@@ -147,8 +146,6 @@ def process_midi_sysex(msg):
             do_keypress(on=True, midi_send_now=True)
             time.sleep(0.125)
             do_keypress(on=False)
-    elif msg == b"reset":
-        reset()
     elif msg == b"!debug!":
         reset(mode="debug")
     elif msg == b"!flash!":
@@ -162,6 +159,9 @@ def process_midi():
     if msg is not None:
         if msg.type == midi.CC and msg.channel == 0:
             do_led_change(msg.data[1])
+
+        if msg.type == midi.SYSTEM_RESET:
+            reset()
 
         elif msg.type == midi.SYSEX:
             msg, truncated = midi_in.receive_sysex(SYSEX_MAX_LEN)

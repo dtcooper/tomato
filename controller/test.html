@@ -52,9 +52,15 @@
             output.sendSysex(0x7D, new TextEncoder().encode(`${SYSEX_PREFIX}${data}`))
           })
         },
-        sysexResetConfirm(data, confirmMessage) {
+        resetConfirm(data, confirmMessage) {
           if (confirm(`Are you SURE you want to RESET ${confirmMessage}?`)) {
-            this.sysex(data)
+            if (data === 'reset') {
+              midi.outputs.forEach((output) => {
+                output.sendReset()
+              })
+            } else {
+              this.sysex(`!${data}!`)
+            }
           }
         },
         registerInput(input) {
@@ -106,9 +112,9 @@
     </p>
     <p>
       <strong>Reset:</strong>
-      <button @click="sysexResetConfirm('reset', 'the device')">Reset</button>
-      <button @click="sysexResetConfirm('!debug!', 'into DEBUG mode')">Reset into DEBUG mode</button>
-      <button @click="sysexResetConfirm('!flash!', 'into FLASH mode')">Reset into FLASH mode</button>
+      <button @click="resetConfirm('reset', 'the device')">Reset</button>
+      <button @click="resetConfirm('debug', 'into DEBUG mode')">Reset into DEBUG mode</button>
+      <button @click="resetConfirm('flash', 'into FLASH mode')">Reset into FLASH mode</button>
     </p>
     <p>
       <strong>LED Control:</strong>
