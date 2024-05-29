@@ -117,11 +117,11 @@ def send_midi_bytes(msg, *, now=False):
 class ProcessUSBConnected:
     def __init__(self):
         for _ in range(12):
-            if not supervisor.runtime.usb_connected:
-                time.sleep(0.25)
+            if supervisor.runtime.usb_connected:
+                break
+            time.sleep(0.25)
 
-        is_connected = supervisor.runtime.usb_connected
-        if is_connected:
+        if is_connected := supervisor.runtime.usb_connected:
             self.on_connect()
         else:
             self.on_disconnect()
