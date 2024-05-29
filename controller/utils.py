@@ -1,36 +1,23 @@
 import io
-import microcontroller
 import msgpack
 import pwmio
 import time
 
-from config import DEBUG
 from constants import SYSEX_STATS_PREFIX
 
 
 # Utilities for code.py (not boot.py)
 
-BOOT_TIME = time.monotonic()
-FORCED_DEBUG = microcontroller.nvm[1] == 1
-
-
-def debug(s):
-    if DEBUG or FORCED_DEBUG:
-        print(f"t={time.monotonic() - BOOT_TIME:.03f} - {s}")
-
-
-if FORCED_DEBUG:
-    debug("Forcing DEBUG = True from nvm flag.")
-
 
 class PulsatingLED:
-    def __init__(self, pin, *, min_duty_cycle=0x1000, max_duty_cycle=0xFFFF, frequency=60):
+    def __init__(self, pin, *, min_duty_cycle=0x1000, max_duty_cycle=0xFFFF, frequency=60, debug=None):
         self._min_duty = max(min(min_duty_cycle, 0xFFFF), 0x0000)
         self._max_duty = max(min(max_duty_cycle, 0xFFFF), 0x0000)
         self._duty_delta = self._max_duty - self._min_duty
         self._pwm = pwmio.PWMOut(pin, frequency=frequency)
         self._period = self._pulsate_started = 0.0
         self._flash_while_pulsating = False
+        self._debug = debug
         self.state = "off"
 
     def solid(self, on=True):
@@ -38,14 +25,16 @@ class PulsatingLED:
         self._flash_while_pulsating = False
         self._pwm.duty_cycle = 0xFFFF if on else 0x0000
         self.state = "on" if on else "off"
-        debug(f"Turned LED {self.state}")
+        if self._debug:
+            self._debug(f"Turned LED {self.state}")
 
     def pulsate(self, period, *, flash=False):
-        debug(f"Set LED to pulsate, {period=}s (0x{self._min_duty:04x} <> 0x{self._max_duty:04X}), {flash=}")
         self._flash_while_pulsating = flash
         self._period = period
         self._pulsate_started = time.monotonic()
         self.state = f"{'flash' if flash else 'pulsate'}/period={period:.2f}s"
+        if self._debug:
+            self._debug(f"Set LED to {self.state} (duty cycle: 0x{self._min_duty:04x} <> 0x{self._max_duty:04X})")
 
     def update(self):
         if self._period > 0:
@@ -79,7 +68,3 @@ def encode_stats_sysex(obj):
         packed.extend(byte & 0x7F for byte in chunk)
 
     return bytes(packed)
-
-
-def uptime():
-    return round(time.monotonic() - BOOT_TIME)

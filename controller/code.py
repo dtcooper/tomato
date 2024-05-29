@@ -6,7 +6,7 @@ import microcontroller
 import supervisor
 import time
 import usb_midi
-import winterbloom_smolmidi as midi
+import winterbloom_smolmidi as smolmidi
 
 from config import (
     BUTTON_PIN,
@@ -16,6 +16,7 @@ from config import (
     LED_PWM_FREQUENCY,
     LED_PWM_MAX_DUTY_CYCLE,
     LED_PWM_MIN_DUTY_CYCLE,
+    MIDI_SYSEX_DEBUG,
 )
 from constants import (
     BTN_PRESSED,
@@ -35,14 +36,24 @@ from constants import (
     SYSEX_PREFIX_LEN,
     VERSION,
 )
-from utils import debug, encode_stats_sysex, PulsatingLED, uptime
+from utils import encode_stats_sysex, PulsatingLED
 
 
-debug(f"Running {PRODUCT_NAME} v{VERSION}.")
+BOOT_TIME = time.monotonic()
+DEBUG = DEBUG or microcontroller.nvm[1] == 1
+
+
+def debug(s):
+    if DEBUG or MIDI_SYSEX_DEBUG:
+        msg = f"t={time.monotonic() - BOOT_TIME:.03f} - {s}"
+        if DEBUG:
+            print(msg)
+        if MIDI_SYSEX_DEBUG:
+            send_sysex(b"debug/%s" % msg, skip_debug_msg=True)
 
 
 def do_keypress(on=True, *, now=False):
-    send_midi_bytes(b"%c%c%c" % (midi.CC, MIDI_BTN_CTRL, BTN_PRESSED if on else BTN_RELEASED), now=now)
+    send_midi_bytes(b"%c%c%c" % (smolmidi.CC, MIDI_BTN_CTRL, BTN_PRESSED if on else BTN_RELEASED), now=now)
     if on:
         debug("Button pressed. Sending MIDI message.")
         builtin_led.value = True
@@ -80,9 +91,10 @@ def reset(*, mode=None):
     microcontroller.reset()
 
 
-def send_sysex(msg, *, now=False, name=None):
-    debug(f"Sending {msg if name is None else name} sysex")
-    send_midi_bytes(b"%c%s%s%c" % (midi.SYSEX, SYSEX_PREFIX, msg, midi.SYSEX_END), now=now)
+def send_sysex(msg, *, now=False, name=None, skip_debug_msg=False):
+    if not skip_debug_msg:
+        debug(f"Sending {msg if name is None else name} sysex")
+    send_midi_bytes(b"%c%s%s%c" % (smolmidi.SYSEX, SYSEX_PREFIX, msg, smolmidi.SYSEX_END), now=now)
 
 
 def write_outgoing_midi_data():
@@ -106,12 +118,12 @@ class ProcessUSBConnected:
         if not supervisor.runtime.usb_connected:
             time.sleep(3)
         if supervisor.runtime.usb_connected:
-            send_sysex(SYSEX_CONNECTED_MSG)
+            send_sysex(SYSEX_CONNECTED_MSG, name="connected")
         self.usb_was_connected = True  # Always act like it was connected, so LEDs flashes if it's not
 
     def on_connect(self):
         do_led_change(LED_OFF)
-        send_sysex(SYSEX_CONNECTED_MSG)
+        send_sysex(SYSEX_CONNECTED_MSG, name="connected")
 
     def on_disconnect(self):
         do_led_change(LED_FLASH)
@@ -138,7 +150,7 @@ def process_midi_sysex(msg):
                     "mem-free": f"{gc.mem_free() / 1024:.1f}kB",
                     "pressed": not button.value,
                     "temp": f"{microcontroller.cpu.temperature:.2f}'C",
-                    "uptime": uptime(),
+                    "uptime": round(time.monotonic() - BOOT_TIME),
                     "version": VERSION,
                 },
             ),
@@ -165,18 +177,24 @@ def process_midi_sysex(msg):
 def process_midi():
     msg = midi_in.receive()
     if msg is not None:
-        if msg.type == midi.CC and msg.channel == 0 and msg.data[0] == MIDI_LED_CTRL:
-            do_led_change(msg.data[1])
+        if msg.type == smolmidi.CC and msg.channel == 0 and msg.data[0] == MIDI_LED_CTRL:
+            num = msg.data[1]
+            if LED_OFF <= num <= LED_PULSATE_RANGE_END:
+                do_led_change(msg.data[1])
+            else:
+                debug(f"WARNING: Invalid LED value: {num}")
 
-        elif msg.type == midi.SYSTEM_RESET:
+        elif msg.type == smolmidi.SYSTEM_RESET:
             reset()
 
-        elif msg.type == midi.SYSEX:
+        elif msg.type == smolmidi.SYSEX:
             msg, truncated = midi_in.receive_sysex(SYSEX_MAX_LEN)
             if truncated:
                 debug("WARNING: truncated sysex message. Skipping!")
             elif msg.startswith(SYSEX_PREFIX):
                 process_midi_sysex(msg[SYSEX_PREFIX_LEN:])
+            else:
+                debug("WARNING: bad sysex message: %s" % msg)
 
         else:
             debug(f"WARNING: Unrecognized MIDI msg: {bytes(msg)}")
@@ -192,6 +210,13 @@ def process_button():
         do_keypress(on=False)
 
 
+midi_outgoing_data = bytearray()
+
+
+debug(f"Running {PRODUCT_NAME} v{VERSION}.")
+if microcontroller.nvm[1] == 1:
+    debug("Forcing DEBUG = True from nvm flag.")
+
 debug("Configuring pins...")
 button = digitalio.DigitalInOut(BUTTON_PIN)
 button.pull = digitalio.Pull.UP
@@ -202,15 +227,15 @@ led = PulsatingLED(
     min_duty_cycle=LED_PWM_MIN_DUTY_CYCLE,
     max_duty_cycle=LED_PWM_MAX_DUTY_CYCLE,
     frequency=LED_PWM_FREQUENCY,
+    debug=debug,
 )
 
 builtin_led = digitalio.DigitalInOut(board.LED)
 builtin_led.direction = digitalio.Direction.OUTPUT
 
 debug("Initializing MIDI...")
-midi_in = midi.MidiIn(usb_midi.ports[0])
+midi_in = smolmidi.MidiIn(usb_midi.ports[0])
 midi_out = usb_midi.ports[1]
-midi_outgoing_data = bytearray()
 
 process_usb_connected = ProcessUSBConnected()
 
