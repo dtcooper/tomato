@@ -9,6 +9,9 @@ LED_PIN = board.GP16  # Pin number for LED
 # Will be true if button is pressed or "debug" is sent via serial/MIDI command
 DEBUG = False
 
+# Debug messages using midi SysEx
+MIDI_SYSEX_DEBUG = False
+
 # Enable auto-reload when DEBUG = True
 AUTORELOAD = True
 
