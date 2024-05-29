@@ -60,6 +60,11 @@ following LED control actions,
 | <code>0xB0 0x11 **0x04**</code> | **Pulsate MEDIUM** (period = 1.25 seconds) |
 | <code>0xB0 0x11 **0x05**</code> | **Pulsate FAST** (period = 0.6 seconds)    |
 
+_**NOTE:** The device will acknowledge a correctly processed LED control change by
+returning same message back. For example sending <code>0xB0 0x11 **0x01**</code> to
+turn the LED on (solid) will receive <code>0xB0 0x11 **0x01**</code> back, which can be used
+to confirm the LED has been turned on (solid)._
+
 ### Reset device
 
 To reset the device, send it the **system reset** byte (`0xFF`).
