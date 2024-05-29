@@ -6,7 +6,7 @@ BUTTON_PIN = board.GP17  # Pin number for button
 LED_PIN = board.GP16  # Pin number for LED
 
 # Debug mode, mounts drive and turns on serial console.
-# Forced if button is pressed at boot time or on '!debug!" sysex MIDI message (see tester tool)
+# Forced if button is pressed at boot time or on debug sysex MIDI message (see tester tool)
 DEBUG = False
 
 # Debug messages using midi SysEx

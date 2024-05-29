@@ -7,7 +7,7 @@ import usb_hid
 import usb_midi
 
 from config import AUTORELOAD, BUTTON_PIN, DEBUG
-from constants import PRODUCT_NAME, VERSION
+from constants import PRODUCT_NAME, USB_PRODUCT_ID, USB_VENDOR_ID, VERSION
 
 
 usb_hid.disable()
@@ -19,6 +19,8 @@ print(f"Booting {PRODUCT_NAME} v{VERSION}.")
 supervisor.set_usb_identification(
     manufacturer="Tomato Radio Automation",
     product=PRODUCT_NAME,
+    vid=USB_VENDOR_ID,
+    pid=USB_PRODUCT_ID,
 )
 usb_midi.set_names(
     audio_control_interface_name=PRODUCT_NAME,

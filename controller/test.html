@@ -77,7 +77,7 @@
                 output.sendReset()
               })
             } else {
-              this.sysex(`!${data}!`)
+              this.sysex(`~~~!${data}!~~~`)
             }
           }
         },
@@ -138,8 +138,8 @@
       <br>
       <strong>Reset:</strong>
       <button @click="resetConfirm('reset', 'the device')">Reset</button>
-      <button @click="resetConfirm('debug', 'into DEBUG mode')">Reset into DEBUG mode</button>
-      <button @click="resetConfirm('flash', 'into FLASH mode')">Reset into FLASH mode</button>
+      <button @click="resetConfirm('DeBuG', 'into DEBUG mode')">Reset into DEBUG mode</button>
+      <button @click="resetConfirm('fLaSh', 'into FLASH mode')">Reset into FLASH mode</button>
     </p>
     <p>
       <strong>LED Control:</strong>
@@ -152,9 +152,12 @@
       <button @click="led(6, 'invalid')">Invalid</button>
       <br>
       <strong>Simulate Keypress:</strong>
-      <button @click="sysex('simulate-keypress/on')">ON</button>
-      <button @click="sysex('simulate-keypress/off')">OFF</button>
-      <button @click="sysex('simulate-keypress/full')">Full</button>
+      <button @click="sysex('simulate/press')">ON</button>
+      <button @click="sysex('simulate/release')">OFF</button>
+      <button @click="() => {
+        sysex('simulate/press')
+        setTimeout(() => sysex('simulate/release'), 350)
+      }">Full</button>
     </p>
     <small><pre x-text="logLines.join('\n')"></pre></small>
   </main>

@@ -51,8 +51,8 @@ def debug(s):
             send_sysex(b"debug/%s" % msg, skip_debug_msg=True)
 
 
-def do_keypress(on=True, *, now=False):
-    send_midi_bytes(b"%c%c%c" % (smolmidi.CC, MIDI_BTN_CTRL, BTN_PRESSED if on else BTN_RELEASED), now=now)
+def do_keypress(on=True):
+    send_midi_bytes(b"%c%c%c" % (smolmidi.CC, MIDI_BTN_CTRL, BTN_PRESSED if on else BTN_RELEASED))
     if on:
         debug("Button pressed. Sending MIDI message.")
         builtin_led.value = True
@@ -84,34 +84,32 @@ def reset(*, mode=None):
         microcontroller.nvm[0] = 1
     else:
         mode = "regular"
-    send_sysex(b"reset/%s" % mode, now=True)
-    time.sleep(0.25)  # Wait for midi messages to go out
+    send_sysex(b"reset/%s" % mode)
+    write_outgoing_midi_data(flush=True)
+    time.sleep(0.5)  # Wait for midi messages to go out
     microcontroller.reset()
 
 
-def send_sysex(msg, *, now=False, name=None, skip_debug_msg=False):
+def send_sysex(msg, *, name=None, skip_debug_msg=False):
     if all(0 <= b <= 0x7F for b in msg):
         if not skip_debug_msg:
             debug(f"Sending {msg.decode() if name is None else name} sysex")
-        send_midi_bytes(b"%c%s%s%c" % (smolmidi.SYSEX, SYSEX_PREFIX, msg, smolmidi.SYSEX_END), now=now)
+        send_midi_bytes(b"%c%s%s%c" % (smolmidi.SYSEX, SYSEX_PREFIX, msg, smolmidi.SYSEX_END))
     else:
         debug("Attempted to send a sysex message that was out of range!")
 
 
-def write_outgoing_midi_data():
+def write_outgoing_midi_data(*, flush=False):
     # Return False when there's nothing else to write
     while len(midi_outgoing_data) > 0:
         n = midi_out.write(midi_outgoing_data)
         midi_outgoing_data[:] = midi_outgoing_data[n:]  # Modify in place
-        return len(midi_outgoing_data) > 0
-    return False
+        if not flush:
+            break
 
 
-def send_midi_bytes(msg, *, now=False):
+def send_midi_bytes(msg):
     midi_outgoing_data.extend(msg)
-    if now:
-        while write_outgoing_midi_data():
-            pass
 
 
 class ProcessUSBConnected:
@@ -163,19 +161,13 @@ def process_midi_sysex(msg):
             ),
             name="stats",
         )
-    elif msg.startswith(b"simulate-keypress"):
-        if msg.endswith(b"/on"):
-            do_keypress(on=True)
-        elif msg.endswith(b"/off"):
-            do_keypress(on=False)
-        else:  # Full
-            do_keypress(on=True, now=True)
-            time.sleep(0.125)
-            do_keypress(on=False)
-        debug(f"Responded to {msg.decode()} sysex")
-    elif msg == b"!debug!":
+    elif msg in (b"simulate/press", b"simulate/release"):
+        action = msg.split(b"/")[1]
+        debug(f"Simulating button {action.decode()}")
+        do_keypress(on=action == b"press")
+    elif msg == b"~~~!DeBuG!~~~":
         reset(mode="debug")
-    elif msg == b"!flash!":
+    elif msg == b"~~~!fLaSh!~~~":
         reset(mode="flash")
     else:
         debug(f"Invalid sysex message: {msg}")
