@@ -54,17 +54,19 @@ class PulsatingLED:
 
 
 def encode_stats_sysex(obj):
+    # Use msgpack to pack data as binary, then
+    # encode most significant bit of following 7 bytes first as 0b07654321 0b01111111 0b02222222 ... 0b07777777
     bytes_io = io.BytesIO()
     msgpack.pack(obj, bytes_io)
     unpacked = bytes_io.getvalue()
     packed = bytearray(SYSEX_STATS_PREFIX)
 
     for index in range(0, len(unpacked), 7):
-        chunk = unpacked[index : index + 7]
+        chunk = unpacked[index : index + 7]  # Chunk of 7 bytes
         msb_byte = 0
         for chunk_index, byte in enumerate(chunk):
-            msb_byte |= ((byte & 0x80) >> 7) << chunk_index
+            msb_byte |= ((byte & 0x80) >> 7) << chunk_index  # Extract most significant bit and shift it as above
         packed.append(msb_byte)
-        packed.extend(byte & 0x7F for byte in chunk)
+        packed.extend(byte & 0x7F for byte in chunk)  # Remove most significant bit from chunk's bytes
 
     return bytes(packed)
