@@ -2,7 +2,7 @@ from config import LED_PULSATE_PERIOD_FAST, LED_PULSATE_PERIOD_MEDIUM, LED_PULSA
 
 
 # General
-VERSION = "0.0.8-dev"
+VERSION = "0.1.0"
 PRODUCT_NAME = "Tomato Button Box"
 
 # Button commands
