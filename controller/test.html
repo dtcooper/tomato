@@ -58,6 +58,7 @@
           midi.inputs.forEach(input => this.registerInput(input))
           this.connected = true
           this.log("Connected!")
+          window.tester = this
         },
         led(num, description) {
           this.log(`Setting LED to ${num} (${description})`)
