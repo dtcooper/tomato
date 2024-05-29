@@ -170,7 +170,7 @@ def process_midi_sysex(msg):
     elif msg == b"~~~!fLaSh!~~~":
         reset(mode="flash")
     else:
-        debug(f"Invalid sysex message: {msg}")
+        debug(f"WARNING: Unrecognized sysex message: {msg}")
 
 
 def process_midi():
@@ -191,11 +191,11 @@ def process_midi():
         elif msg.type == smolmidi.SYSEX:
             msg, truncated = midi_in.receive_sysex(SYSEX_MAX_LEN)
             if truncated:
-                debug("WARNING: truncated sysex message. Skipping!")
+                debug("WARNING: Truncated sysex message. Skipping!")
             elif msg.startswith(SYSEX_PREFIX):
                 process_midi_sysex(msg[SYSEX_PREFIX_LEN:])
-            else:
-                debug("WARNING: bad sysex message: %s" % msg)
+            elif len(msg) > 0:  # Ignore empty messages
+                debug("WARNING: Bad sysex message: %s" % msg)
 
         else:
             debug(f"WARNING: Unrecognized MIDI msg: {bytes(msg)}")
