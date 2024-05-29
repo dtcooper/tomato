@@ -24,12 +24,14 @@
     const MIDI_LED_CTRL = 0x11
 
     const unpackMsgPackMessage = (msg) => {
+      // Decode most significant bit of following 7 bytes first as 0b07654321 0b01111111 0b02222222 ... 0b07777777
+      // Then use msgpack to decode binary data
       const unpacked = []
       for (let index = 0; index < msg.length; index += 8) {
+        const msbByte = msg[index] // Every 8th byte is the most significant bit for the following 7 bytes as above
         const chunk = msg.slice(index + 1, index + 8)
-        const msbByte = msg[index]
         for (let chunkIndex = 0; chunkIndex < chunk.length; chunkIndex++) {
-          unpacked.push(chunk[chunkIndex] | (msbByte << (7 - chunkIndex)) & 0x80)
+          unpacked.push(chunk[chunkIndex] | (msbByte << (7 - chunkIndex)) & 0x80)  // Reassemble chunk byte
         }
       }
       return MessagePack.decode(unpacked)
