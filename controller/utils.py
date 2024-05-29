@@ -40,12 +40,6 @@ class PulsatingLED:
         self.state = "on" if on else "off"
         debug(f"Turned LED {self.state}")
 
-    def on(self):
-        self.solid(on=True)
-
-    def off(self):
-        self.solid(on=False)
-
     def pulsate(self, period, *, flash=False):
         debug(f"Set LED to pulsate, {period=}s (0x{self._min_duty:04x} <> 0x{self._max_duty:04X}), {flash=}")
         self._flash_while_pulsating = flash
