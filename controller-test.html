@@ -63,10 +63,10 @@
             output.channels[1].sendControlChange(MIDI_LED_CTRL, num)
           })
         },
-        sysex(data) {
+        sysex(data, firstByte = SYSEX_NON_COMMERCIAL, prefix = SYSEX_PREFIX) {
           this.log(`Sending sysex: ${data}`)
           midi.outputs.forEach((output) => {
-            output.sendSysex(SYSEX_NON_COMMERCIAL, new TextEncoder().encode(`${SYSEX_PREFIX}${data}`))
+            output.sendSysex(firstByte, new TextEncoder().encode(`${prefix}${data}`))
           })
         },
         resetConfirm(data, confirmMessage) {
@@ -124,11 +124,14 @@
 
   <main x-show="connected" x-cloak>
     <p>
+      <strong>Sysex:</strong>
       <button @click="sysex('ping')">Ping</button>
       <button @click="sysex('stats')">Stats</button>
+      <button @click="sysex('invalid')">Invalid 1</button>
+      <button @click="sysex('invalid', 0x3D)">Invalid 2</button>
+      <button @click="sysex('invalid', undefined, 'test')">Invalid 3</button>
       <button @click="logLines = []">Clear log</button>
-    </p>
-    <p>
+      <br>
       <strong>Reset:</strong>
       <button @click="resetConfirm('reset', 'the device')">Reset</button>
       <button @click="resetConfirm('debug', 'into DEBUG mode')">Reset into DEBUG mode</button>
@@ -142,6 +145,7 @@
       <button @click="led(3, 'pulsate slow')">Pulse/slow</button>
       <button @click="led(4, 'pulsate medium')">Pulse/medium</button>
       <button @click="led(5, 'pulsate fast')">Pulse/fast</button>
+      <button @click="led(6, 'invalid')">Invalid</button>
       <br>
       <strong>Simulate Keypress:</strong>
       <button @click="sysex('simulate-keypress/on')">ON</button>
