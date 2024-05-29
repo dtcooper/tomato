@@ -30,7 +30,6 @@ from constants import (
     MIDI_BTN_CTRL,
     MIDI_LED_CTRL,
     PRODUCT_NAME,
-    SYSEX_CONNECTED_MSG,
     SYSEX_MAX_LEN,
     SYSEX_PREFIX,
     SYSEX_PREFIX_LEN,
@@ -63,7 +62,6 @@ def do_keypress(on=True, *, now=False):
 
 
 def do_led_change(num):
-    debug(f"Received LED control msg: {num}")
     if num in (LED_ON, LED_OFF):
         led.solid(num == LED_ON)
     elif num == LED_FLASH:
@@ -73,7 +71,7 @@ def do_led_change(num):
         led.pulsate(period=period)
     else:
         debug(f"ERROR: Unrecognized LED control msg: {num}")
-        send_sysex("error", f"Unrecognized LED control message: {num}")
+        send_sysex(b"WARNING: Unrecognized LED control message %d" % num)
 
 
 def reset(*, mode=None):
@@ -86,15 +84,18 @@ def reset(*, mode=None):
         microcontroller.nvm[0] = 1
     else:
         mode = "regular"
-    send_sysex(f"reset/{mode}", now=True)
+    send_sysex(b"reset/%s" % mode, now=True)
     time.sleep(0.25)  # Wait for midi messages to go out
     microcontroller.reset()
 
 
 def send_sysex(msg, *, now=False, name=None, skip_debug_msg=False):
-    if not skip_debug_msg:
-        debug(f"Sending {msg if name is None else name} sysex")
-    send_midi_bytes(b"%c%s%s%c" % (smolmidi.SYSEX, SYSEX_PREFIX, msg, smolmidi.SYSEX_END), now=now)
+    if all(0 <= b <= 0x7F for b in msg):
+        if not skip_debug_msg:
+            debug(f"Sending {msg if name is None else name} sysex")
+        send_midi_bytes(b"%c%s%s%c" % (smolmidi.SYSEX, SYSEX_PREFIX, msg, smolmidi.SYSEX_END), now=now)
+    else:
+        debug("Attempted to send a sysex message that was out of range!")
 
 
 def write_outgoing_midi_data():
@@ -115,37 +116,43 @@ def send_midi_bytes(msg, *, now=False):
 
 class ProcessUSBConnected:
     def __init__(self):
-        if not supervisor.runtime.usb_connected:
-            time.sleep(3)
-        if supervisor.runtime.usb_connected:
-            send_sysex(SYSEX_CONNECTED_MSG, name="connected")
-        self.usb_was_connected = True  # Always act like it was connected, so LEDs flashes if it's not
+        for _ in range(12):
+            if not supervisor.runtime.usb_connected:
+                time.sleep(0.25)
+
+        is_connected = supervisor.runtime.usb_connected
+        if is_connected:
+            self.on_connect()
+        else:
+            self.on_disconnect()
+        self.was_connected = is_connected
 
     def on_connect(self):
         do_led_change(LED_OFF)
-        send_sysex(SYSEX_CONNECTED_MSG, name="connected")
+        msg = b"%s/%s%s" % (PRODUCT_NAME.lower().replace(" ", "-"), VERSION, b"/debug" if DEBUG else b"")
+        send_sysex(msg, name="connected")
 
     def on_disconnect(self):
         do_led_change(LED_FLASH)
 
     def update(self):
-        if supervisor.runtime.usb_connected:
-            if not self.usb_was_connected:
-                self.on_connect()
-                self.usb_was_connected = True
-        elif self.usb_was_connected:
+        is_connected = supervisor.runtime.usb_connected
+        if is_connected and not self.was_connected:
+            self.on_connect()
+        elif not is_connected and self.was_connected:
             self.on_disconnect()
-            self.usb_was_connected = False
+        self.was_connected = is_connected
 
 
 def process_midi_sysex(msg):
     if msg == b"ping":
-        send_sysex("pong")
+        send_sysex(b"pong")
     elif msg == b"stats":
         send_sysex(
             encode_stats_sysex(
                 {
                     "is-debug": DEBUG,
+                    "is-midi-sysex-debug": MIDI_SYSEX_DEBUG,
                     "led": led.state,
                     "mem-free": f"{gc.mem_free() / 1024:.1f}kB",
                     "pressed": not button.value,
@@ -180,7 +187,8 @@ def process_midi():
         if msg.type == smolmidi.CC and msg.channel == 0 and msg.data[0] == MIDI_LED_CTRL:
             num = msg.data[1]
             if LED_OFF <= num <= LED_PULSATE_RANGE_END:
-                do_led_change(msg.data[1])
+                debug(f"Received LED control msg: {num}")
+                do_led_change(num)
             else:
                 debug(f"WARNING: Invalid LED value: {num}")
 
