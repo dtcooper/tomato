@@ -92,6 +92,10 @@
               if (pressed) {
                 this.led(0, 'off, button press')
               }
+            } else if (event.controller.number === MIDI_LED_CTRL) {
+              this.log(`Device ack'd LED change: ${event.rawValue}`)
+            } else {
+              this.log(`Bad controller number: ${event.controller.number}`)
             }
           })
           input.addListener("sysex", (event) => {

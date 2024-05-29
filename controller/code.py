@@ -70,8 +70,8 @@ def do_led_change(num):
         period = LED_PULSATE_PERIODS[num - LED_PULSATE_RANGE_START]
         led.pulsate(period=period)
     else:
-        debug(f"ERROR: Unrecognized LED control msg: {num}")
-        send_sysex(b"WARNING: Unrecognized LED control message %d" % num)
+        return False
+    return True
 
 
 def reset(*, mode=None):
@@ -92,7 +92,7 @@ def reset(*, mode=None):
 def send_sysex(msg, *, now=False, name=None, skip_debug_msg=False):
     if all(0 <= b <= 0x7F for b in msg):
         if not skip_debug_msg:
-            debug(f"Sending {msg if name is None else name} sysex")
+            debug(f"Sending {msg.decode() if name is None else name} sysex")
         send_midi_bytes(b"%c%s%s%c" % (smolmidi.SYSEX, SYSEX_PREFIX, msg, smolmidi.SYSEX_END), now=now)
     else:
         debug("Attempted to send a sysex message that was out of range!")
@@ -186,11 +186,12 @@ def process_midi():
     if msg is not None:
         if msg.type == smolmidi.CC and msg.channel == 0 and msg.data[0] == MIDI_LED_CTRL:
             num = msg.data[1]
-            if LED_OFF <= num <= LED_PULSATE_RANGE_END:
+            if do_led_change(num):
                 debug(f"Received LED control msg: {num}")
-                do_led_change(num)
+                send_midi_bytes(b"%c%c%c" % (smolmidi.CC, MIDI_LED_CTRL, num))  # Acknowledge by sending bytes back
             else:
-                debug(f"WARNING: Invalid LED value: {num}")
+                debug(f"WARNING: Invalid LED control msg: {num}")
+                send_sysex(b"invalid-led-ctrl/%d" % num)
 
         elif msg.type == smolmidi.SYSTEM_RESET:
             reset()
