@@ -51,7 +51,7 @@ def debug(s):
             send_sysex(b"debug/%s" % msg, skip_debug_msg=True)
 
 
-def do_keypress(on=True):
+def do_button_press(on=True):
     send_midi_bytes(b"%c%c%c" % (smolmidi.CC, MIDI_BTN_CTRL, BTN_PRESSED if on else BTN_RELEASED))
     if on:
         debug("Button pressed. Sending MIDI message.")
@@ -86,7 +86,7 @@ def reset(*, mode=None):
         mode = "regular"
     send_sysex(b"reset/%s" % mode)
     write_outgoing_midi_data(flush=True)
-    time.sleep(0.5)  # Wait for midi messages to go out
+    time.sleep(0.25)  # Wait for midi messages to flush
     microcontroller.reset()
 
 
@@ -163,7 +163,7 @@ def process_midi_sysex(msg):
     elif msg in (b"simulate/press", b"simulate/release"):
         action = msg.split(b"/")[1]
         debug(f"Simulating button {action.decode()}")
-        do_keypress(on=action == b"press")
+        do_button_press(on=action == b"press")
     elif msg == b"reset":
         reset()
     elif msg == b"~~~!DeBuG!~~~":
@@ -190,7 +190,7 @@ def process_midi():
             debug("Got system reset byte. Restarting.")
             send_midi_bytes((smolmidi.SYSTEM_RESET,))
             write_outgoing_midi_data(flush=True)
-            time.sleep(0.1)
+            time.sleep(0.1)  # Wait for midi messages to flush
             supervisor.reload()
 
         elif msg.type == smolmidi.SYSEX:
@@ -211,9 +211,9 @@ def process_midi():
 def process_button():
     button.update()
     if button.fell:
-        do_keypress(on=True)
+        do_button_press(on=True)
     if button.rose:
-        do_keypress(on=False)
+        do_button_press(on=False)
 
 
 midi_outgoing_data = bytearray()
