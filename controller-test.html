@@ -130,7 +130,7 @@
 
   <main x-show="connected" x-cloak>
     <p>
-      <strong>Sysex:</strong>
+      <strong>SysEx:</strong>
       <button @click="sysex('ping')">Ping</button>
       <button @click="sysex('stats')">Stats</button>
       <button @click="sysex('invalid')">Invalid 1</button>
@@ -154,7 +154,7 @@
       <button @click="led(5, 'pulsate fast')">Pulse/Fast</button>
       <button @click="led(6, 'invalid')">Invalid</button>
       <br>
-      <strong>Simulate Keypress:</strong>
+      <strong>Simulate Button Press:</strong>
       <button @click="sysex('simulate/press')">ON</button>
       <button @click="sysex('simulate/release')">OFF</button>
       <button @click="() => {
