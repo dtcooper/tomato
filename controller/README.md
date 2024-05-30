@@ -65,9 +65,9 @@ returning same message back. For example sending <code>0xB0 0x11 **0x01**</code>
 turn the LED on (solid) will receive <code>0xB0 0x11 **0x01**</code> back, which can be used
 to confirm the LED has been turned on (solid)._
 
-### Reset device
+### Restart
 
-To reset the device, send it the **system reset** byte (`0xFF`).
+To restart the device's program, send it the **system reset** byte (`0xFF`).
 
 ## Development
 

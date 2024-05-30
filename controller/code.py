@@ -142,29 +142,30 @@ class ProcessUSBConnected:
         self.was_connected = is_connected
 
 
+def get_stats_dict():
+    return {
+        "debug": DEBUG,
+        "led": led.state,
+        "mem-free": f"{gc.mem_free() / 1024:.1f}kB",
+        "midi-sysex-debug": MIDI_SYSEX_DEBUG,
+        "pressed": not button.value,
+        "temp": f"{microcontroller.cpu.temperature:.2f}'C",
+        "uptime": round(time.monotonic() - BOOT_TIME),
+        "version": VERSION,
+    }
+
+
 def process_midi_sysex(msg):
     if msg == b"ping":
         send_sysex(b"pong")
     elif msg == b"stats":
-        send_sysex(
-            encode_stats_sysex(
-                {
-                    "is-debug": DEBUG,
-                    "is-midi-sysex-debug": MIDI_SYSEX_DEBUG,
-                    "led": led.state,
-                    "mem-free": f"{gc.mem_free() / 1024:.1f}kB",
-                    "pressed": not button.value,
-                    "temp": f"{microcontroller.cpu.temperature:.2f}'C",
-                    "uptime": round(time.monotonic() - BOOT_TIME),
-                    "version": VERSION,
-                },
-            ),
-            name="stats",
-        )
+        send_sysex(encode_stats_sysex(get_stats_dict()), name="stats")
     elif msg in (b"simulate/press", b"simulate/release"):
         action = msg.split(b"/")[1]
         debug(f"Simulating button {action.decode()}")
         do_keypress(on=action == b"press")
+    elif msg == b"reset":
+        reset()
     elif msg == b"~~~!DeBuG!~~~":
         reset(mode="debug")
     elif msg == b"~~~!fLaSh!~~~":
@@ -186,7 +187,11 @@ def process_midi():
                 send_sysex(b"invalid-led-ctrl/%d" % num)
 
         elif msg.type == smolmidi.SYSTEM_RESET:
-            reset()
+            debug("Got system reset byte. Restarting.")
+            send_midi_bytes((smolmidi.SYSTEM_RESET,))
+            write_outgoing_midi_data(flush=True)
+            time.sleep(0.1)
+            supervisor.reload()
 
         elif msg.type == smolmidi.SYSEX:
             msg, truncated = midi_in.receive_sysex(SYSEX_MAX_LEN)

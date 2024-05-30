@@ -72,16 +72,15 @@
             output.sendSysex(firstByte, new TextEncoder().encode(`${prefix}${data}`))
           })
         },
+        restart() {
+          this.log("Sending restart (reset) MIDI byte")
+          midi.outputs.forEach((output) => {
+            output.sendReset()
+          })
+        },
         resetConfirm(data, confirmMessage) {
           if (confirm(`Are you SURE you want to RESET ${confirmMessage}?`)) {
-            if (data === 'reset') {
-              this.log("Sent system reset byte")
-              midi.outputs.forEach((output) => {
-                output.sendReset()
-              })
-            } else {
-              this.sysex(`~~~!${data}!~~~`)
-            }
+            this.sysex(data)
           }
         },
         registerInput(input) {
@@ -117,7 +116,7 @@
             }
           })
           input.addListener("reset", (event) => {
-            this.log("Device sent reset message")
+            this.log("Device ack'd restart")
           })
         }
       }))
@@ -140,18 +139,19 @@
       <button @click="logLines = []">Clear log</button>
       <br>
       <strong>Reset:</strong>
+      <button @click="restart()">Restart</button>
       <button @click="resetConfirm('reset', 'the device')">Reset</button>
-      <button @click="resetConfirm('DeBuG', 'into DEBUG mode')">Reset into DEBUG mode</button>
-      <button @click="resetConfirm('fLaSh', 'into FLASH mode')">Reset into FLASH mode</button>
+      <button @click="resetConfirm('~~~!DeBuG!~~~', 'into DEBUG mode')">Reset into DEBUG mode</button>
+      <button @click="resetConfirm('~~~!fLaSh!~~~', 'into FLASH mode')">Reset into FLASH mode</button>
     </p>
     <p>
       <strong>LED Control:</strong>
       <button @click="led(0, 'off')">OFF</button>
       <button @click="led(1, 'on')">ON</button>
       <button @click="led(2, 'flash')">Flash</button>
-      <button @click="led(3, 'pulsate slow')">Pulse/slow</button>
-      <button @click="led(4, 'pulsate medium')">Pulse/medium</button>
-      <button @click="led(5, 'pulsate fast')">Pulse/fast</button>
+      <button @click="led(3, 'pulsate slow')">Pulse/Slow</button>
+      <button @click="led(4, 'pulsate medium')">Pulse/Medium</button>
+      <button @click="led(5, 'pulsate fast')">Pulse/Fast</button>
       <button @click="led(6, 'invalid')">Invalid</button>
       <br>
       <strong>Simulate Keypress:</strong>

@@ -2,7 +2,7 @@ from config import LED_PULSATE_PERIOD_FAST, LED_PULSATE_PERIOD_MEDIUM, LED_PULSA
 
 
 # General
-VERSION = "0.1.5"
+VERSION = "0.1.6"
 PRODUCT_NAME = "Tomato Button Box"
 USB_VENDOR_ID = 0x239A  # Adafruit
 USB_PRODUCT_ID = 0x31D0  # Randomly chosen
