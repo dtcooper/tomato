@@ -24,3 +24,4 @@ __pycache__/
 
 # controller
 /controller/lib/
+/controller/settings.toml

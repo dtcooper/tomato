@@ -8,28 +8,19 @@ import time
 import usb_midi
 import winterbloom_smolmidi as smolmidi
 
-from config import (
-    BUTTON_PIN,
-    DEBUG,
-    LED_FLASH_PERIOD,
-    LED_PIN,
-    LED_PWM_FREQUENCY,
-    LED_PWM_MAX_DUTY_CYCLE,
-    LED_PWM_MIN_DUTY_CYCLE,
-    MIDI_SYSEX_DEBUG,
-)
+from config import Config
 from constants import (
     BTN_PRESSED,
     BTN_RELEASED,
     LED_FLASH,
     LED_OFF,
     LED_ON,
-    LED_PULSATE_PERIODS,
     LED_PULSATE_RANGE_END,
     LED_PULSATE_RANGE_START,
     MIDI_BTN_CTRL,
     MIDI_LED_CTRL,
     PRODUCT_NAME,
+    SYSEX_FLASH,
     SYSEX_MAX_LEN,
     SYSEX_PREFIX,
     SYSEX_PREFIX_LEN,
@@ -38,16 +29,17 @@ from constants import (
 from utils import encode_stats_sysex, PulsatingLED
 
 
+config = Config()
 BOOT_TIME = time.monotonic()
-DEBUG = DEBUG or microcontroller.nvm[1] == 1
+PULSATE_PERIODS = (config.pulsate_period_slow, config.pulsate_period_medium, config.pulsate_period_fast)
 
 
 def debug(s):
-    if DEBUG or MIDI_SYSEX_DEBUG:
+    if config.debug or config.sysex_debug_messages:
         msg = f"t={time.monotonic() - BOOT_TIME:.03f} - {s}"
-        if DEBUG:
+        if config.debug:
             print(msg)
-        if MIDI_SYSEX_DEBUG:
+        if config.sysex_debug_messages:
             send_sysex(b"debug/%s" % msg, skip_debug_msg=True)
 
 
@@ -65,29 +57,13 @@ def do_led_change(num):
     if num in (LED_ON, LED_OFF):
         led.solid(num == LED_ON)
     elif num == LED_FLASH:
-        led.pulsate(period=LED_FLASH_PERIOD, flash=True)
+        led.pulsate(period=config.flash_period, flash=True)
     elif LED_PULSATE_RANGE_START <= num <= LED_PULSATE_RANGE_END:
-        period = LED_PULSATE_PERIODS[num - LED_PULSATE_RANGE_START]
+        period = PULSATE_PERIODS[num - LED_PULSATE_RANGE_START]
         led.pulsate(period=period)
     else:
         return False
     return True
-
-
-def reset(*, mode=None):
-    debug("Resetting...")
-    if mode == "flash":
-        debug("Next boot will be in UF2 mode")
-        microcontroller.on_next_reset(microcontroller.RunMode.UF2)
-    elif mode == "debug":
-        debug("Next boot will force DEBUG = True")
-        microcontroller.nvm[0] = 1
-    else:
-        mode = "regular"
-    send_sysex(b"reset/%s" % mode)
-    write_outgoing_midi_data(flush=True)
-    time.sleep(0.25)  # Wait for midi messages to flush
-    microcontroller.reset()
 
 
 def send_sysex(msg, *, name=None, skip_debug_msg=False):
@@ -127,7 +103,7 @@ class ProcessUSBConnected:
 
     def on_connect(self):
         do_led_change(LED_OFF)
-        msg = b"%s/%s%s" % (PRODUCT_NAME.lower().replace(" ", "-"), VERSION, b"/debug" if DEBUG else b"")
+        msg = b"%s/%s%s" % (PRODUCT_NAME.lower().replace(" ", "-"), VERSION, b"/debug" if config.debug else b"")
         send_sysex(msg, name="connected")
 
     def on_disconnect(self):
@@ -143,11 +119,15 @@ class ProcessUSBConnected:
 
 
 def get_stats_dict():
+    with open("boot_out.txt", "r") as f:
+        boot_out = [line.strip() for line in f.readlines()]
+
     return {
-        "debug": DEBUG,
+        "boot-out": boot_out,
+        "debug": config.debug,
         "led": led.state,
         "mem-free": f"{gc.mem_free() / 1024:.1f}kB",
-        "midi-sysex-debug": MIDI_SYSEX_DEBUG,
+        "sysex-debug-messages": config.sysex_debug_messages,
         "pressed": not button.value,
         "temp": f"{microcontroller.cpu.temperature:.2f}'C",
         "uptime": round(time.monotonic() - BOOT_TIME),
@@ -164,12 +144,19 @@ def process_midi_sysex(msg):
         action = msg.split(b"/")[1]
         debug(f"Simulating button {action.decode()}")
         do_button_press(on=action == b"press")
-    elif msg == b"reset":
-        reset()
-    elif msg == b"~~~!DeBuG!~~~":
-        reset(mode="debug")
-    elif msg == b"~~~!fLaSh!~~~":
-        reset(mode="flash")
+    elif msg in (b"reset", SYSEX_FLASH):
+        if msg == SYSEX_FLASH:
+            microcontroller.on_next_reset(microcontroller.RunMode.UF2)
+        debug("Resetting...")
+        send_sysex(b"reset")
+        write_outgoing_midi_data(flush=True)
+        time.sleep(0.25)  # Wait for midi messages to flush
+        microcontroller.reset()
+    elif msg in (b"next-boot/%s" % override for override in Config.NEXT_BOOT_OVERRIDES):
+        override = msg.split(b"/")[1].decode()
+        debug(f"Setting {override} = true for next boot")
+        config.set_next_boot_override_from_code(override, True)
+        send_sysex(b"next-boot/%s/true" % override)
     else:
         debug(f"WARNING: Unrecognized sysex message: {msg}")
 
@@ -220,19 +207,17 @@ midi_outgoing_data = bytearray()
 
 
 debug(f"Running {PRODUCT_NAME} v{VERSION}.")
-if microcontroller.nvm[1] == 1:
-    debug("Forcing DEBUG = True from nvm flag.")
 
 debug("Configuring pins...")
-button = digitalio.DigitalInOut(BUTTON_PIN)
+button = digitalio.DigitalInOut(getattr(board, config.button))
 button.pull = digitalio.Pull.UP
 button = Debouncer(button)
 
 led = PulsatingLED(
-    LED_PIN,
-    min_duty_cycle=LED_PWM_MIN_DUTY_CYCLE,
-    max_duty_cycle=LED_PWM_MAX_DUTY_CYCLE,
-    frequency=LED_PWM_FREQUENCY,
+    getattr(board, config.led),
+    min_duty_cycle=config.pwm_min_duty_cycle,
+    max_duty_cycle=config.pwm_max_duty_cycle,
+    frequency=config.pwm_frequency,
     debug=debug,
 )
 

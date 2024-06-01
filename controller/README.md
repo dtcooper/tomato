@@ -13,24 +13,31 @@ Here's the button box firmware for a Raspberry Pi Pico flashed with CircuitPytho
 2. In the `lib/` folder on your device copy the following,
    [CircuitPython Libraries](https://circuitpython.org/libraries),
     - [`adafruit_ticks`](https://docs.circuitpython.org/projects/ticks/) (required
-      for `adafruit_debouncer`)
+      for `adafruit_debouncer`, can use [`circup`](https://github.com/adafruit/circup))
     - [`adafruit_debouncer`](https://docs.circuitpython.org/projects/debouncer/)
+      (can use [`circup`](https://github.com/adafruit/circup))
+    - [`circuitpython_toml`](https://github.com/elpekenin/circuitpython_toml/)
+      (can use [`circup`](https://github.com/adafruit/circup))
     - [`winterbloom_smolmidi`](https://github.com/wntrblm/Winterbloom_SmolMIDI/)
-      (optionally compile with
+      (cannot use `circup`, so optionally compile with
       [`mpy-cross`](https://adafruit-circuit-python.s3.amazonaws.com/index.html?prefix=bin/mpy-cross/))
-3. Copy python (`*.py`) files in this folder on to your device
+3. Copy all python (`*.py`) files in this folder on to your device
+4. **\[Optional\]** Copy `settings.toml.sample` in this folder to your device as
+   `settings.toml` and edit settings to your liking. If you do not do this on
+   first boot, a default file will be created for you.
+5. Reboot
 
 ## Configuration
 
-Edit `config.py`,
+Edit `settings.toml`,
 
-```python
-# Configure pin numbers
-BUTTON_PIN = board.GP17  # Pin number for button
-LED_PIN = board.GP16  # Pin number for LED
+```toml
+### Pins ###
+button = "GP17"  # Pin number for button
+led = "GP16"  # Pin number for LED
 ```
 
-For additional settings, see [`config.py`](config.py)
+For additional settings, see [`settings.toml`](settings.toml)
 
 ## Basic MIDI Protocol
 
