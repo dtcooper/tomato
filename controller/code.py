@@ -146,9 +146,12 @@ def process_midi_sysex(msg):
         do_button_press(on=action == b"press")
     elif msg in (b"reset", SYSEX_FLASH):
         if msg == SYSEX_FLASH:
+            debug("Resetting into flash mode...")
+            send_sysex(b"reset/flash")
             microcontroller.on_next_reset(microcontroller.RunMode.UF2)
-        debug("Resetting...")
-        send_sysex(b"reset")
+        else:
+            debug("Resetting...")
+            send_sysex(b"reset")
         write_outgoing_midi_data(flush=True)
         time.sleep(0.25)  # Wait for midi messages to flush
         microcontroller.reset()

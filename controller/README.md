@@ -9,7 +9,7 @@ Here's the button box firmware for a Raspberry Pi Pico flashed with CircuitPytho
 ## Installation
 
 1. Install [CircuitPython v9.1](https://circuitpython.org/board/raspberry_pi_pico/)
-   or greater onto your Pi Pico
+   or greater onto your Pi Pico and remove the default `settings.toml` file.
 2. In the `lib/` folder on your device copy the following,
    [CircuitPython Libraries](https://circuitpython.org/libraries),
     - [`adafruit_ticks`](https://docs.circuitpython.org/projects/ticks/) (required
@@ -21,11 +21,11 @@ Here's the button box firmware for a Raspberry Pi Pico flashed with CircuitPytho
     - [`winterbloom_smolmidi`](https://github.com/wntrblm/Winterbloom_SmolMIDI/)
       (cannot use `circup`, so optionally compile with
       [`mpy-cross`](https://adafruit-circuit-python.s3.amazonaws.com/index.html?prefix=bin/mpy-cross/))
-3. Copy all python (`*.py`) files in this folder on to your device
+3. Copy all python (`*.py`) files in this folder on to your device.
 4. **\[Optional\]** Copy `settings.toml.sample` in this folder to your device as
    `settings.toml` and edit settings to your liking. If you do not do this on
    first boot, a default file will be created for you.
-5. Reboot
+5. Restart the device.
 
 ## Configuration
 

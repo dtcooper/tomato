@@ -29,6 +29,16 @@ usb_midi.set_names(
     out_jack_name="output",
 )
 
+mount = storage.getmount("/")
+if mount.label != MOUNT_NAME:
+    print(f"Renaming mount {mount.label} => {MOUNT_NAME}")
+    storage.remount("/", readonly=False)
+    mount.label = MOUNT_NAME
+    storage.remount("/", readonly=True)
+    if not config.debug:
+        print(f"Detected first boot (mount != {MOUNT_NAME}), running in debug mode")
+        config.set_code_override_from_boot("debug", True)
+
 if not config.debug:
     button = digitalio.DigitalInOut(getattr(board, config.button))
     button.direction = digitalio.Direction.INPUT
@@ -36,13 +46,6 @@ if not config.debug:
     if not button.value:
         print("Button pressed, running in debug mode")
         config.set_code_override_from_boot("debug", True)
-
-mount = storage.getmount("/")
-if mount.label != MOUNT_NAME:
-    print(f"Renaming mount {mount.label} => {MOUNT_NAME}")
-    storage.remount("/", readonly=False)
-    mount.label = MOUNT_NAME
-    storage.remount("/", readonly=True)
 
 if config.debug:
     if not config.autoreload:
