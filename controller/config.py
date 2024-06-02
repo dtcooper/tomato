@@ -43,10 +43,14 @@ class Config:
     NEXT_BOOT_OVERRIDES = ("debug", "sysex_debug_messages")
 
     def __init__(self, *, from_boot=False):
+        self.is_first_boot = False
         if from_boot:
             try:
-                os.stat(SETTINGS_FILE)
+                self.is_first_boot = os.stat(SETTINGS_FILE)[6] < 10  # Smaller than 10 bytes, we need a new one
             except OSError:
+                self.is_first_boot = True
+
+            if self.is_first_boot:
                 print("Creating default settings.toml")
                 storage.remount("/", readonly=False)
                 with open(SETTINGS_FILE, "w") as f:
@@ -56,16 +60,22 @@ class Config:
         with open(SETTINGS_FILE, "r") as f:
             self._config = toml.load(f)
 
+        boot_nvm_end = len(self.NEXT_BOOT_OVERRIDES)
+        code_nvm_end = 2 * len(self.NEXT_BOOT_OVERRIDES)
         if from_boot:
-            for index, override in enumerate(self.NEXT_BOOT_OVERRIDES):
-                if microcontroller.nvm[index]:
-                    print(f"Forcing config value {override} = true (forced via nvm)")
-                    self.set_code_override_from_boot(override, True)
-                else:
-                    self.set_code_override_from_boot(override, False)
-
+            if self.is_first_boot:
+                microcontroller.nvm[0:code_nvm_end] = b"\x00" * code_nvm_end  # Clear out nvm on first boot
+                print("Forcing config value debug = true (empty settings.toml, likely a first boot)")
+                self.set_code_override_from_boot("debug", True)
+            else:
+                for index, override in enumerate(self.NEXT_BOOT_OVERRIDES):
+                    if microcontroller.nvm[index]:
+                        print(f"Forcing config value {override} = true (forced via nvm)")
+                        self.set_code_override_from_boot(override, True)
+                    else:
+                        self.set_code_override_from_boot(override, False)
         else:
-            override_values = microcontroller.nvm[len(self.NEXT_BOOT_OVERRIDES) : 2 * len(self.NEXT_BOOT_OVERRIDES)]
+            override_values = microcontroller.nvm[boot_nvm_end : 2 * code_nvm_end]
             for override, value in zip(self.NEXT_BOOT_OVERRIDES, override_values):
                 if value:
                     self._config[override] = True

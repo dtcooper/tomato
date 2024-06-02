@@ -9,7 +9,7 @@ Here's the button box firmware for a Raspberry Pi Pico flashed with CircuitPytho
 ## Installation
 
 1. Install [CircuitPython v9.1](https://circuitpython.org/board/raspberry_pi_pico/)
-   or greater onto your Pi Pico and remove the default `settings.toml` file.
+   or greater onto your Pi Pico.
 2. In the `lib/` folder on your device copy the following,
    [CircuitPython Libraries](https://circuitpython.org/libraries),
     - [`adafruit_ticks`](https://docs.circuitpython.org/projects/ticks/) (required

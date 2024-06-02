@@ -10,12 +10,12 @@ from config import Config
 from constants import PRODUCT_NAME, USB_PRODUCT_ID, USB_VENDOR_ID, VERSION
 
 
+print(f"Booting {PRODUCT_NAME} v{VERSION}.")
+
 config = Config(from_boot=True)
 usb_hid.disable()
 
 MOUNT_NAME = "TOMATOBOX"
-
-print(f"Booting {PRODUCT_NAME} v{VERSION}.")
 
 supervisor.set_usb_identification(
     manufacturer="Tomato Radio Automation",
@@ -35,9 +35,6 @@ if mount.label != MOUNT_NAME:
     storage.remount("/", readonly=False)
     mount.label = MOUNT_NAME
     storage.remount("/", readonly=True)
-    if not config.debug:
-        print(f"Detected first boot (mount != {MOUNT_NAME}), running in debug mode")
-        config.set_code_override_from_boot("debug", True)
 
 if not config.debug:
     button = digitalio.DigitalInOut(getattr(board, config.button))
