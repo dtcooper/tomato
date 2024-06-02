@@ -66,6 +66,11 @@
             output.channels[1].sendControlChange(MIDI_LED_CTRL, num)
           })
         },
+        invalidMidiMsg() {
+          midi.outputs.forEach((output) => {
+            output.channels[1].sendNoteOn("A4")
+          })
+        },
         sysex(data, firstByte = SYSEX_NON_COMMERCIAL, prefix = SYSEX_PREFIX) {
           this.log(`Sending sysex: ${data}`)
           midi.outputs.forEach((output) => {
@@ -78,9 +83,13 @@
             output.sendReset()
           })
         },
-        resetConfirm(data, confirmMessage) {
-          if (confirm(`Are you SURE you want to RESET ${confirmMessage}?`)) {
+        sysexConfirm(data, message) {
+          if (confirm(message)) {
             this.sysex(data)
+            return true
+          } else {
+            this.log(`Aborted sending sysex: ${data}`)
+            return false
           }
         },
         registerInput(input) {
@@ -140,18 +149,25 @@
       <br>
       <strong>Reset:</strong>
       <button @click="restart()">Restart</button>
-      <button @click="resetConfirm('reset', 'the device')">Reset</button>
-      <button @click="resetConfirm('~~~!DeBuG!~~~', 'into DEBUG mode')">Reset into DEBUG mode</button>
-      <button @click="resetConfirm('~~~!fLaSh!~~~', 'into FLASH mode')">Reset into FLASH mode</button>
+      <button @click="sysexConfirm('reset', 'Are you SURE you want to RESET the device?')">Reset</button>
+      <button @click="sysexConfirm('next-boot/debug', 'Are you SURE you want to RESET into DEBUG mode?') && sysex('reset')">Reset (DEBUG)</button>
+      <button @click="sysexConfirm('~~~!fLaSh!~~~', 'Are you SURE you want to RESET and FLASH?')">Reset (FLASH)</button>
+      <br>
+      <strong>Next boot:</strong>
+      <button @click="sysexConfirm('next-boot/debug', 'Are you SURE you want to set `debug = true` next boot?')">debug = true</button>
+      <button @click="sysexConfirm('next-boot/sysex_debug_messages', 'Are you SURE you want to set `sysex_debug_messages = true` next boot?')">sysex_debug_messages = true</button>
     </p>
     <p>
       <strong>LED Control:</strong>
       <button @click="led(0, 'off')">OFF</button>
       <button @click="led(1, 'on')">ON</button>
       <button @click="led(2, 'flash')">Flash</button>
-      <button @click="led(3, 'pulsate slow')">Pulse/Slow</button>
-      <button @click="led(4, 'pulsate medium')">Pulse/Medium</button>
-      <button @click="led(5, 'pulsate fast')">Pulse/Fast</button>
+      <button @click="invalidMidiMsg()">Invalid MIDI</button>
+      <br>
+      <strong>Pulse:</strong>
+      <button @click="led(3, 'pulsate slow')">Slow</button>
+      <button @click="led(4, 'pulsate medium')">Medium</button>
+      <button @click="led(5, 'pulsate fast')">Fast</button>
       <button @click="led(6, 'invalid')">Invalid</button>
       <br>
       <strong>Simulate Button Press:</strong>
