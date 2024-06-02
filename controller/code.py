@@ -124,10 +124,9 @@ def get_stats_dict():
 
     return {
         "boot-out": boot_out,
-        "debug": config.debug,
+        "config": config.to_dict(),
         "led": led.state,
         "mem-free": f"{gc.mem_free() / 1024:.1f}kB",
-        "sysex-debug-messages": config.sysex_debug_messages,
         "pressed": not button.value,
         "temp": f"{microcontroller.cpu.temperature:.2f}'C",
         "uptime": round(time.monotonic() - BOOT_TIME),
@@ -139,7 +138,9 @@ def process_midi_sysex(msg):
     if msg == b"ping":
         send_sysex(b"pong")
     elif msg == b"stats":
-        send_sysex(encode_stats_sysex(get_stats_dict()), name="stats")
+        msg = encode_stats_sysex(get_stats_dict())
+        debug(f"Stats encoded into {len(msg)} sysex bytes")
+        send_sysex(msg, name="stats")
     elif msg in (b"simulate/press", b"simulate/release"):
         action = msg.split(b"/")[1]
         debug(f"Simulating button {action.decode()}")
