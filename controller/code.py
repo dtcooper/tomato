@@ -15,8 +15,9 @@ from constants import (
     LED_FLASH,
     LED_OFF,
     LED_ON,
-    LED_PULSATE_RANGE_END,
-    LED_PULSATE_RANGE_START,
+    LED_PULSATE_SLOW,
+    LED_PULSATE_MEDIUM,
+    LED_PULSATE_FAST,
     MIDI_BTN_CTRL,
     MIDI_LED_CTRL,
     PRODUCT_NAME,
@@ -31,7 +32,11 @@ from utils import encode_stats_sysex, PulsatingLED
 
 config = Config()
 BOOT_TIME = time.monotonic()
-PULSATE_PERIODS = (config.pulsate_period_slow, config.pulsate_period_medium, config.pulsate_period_fast)
+PULSATE_PERIODS = {
+    LED_PULSATE_SLOW: config.pulsate_period_slow,
+    LED_PULSATE_MEDIUM: config.pulsate_period_medium,
+    LED_PULSATE_FAST: config.pulsate_period_fast,
+}
 
 
 def debug(s):
@@ -58,9 +63,8 @@ def do_led_change(num):
         led.solid(num == LED_ON)
     elif num == LED_FLASH:
         led.pulsate(period=config.flash_period, flash=True)
-    elif LED_PULSATE_RANGE_START <= num <= LED_PULSATE_RANGE_END:
-        period = PULSATE_PERIODS[num - LED_PULSATE_RANGE_START]
-        led.pulsate(period=period)
+    elif num in PULSATE_PERIODS:
+        led.pulsate(period=PULSATE_PERIODS[num])
     else:
         return False
     return True

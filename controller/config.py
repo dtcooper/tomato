@@ -98,4 +98,4 @@ class Config:
         return self._config[attr]
 
     def to_dict(self):
-        return {key: value for key, value in self._config.items()}
+        return dict(self._config.items())
