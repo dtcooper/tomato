@@ -22,14 +22,16 @@ Here's the button box firmware for a Raspberry Pi Pico flashed with CircuitPytho
       (cannot use `circup`, so optionally compile with
       [`mpy-cross`](https://adafruit-circuit-python.s3.amazonaws.com/index.html?prefix=bin/mpy-cross/))
 3. Copy all python (`*.py`) files in this folder on to your device.
-4. **\[Optional\]** Copy `settings.toml.sample` in this folder to your device as
-   `settings.toml` and edit settings to your liking. If you do not do this on
-   first boot, a default file will be created for you.
-5. Restart the device.
+4. Reset the device. Upon first boot, you'll see the `TOMATOBOX` drive, and
+   you can edit the newly generated `settings.toml` file to your liking.
+
+**NOTE:** After resetting the device again, the `TOMATOBOX` drive will disappear.
+To boot the device into "debug" mode (and display the drive again), use the
+testing tool linked in the [Development](#development) section of this document.
 
 ## Configuration
 
-Edit `settings.toml`,
+Edit `settings.toml` and set the button and led pins to match your setup.
 
 ```toml
 ### Pins ###
@@ -37,7 +39,8 @@ button = "GP17"  # Pin number for button
 led = "GP16"  # Pin number for LED
 ```
 
-For additional settings, see [`settings.toml`](settings.toml)
+For additional settings, see `settings.toml` generated after you first install
+and reset your device.
 
 ## Basic MIDI Protocol
 
@@ -79,7 +82,7 @@ To restart the device's program, send it the **system reset** byte (`0xFF`).
 ## Development
 
 Head to the [tester web page here](https://dtcooper.github.io/tomato/controller-test.html).
-(This is known to work in Google Chrome)
+(This is known to work in Google Chrome.)
 
 ## Circuit Diagram
 
