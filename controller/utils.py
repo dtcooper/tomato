@@ -1,6 +1,7 @@
 import io
 import msgpack
 import pwmio
+import supervisor
 import time
 
 from constants import SYSEX_STATS_PREFIX
@@ -70,3 +71,25 @@ def encode_stats_sysex(obj):
         packed.extend(byte & 0x7F for byte in chunk)  # Remove most significant bit from chunk's bytes
 
     return bytes(packed)
+
+
+class ConnectedBase:
+    def __init__(self):
+        for _ in range(12):
+            if supervisor.runtime.usb_connected:
+                break
+            time.sleep(0.25)
+
+        if is_connected := supervisor.runtime.usb_connected:
+            self.on_connect()
+        else:
+            self.on_disconnect()
+        self.was_connected = is_connected
+
+    def update(self):
+        is_connected = supervisor.runtime.usb_connected
+        if is_connected and not self.was_connected:
+            self.on_connect()
+        elif not is_connected and self.was_connected:
+            self.on_disconnect()
+        self.was_connected = is_connected

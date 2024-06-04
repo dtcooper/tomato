@@ -27,7 +27,7 @@ from constants import (
     SYSEX_PREFIX_LEN,
     VERSION,
 )
-from utils import encode_stats_sysex, PulsatingLED
+from utils import ConnectedBase, encode_stats_sysex, PulsatingLED
 
 
 config = Config()
@@ -92,34 +92,15 @@ def send_midi_bytes(msg):
     midi_outgoing_data.extend(msg)
 
 
-class ProcessUSBConnected:
-    def __init__(self):
-        for _ in range(12):
-            if supervisor.runtime.usb_connected:
-                break
-            time.sleep(0.25)
-
-        if is_connected := supervisor.runtime.usb_connected:
-            self.on_connect()
-        else:
-            self.on_disconnect()
-        self.was_connected = is_connected
-
+class ProcessUSBConnected(ConnectedBase):
     def on_connect(self):
+        debug("USB now in connected state")
         do_led_change(LED_OFF)
         msg = b"%s/%s%s" % (PRODUCT_NAME.lower().replace(" ", "-"), VERSION, b"/debug" if config.debug else b"")
         send_sysex(msg, name="connected")
 
     def on_disconnect(self):
         do_led_change(LED_FLASH)
-
-    def update(self):
-        is_connected = supervisor.runtime.usb_connected
-        if is_connected and not self.was_connected:
-            self.on_connect()
-        elif not is_connected and self.was_connected:
-            self.on_disconnect()
-        self.was_connected = is_connected
 
 
 def get_stats_dict():

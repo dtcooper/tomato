@@ -43,14 +43,14 @@ class Config:
     NEXT_BOOT_OVERRIDES = ("debug", "sysex_debug_messages")
 
     def __init__(self, *, from_boot=False):
-        self.is_first_boot = False
+        is_first_boot = False
         if from_boot:
             try:
-                self.is_first_boot = os.stat(SETTINGS_FILE)[6] < 10  # Smaller than 10 bytes, we need a new one
+                is_first_boot = os.stat(SETTINGS_FILE)[6] < 10  # Smaller than 10 bytes, we need a new one
             except OSError:
-                self.is_first_boot = True
+                is_first_boot = True
 
-            if self.is_first_boot:
+            if is_first_boot:
                 print("Creating default settings.toml")
                 storage.remount("/", readonly=False)
                 with open(SETTINGS_FILE, "w") as f:
@@ -63,7 +63,7 @@ class Config:
         boot_nvm_end = len(self.NEXT_BOOT_OVERRIDES)
         code_nvm_end = 2 * len(self.NEXT_BOOT_OVERRIDES)
         if from_boot:
-            if self.is_first_boot:
+            if is_first_boot:
                 microcontroller.nvm[0:code_nvm_end] = b"\x00" * code_nvm_end  # Clear out nvm on first boot
                 print("Forcing config value debug = true (empty settings.toml, likely a first boot)")
                 self.set_code_override_from_boot("debug", True)
