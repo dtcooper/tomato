@@ -1,8 +1,10 @@
 # General
-VERSION = "0.2.5"
+VERSION = "0.3.0"
 PRODUCT_NAME = "Tomato Button Box"
-USB_VENDOR_ID = 0x239A  # Adafruit
-USB_PRODUCT_ID = 0x31D0  # Randomly chosen
+
+# Kindly assigned by pid.codes (https://pid.codes/1209/7111/)
+USB_VENDOR_ID = 0x1209
+USB_PRODUCT_ID = 0x7111
 
 # Button commands
 MIDI_BTN_CTRL = 0x10
