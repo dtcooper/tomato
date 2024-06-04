@@ -29,7 +29,7 @@ autoreload = true
 # These defaults should be okay
 pwm_min_duty_cycle = 0x0000
 pwm_max_duty_cycle = 0xFFFF
-pwm_frequency = 250
+pwm_frequency = 350
 
 # In seconds
 flash_period = 1.0
