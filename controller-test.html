@@ -22,6 +22,7 @@
     const SYSEX_STATS_PREFIX = 'S~'
     const MIDI_BTN_CTRL = 0x10
     const MIDI_LED_CTRL = 0x11
+    const BTN_PRESSED = 0x7F
 
     const unpackMsgPackMessage = (msg) => {
       // Decode most significant bit of following 7 bytes first as 0b07654321 0b01111111 0b02222222 ... 0b07777777
@@ -42,6 +43,7 @@
 
       Alpine.data('main', () => ({
         connected: false,
+        turnLedOff: true,
         logLines: [],
         log(s) {
           const date = new Date()
@@ -98,9 +100,9 @@
           input.removeListener()
           input.channels[1].addListener("controlchange", (event) => {
             if (event.controller.number === MIDI_BTN_CTRL) {
-              const pressed = event.rawValue === 0
-              this.log(`Button ${pressed ? "released" : "pressed"}`)
-              if (pressed) {
+              const pressed = event.rawValue === BTN_PRESSED
+              this.log(`Button ${pressed ? "pressed" : "released"}`)
+              if (pressed && this.turnLedOff) {
                 this.led(0, 'off, button press')
               }
             } else if (event.controller.number === MIDI_LED_CTRL) {
@@ -171,12 +173,15 @@
       <button @click="led(6, 'invalid')">Invalid</button>
       <br>
       <strong>Simulate Button Press:</strong>
-      <button @click="sysex('simulate/press')">ON</button>
-      <button @click="sysex('simulate/release')">OFF</button>
+      <button @click="sysex('simulate/press')">Press</button>
+      <button @click="sysex('simulate/release')">Release</button>
       <button @click="() => {
         sysex('simulate/press')
         setTimeout(() => sysex('simulate/release'), 350)
       }">Full</button>
+      <label style="display: inline; cursor: pointer">
+        <input type="checkbox" x-model="turnLedOff"> Turn LED off on press
+      </label>
     </p>
     <small><pre x-text="logLines.join('\n')"></pre></small>
   </main>
