@@ -109,7 +109,7 @@ def get_stats_dict():
 
     return {
         "boot-out": boot_out,
-        "config": config.to_dict(),
+        "config": {key: getattr(config, key) for key in ("button", "led", "debug", "sysex_debug_messages")},
         "led": led.state,
         "mem-free": f"{gc.mem_free() / 1024:.1f}kB",
         "pressed": not button.value,

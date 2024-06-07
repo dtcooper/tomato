@@ -96,6 +96,3 @@ class Config:
 
     def __getattr__(self, attr):
         return self._config[attr]
-
-    def to_dict(self):
-        return dict(self._config.items())
