@@ -9,33 +9,16 @@ import usb_midi
 import winterbloom_smolmidi as smolmidi
 
 from config import Config
-from constants import (
-    BTN_PRESSED,
-    BTN_RELEASED,
-    LED_FLASH,
-    LED_OFF,
-    LED_ON,
-    LED_PULSATE_SLOW,
-    LED_PULSATE_MEDIUM,
-    LED_PULSATE_FAST,
-    MIDI_BTN_CTRL,
-    MIDI_LED_CTRL,
-    PRODUCT_NAME,
-    SYSEX_FLASH,
-    SYSEX_MAX_LEN,
-    SYSEX_PREFIX,
-    SYSEX_PREFIX_LEN,
-    VERSION,
-)
+import constants
 from utils import ConnectedBase, encode_stats_sysex, PulsatingLED
 
 
 config = Config()
 BOOT_TIME = time.monotonic()
 PULSATE_PERIODS = {
-    LED_PULSATE_SLOW: config.pulsate_period_slow,
-    LED_PULSATE_MEDIUM: config.pulsate_period_medium,
-    LED_PULSATE_FAST: config.pulsate_period_fast,
+    constants.LED_PULSATE_SLOW: config.pulsate_period_slow,
+    constants.LED_PULSATE_MEDIUM: config.pulsate_period_medium,
+    constants.LED_PULSATE_FAST: config.pulsate_period_fast,
 }
 
 
@@ -49,7 +32,9 @@ def debug(s):
 
 
 def do_button_press(on=True):
-    send_midi_bytes(b"%c%c%c" % (smolmidi.CC, MIDI_BTN_CTRL, BTN_PRESSED if on else BTN_RELEASED))
+    send_midi_bytes(
+        b"%c%c%c" % (smolmidi.CC, constants.MIDI_BTN_CTRL, constants.BTN_PRESSED if on else constants.BTN_RELEASED)
+    )
     if on:
         debug("Button pressed. Sending MIDI message.")
         builtin_led.value = True
@@ -59,9 +44,9 @@ def do_button_press(on=True):
 
 
 def do_led_change(num):
-    if num in (LED_ON, LED_OFF):
-        led.solid(num == LED_ON)
-    elif num == LED_FLASH:
+    if num in (constants.LED_ON, constants.LED_OFF):
+        led.solid(num == constants.LED_ON)
+    elif num == constants.LED_FLASH:
         led.pulsate(period=config.flash_period, flash=True)
     elif num in PULSATE_PERIODS:
         led.pulsate(period=PULSATE_PERIODS[num])
@@ -74,7 +59,7 @@ def send_sysex(msg, *, name=None, skip_debug_msg=False):
     if all(0 <= b <= 0x7F for b in msg):
         if not skip_debug_msg:
             debug(f"Sending {msg.decode() if name is None else name} sysex")
-        send_midi_bytes(b"%c%s%s%c" % (smolmidi.SYSEX, SYSEX_PREFIX, msg, smolmidi.SYSEX_END))
+        send_midi_bytes(b"%c%s%s%c" % (smolmidi.SYSEX, constants.SYSEX_PREFIX, msg, smolmidi.SYSEX_END))
     else:
         debug("Attempted to send a sysex message that was out of range!")
 
@@ -95,12 +80,16 @@ def send_midi_bytes(msg):
 class ProcessUSBConnected(ConnectedBase):
     def on_connect(self):
         debug("USB now in connected state")
-        do_led_change(LED_OFF)
-        msg = b"%s/%s%s" % (PRODUCT_NAME.lower().replace(" ", "-"), VERSION, b"/debug" if config.debug else b"")
+        do_led_change(constants.LED_OFF)
+        msg = b"%s/%s%s" % (
+            constants.PRODUCT_NAME.lower().replace(" ", "-"),
+            constants.VERSION,
+            b"/debug" if config.debug else b"",
+        )
         send_sysex(msg, name="connected")
 
     def on_disconnect(self):
-        do_led_change(LED_FLASH)
+        do_led_change(constants.LED_FLASH)
 
 
 def get_stats_dict():
@@ -115,7 +104,7 @@ def get_stats_dict():
         "pressed": not button.value,
         "temp": f"{microcontroller.cpu.temperature:.2f}'C",
         "uptime": round(time.monotonic() - BOOT_TIME),
-        "version": VERSION,
+        "version": constants.VERSION,
     }
 
 
@@ -130,8 +119,8 @@ def process_midi_sysex(msg):
         action = msg.split(b"/")[1]
         debug(f"Simulating button {action.decode()}")
         do_button_press(on=action == b"press")
-    elif msg in (b"reset", SYSEX_FLASH):
-        if msg == SYSEX_FLASH:
+    elif msg in (b"reset", constants.SYSEX_FLASH):
+        if msg == constants.SYSEX_FLASH:
             debug("Resetting into flash mode...")
             send_sysex(b"reset/flash")
             microcontroller.on_next_reset(microcontroller.RunMode.UF2)
@@ -143,7 +132,6 @@ def process_midi_sysex(msg):
         microcontroller.reset()
     elif msg in (b"next-boot/%s" % override for override in Config.NEXT_BOOT_OVERRIDES):
         override = msg.split(b"/")[1].decode()
-        debug(f"Setting {override} = true for next boot")
         config.set_next_boot_override_from_code(override, True)
         send_sysex(b"next-boot/%s/true" % override)
     else:
@@ -153,11 +141,13 @@ def process_midi_sysex(msg):
 def process_midi():
     msg = midi_in.receive()
     if msg is not None:
-        if msg.type == smolmidi.CC and msg.channel == 0 and msg.data[0] == MIDI_LED_CTRL:
+        if msg.type == smolmidi.CC and msg.channel == 0 and msg.data[0] == constants.MIDI_LED_CTRL:
             num = msg.data[1]
             if do_led_change(num):
                 debug(f"Received LED control msg: {num}")
-                send_midi_bytes(b"%c%c%c" % (smolmidi.CC, MIDI_LED_CTRL, num))  # Acknowledge by sending bytes back
+                send_midi_bytes(
+                    b"%c%c%c" % (smolmidi.CC, constants.MIDI_LED_CTRL, num)
+                )  # Acknowledge by sending bytes back
             else:
                 debug(f"WARNING: Invalid LED control msg: {num}")
                 send_sysex(b"invalid-led-ctrl/%d" % num)
@@ -170,11 +160,11 @@ def process_midi():
             supervisor.reload()
 
         elif msg.type == smolmidi.SYSEX:
-            msg, truncated = midi_in.receive_sysex(SYSEX_MAX_LEN)
+            msg, truncated = midi_in.receive_sysex(constants.SYSEX_MAX_LEN)
             if truncated:
                 debug("WARNING: Truncated sysex message. Skipping!")
-            elif msg.startswith(SYSEX_PREFIX):
-                process_midi_sysex(msg[SYSEX_PREFIX_LEN:])
+            elif msg.startswith(constants.SYSEX_PREFIX):
+                process_midi_sysex(msg[constants.SYSEX_PREFIX_LEN :])
             elif len(msg) > 0:  # Ignore empty messages
                 debug("WARNING: Bad sysex message: %s" % msg)
 
@@ -195,7 +185,7 @@ def process_button():
 midi_outgoing_data = bytearray()
 
 
-debug(f"Running {PRODUCT_NAME} v{VERSION}.")
+debug(f"Running {constants.PRODUCT_NAME} v{constants.VERSION}.")
 
 debug("Configuring pins...")
 button = digitalio.DigitalInOut(getattr(board, config.button))
@@ -219,8 +209,17 @@ midi_out = usb_midi.ports[1]
 
 process_usb_connected = ProcessUSBConnected()
 
-while True:
-    process_usb_connected.update()
-    process_midi()
-    process_button()
-    led.update()
+try:
+    while True:
+        process_usb_connected.update()
+        process_midi()
+        process_button()
+        led.update()
+
+except Exception as e:
+    import traceback
+
+    for i in range(5):
+        formatted_exception = "\n".join(traceback.format_exception(e))
+        debug(f"An unexpected error occurred. Reloading in {5 - i} second(s)...\n{formatted_exception}")
+        time.sleep(1)

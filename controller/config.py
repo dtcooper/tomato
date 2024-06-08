@@ -42,7 +42,9 @@ pulsate_period_fast = 0.6
 class Config:
     NEXT_BOOT_OVERRIDES = ("debug", "sysex_debug_messages")
 
-    def __init__(self, *, from_boot=False):
+    def __init__(self, *, from_boot=False, debug=print):
+        self._debug = debug
+
         is_first_boot = False
         if from_boot:
             try:
@@ -51,7 +53,7 @@ class Config:
                 is_first_boot = True
 
             if is_first_boot:
-                print("Creating default settings.toml")
+                self._debug("Creating default settings.toml")
                 storage.remount("/", readonly=False)
                 with open(SETTINGS_FILE, "w") as f:
                     f.write(DEFAULT_SETTINGS_TOML)
@@ -65,12 +67,12 @@ class Config:
         if from_boot:
             if is_first_boot:
                 microcontroller.nvm[0:code_nvm_end] = b"\x00" * code_nvm_end  # Clear out nvm on first boot
-                print("Forcing config value debug = true (empty settings.toml, likely a first boot)")
+                self._debug("Forcing config value debug = true (empty settings.toml, likely a first boot)")
                 self.set_code_override_from_boot("debug", True)
             else:
                 for index, override in enumerate(self.NEXT_BOOT_OVERRIDES):
                     if microcontroller.nvm[index]:
-                        print(f"Forcing config value {override} = true (forced via nvm)")
+                        self._debug(f"Forcing config value {override} = true (forced via nvm)")
                         self.set_code_override_from_boot(override, True)
                     else:
                         self.set_code_override_from_boot(override, False)
@@ -81,6 +83,7 @@ class Config:
                     self._config[override] = True
 
     def set_next_boot_override_from_code(self, override, value=True):
+        self._debug(f"Setting {override} = true for next boot")
         index = self.NEXT_BOOT_OVERRIDES.index(override)
         microcontroller.nvm[index] = 1 if value else 0
 
@@ -95,4 +98,7 @@ class Config:
             microcontroller.nvm[code_index] = 0  # Unset for code.py
 
     def __getattr__(self, attr):
-        return self._config[attr]
+        try:
+            return self._config[attr]
+        except KeyError:
+            raise Exception(f"Error getting config key: {attr}!")

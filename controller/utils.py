@@ -4,14 +4,14 @@ import pwmio
 import supervisor
 import time
 
-from constants import SYSEX_STATS_PREFIX
+import constants
 
 
 # Utilities for code.py (not boot.py)
 
 
 class PulsatingLED:
-    def __init__(self, pin, *, min_duty_cycle=0x1000, max_duty_cycle=0xFFFF, frequency=60, debug=None):
+    def __init__(self, pin, *, min_duty_cycle=0x1000, max_duty_cycle=0xFFFF, frequency=60, debug=print):
         self._min_duty = max(min(min_duty_cycle, 0xFFFF), 0x0000)
         self._max_duty = max(min(max_duty_cycle, 0xFFFF), 0x0000)
         self._duty_delta = self._max_duty - self._min_duty
@@ -26,16 +26,14 @@ class PulsatingLED:
         self._flash_while_pulsating = False
         self._pwm.duty_cycle = 0xFFFF if on else 0x0000
         self.state = "on" if on else "off"
-        if self._debug:
-            self._debug(f"Turned LED {self.state}")
+        self._debug(f"Turned LED {self.state}")
 
     def pulsate(self, period, *, flash=False):
         self._flash_while_pulsating = flash
         self._period = period
         self._pulsate_started = time.monotonic()
         self.state = f"{'flash' if flash else 'pulsate'}/period={period:.2f}s"
-        if self._debug:
-            self._debug(f"Set LED to {self.state} (duty cycle: 0x{self._min_duty:04x} <> 0x{self._max_duty:04X})")
+        self._debug(f"Set LED to {self.state} (duty cycle: 0x{self._min_duty:04x} <> 0x{self._max_duty:04X})")
 
     def update(self):
         if self._period > 0:
@@ -60,7 +58,7 @@ def encode_stats_sysex(obj):
     bytes_io = io.BytesIO()
     msgpack.pack(obj, bytes_io)
     unpacked = bytes_io.getvalue()
-    packed = bytearray(SYSEX_STATS_PREFIX)
+    packed = bytearray(constants.SYSEX_STATS_PREFIX)
 
     for index in range(0, len(unpacked), 7):
         chunk = unpacked[index : index + 7]  # Chunk of 7 bytes
