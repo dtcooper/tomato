@@ -12,15 +12,20 @@ Here's the button box firmware for a Raspberry Pi Pico flashed with CircuitPytho
    or greater onto your Pi Pico.
 2. In the `lib/` folder on your device copy the following,
    [CircuitPython Libraries](https://circuitpython.org/libraries),
-    - [`adafruit_ticks`](https://docs.circuitpython.org/projects/ticks/) (required
-      for `adafruit_debouncer`, can use [`circup`](https://github.com/adafruit/circup))
-    - [`adafruit_debouncer`](https://docs.circuitpython.org/projects/debouncer/)
-      (can use [`circup`](https://github.com/adafruit/circup))
-    - [`circuitpython_toml`](https://github.com/elpekenin/circuitpython_toml/)
-      (can use [`circup`](https://github.com/adafruit/circup))
-    - [`winterbloom_smolmidi`](https://github.com/wntrblm/Winterbloom_SmolMIDI/)
-      (cannot use `circup`, so optionally compile with
-      [`mpy-cross`](https://adafruit-circuit-python.s3.amazonaws.com/index.html?prefix=bin/mpy-cross/))
+
+    1. [`adafruit_debouncer`](https://docs.circuitpython.org/projects/debouncer/)
+      (requires [`adafruit_ticks`](https://docs.circuitpython.org/projects/ticks/))
+    2. [`circuitpython_toml`](https://github.com/elpekenin/circuitpython_toml/)
+    3. [`winterbloom_smolmidi`](https://github.com/wntrblm/Winterbloom_SmolMIDI/)
+       (optionally compile with
+       [`mpy-cross`](https://adafruit-circuit-python.s3.amazonaws.com/index.html?prefix=bin/mpy-cross/))
+
+    You can install the first dependencies (not `winterbloom_smolmidi`) using the
+    [`circup`](https://github.com/adafruit/circup) tool,
+    ```
+    circup install adafruit_debouncer toml
+    ```
+
 3. Copy all python (`*.py`) files in this folder on to your device.
 4. Reset the device. Upon first boot, you'll see the `TOMATOBOX` drive, and
    you can edit the newly generated `settings.toml` file to your liking.
@@ -77,7 +82,8 @@ to confirm the LED has been turned on (solid)._
 
 ### Restart
 
-To restart the device's program, send it the **system reset** byte (`0xFF`).
+To restart the device's program, send it the **system reset** byte (`0xFF`). The device
+will send back a `0xFF` when it resets or starts up.
 
 ## Development
 
