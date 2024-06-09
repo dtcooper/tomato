@@ -3,8 +3,9 @@ import msgpack
 import pwmio
 import supervisor
 import time
+import winterbloom_smolmidi as smolmidi
 
-import constants
+import constants as c
 
 
 # Utilities for code.py (not boot.py)
@@ -52,13 +53,13 @@ class PulsatingLED:
             self._pwm.duty_cycle = duty
 
 
-def encode_stats_sysex(obj):
+def sysex_msgpack_7bit_encode(type, obj=None):
     # Use msgpack to pack data as binary, then
     # encode most significant bit of following 7 bytes first as 0b07654321 0b01111111 0b02222222 ... 0b07777777
     bytes_io = io.BytesIO()
-    msgpack.pack(obj, bytes_io)
+    msgpack.pack((type, obj), bytes_io)
     unpacked = bytes_io.getvalue()
-    packed = bytearray(constants.SYSEX_STATS_PREFIX)
+    packed = bytearray(b"%c%s" % (smolmidi.SYSEX, c.SYSEX_PREFIX))
 
     for index in range(0, len(unpacked), 7):
         chunk = unpacked[index : index + 7]  # Chunk of 7 bytes
@@ -67,8 +68,9 @@ def encode_stats_sysex(obj):
             msb_byte |= ((byte & 0x80) >> 7) << chunk_index  # Extract most significant bit and shift it as above
         packed.append(msb_byte)
         packed.extend(byte & 0x7F for byte in chunk)  # Remove most significant bit from chunk's bytes
+    packed.append(smolmidi.SYSEX_END)
 
-    return bytes(packed)
+    return packed
 
 
 class ConnectedBase:

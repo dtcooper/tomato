@@ -1,5 +1,5 @@
 # General
-VERSION = "0.3.3"
+VERSION = "0.3.4"
 PRODUCT_NAME = "Tomato Button Box"
 
 # Kindly assigned by pid.codes (https://pid.codes/1209/7111/)
@@ -24,5 +24,4 @@ LED_PULSATE_FAST = 5
 SYSEX_NON_COMMERCIAL = 0x7D
 SYSEX_PREFIX = b"%c!T~" % SYSEX_NON_COMMERCIAL  # 0x7D is the non-commercial sysex prefix
 SYSEX_PREFIX_LEN = len(SYSEX_PREFIX)
-SYSEX_STATS_PREFIX = b"S~"
 SYSEX_MAX_LEN = 128

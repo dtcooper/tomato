@@ -1,3 +1,4 @@
+import board
 import microcontroller
 import os
 import storage
@@ -41,10 +42,9 @@ pulsate_period_fast = 0.6
 
 class Config:
     NEXT_BOOT_OVERRIDES = ("debug", "sysex_debug_messages")
+    PIN_ATTRS = ("button", "led")
 
-    def __init__(self, *, from_boot=False, debug=print):
-        self._debug = debug
-
+    def __init__(self, *, from_boot=False):
         is_first_boot = False
         if from_boot:
             try:
@@ -53,7 +53,7 @@ class Config:
                 is_first_boot = True
 
             if is_first_boot:
-                self._debug("Creating default settings.toml")
+                print("Creating default settings.toml")
                 storage.remount("/", readonly=False)
                 with open(SETTINGS_FILE, "w") as f:
                     f.write(DEFAULT_SETTINGS_TOML)
@@ -67,12 +67,12 @@ class Config:
         if from_boot:
             if is_first_boot:
                 microcontroller.nvm[0:code_nvm_end] = b"\x00" * code_nvm_end  # Clear out nvm on first boot
-                self._debug("Forcing config value debug = true (empty settings.toml, likely a first boot)")
+                print("Forcing config value debug = true (empty settings.toml, likely a first boot)")
                 self.set_code_override_from_boot("debug", True)
             else:
                 for index, override in enumerate(self.NEXT_BOOT_OVERRIDES):
                     if microcontroller.nvm[index]:
-                        self._debug(f"Forcing config value {override} = true (forced via nvm)")
+                        print(f"Forcing config value {override} = true (forced via nvm)")
                         self.set_code_override_from_boot(override, True)
                     else:
                         self.set_code_override_from_boot(override, False)
@@ -82,8 +82,15 @@ class Config:
                 if value:
                     self._config[override] = True
 
+        for pin_value in self.PIN_ATTRS:
+            try:
+                self._config[f"{pin_value}_pin"] = getattr(board, self._config[pin_value])
+            except AttributeError:
+                raise Exception(f"{self._config[pin_value]} is an invalid pin value ({pin_value})")
+            except KeyError:
+                raise Exception(f"No configuration for {pin_value}")
+
     def set_next_boot_override_from_code(self, override, value=True):
-        self._debug(f"Setting {override} = true for next boot")
         index = self.NEXT_BOOT_OVERRIDES.index(override)
         microcontroller.nvm[index] = 1 if value else 0
 

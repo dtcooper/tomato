@@ -7,26 +7,22 @@ import usb_hid
 import usb_midi
 
 from config import Config
-import constants
+import constants as c
 
 
-print(
-    f"Booting {constants.PRODUCT_NAME} v{constants.VERSION} [{constants.USB_VENDOR_ID:04x}:{constants.USB_PRODUCT_ID:04x}]"
-)
-
-config = Config(from_boot=True)
+print(f"Booting {c.PRODUCT_NAME} v{c.VERSION} [{c.USB_VENDOR_ID:04x}:{c.USB_PRODUCT_ID:04x}]")
 usb_hid.disable()
 
 MOUNT_NAME = "TOMATOBOX"
 
 supervisor.set_usb_identification(
     manufacturer="Tomato Radio Automation",
-    product=constants.PRODUCT_NAME,
-    vid=constants.USB_VENDOR_ID,
-    pid=constants.USB_PRODUCT_ID,
+    product=c.PRODUCT_NAME,
+    vid=c.USB_VENDOR_ID,
+    pid=c.USB_PRODUCT_ID,
 )
 usb_midi.set_names(
-    audio_control_interface_name=constants.PRODUCT_NAME,
+    audio_control_interface_name=c.PRODUCT_NAME,
     in_jack_name="input",
     out_jack_name="output",
 )
@@ -38,8 +34,10 @@ if mount.label != MOUNT_NAME:
     mount.label = MOUNT_NAME
     storage.remount("/", readonly=True)
 
+
+config = Config(from_boot=True)
 if not config.debug:
-    button = digitalio.DigitalInOut(getattr(board, config.button))
+    button = digitalio.DigitalInOut(config.button_pin)
     button.direction = digitalio.Direction.INPUT
     button.pull = digitalio.Pull.UP
     if not button.value:

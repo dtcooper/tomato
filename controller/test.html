@@ -19,12 +19,11 @@
     // From constants.py
     const SYSEX_NON_COMMERCIAL = 0x7D
     const SYSEX_PREFIX = '!T~'
-    const SYSEX_STATS_PREFIX = 'S~'
     const MIDI_BTN_CTRL = 0x10
     const MIDI_LED_CTRL = 0x11
     const BTN_PRESSED = 0x7F
 
-    const unpackMsgPackMessage = (msg) => {
+    const unpackMsgPackMIDIMessage = (msg) => {
       // Decode most significant bit of following 7 bytes first as 0b07654321 0b01111111 0b02222222 ... 0b07777777
       // Then use msgpack to decode binary data
       const unpacked = []
@@ -80,7 +79,7 @@
           })
         },
         restart() {
-          this.log("Sending restart (reset) MIDI byte")
+          this.log("Sending restart (reset) byte")
           midi.outputs.forEach((output) => {
             output.sendReset()
           })
@@ -114,20 +113,15 @@
           input.addListener("sysex", (event) => {
             let message = new TextDecoder().decode(event.message.rawDataBytes)
             if (message.startsWith(SYSEX_PREFIX)) {
-              message = message.substr(SYSEX_PREFIX.length)
-              if (message.startsWith(SYSEX_STATS_PREFIX)) {
-                const bytes = event.message.rawDataBytes.slice(SYSEX_PREFIX.length + SYSEX_STATS_PREFIX.length)
-                const stats = unpackMsgPackMessage(bytes)
-                this.log(`Received stats sysex: ${JSON.stringify(stats, null, 2)}`)
-              } else {
-                this.log(`Received sysex: ${message}`)
-              }
+              const bytes = event.message.rawDataBytes.slice(SYSEX_PREFIX.length)
+              const [ type, obj ] = unpackMsgPackMIDIMessage(bytes)
+              this.log(`Received ${type} sysex${obj === null ? '' : ': ' + JSON.stringify(obj, null, 2)}`)
             } else {
               this.log(`Received INVALID sysex: ${message}`)
             }
           })
           input.addListener("reset", (event) => {
-            this.log("Device ack'd restart")
+            this.log("Received reset byte: restarted or reconnected")
           })
         }
       }))
