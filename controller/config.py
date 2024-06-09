@@ -59,6 +59,7 @@ class Config:
                     f.write(DEFAULT_SETTINGS_TOML)
                 storage.remount("/", readonly=True)
 
+        self._defaults = toml.loads(DEFAULT_SETTINGS_TOML)
         with open(SETTINGS_FILE, "r") as f:
             self._config = toml.load(f)
 
@@ -84,11 +85,9 @@ class Config:
 
         for pin_value in self.PIN_ATTRS:
             try:
-                self._config[f"{pin_value}_pin"] = getattr(board, self._config[pin_value])
+                self._config.update({f"{pin}_pin": getattr(board, getattr(self, pin)) for pin in ("led", "button")})
             except AttributeError:
                 raise Exception(f"{self._config[pin_value]} is an invalid pin value ({pin_value})")
-            except KeyError:
-                raise Exception(f"No configuration for {pin_value}")
 
     def set_next_boot_override_from_code(self, override, value=True):
         index = self.NEXT_BOOT_OVERRIDES.index(override)
@@ -108,4 +107,7 @@ class Config:
         try:
             return self._config[attr]
         except KeyError:
-            raise Exception(f"Error getting config key: {attr}!")
+            try:  # Try default if there's a miss
+                return self._defaults[attr]
+            except KeyError:
+                raise Exception(f"Error getting config key: {attr}!")

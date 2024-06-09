@@ -54,7 +54,6 @@ def do_led_change(num):
 
 
 def write_outgoing_midi_data(*, flush=False):
-    # Return False when there's nothing else to write
     while len(midi_outgoing_data) > 0:
         num_written = midi_out.write(midi_outgoing_data)
         midi_outgoing_data[:] = midi_outgoing_data[num_written:]  # Modify in place
@@ -89,27 +88,25 @@ class ProcessUSBConnected(ConnectedBase):
         do_led_change(c.LED_FLASH)
 
 
-def get_stats_dict():
-    with open("boot_out.txt", "r") as f:
-        boot_out = [line.strip() for line in f.readlines()]
-
-    return {
-        "boot-out": boot_out,
-        "config": {key: getattr(config, key) for key in ("button", "led", "debug", "sysex_debug_messages")},
-        "led": led.state,
-        "mem-free": f"{gc.mem_free() / 1024:.1f}kB",
-        "pressed": not button.value,
-        "temp": f"{microcontroller.cpu.temperature:.2f}'C",
-        "uptime": round(time.monotonic() - BOOT_TIME),
-        "version": c.VERSION,
-    }
-
-
 def process_midi_sysex(msg):
     if msg == b"ping":
         send_sysex("pong")
     elif msg == b"stats":
-        send_sysex("stats", get_stats_dict())
+        with open("boot_out.txt", "r") as f:
+            boot_out = [line.strip() for line in f.readlines()]
+        send_sysex(
+            "stats",
+            {
+                "boot-out": boot_out,
+                "config": {key: getattr(config, key) for key in ("button", "led", "debug", "sysex_debug_messages")},
+                "led": led.state,
+                "mem-free": f"{gc.mem_free() / 1024:.1f}kB",
+                "pressed": not button.value,
+                "temp": f"{microcontroller.cpu.temperature:.2f}'C",
+                "uptime": round(time.monotonic() - BOOT_TIME),
+                "version": c.VERSION,
+            },
+        )
     elif msg in (b"simulate/press", b"simulate/release"):
         pressed = msg.split(b"/")[1] == b"press"
         debug(f"Simulating button {'press' if pressed else 'release'}")
@@ -178,7 +175,7 @@ midi_outgoing_data = bytearray()
 
 debug(f"Running {c.PRODUCT_NAME} v{c.VERSION}.")
 
-debug("Configuring pins...")
+debug(f"Configuring pins: button={config.button}, LED={config.led}...")
 button = digitalio.DigitalInOut(config.button_pin)
 button.pull = digitalio.Pull.UP
 button = Debouncer(button)
