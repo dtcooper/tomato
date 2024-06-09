@@ -20,12 +20,11 @@
     // From constants.py
     const SYSEX_NON_COMMERCIAL = 0x7D
     const SYSEX_PREFIX = '!T~'
-    const SYSEX_PREFIX_ARRAY = Array.from(SYSEX_PREFIX).map(letter => letter.charCodeAt(0))
     const MIDI_BTN_CTRL = 0x10
     const MIDI_LED_CTRL = 0x11
     const BTN_PRESSED = 0x7F
 
-    const unpackMsgPackMIDIMessage = (msg) => {
+    const sysexMsgPack7bitDecode = (msg) => {
       // Decode most significant bit of following 7 bytes first as 0b07654321 0b01111111 0b02222222 ... 0b07777777
       // Then use msgpack to decode binary data
       const unpacked = []
@@ -33,7 +32,8 @@
         const msbByte = msg[index] // Every 8th byte is the most significant bit for the following 7 bytes as above
         const chunk = msg.slice(index + 1, index + 8)
         for (let chunkIndex = 0; chunkIndex < chunk.length; chunkIndex++) {
-          unpacked.push(chunk[chunkIndex] | (msbByte << (7 - chunkIndex)) & 0x80)  // Reassemble chunk byte
+          const msb = (msbByte << (7 - chunkIndex)) & 0x80
+          unpacked.push(chunk[chunkIndex] | msb)  // Reassemble chunk byte
         }
       }
       return MessagePack.decode(unpacked)
@@ -118,8 +118,8 @@
               const message = event.message.rawDataBytes
               const prefix = new TextDecoder().decode(message.slice(0, SYSEX_PREFIX.length))
               if (prefix === SYSEX_PREFIX) {
-                const trimmedMessage = message.slice(SYSEX_PREFIX.length)
-                const [ type, obj ] = unpackMsgPackMIDIMessage(trimmedMessage)
+                const encoded = message.slice(SYSEX_PREFIX.length)
+                const [ type, obj ] = sysexMsgPack7bitDecode(encoded)
                 this.log(`Received ${type} sysex${obj === null ? '' : ': ' + JSON.stringify(obj, null, 2)}`)
               } else {
                 this.log(`Received INVALID sysex: ${message}`)
