@@ -14,11 +14,13 @@
   </style>
   <script crossorigin src="https://unpkg.com/@msgpack/msgpack"></script>
   <script src="https://unpkg.com/webmidi/dist/iife/webmidi.iife.js"></script>
+  <script defer src="https://unpkg.com/@alpinejs/persist"></script>
   <script src="https://unpkg.com/alpinejs" defer></script>
   <script>
     // From constants.py
     const SYSEX_NON_COMMERCIAL = 0x7D
     const SYSEX_PREFIX = '!T~'
+    const SYSEX_PREFIX_ARRAY = Array.from(SYSEX_PREFIX).map(letter => letter.charCodeAt(0))
     const MIDI_BTN_CTRL = 0x10
     const MIDI_LED_CTRL = 0x11
     const BTN_PRESSED = 0x7F
@@ -40,91 +42,95 @@
     document.addEventListener('alpine:init', () => {
       let midi
 
-      Alpine.data('main', () => ({
-        connected: false,
-        turnLedOff: true,
-        logLines: [],
-        log(s) {
-          const date = new Date()
-          this.logLines.unshift(`${date.toLocaleDateString()} ${date.toLocaleTimeString()} - ${s}`)
-        },
-        async init() {
-          window.midi = midi = await WebMidi.enable({sysex: true})
-          midi.addListener("connected", (event) => {
-            const port = event.port
-            if (port instanceof Input) {
-              this.registerInput(port)
-            }
-          })
-          midi.inputs.forEach(input => this.registerInput(input))
-          this.connected = true
-          this.log("Connected!")
-          window.tester = this
-        },
-        led(num, description) {
-          this.log(`Setting LED to ${num} (${description})`)
-          midi.outputs.forEach((output) => {
-            output.channels[1].sendControlChange(MIDI_LED_CTRL, num)
-          })
-        },
-        invalidMidiMsg() {
-          midi.outputs.forEach((output) => {
-            output.channels[1].sendNoteOn("A4")
-          })
-        },
-        sysex(data, firstByte = SYSEX_NON_COMMERCIAL, prefix = SYSEX_PREFIX) {
-          this.log(`Sending sysex: ${data}`)
-          midi.outputs.forEach((output) => {
-            output.sendSysex(firstByte, new TextEncoder().encode(`${prefix}${data}`))
-          })
-        },
-        restart() {
-          this.log("Sending restart (reset) byte")
-          midi.outputs.forEach((output) => {
-            output.sendReset()
-          })
-        },
-        sysexConfirm(data, message) {
-          if (confirm(message)) {
-            this.sysex(data)
-            return true
-          } else {
-            this.log(`Aborted sending sysex: ${data}`)
-            return false
-          }
-        },
-        registerInput(input) {
-          this.log(`Input: ${input.name}`)
-          input.channels[1].removeListener() // Remove all existing listeners
-          input.removeListener()
-          input.channels[1].addListener("controlchange", (event) => {
-            if (event.controller.number === MIDI_BTN_CTRL) {
-              const pressed = event.rawValue === BTN_PRESSED
-              this.log(`Button ${pressed ? "pressed" : "released"}`)
-              if (pressed && this.turnLedOff) {
-                this.led(0, 'off, button press')
+      Alpine.data('main', function() {
+        return {
+          connected: false,
+          turnLedOff: this.$persist(true),
+          logLines: [],
+          log(s) {
+            const date = new Date()
+            this.logLines.unshift(`${date.toLocaleDateString()} ${date.toLocaleTimeString()} - ${s}`)
+          },
+          async init() {
+            window.midi = midi = await WebMidi.enable({sysex: true})
+            midi.addListener("connected", (event) => {
+              const port = event.port
+              if (port instanceof Input) {
+                this.registerInput(port)
               }
-            } else if (event.controller.number === MIDI_LED_CTRL) {
-              this.log(`Device ack'd LED change: ${event.rawValue}`)
+            })
+            midi.inputs.forEach(input => this.registerInput(input))
+            this.connected = true
+            this.log("Connected!")
+            window.tester = this
+          },
+          led(num, description) {
+            this.log(`Setting LED to ${num} (${description})`)
+            midi.outputs.forEach((output) => {
+              output.channels[1].sendControlChange(MIDI_LED_CTRL, num)
+            })
+          },
+          invalidMidiMsg() {
+            midi.outputs.forEach((output) => {
+              output.channels[1].sendNoteOn("A4")
+            })
+          },
+          sysex(data, firstByte = SYSEX_NON_COMMERCIAL, prefix = SYSEX_PREFIX) {
+            this.log(`Sending sysex: ${data}`)
+            const message = Array.from(prefix + data).map(letter => letter.charCodeAt(0))
+            midi.outputs.forEach((output) => {
+              output.sendSysex(firstByte, message)
+            })
+          },
+          restart() {
+            this.log("Sending restart (reset) byte")
+            midi.outputs.forEach((output) => {
+              output.sendReset()
+            })
+          },
+          sysexConfirm(data, message) {
+            if (confirm(message)) {
+              this.sysex(data)
+              return true
             } else {
-              this.log(`Bad controller number: ${event.controller.number}`)
+              this.log(`Aborted sending sysex: ${data}`)
+              return false
             }
-          })
-          input.addListener("sysex", (event) => {
-            let message = new TextDecoder().decode(event.message.rawDataBytes)
-            if (message.startsWith(SYSEX_PREFIX)) {
-              const bytes = event.message.rawDataBytes.slice(SYSEX_PREFIX.length)
-              const [ type, obj ] = unpackMsgPackMIDIMessage(bytes)
-              this.log(`Received ${type} sysex${obj === null ? '' : ': ' + JSON.stringify(obj, null, 2)}`)
-            } else {
-              this.log(`Received INVALID sysex: ${message}`)
-            }
-          })
-          input.addListener("reset", (event) => {
-            this.log("Received reset byte: restarted or reconnected")
-          })
+          },
+          registerInput(input) {
+            this.log(`Input: ${input.name}`)
+            input.channels[1].removeListener() // Remove all existing listeners
+            input.removeListener()
+            input.channels[1].addListener("controlchange", (event) => {
+              if (event.controller.number === MIDI_BTN_CTRL) {
+                const pressed = event.rawValue === BTN_PRESSED
+                this.log(`Button ${pressed ? "pressed" : "released"}`)
+                if (pressed && this.turnLedOff) {
+                  this.led(0, 'off, button press')
+                }
+              } else if (event.controller.number === MIDI_LED_CTRL) {
+                this.log(`Device ack'd LED change: ${event.rawValue}`)
+              } else {
+                this.log(`Bad controller number: ${event.controller.number}`)
+              }
+            })
+            input.addListener("sysex", (event) => {
+              const message = event.message.rawDataBytes
+              const prefix = new TextDecoder().decode(message.slice(0, SYSEX_PREFIX.length))
+              if (prefix === SYSEX_PREFIX) {
+                const trimmedMessage = message.slice(SYSEX_PREFIX.length)
+                const [ type, obj ] = unpackMsgPackMIDIMessage(trimmedMessage)
+                this.log(`Received ${type} sysex${obj === null ? '' : ': ' + JSON.stringify(obj, null, 2)}`)
+              } else {
+                this.log(`Received INVALID sysex: ${message}`)
+              }
+            })
+            input.addListener("reset", (event) => {
+              this.log("Received reset byte: restarted or reconnected")
+            })
+          }
         }
-      }))
+      })
     })
   </script>
 </head>
