@@ -31,9 +31,9 @@ def debug(s):
             send_sysex("debug", msg, skip_debug_msg=True)
 
 
-def do_button_press(on=True):
-    send_midi_bytes((smolmidi.CC, c.MIDI_BTN_CTRL, c.BTN_PRESSED if on else c.BTN_RELEASED))
-    if on:
+def do_button_press(pressed=True):
+    send_midi_bytes((smolmidi.CC, c.MIDI_BTN_CTRL, c.BTN_PRESSED if pressed else c.BTN_RELEASED))
+    if pressed:
         debug("Button pressed. Sending MIDI message.")
         builtin_led.value = True
     else:
@@ -111,9 +111,10 @@ def process_midi_sysex(msg):
     elif msg == b"stats":
         send_sysex("stats", get_stats_dict())
     elif msg in (b"simulate/press", b"simulate/release"):
-        action = msg.split(b"/")[1]
-        debug(f"Simulating button {action.decode()}")
-        do_button_press(on=action == b"press")
+        pressed = msg.split(b"/")[1] == b"press"
+        debug(f"Simulating button {'press' if pressed else 'release'}")
+        send_sysex("simulate", {"pressed": pressed})
+        do_button_press(pressed=pressed)
     elif msg in (b"reset", b"~~~!fLaSh!~~~"):
         flash = msg == b"~~~!fLaSh!~~~"
         debug(f"Resetting{' into flash mode' if flash else ''}...")
@@ -167,9 +168,9 @@ def process_midi():
 def process_button():
     button.update()
     if button.fell:
-        do_button_press(on=True)
+        do_button_press(pressed=True)
     if button.rose:
-        do_button_press(on=False)
+        do_button_press(pressed=False)
 
 
 midi_outgoing_data = bytearray()
