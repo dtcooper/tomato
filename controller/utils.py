@@ -120,18 +120,18 @@ class MIDISystemBase:
 
     def _on_sysex(self, msg):
         if msg == b"ping":
-            self.on_ping()
+            self.on_ping_sysex()
         elif msg == b"stats":
-            self.on_stats()
+            self.on_stats_sysex()
         elif msg in (b"simulate/press", b"simulate/release"):
             pressed = msg.split(b"/")[1] == b"press"
-            self.on_simulate_press(pressed=pressed)
+            self.on_simulate_press_sysex(pressed=pressed)
         elif msg in (b"reset", b"~~~!fLaSh!~~~"):
             flash = msg == b"~~~!fLaSh!~~~"
-            self.on_reset(flash=flash)
+            self.on_reset_sysex(flash=flash)
         elif msg in (b"next-boot/%s" % override for override in Config.NEXT_BOOT_OVERRIDES):
             override = msg.split(b"/")[1].decode()
-            self.on_next_boot_override(override=override)
+            self.on_next_boot_override_sysex(override=override)
         else:
             self._debug(f"WARNING: Unrecognized sysex message: {msg}")
 
@@ -148,19 +148,19 @@ class MIDISystemBase:
     def on_system_reset(self):
         raise NotImplementedError()
 
-    def on_ping(self):
+    def on_ping_sysex(self):
         raise NotImplementedError()
 
-    def on_stats(self):
+    def on_stats_sysex(self):
         raise NotImplementedError()
 
-    def on_simulate_press(self, pressed):
+    def on_simulate_press_sysex(self, pressed):
         raise NotImplementedError()
 
-    def on_reset(self, flash):
+    def on_reset_sysex(self, flash):
         raise NotImplementedError()
 
-    def on_next_boot_override(self, override):
+    def on_next_boot_override_sysex(self, override):
         raise NotImplementedError()
 
 
@@ -175,15 +175,15 @@ class USBConnectedBase:
             self.on_connect()
         else:
             self.on_disconnect()
-        self.was_connected = is_connected
+        self._was_connected = is_connected
 
     def update(self):
         is_connected = supervisor.runtime.usb_connected
-        if is_connected and not self.was_connected:
+        if is_connected and not self._was_connected:
             self.on_connect()
-        elif not is_connected and self.was_connected:
+        elif not is_connected and self._was_connected:
             self.on_disconnect()
-        self.was_connected = is_connected
+        self._was_connected = is_connected
 
     def on_connect(self):
         raise NotImplementedError()

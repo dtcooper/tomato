@@ -68,10 +68,10 @@ class MIDISystem(MIDISystemBase):
         time.sleep(0.1)  # Wait for midi messages to flush
         supervisor.reload()
 
-    def on_ping(self):
+    def on_ping_sysex(self):
         self.send_sysex("pong")
 
-    def on_stats(self):
+    def on_stats_sysex(self):
         with open("boot_out.txt", "r") as f:
             boot_out = [line.strip() for line in f.readlines()]
         self.send_sysex(
@@ -88,12 +88,12 @@ class MIDISystem(MIDISystemBase):
             },
         )
 
-    def on_simulate_press(self, pressed):
+    def on_simulate_press_sysex(self, pressed):
         debug(f"Simulating button {'press' if pressed else 'release'}")
         self.send_sysex("simulate", {"pressed": pressed})
         button.on_press(pressed=pressed)
 
-    def on_reset(self, flash):
+    def on_reset_sysex(self, flash):
         debug(f"Resetting{' into flash mode' if flash else ''}...")
         self.send_sysex("reset", {"flash": flash}, flush=True)
         if flash:
@@ -101,7 +101,7 @@ class MIDISystem(MIDISystemBase):
         time.sleep(0.25)  # Wait for midi messages to flush
         microcontroller.reset()
 
-    def on_next_boot_override(self, override):
+    def on_next_boot_override_sysex(self, override):
         debug(f"Setting {override} = true for next boot")
         config.set_next_boot_override_from_code(override, True)
         self.send_sysex("next-boot-override", {override: True})
