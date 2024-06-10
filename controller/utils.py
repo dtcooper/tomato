@@ -1,10 +1,15 @@
+from adafruit_debouncer import Debouncer
+import board
+import digitalio
 import io
 import msgpack
 import pwmio
 import supervisor
 import time
+import usb_midi
 import winterbloom_smolmidi as smolmidi
 
+from config import Config
 import constants as c
 
 
@@ -53,27 +58,113 @@ class PulsatingLED:
             self._pwm.duty_cycle = duty
 
 
-def sysex_msgpack_7bit_encode(type, obj=None):
-    # Use msgpack to pack data as binary, then encode most significant bit of
-    # following 7 bytes first as: 0b07654321 0b01111111 0b02222222 ... 0b07777777
-    bytes_io = io.BytesIO()
-    msgpack.pack((type, obj), bytes_io)
-    unpacked = bytes_io.getvalue()
-    packed = bytearray(b"%c%s" % (smolmidi.SYSEX, c.SYSEX_PREFIX))  # MIDI SysEx prefix
+class MIDISystemBase:
+    def __init__(self, debug=print):
+        self._outgoing = bytearray()
+        self._midi_in = smolmidi.MidiIn(usb_midi.ports[0])
+        self._midi_out = usb_midi.ports[1]
+        self._debug = debug
 
-    for index in range(0, len(unpacked), 7):
-        chunk = unpacked[index : index + 7]  # Chunk of 7 bytes or less
-        msb_byte = 0  # Most significant bit byte
-        for chunk_index, byte in enumerate(chunk):
-            msb_byte |= ((byte & 0x80) >> 7) << chunk_index  # Extract most significant bit and shift it as above
-        packed.append(msb_byte)  # Insert MSB byte before the next chunk
-        packed.extend(byte & 0x7F for byte in chunk)  # Remove most significant bit from chunk's bytes
+    def update(self):
+        msg = self._midi_in.receive()
+        if msg is not None:
+            if msg.type == smolmidi.CC and msg.channel == 0 and msg.data[0] == c.MIDI_LED_CTRL:
+                self.on_led_change(msg.data[1])
 
-    packed.append(smolmidi.SYSEX_END)  # MIDI SysEx suffix
-    return packed
+            elif msg.type == smolmidi.SYSTEM_RESET:
+                self.on_system_reset()
+
+            elif msg.type == smolmidi.SYSEX:
+                msg, truncated = self._midi_in.receive_sysex(c.SYSEX_MAX_LEN)
+                if truncated:
+                    self._debug("WARNING: Truncated sysex message. Skipping!")
+                elif msg.startswith(c.SYSEX_PREFIX):
+                    self._on_sysex(msg[c.SYSEX_PREFIX_LEN :])
+                elif len(msg) > 0:  # Ignore empty messages
+                    self._debug("WARNING: Bad sysex message: %s" % msg)
+
+            else:
+                self._debug(f"WARNING: Unrecognized MIDI msg: {bytes(msg)}")
+
+        self._write_outgoing()
+
+    def send_bytes(self, msg, flush=False):
+        self._outgoing.extend(msg)
+        if flush:
+            self.flush()
+
+    def send_sysex(self, type, obj=None, *, skip_debug_msg=False, flush=False):
+        # Use msgpack to pack data as binary, then encode most significant bit of
+        # following 7 bytes first as: 0b07654321 0b01111111 0b02222222 ... 0b07777777
+        bytes_io = io.BytesIO()
+        msgpack.pack((type, obj), bytes_io)
+        unpacked = bytes_io.getvalue()
+        packed = bytearray(b"%c%s" % (smolmidi.SYSEX, c.SYSEX_PREFIX))  # MIDI SysEx prefix
+
+        for index in range(0, len(unpacked), 7):
+            chunk = unpacked[index : index + 7]  # Chunk of 7 bytes or less
+            msb_byte = 0  # Most significant bit byte
+            for chunk_index, byte in enumerate(chunk):
+                msb_byte |= ((byte & 0x80) >> 7) << chunk_index  # Extract most significant bit and shift it as above
+            packed.append(msb_byte)  # Insert MSB byte before the next chunk
+            packed.extend(byte & 0x7F for byte in chunk)  # Remove most significant bit from chunk's bytes
+
+        packed.append(smolmidi.SYSEX_END)  # MIDI SysEx suffix
+
+        if not skip_debug_msg:
+            self._debug(f"Sending {type} sysex of {len(packed)} bytes")
+        self.send_bytes(packed, flush=flush)
+
+    def flush(self):
+        self._write_outgoing(flush=True)
+
+    def _on_sysex(self, msg):
+        if msg == b"ping":
+            self.on_ping()
+        elif msg == b"stats":
+            self.on_stats()
+        elif msg in (b"simulate/press", b"simulate/release"):
+            pressed = msg.split(b"/")[1] == b"press"
+            self.on_simulate_press(pressed=pressed)
+        elif msg in (b"reset", b"~~~!fLaSh!~~~"):
+            flash = msg == b"~~~!fLaSh!~~~"
+            self.on_reset(flash=flash)
+        elif msg in (b"next-boot/%s" % override for override in Config.NEXT_BOOT_OVERRIDES):
+            override = msg.split(b"/")[1].decode()
+            self.on_next_boot_override(override=override)
+        else:
+            self._debug(f"WARNING: Unrecognized sysex message: {msg}")
+
+    def _write_outgoing(self, flush=False):
+        while len(self._outgoing) > 0:
+            num_written = self._midi_out.write(self._outgoing)
+            self._outgoing = self._outgoing[num_written:]  # Modify in place
+            if not flush:
+                break
+
+    def on_led_change(self, num):
+        raise NotImplementedError()
+
+    def on_system_reset(self):
+        raise NotImplementedError()
+
+    def on_ping(self):
+        raise NotImplementedError()
+
+    def on_stats(self):
+        raise NotImplementedError()
+
+    def on_simulate_press(self, pressed):
+        raise NotImplementedError()
+
+    def on_reset(self, flash):
+        raise NotImplementedError()
+
+    def on_next_boot_override(self, override):
+        raise NotImplementedError()
 
 
-class ConnectedBase:
+class USBConnectedBase:
     def __init__(self):
         for _ in range(12):
             if supervisor.runtime.usb_connected:
@@ -93,3 +184,35 @@ class ConnectedBase:
         elif not is_connected and self.was_connected:
             self.on_disconnect()
         self.was_connected = is_connected
+
+    def on_connect(self):
+        raise NotImplementedError()
+
+    def on_disconnect(self):
+        raise NotImplementedError()
+
+
+class ButtonBase:
+    def __init__(self, pin):
+        button = digitalio.DigitalInOut(pin)
+        button.pull = digitalio.Pull.UP
+        self._button = Debouncer(button)
+
+        self._builtin_led = digitalio.DigitalInOut(board.LED)
+        self._builtin_led.direction = digitalio.Direction.OUTPUT
+
+    @property
+    def is_pressed(self):
+        return self._button.value
+
+    def update(self):
+        self._button.update()
+        if self._button.fell:
+            self._builtin_led.value = True
+            self.on_press(pressed=True)
+        if self._button.rose:
+            self._builtin_led.value = False
+            self.on_press(pressed=False)
+
+    def on_press(self, pressed):
+        raise NotImplementedError()
