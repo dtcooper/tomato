@@ -27,22 +27,10 @@ def debug(s):
             midi.send_sysex("debug", msg, skip_debug_msg=True)
 
 
-def do_led_change(num):
-    if num in (c.LED_ON, c.LED_OFF):
-        led.solid(num == c.LED_ON)
-    elif num == c.LED_FLASH:
-        led.pulsate(period=config.flash_period, flash=True)
-    elif num in PULSATE_PERIODS:
-        led.pulsate(period=PULSATE_PERIODS[num])
-    else:
-        return False
-    return True
-
-
 class USBConnected(USBConnectedBase):
     def on_connect(self):
         debug("USB now in connected state. Sending reset byte and hello message.")
-        do_led_change(c.LED_OFF)
+        midi.on_led_change(c.LED_OFF)
         midi.send_bytes((smolmidi.SYSTEM_RESET,))
         midi.send_sysex(
             "hello",
@@ -50,14 +38,20 @@ class USBConnected(USBConnectedBase):
         )
 
     def on_disconnect(self):
-        do_led_change(c.LED_FLASH)
+        midi.on_led_change(c.LED_FLASH)
 
 
 class MIDISystem(MIDISystemBase):
     def on_led_change(self, num):
-        if do_led_change(num):
+        if c.LED_RANGE_MIN <= num <= c.LED_RANGE_MAX:
             debug(f"Received LED control msg: {num}")
             self.send_bytes(b"%c%c%c" % (smolmidi.CC, c.MIDI_LED_CTRL, num))  # Acknowledge by sending bytes back
+            if num in (c.LED_ON, c.LED_OFF):
+                led.solid(num == c.LED_ON)
+            elif num == c.LED_FLASH:
+                led.pulsate(period=config.flash_period, flash=True)
+            elif num in PULSATE_PERIODS:
+                led.pulsate(period=PULSATE_PERIODS[num])
         else:
             debug(f"WARNING: Invalid LED control msg: {num}")
             self.send_sysex("error", f"Invalid MIDI control number {num}")
