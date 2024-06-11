@@ -64,7 +64,7 @@ class MIDISystem(MIDISystemBase):
 
     def on_system_reset(self):
         debug("Got system reset byte. Restarting.")
-        self.flush()
+        self.send_sysex("reset", {"mode": "restart"}, flush=True)
         time.sleep(0.1)  # Wait for midi messages to flush
         supervisor.reload()
 
@@ -95,7 +95,7 @@ class MIDISystem(MIDISystemBase):
 
     def on_reset_sysex(self, flash):
         debug(f"Resetting{' into flash mode' if flash else ''}...")
-        self.send_sysex("reset", {"flash": flash}, flush=True)
+        self.send_sysex("reset", {"mode": "flash" if flash else "normal"}, flush=True)
         if flash:
             microcontroller.on_next_reset(microcontroller.RunMode.UF2)
         time.sleep(0.25)  # Wait for midi messages to flush
