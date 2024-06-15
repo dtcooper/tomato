@@ -123,7 +123,7 @@
               if (prefix === SYSEX_PREFIX) {
                 const encoded = message.slice(SYSEX_PREFIX.length)
                 const [ type, obj ] = sysexMsgPack7bitDecode(encoded)
-                this.log(`Received ${type} sysex${obj === null ? '' : ': ' + JSON.stringify(obj, null, 2)}`)
+                this.log(`Received ${type} sysex${obj === null ? '' : ': ' + JSON.stringify(obj, undefined, Object.keys(obj).length === 1 ? undefined : 2)}`)
               } else {
                 this.log(`Received INVALID sysex: ${message}`)
               }
