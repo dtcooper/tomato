@@ -25,7 +25,8 @@
     const SYSEX_PREFIX = '!T~'
     const MIDI_BTN_CTRL = 0x10
     const MIDI_LED_CTRL = 0x11
-    const BTN_PRESSED = 0x7F
+    const BTN_PRESSED = 0x01
+    const NEXT_BOOT_OVERRIDES = ["debug", "debug_messages_over_transport", "midi_transport", "hid_transport"]
 
     const sysexMsgPack7bitDecode = (msg) => {
       // Decode most significant bit of following 7 bytes first as 0b07654321 0b01111111 0b02222222 ... 0b07777777
@@ -48,7 +49,7 @@
       Alpine.data('main', function() {
         return {
           connected: false,
-          turnLedOff: this.$persist(true),
+          turnLedOff: this.$persist(true).as("turnLedOffMIDI"),
           logLines: [],
           log(s) {
             const date = new Date()
@@ -155,12 +156,17 @@
       <strong>Reset:</strong>
       <button @click="restart()">Restart</button>
       <button @click="sysexConfirm('reset', 'Are you SURE you want to RESET the device?')">Reset</button>
-      <button @click="sysexConfirm('next-boot/debug', 'Are you SURE you want to RESET into DEBUG mode?') && sysex('reset')">Reset (DEBUG)</button>
+      <button @click="sysexConfirm('next-boot/debug', 'Are you SURE you want to RESET into DEBUG mode?') && sysex('reset')">Reset (debug)</button>
       <button @click="sysexConfirm('~~~!fLaSh!~~~', 'Are you SURE you want to RESET and FLASH?')">Reset (FLASH)</button>
       <br>
       <strong>Next boot:</strong>
-      <button @click="sysexConfirm('next-boot/debug', 'Are you SURE you want to set `debug = true` next boot?')">debug = true</button>
-      <button @click="sysexConfirm('next-boot/sysex_debug_messages', 'Are you SURE you want to set `sysex_debug_messages = true` next boot?')">sysex_debug_messages = true</button>
+      <template x-for="override in NEXT_BOOT_OVERRIDES">
+        <span>
+          <button @click="sysexConfirm(`next-boot/${override}`, `Are you SURE you want to set '${override} = true' next boot?`)">
+            <small x-text="`${override} = true`"></small>
+          </button>
+        </span>
+      </template>
     </p>
     <p>
       <strong>LED Control:</strong>

@@ -57,7 +57,7 @@ button presses,
 
 | Bytes                           | Button Press State |
 |---------------------------------|--------------------|
-| <code>0xB0 0x10 **0x7F**</code> | **Pressed**        |
+| <code>0xB0 0x10 **0x01**</code> | **Pressed**        |
 | <code>0xB0 0x10 **0x00**</code> | **Released**       |
 
 ### LED Control (Send to Device)

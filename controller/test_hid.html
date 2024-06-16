@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="google" content="notranslate">
+  <meta http-equiv="Content-Language" content="en">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tomato HID Controller Tester</title>
+  <link rel="stylesheet" href="https://unpkg.com/simpledotcss/simple.min.css">
+  <style>
+    body {
+      grid-template-columns: 1fr min(65rem, 90%) 1fr
+    }
+
+    [x-cloak] {
+      display: none;
+    }
+  </style>
+  <script crossorigin src="https://unpkg.com/@msgpack/msgpack"></script>
+  <script defer src="https://unpkg.com/@alpinejs/persist"></script>
+  <script src="https://unpkg.com/alpinejs" defer></script>
+  <script>
+    // From constants.py
+    const USB_VENDOR_ID = 0x1209
+    const USB_PRODUCT_ID = 0x7111
+
+    const BUTTON_REPORT_ID = 1
+    const LED_REPORT_ID = 2
+    const DATA_REQUEST_REPORT_ID = 3
+    const DATA_RESPONSE_REPORT_ID = 4
+
+    const LED_OFF = 0
+    const LED_ON = 1
+    const LED_FLASH = 2
+    const LED_PULSATE_SLOW = 3
+    const LED_PULSATE_MEDIUM = 4
+    const LED_PULSATE_FAST = 5
+
+    const NEXT_BOOT_OVERRIDES = ["debug", "debug_messages_over_transport", "midi_transport", "hid_transport"]
+    const PING = 0
+    const STATS = 1
+    const SIMULATE_PRESS = 2
+    const SIMULATE_RELEASE = 3
+    const RESTART = 4
+    const RESET = 5
+    const FLASH = 6
+    const NEXT_BOOT_OVERRIDE_START = 7
+    const NEXT_BOOT_OVERRIDE_DEBUG = NEXT_BOOT_OVERRIDE_START + NEXT_BOOT_OVERRIDES.indexOf("debug")
+
+    document.addEventListener('alpine:init', () => {
+      let currentDevice = null
+      let pendingDataResponse = []
+      let pendingDataBytes = 0
+
+      Alpine.data('main', function() {
+        return {
+          connected: false,
+          logLines: [],
+          turnLedOff: this.$persist(true).as("turnLedOffHID"),
+          log(s) {
+            const date = new Date()
+            this.logLines.unshift(`${date.toLocaleDateString()} ${date.toLocaleTimeString()} - ${s}`)
+          },
+          async init() {
+            await this.requestDevice(true)
+          },
+          async requestDevice(ignoreErrors = false) {
+            try {
+              navigator.hid.ondisconnect = ({ device }) => {
+                if (currentDevice !== null && device === currentDevice) {
+                  this.log("Device disconnected!")
+                  currentDevice = null
+                  this.connected = false
+                }
+              }
+
+              navigator.hid.onconnect = ({ device }) => {
+                if (!currentDevice && device.productId === USB_PRODUCT_ID && device.vendorId === USB_VENDOR_ID) {
+                  this.log("Device reconnected!")
+                  this.initDevice(device)
+                }
+              }
+
+              const device = (await navigator.hid.requestDevice({filters: [{ vendorId: USB_VENDOR_ID, productId: USB_PRODUCT_ID }]}))[0];
+              if (device) {
+                this.log("Device requested...", device)
+                this.initDevice(device)
+              }
+            } catch (e) {
+              if (!ignoreErrors) {
+                console.error(e)
+                this.log(`Error: ${e}`)
+              }
+            }
+          },
+          async initDevice(device) {
+            device.oninputreport = ({reportId, data}) => {
+              if (reportId === BUTTON_REPORT_ID) {
+                const pressed = !!data.getInt8()
+                this.log(`Button ${pressed ? 'pressed' : 'released'}!`)
+                if (pressed && this.turnLedOff) {
+                  this.led(LED_OFF, 'off, button press')
+                }
+
+              } else if (reportId === DATA_RESPONSE_REPORT_ID) {
+
+                let report = new Uint8Array(data.buffer)
+                if (pendingDataBytes === 0) {  // First message, which means first two bytes are size
+                  pendingDataBytes = (report[1] << 8) + report[0]  // Little endian unsigned short
+                  report = report.slice(2)
+                }
+                // Last message may be smaller than max size, so slice it accordingly
+                if (report.length > pendingDataBytes) {
+                  report = report.slice(0, pendingDataBytes)
+                }
+
+                // Decrease number pending bytes, and add bytes we received to array
+                pendingDataBytes = pendingDataBytes - report.length
+                pendingDataResponse.push(...report)
+
+                // If there are no more bytes to receive, then we can decode the message
+                if (pendingDataBytes <= 0) {
+                  const [type, data] = MessagePack.decode(pendingDataResponse)
+                  this.log(`Received ${type} message${data !== null ? `: ${JSON.stringify(data, undefined, Object.keys(data).length === 1 ? undefined : 2)}` :''}`)
+                  pendingDataResponse = []
+                }
+              }
+            }
+
+            try {
+              await device.open()
+            } catch (e) {
+              console.error(e)
+              this.log("Error opening device!")
+              return
+            }
+            currentDevice = device
+            console.log("Device opened!", device)
+            this.connected = true
+          },
+          async sendData(reportId, byte) {
+            await currentDevice.sendReport(reportId, new Uint8Array([byte]))
+          },
+          async led(num, description) {
+            this.log(`Setting LED to ${num} (${description})`)
+            await this.sendData(LED_REPORT_ID, num)
+          },
+          async requestConfirm(num, description, message) {
+            if (confirm(message)) {
+              await this.request(num, description)
+              return true
+            } else {
+              this.log(`Aborted sending ${description} request!`)
+              return false
+            }
+          },
+          async request(num, description) {
+            this.log(`Sending ${description} request`)
+            await this.sendData(DATA_REQUEST_REPORT_ID, num)
+          }
+        }
+      })
+    })
+  </script>
+</head>
+<body x-data="main">
+  <header>
+    <h1>Tomato HID Controller Tester</h1>
+  </header>
+
+  <main x-cloak>
+    <div x-show="!connected">
+      <p>
+        <button @click="requestDevice()">Connect</button>
+        <button @click="logLines = []">Clear Log</button>
+      </p>
+    </div>
+    <div x-show="connected">
+      <p>
+        <strong>Data Requests:</strong>
+        <button @click="request(PING, 'ping')">Ping</button>
+        <button @click="request(STATS, 'stats')">Stats</button>
+        <button @click="request(69, 'invalid')">Invalid</button>
+        <button @click="logLines = []">Clear Log</button>
+        <br>
+        <strong>Reset:</strong>
+        <button @click="request(RESTART, 'restart')">Restart</button>
+        <button @click="requestConfirm(RESET, 'reset', 'Are you SURE you want to RESET the device?')">Reset</button>
+        <button @click="await requestConfirm(NEXT_BOOT_OVERRIDE_DEBUG, 'next-boot/debug', 'Are you SURE you want to RESET into DEBUG mode?') && request(RESET, 'reset')">Reset (debug)</button>
+        <button @click="requestConfirm(FLASH, 'flash', 'Are you SURE you want to RESET and FLASH?')">Reset (FLASH)</button>
+        <br>
+        <strong>Next boot:</strong>
+        <template x-for="(override, index) in NEXT_BOOT_OVERRIDES">
+          <span>
+            <button
+              @click="requestConfirm(NEXT_BOOT_OVERRIDE_START + index, `next-boot/${override}`, `Are you SURE you want to set '${override} = true' next boot?`)"
+            >
+              <small x-text="`${override} = true`"></small>
+            </button>
+
+          </span>
+        </template>
+      </p>
+      <p>
+        <strong>LED Control:</strong>
+        <button @click="led(LED_OFF, 'off')">OFF</button>
+        <button @click="led(LED_ON, 'on')">ON</button>
+        <button @click="led(LED_FLASH, 'flash')">Flash</button>
+        <button @click="led(LED_PULSATE_SLOW, 'pulsate slow')">Pulse/slow</button>
+        <button @click="led(LED_PULSATE_MEDIUM, 'pulsate medium')">Pulse/medium</button>
+        <button @click="led(LED_PULSATE_FAST, 'pulsate fast')">Pulse/fast</button>
+        <button @click="led(69, 'invalid')">Invalid</button>
+        <br>
+        <strong>Simulate Button Press:</strong>
+        <button @click="request(SIMULATE_PRESS, 'simulate/press')">ON</button>
+        <button @click="request(SIMULATE_RELEASE, 'simulate/release')">OFF</button>
+        <button @click="() => {
+          request(SIMULATE_PRESS, 'simulate/press')
+          setTimeout(() => request(SIMULATE_RELEASE, 'simulate/release'), 350)
+        }">Full</button>
+        <label style="display: inline; cursor: pointer">
+          <input type="checkbox" x-model="turnLedOff"> Turn LED off on press
+        </label>
+      </p>
+
+    </div>
+    <div>
+      <small>
+        <pre
+          x-text="logLines.length > 0 ? logLines.join('\n') : (connected ? 'No log entries...' : 'Please connect...')"
+        ></pre>
+      </small>
+    </div>
+  </main>
+</body>
+</html>

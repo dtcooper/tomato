@@ -5,6 +5,8 @@ import storage
 
 import toml
 
+import constants as c
+
 
 SETTINGS_FILE = "settings.toml"
 DEFAULT_SETTINGS_TOML = """\
@@ -13,21 +15,24 @@ button = "GP17"  # Pin number for button
 led = "GP16"  # Pin number for LED
 
 
-### Debugging ###
+### Operation Modes ###
+midi_transport = true
+hid_transport = false
 
+
+### Debugging ###
 # Debug mode, mounts drive and turns on serial console.
 # Forced if button is pressed at boot time or on receipt of debug sysex MIDI message (see tester tool)
 debug = false
 
-# Debug messages get sent using MIDI sysex
-sysex_debug_messages = false
+# Verbose debug messages get sent using MIDI / HID, not just serial port
+debug_messages_over_transport = false
 
 # Enable auto-reload on file changes when debug = True
 autoreload = true
 
 
 ### LED ###
-
 # These defaults should be okay
 pwm_min_duty_cycle = 0x0000
 pwm_max_duty_cycle = 0xFFFF
@@ -42,7 +47,6 @@ pulsate_period_fast = 0.6
 
 
 class Config:
-    NEXT_BOOT_OVERRIDES = ("debug", "sysex_debug_messages")
     PIN_ATTRS = ("button", "led")
 
     def __init__(self, *, from_boot=False):
@@ -64,15 +68,15 @@ class Config:
         with open(SETTINGS_FILE, "r") as f:
             self._config = toml.load(f)
 
-        boot_nvm_end = len(self.NEXT_BOOT_OVERRIDES)
-        code_nvm_end = 2 * len(self.NEXT_BOOT_OVERRIDES)
+        boot_nvm_end = len(c.NEXT_BOOT_OVERRIDES)
+        code_nvm_end = 2 * len(c.NEXT_BOOT_OVERRIDES)
         if from_boot:
             if is_first_boot:
                 microcontroller.nvm[0:code_nvm_end] = b"\x00" * code_nvm_end  # Clear out nvm on first boot
                 print("Forcing config value debug = true (empty settings.toml, likely a first boot)")
                 self.set_code_override_from_boot("debug", True)
             else:
-                for index, override in enumerate(self.NEXT_BOOT_OVERRIDES):
+                for index, override in enumerate(c.NEXT_BOOT_OVERRIDES):
                     if microcontroller.nvm[index]:
                         print(f"Forcing config value {override} = true (forced via nvm)")
                         self.set_code_override_from_boot(override, True)
@@ -80,9 +84,14 @@ class Config:
                         self.set_code_override_from_boot(override, False)
         else:
             override_values = microcontroller.nvm[boot_nvm_end : 2 * code_nvm_end]
-            for override, value in zip(self.NEXT_BOOT_OVERRIDES, override_values):
+            for override, value in zip(c.NEXT_BOOT_OVERRIDES, override_values):
                 if value:
                     self._config[override] = True
+
+        if not self.midi_transport and not self.hid_transport:
+            if from_boot:
+                print("WARNING: midi_transport and hid_transport disabled. Forcing midi_transport = true")
+            self._config["midi_transport"] = True
 
         for pin_value in self.PIN_ATTRS:
             try:
@@ -91,12 +100,12 @@ class Config:
                 raise Exception(f"{self._config[pin_value]} is an invalid pin value ({pin_value})")
 
     def set_next_boot_override_from_code(self, override, value=True):
-        index = self.NEXT_BOOT_OVERRIDES.index(override)
+        index = c.NEXT_BOOT_OVERRIDES.index(override)
         microcontroller.nvm[index] = 1 if value else 0
 
     def set_code_override_from_boot(self, override, value=True):
-        index = self.NEXT_BOOT_OVERRIDES.index(override)
-        code_index = index + len(self.NEXT_BOOT_OVERRIDES)
+        index = c.NEXT_BOOT_OVERRIDES.index(override)
+        code_index = index + len(c.NEXT_BOOT_OVERRIDES)
         if value:
             microcontroller.nvm[index] = 0  # Reset for next run
             microcontroller.nvm[code_index] = 1  # Set for code.py
@@ -112,3 +121,16 @@ class Config:
                 return self._defaults[attr]
             except KeyError:
                 raise Exception(f"Error getting config key: {attr}!")
+
+    def pretty(self):
+        return {
+            k: getattr(self, k)
+            for k in (
+                "button",
+                "led",
+                "debug",
+                "debug_messages_over_transport",
+                "midi_transport",
+                "hid_transport",
+            )
+        }

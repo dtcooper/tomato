@@ -1,0 +1,3 @@
+SUBSYSTEM=="input", GROUP="input", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="7111", MODE="660", TAG+="uaccess"
+KERNEL=="hidraw*", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="7111", MODE="660", TAG+="uaccess"
