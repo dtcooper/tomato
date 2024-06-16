@@ -1,4 +1,3 @@
-from adafruit_debouncer import Debouncer
 import board
 import digitalio
 import io
@@ -7,6 +6,8 @@ import pwmio
 import supervisor
 import time
 import usb_midi
+
+from adafruit_debouncer import Debouncer
 import winterbloom_smolmidi as smolmidi
 
 from config import Config
@@ -93,7 +94,7 @@ class MIDISystemBase:
         if flush:
             self.flush()
 
-    def send_sysex(self, type, obj=None, *, skip_debug_msg=False, flush=False):
+    def send_obj(self, type, obj=None, *, skip_debug_msg=False, flush=False):
         # Use msgpack to pack data as binary, then encode most significant bit of
         # following 7 bytes first as: 0b07654321 0b01111111 0b02222222 ... 0b07777777
         bytes_io = io.BytesIO()
@@ -120,18 +121,18 @@ class MIDISystemBase:
 
     def _on_sysex(self, msg):
         if msg == b"ping":
-            self.on_ping_sysex()
+            self.on_ping()
         elif msg == b"stats":
-            self.on_stats_sysex()
+            self.on_stats()
         elif msg in (b"simulate/press", b"simulate/release"):
             pressed = msg.split(b"/")[1] == b"press"
-            self.on_simulate_press_sysex(pressed=pressed)
+            self.on_simulate_press(pressed=pressed)
         elif msg in (b"reset", b"~~~!fLaSh!~~~"):
             flash = msg == b"~~~!fLaSh!~~~"
-            self.on_reset_sysex(flash=flash)
+            self.on_reset(flash=flash)
         elif msg in (b"next-boot/%s" % override for override in Config.NEXT_BOOT_OVERRIDES):
             override = msg.split(b"/")[1].decode()
-            self.on_next_boot_override_sysex(override=override)
+            self.on_next_boot_override(override=override)
         else:
             self._debug(f"WARNING: Unrecognized sysex message: {msg}")
 
@@ -148,19 +149,19 @@ class MIDISystemBase:
     def on_system_reset(self):
         raise NotImplementedError()
 
-    def on_ping_sysex(self):
+    def on_ping(self):
         raise NotImplementedError()
 
-    def on_stats_sysex(self):
+    def on_stats(self):
         raise NotImplementedError()
 
-    def on_simulate_press_sysex(self, pressed):
+    def on_simulate_press(self, pressed):
         raise NotImplementedError()
 
-    def on_reset_sysex(self, flash):
+    def on_reset(self, flash):
         raise NotImplementedError()
 
-    def on_next_boot_override_sysex(self, override):
+    def on_next_boot_override(self, override):
         raise NotImplementedError()
 
 

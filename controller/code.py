@@ -2,6 +2,7 @@ import gc
 import microcontroller
 import supervisor
 import time
+
 import winterbloom_smolmidi as smolmidi
 
 from config import Config
@@ -24,7 +25,7 @@ def debug(s):
         if config.debug:
             print(msg)
         if config.sysex_debug_messages:
-            midi.send_sysex("debug", msg, skip_debug_msg=True)
+            midi.send_obj("debug", msg, skip_debug_msg=True)
 
 
 class USBConnected(USBConnectedBase):
@@ -32,7 +33,7 @@ class USBConnected(USBConnectedBase):
         debug("USB now in connected state. Sending reset byte and hello message.")
         midi.on_led_change(c.LED_OFF)
         midi.send_bytes((smolmidi.SYSTEM_RESET,))
-        midi.send_sysex(
+        midi.send_obj(
             "hello",
             "%s/%s%s" % (c.PRODUCT_NAME.lower().replace(" ", "-"), c.VERSION, "/debug" if config.debug else ""),
         )
@@ -54,21 +55,21 @@ class MIDISystem(MIDISystemBase):
                 led.pulsate(period=PULSATE_PERIODS[num])
         else:
             debug(f"WARNING: Invalid LED control msg: {num}")
-            self.send_sysex("error", f"Invalid MIDI control number {num}")
+            self.send_obj("error", f"Invalid MIDI control number {num}")
 
     def on_system_reset(self):
         debug("Got system reset byte. Restarting.")
-        self.send_sysex("reset", {"mode": "restart"}, flush=True)
+        self.send_obj("reset", {"mode": "restart"}, flush=True)
         time.sleep(0.1)  # Wait for midi messages to flush
         supervisor.reload()
 
-    def on_ping_sysex(self):
-        self.send_sysex("pong")
+    def on_ping(self):
+        self.send_obj("pong")
 
-    def on_stats_sysex(self):
+    def on_stats(self):
         with open("boot_out.txt", "r") as f:
             boot_out = [line.strip() for line in f.readlines()]
-        self.send_sysex(
+        self.send_obj(
             "stats",
             {
                 "boot-out": boot_out,
@@ -82,23 +83,23 @@ class MIDISystem(MIDISystemBase):
             },
         )
 
-    def on_simulate_press_sysex(self, pressed):
+    def on_simulate_press(self, pressed):
         debug(f"Simulating button {'press' if pressed else 'release'}")
-        self.send_sysex("simulate", {"pressed": pressed})
+        self.send_obj("simulate", {"pressed": pressed})
         button.on_press(pressed=pressed)
 
-    def on_reset_sysex(self, flash):
+    def on_reset(self, flash):
         debug(f"Resetting{' into flash mode' if flash else ''}...")
-        self.send_sysex("reset", {"mode": "flash" if flash else "normal"}, flush=True)
+        self.send_obj("reset", {"mode": "flash" if flash else "normal"}, flush=True)
         if flash:
             microcontroller.on_next_reset(microcontroller.RunMode.UF2)
         time.sleep(0.25)  # Wait for midi messages to flush
         microcontroller.reset()
 
-    def on_next_boot_override_sysex(self, override):
+    def on_next_boot_override(self, override):
         debug(f"Setting {override} = true for next boot")
         config.set_next_boot_override_from_code(override, True)
-        self.send_sysex("next-boot-override", {override: True})
+        self.send_obj("next-boot-override", {override: True})
 
 
 class Button(ButtonBase):
@@ -107,7 +108,7 @@ class Button(ButtonBase):
         midi.send_bytes((smolmidi.CC, c.MIDI_BTN_CTRL, c.BTN_PRESSED if pressed else c.BTN_RELEASED))
 
 
-midi = MIDISystem(debug=debug)  # Needs to be defined before any calls to debug (calls midi.send_sysex)
+midi = MIDISystem(debug=debug)  # Needs to be defined before any calls to debug (calls midi.send_obj)
 
 debug(f"Running {c.PRODUCT_NAME} v{c.VERSION}.")
 
@@ -137,7 +138,7 @@ except Exception as e:
     for secs in range(5, 0, -1):
         error = f"An unexpected error occurred. Reloading in {secs}s...\n{'\n'.join(traceback.format_exception(e))}"
         debug(error)
-        midi.send_sysex("error", error, flush=True)
+        midi.send_obj("error", error, flush=True)
         time.sleep(1)
 
     supervisor.reload()
