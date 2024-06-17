@@ -14,20 +14,18 @@ led = "GP16"  # Pin number for LED
 
 
 ### Debugging ###
-
 # Debug mode, mounts drive and turns on serial console.
 # Forced if button is pressed at boot time or on receipt of debug sysex MIDI message (see tester tool)
 debug = false
 
 # Debug messages get sent using MIDI sysex
-sysex_debug_messages = false
+debug_messages_over_transport = false
 
 # Enable auto-reload on file changes when debug = True
 autoreload = true
 
 
 ### LED ###
-
 # These defaults should be okay
 pwm_min_duty_cycle = 0x0000
 pwm_max_duty_cycle = 0xFFFF
@@ -42,7 +40,7 @@ pulsate_period_fast = 0.6
 
 
 class Config:
-    NEXT_BOOT_OVERRIDES = ("debug", "sysex_debug_messages")
+    NEXT_BOOT_OVERRIDES = ("debug", "debug_messages_over_transport")
     PIN_ATTRS = ("button", "led")
 
     def __init__(self, *, from_boot=False):
@@ -112,3 +110,12 @@ class Config:
                 return self._defaults[attr]
             except KeyError:
                 raise Exception(f"Error getting config key: {attr}!")
+
+    def keys(self):
+        return filter(lambda k: not k.endswith("_pin"), set(self._config.keys()) | set(self._defaults.keys()))
+
+    def items(self):
+        return ((k, getattr(self, k)) for k in self.keys())
+
+    def pretty(self):
+        return {k: f"{v:.02f}" if isinstance(v, float) else v for k, v in self.items()}

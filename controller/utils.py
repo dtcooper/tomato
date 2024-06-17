@@ -94,12 +94,14 @@ class MIDISystemBase:
         if flush:
             self.flush()
 
-    def send_obj(self, type, obj=None, *, skip_debug_msg=False, flush=False):
-        # Use msgpack to pack data as binary, then encode most significant bit of
-        # following 7 bytes first as: 0b07654321 0b01111111 0b02222222 ... 0b07777777
+    @staticmethod
+    def _obj_to_msgpack_bytes(obj):
         bytes_io = io.BytesIO()
-        msgpack.pack((type, obj), bytes_io)
-        unpacked = bytes_io.getvalue()
+        msgpack.pack(obj, bytes_io)
+        return bytes_io.getvalue()
+
+    @staticmethod
+    def _packed_bytes_for_7bit_sysex(unpacked):
         packed = bytearray(b"%c%s" % (smolmidi.SYSEX, c.SYSEX_PREFIX))  # MIDI SysEx prefix
 
         for index in range(0, len(unpacked), 7):
@@ -111,6 +113,13 @@ class MIDISystemBase:
             packed.extend(byte & 0x7F for byte in chunk)  # Remove most significant bit from chunk's bytes
 
         packed.append(smolmidi.SYSEX_END)  # MIDI SysEx suffix
+        return packed
+
+    def send_obj(self, type, obj=None, *, skip_debug_msg=False, flush=False):
+        # Use msgpack to pack data as binary, then encode most significant bit of
+        # following 7 bytes first as: 0b07654321 0b01111111 0b02222222 ... 0b07777777
+        unpacked = self._obj_to_msgpack_bytes((type, obj))
+        packed = self._packed_bytes_for_7bit_sysex(unpacked)
 
         if not skip_debug_msg:
             self._debug(f"Sending {type} sysex of {len(packed)} bytes")

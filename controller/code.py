@@ -20,11 +20,11 @@ PULSATE_PERIODS = {
 
 
 def debug(s):
-    if config.debug or config.sysex_debug_messages:
+    if config.debug or config.debug_messages_over_transport:
         msg = f"t={time.monotonic() - BOOT_TIME:.03f} - {s}"
         if config.debug:
             print(msg)
-        if config.sysex_debug_messages:
+        if config.debug_messages_over_transport:
             midi.send_obj("debug", msg, skip_debug_msg=True)
 
 
@@ -73,7 +73,7 @@ class MIDISystem(MIDISystemBase):
             "stats",
             {
                 "boot-out": boot_out,
-                "config": {key: getattr(config, key) for key in ("button", "led", "debug", "sysex_debug_messages")},
+                "config": config.pretty(),
                 "led": led.state,
                 "mem-free": f"{gc.mem_free() / 1024:.1f}kB",
                 "pressed": not button.is_pressed,
