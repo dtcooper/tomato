@@ -26,6 +26,9 @@ autoreload = true
 
 
 ### LED ###
+# Whether to flash LED when USB is disconnected
+flash_on_usb_disconnect = true
+
 # These defaults should be okay
 pwm_min_duty_cycle = 0x0000
 pwm_max_duty_cycle = 0xFFFF
@@ -42,6 +45,22 @@ pulsate_period_fast = 0.6
 class Config:
     NEXT_BOOT_OVERRIDES = ("debug", "debug_messages_over_transport")
     PIN_ATTRS = ("button", "led")
+
+    button: str
+    buttin_pin: microcontroller.Pin
+    led: str
+    led_pin: microcontroller.Pin
+    debug: bool
+    debug_messages_over_transport: bool
+    autoreload: bool
+    flash_on_usb_disconnect: bool
+    pwm_min_duty_cycle: int
+    pwm_max_duty_cycle: int
+    pwm_frequency: int
+    flash_period: float
+    pulsate_period_slow: float
+    pulsate_period_medium: float
+    pulsate_period_fast: float
 
     def __init__(self, *, from_boot=False):
         is_first_boot = False
