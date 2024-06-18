@@ -136,5 +136,5 @@ class Config:
     def items(self):
         return ((k, getattr(self, k)) for k in self.keys())
 
-    def pretty(self):
-        return {k: f"{v:.02f}" if isinstance(v, float) else v for k, v in self.items()}
+    def to_dict(self):
+        return dict(self.items())

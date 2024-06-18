@@ -74,7 +74,7 @@ class MIDISystem(MIDISystemBase):
             "stats",
             {
                 "boot-out": boot_out,
-                "config": config.pretty(),
+                "config": config.to_dict(),
                 "led": led.state,
                 "mem-free": f"{gc.mem_free() / 1024:.1f}kB",
                 "pressed": not button.is_pressed,
