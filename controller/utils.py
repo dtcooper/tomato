@@ -1,4 +1,3 @@
-import board
 import digitalio
 import io
 import keypad
@@ -203,10 +202,10 @@ class USBConnectedBase:
 
 
 class ButtonBase:
-    def __init__(self, pin):
+    def __init__(self, pin, *, trigger_pin):
         self._keys = keypad.Keys((pin,), value_when_pressed=False, pull=True)
         self._event = keypad.Event()
-        self._builtin_led = digitalio.DigitalInOut(board.LED)
+        self._builtin_led = digitalio.DigitalInOut(trigger_pin)
         self._builtin_led.direction = digitalio.Direction.OUTPUT
         self.is_pressed = False
 

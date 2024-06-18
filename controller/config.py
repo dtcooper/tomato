@@ -11,6 +11,7 @@ DEFAULT_SETTINGS_TOML = """\
 ### Pins ###
 button = "GP17"  # Pin number for button
 led = "GP16"  # Pin number for LED
+button_trigger_led = "LED"  # Pin number for button trigger LED (turned on when button is down)
 
 
 ### Debugging ###
@@ -44,12 +45,14 @@ pulsate_period_fast = 0.6
 
 class Config:
     NEXT_BOOT_OVERRIDES = ("debug", "debug_messages_over_transport")
-    PIN_ATTRS = ("button", "led")
+    PIN_ATTRS = ("button", "led", "button_trigger_led")
 
     button: str
-    buttin_pin: microcontroller.Pin
+    button_pin: microcontroller.Pin
     led: str
     led_pin: microcontroller.Pin
+    button_trigger_led: str
+    button_trigger_led_pin: microcontroller.Pin
     debug: bool
     debug_messages_over_transport: bool
     autoreload: bool
@@ -101,11 +104,11 @@ class Config:
                 if value:
                     self._config[override] = True
 
-        for pin_value in self.PIN_ATTRS:
-            try:
-                self._config.update({f"{pin}_pin": getattr(board, getattr(self, pin)) for pin in ("led", "button")})
-            except AttributeError:
-                raise Exception(f"{self._config[pin_value]} is an invalid pin value ({pin_value})")
+        try:
+            self._config.update({f"{pin}_pin": getattr(board, getattr(self, pin)) for pin in self.PIN_ATTRS})
+        except Exception:
+            print("Error setting pin value!")
+            raise
 
     def set_next_boot_override_from_code(self, override, value=True):
         index = self.NEXT_BOOT_OVERRIDES.index(override)
