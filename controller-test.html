@@ -49,6 +49,7 @@
         return {
           connected: false,
           turnLedOff: this.$persist(true),
+          showWarnings: this.$persist(true),
           logLines: [],
           log(s) {
             const date = new Date()
@@ -91,8 +92,8 @@
               output.sendReset()
             })
           },
-          sysexConfirm(data, message) {
-            if (confirm(message)) {
+          sysexWarning(data, message) {
+            if (!this.showWarnings || confirm(message)) {
               this.sysex(data)
               return true
             } else {
@@ -154,13 +155,16 @@
       <br>
       <strong>Reset:</strong>
       <button @click="restart()">Restart</button>
-      <button @click="sysexConfirm('reset', 'Are you SURE you want to RESET the device?')">Reset</button>
-      <button @click="sysexConfirm('next-boot/debug', 'Are you SURE you want to RESET into DEBUG mode?') && sysex('reset')">Reset (DEBUG)</button>
-      <button @click="sysexConfirm('~~~!fLaSh!~~~', 'Are you SURE you want to RESET and FLASH?')">Reset (FLASH)</button>
+      <button @click="sysexWarning('reset', 'Are you SURE you want to RESET the device?')">Reset</button>
+      <button @click="sysexWarning('next-boot/debug', 'Are you SURE you want to RESET into DEBUG mode?') && sysex('reset')">Reset (DEBUG)</button>
+      <button @click="sysexWarning('~~~!fLaSh!~~~', 'Are you SURE you want to RESET and FLASH?')">Reset (FLASH)</button>
+      <label style="display: inline; cursor: pointer">
+        <input type="checkbox" x-model="showWarnings"> Show warning prompts
+      </label>
       <br>
       <strong>Next boot:</strong>
-      <button @click="sysexConfirm('next-boot/debug', 'Are you SURE you want to set `debug = true` next boot?')">debug = true</button>
-      <button @click="sysexConfirm('next-boot/debug_messages_over_transport', 'Are you SURE you want to set `debug_messages_over_transport = true` next boot?')">debug_messages_over_transport = true</button>
+      <button @click="sysexWarning('next-boot/debug', 'Are you SURE you want to set `debug = true` next boot?')">debug = true</button>
+      <button @click="sysexWarning('next-boot/debug_messages_over_transport', 'Are you SURE you want to set `debug_messages_over_transport = true` next boot?')">debug_messages_over_transport = true</button>
     </p>
     <p>
       <strong>LED Control:</strong>
