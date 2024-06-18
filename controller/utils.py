@@ -1,13 +1,13 @@
 import board
 import digitalio
 import io
+import keypad
 import msgpack
 import pwmio
 import supervisor
 import time
 import usb_midi
 
-from adafruit_debouncer import Debouncer
 import winterbloom_smolmidi as smolmidi
 
 from config import Config
@@ -204,25 +204,16 @@ class USBConnectedBase:
 
 class ButtonBase:
     def __init__(self, pin):
-        button = digitalio.DigitalInOut(pin)
-        button.pull = digitalio.Pull.UP
-        self._button = Debouncer(button)
-
+        self._keys = keypad.Keys((pin,), value_when_pressed=False, pull=True)
+        self._event = keypad.Event()
         self._builtin_led = digitalio.DigitalInOut(board.LED)
         self._builtin_led.direction = digitalio.Direction.OUTPUT
-
-    @property
-    def is_pressed(self):
-        return self._button.value
+        self.is_pressed = False
 
     def update(self):
-        self._button.update()
-        if self._button.fell:
-            self._builtin_led.value = True
-            self.on_press(pressed=True)
-        if self._button.rose:
-            self._builtin_led.value = False
-            self.on_press(pressed=False)
+        if self._keys.events.get_into(self._event):
+            self.is_pressed = self._builtin_led.value = self._event.pressed
+            self.on_press(pressed=self.is_pressed)
 
     def on_press(self, pressed):
         raise NotImplementedError()

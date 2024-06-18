@@ -13,17 +13,15 @@ Here's the button box firmware for a Raspberry Pi Pico flashed with CircuitPytho
 2. In the `lib/` folder on your device copy the following,
    [CircuitPython Libraries](https://circuitpython.org/libraries),
 
-    1. [`adafruit_debouncer`](https://docs.circuitpython.org/projects/debouncer/)
-      (requires [`adafruit_ticks`](https://docs.circuitpython.org/projects/ticks/))
-    2. [`circuitpython_toml`](https://github.com/elpekenin/circuitpython_toml/)
-    3. [`winterbloom_smolmidi`](https://github.com/wntrblm/Winterbloom_SmolMIDI/)
+    1. [`circuitpython_toml`](https://github.com/elpekenin/circuitpython_toml/)
+    2. [`winterbloom_smolmidi`](https://github.com/wntrblm/Winterbloom_SmolMIDI/)
        (optionally compile with
        [`mpy-cross`](https://adafruit-circuit-python.s3.amazonaws.com/index.html?prefix=bin/mpy-cross/))
 
-    You can install the first dependencies (not `winterbloom_smolmidi`) using the
+    You can install the first dependency (not `winterbloom_smolmidi`) using the
     [`circup`](https://github.com/adafruit/circup) tool,
     ```
-    circup install adafruit_debouncer toml
+    circup install toml
     ```
 
 3. Copy all python (`*.py`) files in this folder on to your device.
