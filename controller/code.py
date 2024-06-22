@@ -113,7 +113,7 @@ midi = MIDISystem(debug=debug)  # Needs to be defined before any calls to debug 
 
 debug(f"Running {c.PRODUCT_NAME} v{c.VERSION}.")
 
-debug(f"Configuring pins: button={config.button}, LED={config.led}...")
+debug(f"Configuring pins: button=<{config.button}>, LED=<{config.led}>, trigger=<{config.button_trigger_led}>...")
 button = Button(pin=config.button_pin, trigger_pin=config.button_trigger_led_pin)
 led = PulsatingLED(
     pin=config.led_pin,
