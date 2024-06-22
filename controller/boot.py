@@ -21,9 +21,10 @@ supervisor.set_usb_identification(
     pid=c.USB_PRODUCT_ID,
 )
 usb_midi.set_names(
+    streaming_interface_name=c.PRODUCT_NAME,
     audio_control_interface_name=c.PRODUCT_NAME,
-    in_jack_name="input",
-    out_jack_name="output",
+    in_jack_name="input jack",
+    out_jack_name="output jack",
 )
 
 mount = storage.getmount("/")

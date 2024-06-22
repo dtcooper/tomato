@@ -140,11 +140,6 @@ class Config:
             except KeyError:
                 raise Exception(f"Error getting config key: {attr}!")
 
-    def keys(self):
-        return filter(lambda k: not k.endswith("_pin"), set(self._config.keys()) | set(self._defaults.keys()))
-
-    def items(self):
-        return ((k, getattr(self, k)) for k in self.keys())
-
     def to_dict(self):
-        return dict(self.items())
+        # <...>_pin keys don't exist in self._defaults
+        return {k: getattr(self, k) for k in self._defaults.keys()}
