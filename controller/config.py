@@ -81,8 +81,15 @@ class Config:
                 storage.remount("/", readonly=True)
 
         self._defaults = toml.loads(DEFAULT_SETTINGS_TOML)
-        with open(SETTINGS_FILE, "r") as f:
-            self._config = toml.load(f)
+        try:
+            with open(SETTINGS_FILE, "r") as f:
+                self._config = toml.load(f)
+        except Exception as e:
+            import traceback
+
+            traceback.print_exception(e)
+            print("ERROR: Couldn't open settings.toml. Recovering from error by using defaults.")
+            self._config = {}
 
         boot_nvm_end = len(self.NEXT_BOOT_OVERRIDES)
         code_nvm_end = 2 * len(self.NEXT_BOOT_OVERRIDES)
