@@ -9,7 +9,7 @@ from config import Config
 import constants as c
 
 
-print(f"Booting {c.PRODUCT_NAME} v{c.VERSION} [{c.USB_VENDOR_ID:04x}:{c.USB_PRODUCT_ID:04x}]")
+print(f"Booting {c.PRODUCT_NAME} {c.VERSION} [{c.USB_VENDOR_ID:04x}:{c.USB_PRODUCT_ID:04x}]")
 usb_hid.disable()
 
 MOUNT_NAME = "TOMATOBOX"

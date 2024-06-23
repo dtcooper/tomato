@@ -39,7 +39,10 @@ class PulsatingLED:
         self._period = period
         self._pulsate_started = time.monotonic()
         self.state = f"{'flash' if flash else 'pulsate'}/period={period:.2f}s"
-        self._debug(f"Set LED to {self.state} (duty cycle: 0x{self._min_duty:04x} <> 0x{self._max_duty:04X})")
+        log_line = f"Set LED to {self.state}"
+        if not flash:
+            log_line = f"{log_line} (duty cycle: 0x{self._min_duty:04x} <> 0x{self._max_duty:04X})"
+        self._debug(log_line)
 
     def update(self):
         if self._period > 0:

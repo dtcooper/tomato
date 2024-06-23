@@ -77,7 +77,7 @@ class MIDISystem(MIDISystemBase):
                 "config": config.to_dict(),
                 "led": led.state,
                 "mem-free": f"{gc.mem_free() / 1024:.1f}kB",
-                "pressed": not button.is_pressed,
+                "pressed": button.is_pressed,
                 "temp": f"{microcontroller.cpu.temperature:.2f}'C",
                 "uptime": round(time.monotonic() - BOOT_TIME),
                 "version": c.VERSION,
@@ -111,7 +111,7 @@ class Button(ButtonBase):
 
 midi = MIDISystem(debug=debug)  # Needs to be defined before any calls to debug (calls midi.send_obj)
 
-debug(f"Running {c.PRODUCT_NAME} v{c.VERSION}.")
+debug(f"Running {c.PRODUCT_NAME} {c.VERSION}.")
 
 debug(f"Configuring pins: button=<{config.button}>, LED=<{config.led}>, trigger=<{config.button_trigger_led}>...")
 button = Button(pin=config.button_pin, trigger_pin=config.button_trigger_led_pin)
