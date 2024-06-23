@@ -154,17 +154,17 @@ bcrypt = ["bcrypt"]
 
 [[package]]
 name = "django-admin-notice"
-version = "3.0.0"
+version = "3.0.1"
 description = "Show a floating notice banner above the Django admon interface"
 optional = false
 python-versions = "<4.0,>=3.10"
 files = [
-    {file = "django_admin_notice-3.0.0-py3-none-any.whl", hash = "sha256:4e1885561c6109d3e4faf09dc55994beb1f269ab9de9f984a4ead55895bf53cf"},
-    {file = "django_admin_notice-3.0.0.tar.gz", hash = "sha256:de56f84aa7ba11567187b866928f1e1888abc3fd762b743278bef89a362431e3"},
+    {file = "django_admin_notice-3.0.1-py3-none-any.whl", hash = "sha256:7b79594ecaf1c5d33fcd4d22026c2639d8be913a485ae07bfa5efebc8aabddc5"},
+    {file = "django_admin_notice-3.0.1.tar.gz", hash = "sha256:785da0ea018ee6d8d6a6ea1b6c580c834de900859695c878e5e8f4c8618deddd"},
 ]
 
 [package.dependencies]
-django = ">=2.2"
+django = ">=4.2"
 
 [[package]]
 name = "django-constance"
@@ -1244,4 +1244,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "522700044561669bbd3512c9d68045e4c0591b224b2d112a26b16fcb4cc84a4f"
+content-hash = "5e43f64a9122de3a0c23eb98d3ea1e5e6df566e01390cd356489124c06e1a2d6"
