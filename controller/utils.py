@@ -144,6 +144,8 @@ class MIDISystemBase:
         elif msg in (b"next-boot/%s" % override for override in Config.NEXT_BOOT_OVERRIDES):
             override = msg.split(b"/")[1].decode()
             self.on_next_boot_override(override=override)
+        elif msg == b"~~~!TeSt-ExCePtIoN!~~~":
+            self.on_test_exception()
         else:
             self._debug(f"WARNING: Unrecognized sysex message: {msg}")
 
@@ -173,6 +175,9 @@ class MIDISystemBase:
         raise NotImplementedError()
 
     def on_next_boot_override(self, override):
+        raise NotImplementedError()
+
+    def on_test_exception(self):
         raise NotImplementedError()
 
 

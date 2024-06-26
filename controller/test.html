@@ -124,7 +124,11 @@
               if (prefix === SYSEX_PREFIX) {
                 const encoded = message.slice(SYSEX_PREFIX.length)
                 const [ type, obj ] = sysexMsgPack7bitDecode(encoded)
-                this.log(`Received ${type} sysex${obj === null ? '' : ': ' + JSON.stringify(obj, undefined, Object.keys(obj).length === 1 ? undefined : 2)}`)
+                if (type === "exception") {
+                  this.log(`Received exception...\n${obj}`)
+                } else {
+                  this.log(`Received ${type} sysex${obj === null ? '' : ': ' + JSON.stringify(obj, undefined, Object.keys(obj).length === 1 ? undefined : 2)}`)
+                }
               } else {
                 this.log(`Received INVALID sysex: ${message}`)
               }
@@ -151,12 +155,13 @@
       <button @click="sysex('invalid')">Invalid 1</button>
       <button @click="sysex('invalid', 0x3D)">Invalid 2</button>
       <button @click="sysex('invalid', undefined, 'test')">Invalid 3</button>
+      <button @click="sysexWarning('~~~!TeSt-ExCePtIoN!~~~', 'Are you sure you want to send a test exception?')">Test exception</button>
       <button @click="logLines = []">Clear log</button>
       <br>
       <strong>Reset:</strong>
       <button @click="restart()">Restart</button>
       <button @click="sysexWarning('reset', 'Are you SURE you want to RESET the device?')">Reset</button>
-      <button @click="sysexWarning('next-boot/debug', 'Are you SURE you want to RESET into DEBUG mode?') && sysex('reset')">Reset (DEBUG)</button>
+      <button @click="sysexWarning('next-boot/debug', 'Are you SURE you want to RESET into DEBUG mode?') && sysex('reset')">Reset (debug = true)</button>
       <button @click="sysexWarning('~~~!fLaSh!~~~', 'Are you SURE you want to RESET and FLASH?')">Reset (FLASH)</button>
       <label style="display: inline; cursor: pointer">
         <input type="checkbox" x-model="showWarnings"> Show warning prompts
@@ -164,7 +169,7 @@
       <br>
       <strong>Next boot:</strong>
       <button @click="sysexWarning('next-boot/debug', 'Are you SURE you want to set `debug = true` next boot?')">debug = true</button>
-      <button @click="sysexWarning('next-boot/debug_messages_over_transport', 'Are you SURE you want to set `debug_messages_over_transport = true` next boot?')">debug_messages_over_transport = true</button>
+      <button @click="sysexWarning('next-boot/debug_messages_over_midi', 'Are you SURE you want to set `debug_messages_over_midi = true` next boot?')">debug_messages_over_midi = true</button>
     </p>
     <p>
       <strong>LED Control:</strong>

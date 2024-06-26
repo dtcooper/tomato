@@ -20,7 +20,7 @@ button_trigger_led = "LED"  # Pin number for button trigger LED (turned on when 
 debug = false
 
 # Debug messages get sent using MIDI sysex
-debug_messages_over_transport = false
+debug_messages_over_midi = false
 
 # Enable auto-reload on file changes when debug = True
 autoreload = true
@@ -44,7 +44,7 @@ pulsate_period_fast = 0.6
 
 
 class Config:
-    NEXT_BOOT_OVERRIDES = ("debug", "debug_messages_over_transport")
+    NEXT_BOOT_OVERRIDES = ("debug", "debug_messages_over_midi")
     PIN_ATTRS = ("button", "led", "button_trigger_led")
 
     button: str
@@ -54,7 +54,7 @@ class Config:
     button_trigger_led: str
     button_trigger_led_pin: microcontroller.Pin
     debug: bool
-    debug_messages_over_transport: bool
+    debug_messages_over_midi: bool
     autoreload: bool
     flash_on_usb_disconnect: bool
     pwm_min_duty_cycle: int
