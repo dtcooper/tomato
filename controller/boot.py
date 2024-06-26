@@ -50,5 +50,9 @@ if config.debug:
         supervisor.runtime.autoreload = False
 else:
     storage.disable_usb_drive()
-    usb_cdc.disable()
+    if config.serial:
+        print("Enabling serial mode (debug = false)")
+        usb_cdc.enable(console=True, data=False)
+    else:
+        usb_cdc.disable()
     supervisor.runtime.autoreload = False

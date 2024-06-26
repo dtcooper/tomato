@@ -1,5 +1,5 @@
 # General
-VERSION = "v0.3.22"
+VERSION = "v0.3.23"
 PRODUCT_NAME = "Tomato Button Box"
 
 # Kindly assigned by pid.codes (https://pid.codes/1209/7111/)

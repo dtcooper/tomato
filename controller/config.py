@@ -22,7 +22,10 @@ debug = false
 # Debug messages get sent using MIDI sysex
 debug_messages_over_midi = false
 
-# Enable auto-reload on file changes when debug = True
+# Enable serial console (when debug = false ONLY, as it's always enabled when debug = true)
+serial = false
+
+# Enable auto-reload on file changes (when debug = true ONLY)
 autoreload = true
 
 
@@ -44,7 +47,7 @@ pulsate_period_fast = 0.6
 
 
 class Config:
-    NEXT_BOOT_OVERRIDES = ("debug", "debug_messages_over_midi")
+    NEXT_BOOT_OVERRIDES = ("debug", "debug_messages_over_midi", "serial")
     PIN_ATTRS = ("button", "led", "button_trigger_led")
 
     button: str
@@ -55,6 +58,7 @@ class Config:
     button_trigger_led_pin: microcontroller.Pin
     debug: bool
     debug_messages_over_midi: bool
+    serial: bool
     autoreload: bool
     flash_on_usb_disconnect: bool
     pwm_min_duty_cycle: int

@@ -17,13 +17,15 @@ try:
         c.LED_PULSATE_MEDIUM: config.pulsate_period_medium,
         c.LED_PULSATE_FAST: config.pulsate_period_fast,
     }
+    SHOULD_DEBUG_PRINT = config.debug or config.serial
+    SHOULD_DEBUG_SEND_MIDI_MESSAGE = config.debug_messages_over_midi
 
     def debug(s):
-        if config.debug or config.debug_messages_over_midi:
+        if SHOULD_DEBUG_PRINT or SHOULD_DEBUG_SEND_MIDI_MESSAGE:
             msg = f"t={time.monotonic() - BOOT_TIME:.03f} - {s}"
-            if config.debug:
+            if SHOULD_DEBUG_PRINT:
                 print(msg)
-            if config.debug_messages_over_midi:
+            if SHOULD_DEBUG_SEND_MIDI_MESSAGE:
                 midi.send_obj("debug", msg, skip_debug_msg=True)
 
     class USBConnected(USBConnectedBase):
@@ -141,4 +143,5 @@ except Exception as e:
         midi.send_obj("exception", exc, flush=True)
         time.sleep(1)
 
+    midi.send_obj("error", "Reloading...")
     supervisor.reload()
