@@ -32,7 +32,7 @@ class USBConnected(USBConnectedBase):
     def on_connect(self):
         debug("USB now in connected state. Sending reset byte and hello message.")
         if config.flash_on_usb_disconnect:
-            midi.on_led_change(c.LED_OFF)
+            led.solid(on=False)
         midi.send_bytes((smolmidi.SYSTEM_RESET,))
         midi.send_obj(
             "hello",
@@ -40,7 +40,10 @@ class USBConnected(USBConnectedBase):
         )
 
     def on_disconnect(self):
-        midi.on_led_change(c.LED_FLASH if config.flash_on_usb_disconnect else c.LED_OFF)
+        if config.flash_on_usb_disconnect:
+            led.pulsate(period=config.flash_period, flash=True)
+        else:
+            led.solid(on=False)
 
 
 class MIDISystem(MIDISystemBase):
