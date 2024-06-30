@@ -62,7 +62,8 @@ try:
 
         def on_system_reset(self):
             debug("Got system reset byte. Restarting.")
-            self.send_obj("reset", {"mode": "restart"}, flush=True)
+            self.send_obj("reset", {"mode": "restart"})
+            self.flush()
             time.sleep(0.1)  # Wait for midi messages to flush
             supervisor.reload()
 
@@ -93,7 +94,8 @@ try:
 
         def on_reset(self, flash):
             debug(f"Resetting{' into flash mode' if flash else ''}...")
-            self.send_obj("reset", {"mode": "flash" if flash else "normal"}, flush=True)
+            self.send_obj("reset", {"mode": "flash" if flash else "normal"})
+            self.flush()
             if flash:
                 microcontroller.on_next_reset(microcontroller.RunMode.UF2)
             time.sleep(0.25)  # Wait for midi messages to flush
@@ -140,7 +142,8 @@ except Exception as e:
     for secs in range(5, 0, -1):
         exc = f"An unexpected error occurred. Reloading in {secs}s...\n{'\n'.join(traceback.format_exception(e))}"
         debug(exc)
-        midi.send_obj("exception", exc, flush=True)
+        midi.send_obj("exception", exc)
+        midi.flush()
         time.sleep(1)
 
     midi.send_obj("error", "Reloading...")

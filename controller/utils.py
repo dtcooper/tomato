@@ -91,10 +91,8 @@ class MIDISystemBase:
 
         self._write_outgoing()
 
-    def send_bytes(self, msg, flush=False):
+    def send_bytes(self, msg):
         self._outgoing.extend(msg)
-        if flush:
-            self.flush()
 
     @staticmethod
     def _obj_to_msgpack_bytes(obj):
@@ -117,7 +115,7 @@ class MIDISystemBase:
         packed.append(smolmidi.SYSEX_END)  # MIDI SysEx suffix
         return packed
 
-    def send_obj(self, type, obj=None, *, skip_debug_msg=False, flush=False):
+    def send_obj(self, type, obj=None, *, skip_debug_msg=False):
         # Use msgpack to pack data as binary, then encode most significant bit of
         # following 7 bytes first as: 0b07654321 0b01111111 0b02222222 ... 0b07777777
         unpacked = self._obj_to_msgpack_bytes((type, obj))
@@ -125,7 +123,7 @@ class MIDISystemBase:
 
         if not skip_debug_msg:
             self._debug(f"Sending {type} sysex of {len(packed)} bytes")
-        self.send_bytes(packed, flush=flush)
+        self.send_bytes(packed)
 
     def flush(self):
         self._write_outgoing(flush=True)
