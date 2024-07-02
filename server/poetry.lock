@@ -637,13 +637,13 @@ wcwidth = "*"
 
 [[package]]
 name = "psycopg"
-version = "3.2.0"
+version = "3.2.1"
 description = "PostgreSQL database adapter for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "psycopg-3.2.0-py3-none-any.whl", hash = "sha256:48a069cfe0ae852a331e1eb48e4da64a1a47723a6303559935801f0e0245ba22"},
-    {file = "psycopg-3.2.0.tar.gz", hash = "sha256:f93c5376598da868a5f761a44f920b84ec937a15a46e85df2454328f13d7009a"},
+    {file = "psycopg-3.2.1-py3-none-any.whl", hash = "sha256:ece385fb413a37db332f97c49208b36cf030ff02b199d7635ed2fbd378724175"},
+    {file = "psycopg-3.2.1.tar.gz", hash = "sha256:dc8da6dc8729dacacda3cc2f17d2c9397a70a66cf0d2b69c91065d60d5f00cb7"},
 ]
 
 [package.dependencies]
@@ -651,8 +651,8 @@ typing-extensions = ">=4.4"
 tzdata = {version = "*", markers = "sys_platform == \"win32\""}
 
 [package.extras]
-binary = ["psycopg-binary (==3.2.0.dev1)"]
-c = ["psycopg-c (==3.2.0.dev1)"]
+binary = ["psycopg-binary (==3.2.1)"]
+c = ["psycopg-c (==3.2.1)"]
 dev = ["ast-comments (>=1.1.2)", "black (>=24.1.0)", "codespell (>=2.2)", "dnspython (>=2.1)", "flake8 (>=4.0)", "mypy (>=1.6)", "types-setuptools (>=57.4)", "wheel (>=0.37)"]
 docs = ["Sphinx (>=5.0)", "furo (==2022.6.21)", "sphinx-autobuild (>=2021.3.14)", "sphinx-autodoc-typehints (>=1.12)"]
 pool = ["psycopg-pool"]
@@ -1244,4 +1244,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "254ff555126605eb9b8d7b38a2f48bcd076578436c5205ecb219cf64e7226ce8"
+content-hash = "63e7b39e0fc5553452af858f2891b13cb2349d3e63f6cc70b7a4d5eddd3b2df3"
