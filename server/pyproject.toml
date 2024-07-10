@@ -26,7 +26,7 @@ wait-for-it = "^2.2.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.4.2"
-django-debug-toolbar = "^4.4.5"
+django-debug-toolbar = "^4.4.6"
 django-extensions = "^3.2.3"
 flake8 = "^7.1.0"
 ipdb = "^0.13.13"
