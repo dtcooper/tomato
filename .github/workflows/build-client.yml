@@ -30,7 +30,7 @@ jobs:
         include:
           -
             title: macOS
-            os: macos-11
+            os: macos-12
             arch: universal
             platform: darwin
             out_path: "*.dmg"
@@ -77,13 +77,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      -
-        # macOS: appears to fix https://github.com/electron/forge/issues/2807
-        name: Fix macOS build
-        uses: actions/setup-python@v5
-        if: matrix.platform == 'darwin'
-        with:
-          python-version: '3.11'
       -
         name: Build package
         shell: bash
