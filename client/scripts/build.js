@@ -4,7 +4,7 @@ const { version: electronVersion } = require("electron/package.json")
 const path = require("path")
 const process = require("process")
 const sveltePlugin = require("esbuild-svelte")
-const sveltePreprocess = require("svelte-preprocess")
+const stylePlugin = require("esbuild-style-plugin")
 
 process.chdir(path.join(__dirname, ".."))
 
@@ -80,16 +80,12 @@ const runBuild = async () => {
     loader: { ".svg": "text" },
     plugins: [
       sveltePlugin({
-        compilerOptions: { dev: isDev, enableSourcemap: true },
-        cache: "overzealous",
-        preprocess: [
-          sveltePreprocess({
-            sourceMap: true,
-            postcss: {
-              plugins: [require("tailwindcss"), require("autoprefixer")]
-            }
-          })
-        ]
+        compilerOptions: { dev: isDev, enableSourcemap: true }
+      }),
+      stylePlugin({
+        postcss: {
+          plugins: [require("tailwindcss"), require("autoprefixer")]
+        }
       })
     ]
   })

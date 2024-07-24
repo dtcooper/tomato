@@ -98,3 +98,8 @@ Head to the [tester web page here](https://dtcooper.github.io/tomato/controller-
 
 1. [Google Labs web serial tester](https://googlechromelabs.github.io/serial-terminal/)
 2. [WebMIDI tester](https://studiocode.dev/webmidi-tester/)
+
+
+## TODO
+
+* Localize test.html dependencies
