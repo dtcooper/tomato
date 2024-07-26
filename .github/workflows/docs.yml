@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - .github/workflows/docs.yml
-      - controller/test.html
       - docs/**
       - server/tomato/settings.py
       - LICENSE
