@@ -35,6 +35,6 @@ def dismiss_message(request):
 
 def debug_json(request):
     if request.user.is_superuser:
-        return JsonResponse(serialize_for_api_sync())
+        return JsonResponse(serialize_for_api_sync(include_archived=bool(request.GET.get("include_archived"))))
     else:
         return HttpResponseForbidden()

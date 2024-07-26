@@ -101,17 +101,22 @@ class NumAssetsMixin:
             assets = Asset.objects.filter(rotators__in=obj.rotators.distinct().values_list("id", flat=True)).distinct()
         else:
             assets = Asset.objects.filter(rotators=obj.id)
+        assets_archived = assets.filter(archived=True)
+        assets = assets.filter(archived=False)
 
         display = []
         total = assets.count()
         num_eligible = assets.eligible_to_air().count()
         num_not_eligible = total - num_eligible
+        num_archived = assets_archived.count()
 
         if num_eligible:
             display.append((f"{num_eligible} eligible to air",))
         if num_not_eligible:
             display.append((f"{num_not_eligible} not eligible to air",))
         display.append((format_html("<strong>{} asset{} total</strong>", total, pluralize(total)),))
+        if num_archived:
+            display.append((format_html("<em>{} asset{} archived</em>", num_archived, pluralize(num_archived)),))
         return format_html_join(mark_safe("<br>\n"), "&#x25cf; {}", display)
 
 

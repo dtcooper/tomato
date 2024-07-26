@@ -33,7 +33,7 @@ def export_data_as_zip(file):
 
     zip = zipfile.ZipFile(file, "w")
 
-    metadata = serialize_for_api_sync(skip_config=True)
+    metadata = serialize_for_api_sync(skip_config=True, include_archived=True)
     # Remove IDs from all but rotators (only they are needed for import)
     for asset in metadata["assets"]:
         del asset["id"], asset["url"]

@@ -4,6 +4,7 @@ from pathlib import Path
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.admin import actions
 from django.templatetags.static import static
 from django.urls import path
 from django.utils.html import format_html
@@ -33,6 +34,7 @@ MODELS_HELP_DOCS_TEXT = {
     for model_cls in (Asset, Rotator, Stopset)
 }
 MODELS_HELP_DOCS_TEXT[AssetAlternate] = MODELS_HELP_DOCS_TEXT[Asset]
+actions.delete_selected.short_description = "DANGER: Delete selected %(verbose_name_plural)s"
 
 
 class TomatoAdminSite(admin.AdminSite):

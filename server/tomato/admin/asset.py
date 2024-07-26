@@ -61,6 +61,23 @@ class StatusFilter(admin.SimpleListFilter):
             return queryset.exclude(status=Asset.Status.READY)
 
 
+class ArchivedFilter(admin.SimpleListFilter):
+    title = "archived"
+    parameter_name = "archived"
+
+    def lookups(self, request, model_admin):
+        return (("with_archived", "All (including archived)"), ("archived_only", "Archived only"))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "with_archived":
+            return queryset
+        elif value == "archived_only":
+            return queryset.filter(archived=True)
+        else:  # All
+            return queryset.filter(archived=False)
+
+
 class AssetAdminBase(FileFormAdminMixin, TomatoModelAdminBase):
     ADDITIONAL_INFO_FIELDSET = ("Additional information", {"fields": ("created_at", "created_by")})
 
@@ -185,6 +202,8 @@ class AssetAdmin(AiringMixin, AssetAdminBase):
         "disable",
         "add_rotator",
         "remove_rotator",
+        "archive",
+        "unarchive",
         "delete_selected",
     )
     fieldsets = (
@@ -193,12 +212,13 @@ class AssetAdmin(AiringMixin, AssetAdminBase):
         ROTATORS_FIELDSET,
         AiringMixin.AIRING_INFO_FIELDSET,
         AssetAdminBase.ADDITIONAL_INFO_FIELDSET,
+        ("Danger Zone", {"fields": ("archived",)}),
     )
     filter_horizontal = ("rotators",)
     field_to_highlight = "name"
     list_display = (
         "list_player",
-        "name",
+        "list_name",
         "airing",
         "air_date",
         "weight",
@@ -206,12 +226,13 @@ class AssetAdmin(AiringMixin, AssetAdminBase):
         "rotators_display",
         "created_at",
     )
-    list_display_links = ("name",)
+    list_display_links = ("list_name",)
     list_filter = (
         AiringFilter,
         "rotators",
         "enabled",
         StatusFilter,
+        ArchivedFilter,
         ("created_by", NoNullRelatedOnlyFieldFilter),
     )
     list_prefetch_related = ("rotators", "alternates")
@@ -224,6 +245,10 @@ class AssetAdmin(AiringMixin, AssetAdminBase):
         AssetAdminBase.ADDITIONAL_INFO_FIELDSET,
     )
     readonly_fields = ("airing", "alternates_display", "rotators_display") + AssetAdminBase.readonly_fields
+
+    @admin.display(description="name", ordering="name")
+    def list_name(self, obj):
+        return format_html('<span style="color: red">[archived]</span> {}', obj.name) if obj.archived else obj.name
 
     @admin.display(description="Rotator(s)")
     def rotators_display(self, obj):
@@ -278,6 +303,18 @@ class AssetAdmin(AiringMixin, AssetAdminBase):
     def alternates_display_readonly(self, obj):
         return self.alternates_display(obj, readonly=True)
 
+    @admin.action(description="Archive (soft delete) selected audio assets", permissions=("add", "change", "delete"))
+    def archive(self, request, queryset):
+        num = queryset.update(archived=True)
+        if num:
+            self.message_user(request, f"Archived {num} audio assets(s).", messages.SUCCESS)
+
+    @admin.action(description="Unarchive (restore) selected audio assets", permissions=("add", "change", "delete"))
+    def unarchive(self, request, queryset):
+        num = queryset.update(archived=False)
+        if num:
+            self.message_user(request, f"Unarchived {num} audio assets(s).", messages.SUCCESS)
+
     @admin.action(description="Add selected audio assets to rotator", permissions=("add", "change", "delete"))
     def add_rotator(self, request, queryset):
         rotator_id = request.POST.get("rotator")
@@ -286,7 +323,7 @@ class AssetAdmin(AiringMixin, AssetAdminBase):
             for asset in queryset:
                 asset.rotators.add(rotator)
             self.message_user(
-                request, f"Added {len(queryset)} audio assets to rotator {rotator.name}.", messages.SUCCESS
+                request, f"Added {len(queryset)} audio asset(s) to rotator {rotator.name}.", messages.SUCCESS
             )
         else:
             self.message_user(request, "You must select a rotator to add audio assets to.", messages.WARNING)
@@ -299,7 +336,7 @@ class AssetAdmin(AiringMixin, AssetAdminBase):
             for asset in queryset:
                 asset.rotators.remove(rotator)
             self.message_user(
-                request, f"Removed {len(queryset)} audio assets from rotator {rotator.name}.", messages.SUCCESS
+                request, f"Removed {len(queryset)} audio asset(s) from rotator {rotator.name}.", messages.SUCCESS
             )
         else:
             self.message_user(request, "You must select a rotator to remove audio assets from.", messages.WARNING)
@@ -396,9 +433,7 @@ class AssetAlternateAdmin(AssetAdminBase):
 
     @admin.display(description=AssetAlternate._meta.get_field("asset").verbose_name, ordering="asset__name")
     def asset_display(self, obj):
-        return format_html(
-            '<a href="{}">{}</a>', reverse("admin:tomato_asset_change", args=(obj.asset.id,)), obj.asset.name
-        )
+        return format_html('<a href="{}">{}</a>', reverse("admin:tomato_asset_change", args=(obj.asset.id,)), obj.asset)
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)

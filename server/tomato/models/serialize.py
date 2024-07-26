@@ -49,7 +49,7 @@ async def get_constance_config_for_api():
     return config
 
 
-async def serialize_for_api(skip_config=False):
+async def serialize_for_api(*, skip_config=False, include_archived=False):
     rotators = [rotator async for rotator in Rotator.objects.order_by("id")]
     rotator_ids = [r.id for r in rotators]
     # Only select from rotators that existed at time query was made
@@ -62,6 +62,9 @@ async def serialize_for_api(skip_config=False):
         .filter(status=Asset.Status.READY)
         .order_by("id")
     )
+    if not include_archived:
+        assets = assets.filter(archived=False)
+
     stopsets = Stopset.objects.prefetch_related(
         Prefetch("rotators", prefetch_qs.order_by("stopsetrotator__id"))
     ).order_by("id")

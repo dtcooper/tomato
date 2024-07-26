@@ -146,12 +146,20 @@ class Asset(EnabledBeginEndWeightMixin, AssetBase):
         help_text="Rotators that this asset will be included in.",
         db_table="asset_rotators",
     )
+    archived = models.BooleanField(
+        "archived",
+        default=False,
+        help_text="Archived models will not show in the desktop client. Think of archive as 'soft delete'.",
+    )
 
     class Meta(TomatoModelBase.Meta):
         db_table = "assets"
         verbose_name = "audio asset"
         ordering = ("-created_at",)
         permissions = [("immediate_play_asset", "Can immediately play audio assets")]
+
+    def __str__(self):
+        return f"{self.name}{' (archived)' if self.archived else ''}"
 
     def save(self, *args, **kwargs):
         self.name = (
@@ -162,7 +170,13 @@ class Asset(EnabledBeginEndWeightMixin, AssetBase):
     def is_eligible_to_air(self, now=None, with_reason=False):
         if self.status != self.Status.READY:
             return (False, "Processing") if with_reason else False
-        return super().is_eligible_to_air(now, with_reason)
+        response = super().is_eligible_to_air(now, with_reason)
+        if self.archived:
+            if with_reason:
+                response = (False, "Archived" if response[1] is None else f"Archived and {response[1].lower()}")
+            else:
+                response = False
+        return response
 
     def serialize(self, alternates_already_filtered_by_prefetch=False):
         alternates_qs = self.alternates.all()
@@ -201,7 +215,7 @@ class AssetAlternate(AssetBase):
     # Property existing means there's no name field on this model
     @property
     def name(self):
-        return f"Alternate #{self.num_before} for {self.asset.name}"
+        return f"Alternate #{self.num_before} for {self.asset}"
 
     @property
     def num_before(self):
