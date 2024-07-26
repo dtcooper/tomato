@@ -68,8 +68,6 @@ theme:
       toggle:
         icon: material/weather-night
         name: Switch to light mode
-  static_templates:
-    - controller-test.html
 
 markdown_extensions:
   - attr_list

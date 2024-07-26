@@ -85,8 +85,7 @@ will send back a `0xFF` when it resets or starts up.
 
 ## Development
 
-Head to the [tester web page here](https://dtcooper.github.io/tomato/controller-test.html).
-(This is known to work in Google Chrome.)
+Use the files contained in the `test/` directory to test. (This is known to work in Google Chrome.)
 
 ## Circuit Diagram
 
