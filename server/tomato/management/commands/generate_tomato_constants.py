@@ -24,7 +24,7 @@ class Command(BaseCommand):
         constants.update({
             "client_log_entry_types": sorted(ClientLogEntry.Type.values),
             "settings_descriptions": {
-                key: strip_tags(value[1].replace("<br>", " "))
+                key: strip_tags(value[1].replace("<br>", "\n"))
                 for key, value in settings.CONSTANCE_CONFIG.items()
                 if key not in settings.CONSTANCE_SERVER_ONLY_SETTINGS
             },
