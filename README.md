@@ -125,7 +125,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
       to implement, too many opinions, person wishing to flag talks to manager-of-the-moment
 - [ ] Refresh playlist from backend. Connected client status from backend? Communicate what's in the playlist?
 - [ ] ~~Status updates, ie news and traffic? Fullscreen thing?~~ / ~~Custom UI labels unused labels that play every N times (ie for telling the DJ to do something)~~ -- Probably not
-- [ ] Round-robin (or "cycle evenly") rotator scheduling, ignoring weight as an option for a rotator
+- [x] Round-robin (or "cycle evenly") rotator scheduling, ignoring weight as an option for a rotator
 - [x] Check / validate randomization algorithm
   - [x] Validated! Review of algorithm provided by [Andy](https://github.com/sagittandy/)
 - [x] Mini-player column in asset list view

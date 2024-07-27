@@ -59,7 +59,7 @@ export const stop = () => {
 
 export const play = (rotator, mediumIgnoreIds = new Set()) => {
   clearInterval(interval) // Just in case we enter twice
-  const asset = rotator.getAsset(mediumIgnoreIds)
+  const asset = rotator.getRandomAssetForSinglePlay(mediumIgnoreIds)
   if (!asset) {
     error(rotator, "No assets to play!")
   } else {

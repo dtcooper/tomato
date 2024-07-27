@@ -170,7 +170,8 @@ const filterItemsByActive = (obj, dt = null) => {
 class Rotator extends HydratableObject {
   constructor({ color, ...data }, db) {
     super(data, db)
-    this.assets = db.assets.filter((a) => a._rotators.includes(this.id))
+    // Ensure's their sorted for evenly_cycle
+    this.assets = db.assets.filter((a) => a._rotators.includes(this.id)).sort((a, b) => a.id - b.id)
     this.color = colors.find((c) => c.name === color)
   }
 
@@ -189,38 +190,53 @@ class Rotator extends HydratableObject {
     return softIgnoreIds
   }
 
-  getAsset(mediumIgnoreIds = new Set(), hardIgnoreIds = new Set(), startTime, endDateMultiplier) {
-    const softIgnoreIds = Rotator.getSoftIgnoreIds()
+  getRandomAssetForSinglePlay(mediumIgnoreIds = new Set()) {
+    return this.getAsset(mediumIgnoreIds, undefined, undefined, undefined, true)  // forceRandom = true
+  }
+
+  getAsset(mediumIgnoreIds = new Set(), hardIgnoreIds = new Set(), startTime, endDateMultiplier, forceRandom = false) {
     if (!startTime) {
       startTime = dayjs()
-    }
-
-    // soft ignored = played within a recent amount of time
-    // medium ignored = exists on screen already
-    // hard ignored = exists within the stopset being generated
-    const activeAssets = filterItemsByActive(this.assets, startTime)
-    const hardIgnoredAssets = activeAssets.filter((a) => !hardIgnoreIds.has(a.id))
-    const mediumIgnoredAssets = hardIgnoredAssets.filter((a) => !mediumIgnoreIds.has(a.id))
-    const softIgnoredAssets = mediumIgnoredAssets.filter((a) => !softIgnoreIds.has(a.id))
-
-    const tries = [
-      ["soft ignored", softIgnoredAssets],
-      ["medium ignored", mediumIgnoredAssets],
-      ["hard ignored", hardIgnoredAssets]
-    ]
-    if (get(config).ALLOW_REPEATS_IN_STOPSET) {
-      // ignore hard ignored
-      tries.push(["all active", activeAssets])
     }
 
     let asset = null
     let assetListName = ""
 
-    for (const [name, assets] of tries) {
-      asset = pickRandomItemByWeight(assets, endDateMultiplier, startTime)
-      if (asset) {
-        assetListName = name
-        break
+    // soft ignored = played within a recent amount of time
+    // medium ignored = exists on screen already
+    // hard ignored = exists within the stopset being generated
+    const activeAssets = filterItemsByActive(this.assets, startTime)
+
+    if (this.evenly_cycle && !forceRandom) {
+      if (activeAssets.length > 0) {
+        let assetIdAfter = DB._evenlyCycleRotatorTracker.get(this.id) || 0
+        asset = activeAssets.find((a) => a.id > assetIdAfter) || activeAssets[0] // Take the first one if we're at end of list
+        assetListName = "cycle evenly"
+        DB._evenlyCycleRotatorTracker.set(this.id, asset.id)
+        DB._saveEvenlyCycleRotatorTracker()
+      }
+    } else {
+      const softIgnoreIds = Rotator.getSoftIgnoreIds()
+      const hardIgnoredAssets = activeAssets.filter((a) => !hardIgnoreIds.has(a.id))
+      const mediumIgnoredAssets = hardIgnoredAssets.filter((a) => !mediumIgnoreIds.has(a.id))
+      const softIgnoredAssets = mediumIgnoredAssets.filter((a) => !softIgnoreIds.has(a.id))
+
+      const tries = [
+        ["soft ignored", softIgnoredAssets],
+        ["medium ignored", mediumIgnoredAssets],
+        ["hard ignored", hardIgnoredAssets]
+      ]
+      if (get(config).ALLOW_REPEATS_IN_STOPSET) {
+        // ignore hard ignored
+        tries.push(["all active", activeAssets])
+      }
+
+      for (const [name, assets] of tries) {
+        asset = pickRandomItemByWeight(assets, endDateMultiplier, startTime)
+        if (asset) {
+          assetListName = name
+          break
+        }
       }
     }
 
@@ -279,6 +295,7 @@ class DB {
   static _nonGarbageCollectedAssets = new WeakRefSet()
   static _filesToCleanup = new Set()
   static _assetPlayTimes = new Map()
+  static _evenlyCycleRotatorTracker = new Map()
 
   constructor({ assets, rotators, stopsets } = { assets: [], rotators: [], stopsets: [] }) {
     this.assets = assets.map((data) => new Asset(data, this))
@@ -309,6 +326,19 @@ class DB {
   static _loadAssetPlayTimes() {
     try {
       this._assetPlayTimes = new Map(JSON.parse(window.localStorage.getItem("soft-ignored-ids")))
+    } catch {}
+  }
+
+  static _saveEvenlyCycleRotatorTracker() {
+    window.localStorage.setItem(
+      "evenly-cycle-rotator-tracker",
+      JSON.stringify(Array.from(this._evenlyCycleRotatorTracker.entries()), null, "")
+    )
+  }
+
+  static _loadEvenlyCycleRotatorTracker() {
+    try {
+      this._evenlyCycleRotatorTracker = new Map(JSON.parse(window.localStorage.getItem("evenly-cycle-rotator-tracker")))
     } catch {}
   }
 
@@ -376,6 +406,7 @@ class DB {
 }
 
 DB._loadAssetPlayTimes()
+DB._loadEvenlyCycleRotatorTracker()
 const emptyDB = new DB()
 window._DB = DB
 const dbStore = writable(emptyDB)
@@ -453,9 +484,11 @@ export const restoreAssetsDBFromLocalStorage = () => {
   dbStore.set(emptyDB)
 }
 
-export const clearSoftIgnoredAssets = () => {
+export const clearAssetState = () => {
   DB._assetPlayTimes = new Map()
   window.localStorage.removeItem("soft-ignored-ids")
+  DB._evenlyCycleRotatorTracker = new Map()
+  window.localStorage.removeItem("evenly-cycle-rotator-tracker")
 }
 
 export const markPlayed = (asset) => DB.markPlayed(asset)

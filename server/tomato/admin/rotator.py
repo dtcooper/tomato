@@ -7,23 +7,39 @@ from .base import AiringEnabledMixin, NoNullRelatedOnlyFieldFilter, NumAssetsMix
 
 
 class RotatorAdmin(AiringEnabledMixin, NumAssetsMixin, TomatoModelAdminBase):
-    actions = ("enable", "disable", "enable_single_play", "disable_single_play", "delete_selected")
-    list_display = ("name", "enabled", "is_single_play", "color_display", "stopsets_display", "num_assets")
+    actions = ("enable", "disable", "enable_single_play", "disable_single_play", "enable_evenly_cycle", "disable_evenly_cycle")
+    list_display = (
+        "name",
+        "enabled",
+        "is_single_play",
+        "evenly_cycle",
+        "color_display",
+        "stopsets_display",
+        "num_assets",
+    )
     list_prefetch_related = ("stopsets",)
     COLOR_FIELDSET = ("Color", {"fields": ("color", "color_preview")})
     add_fieldsets = (
-        (None, {"fields": ("name",)}),
-        ("Airing Information", {"fields": ("enabled", "is_single_play")}),
-        ("Color", {"fields": ("color", "color_preview")}),
+        (None, {"fields": ("name", "is_single_play", "evenly_cycle")}),
+        COLOR_FIELDSET,
     )
-    fieldsets = add_fieldsets + (
+    fieldsets = (
+        (None, {"fields": ("name",)}),
+        ("Airing Information", {"fields": ("enabled", "is_single_play", "evenly_cycle")}),
+        COLOR_FIELDSET,
         ("Stop sets", {"fields": ("stopsets_display",)}),
         ("Additional information", {"fields": ("num_assets", "created_by", "created_at")}),
     )
     # Average asset length?
     # Assets
     readonly_fields = ("stopsets_display", "color_preview", "num_assets") + TomatoModelAdminBase.readonly_fields
-    list_filter = ("enabled", "stopsets", ("created_by", NoNullRelatedOnlyFieldFilter), "is_single_play")
+    list_filter = (
+        "enabled",
+        "stopsets",
+        ("created_by", NoNullRelatedOnlyFieldFilter),
+        "is_single_play",
+        "evenly_cycle",
+    )
 
     @admin.action(
         description="Enable single play for selected %(verbose_name_plural)s", permissions=("add", "change", "delete")
@@ -43,6 +59,26 @@ class RotatorAdmin(AiringEnabledMixin, NumAssetsMixin, TomatoModelAdminBase):
         if num:
             self.message_user(
                 request, f"Disabled single play for {num} {self.model._meta.verbose_name}(s).", messages.SUCCESS
+            )
+
+    @admin.action(
+        description="Enable cycle evenly for selected %(verbose_name_plural)s", permissions=("add", "change", "delete")
+    )
+    def enable_evenly_cycle(self, request, queryset):
+        num = queryset.update(evenly_cycle=True)
+        if num:
+            self.message_user(
+                request, f"Enabled cycle evenly for {num} {self.model._meta.verbose_name}(s) .", messages.SUCCESS
+            )
+
+    @admin.action(
+        description="Disable cycle evenly for selected %(verbose_name_plural)s", permissions=("add", "change", "delete")
+    )
+    def disable_evenly_cycle(self, request, queryset):
+        num = queryset.update(evenly_cycle=False)
+        if num:
+            self.message_user(
+                request, f"Disabled cycle evenly for {num} {self.model._meta.verbose_name}(s).", messages.SUCCESS
             )
 
     @admin.display(description="Color", ordering="color")

@@ -23,6 +23,15 @@ class Rotator(TomatoModelBase):
             " rotator. (Standard and advanced mode only.)"
         ),
     )
+    evenly_cycle = models.BooleanField(
+        "evenly cycle",
+        default=False,
+        help_text=mark_safe(
+            "If selected, rotator cycles through its assets evenly <strong><em>completely ignoring</em></strong> their"
+            " weight. In short, this completely bypasses the randomization algorithm and instead picks every asset"
+            " within this rotator <strong>once</strong> before resetting back to the first asset."
+        ),
+    )
     enabled = models.BooleanField(
         "enabled",
         default=True,

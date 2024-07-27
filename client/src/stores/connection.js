@@ -6,7 +6,7 @@ import { derived, get, writable } from "svelte/store"
 import { protocol_version } from "../../../server/constants.json"
 import { acknowledgeLog, log, sendPendingLogs } from "./client-logs"
 import { resetUserConfig, setServerConfig } from "./config"
-import { clearAssetsDB, clearSoftIgnoredAssets, syncAssetsDB } from "./db"
+import { clearAssetsDB, clearAssetState, syncAssetsDB } from "./db"
 
 const connPersisted = persisted("conn", {
   username: "",
@@ -72,7 +72,7 @@ export const logout = (error) => {
   }
   updateConn({ authenticated: false, connected: false, connecting: false, didFirstSync: false })
   clearAssetsDB()
-  clearSoftIgnoredAssets() // Do I want this cleared?
+  clearAssetState()
   setServerConfig({})
   resetUserConfig()
 
