@@ -877,13 +877,13 @@ tests = ["cython", "littleutils", "pygments", "pytest", "typeguard"]
 
 [[package]]
 name = "starlette"
-version = "0.38.1"
+version = "0.38.2"
 description = "The little ASGI library that shines."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "starlette-0.38.1-py3-none-any.whl", hash = "sha256:42688a287165bd6acc53068457b5cbf28a3204110b704930411728a633f0f7b8"},
-    {file = "starlette-0.38.1.tar.gz", hash = "sha256:890e89d9b1b367bad6fd11a6e191f40d03504df1ff55fd15674a3b35a122990e"},
+    {file = "starlette-0.38.2-py3-none-any.whl", hash = "sha256:4ec6a59df6bbafdab5f567754481657f7ed90dc9d69b0c9ff017907dd54faeff"},
+    {file = "starlette-0.38.2.tar.gz", hash = "sha256:c7c0441065252160993a1a37cf2a73bb64d271b17303e0b0c1eb7191cfb12d75"},
 ]
 
 [package.dependencies]
@@ -1244,4 +1244,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "36f089d2e4dda8ddcc94657d65f6a13ffa24b2672dfed5def5cd521b97e02efd"
+content-hash = "e828c9744dfb82c360bb0688fd68711656c5af8b6070bb3f69b5f653b1c9a9e8"
