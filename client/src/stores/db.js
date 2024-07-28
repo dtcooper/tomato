@@ -147,7 +147,7 @@ const pickRandomItemByWeight = (objects, endDateMultiplier = null, startTime = n
       return [obj, obj.weight]
     }
   })
-  const totalWeight = objects.reduce((s, [obj, weight]) => s + weight, 0)
+  const totalWeight = objects.reduce((s, [, weight]) => s + weight, 0)
   const randomWeight = Math.random() * totalWeight
   let cumulativeWeight = 0
   for (const [obj, weight] of objects) {
@@ -171,6 +171,8 @@ class Rotator extends HydratableObject {
   constructor({ color, ...data }, db) {
     super(data, db)
     // Ensure's their sorted for evenly_cycle
+    // TODO confirm sort is needed here... do they come sorted from backedn (try -id in reverse to check),
+    // ALSO sort asset alternates, and cycle through them similarly
     this.assets = db.assets.filter((a) => a._rotators.includes(this.id)).sort((a, b) => a.id - b.id)
     this.color = colors.find((c) => c.name === color)
   }
@@ -202,41 +204,43 @@ class Rotator extends HydratableObject {
     let asset = null
     let assetListName = ""
 
-    // soft ignored = played within a recent amount of time
-    // medium ignored = exists on screen already
-    // hard ignored = exists within the stopset being generated
     const activeAssets = filterItemsByActive(this.assets, startTime)
+    const cycleEvenly = this.evenly_cycle && !forceRandom
 
-    if (this.evenly_cycle && !forceRandom) {
-      if (activeAssets.length > 0) {
-        let assetIdAfter = DB._evenlyCycleRotatorTracker.get(this.id) || 0
-        asset = activeAssets.find((a) => a.id > assetIdAfter) || activeAssets[0] // Take the first one if we're at end of list
-        assetListName = "cycle evenly"
-        DB._evenlyCycleRotatorTracker.set(this.id, asset.id)
-        DB._saveEvenlyCycleRotatorTracker()
-      }
-    } else {
+    // soft ignored = played within a recent amount of time (+ medium and hard)
+    // medium ignored = exists on screen already (+ hard)
+    // hard ignored = exists within the stopset being generated
+    const hardIgnoredAssets = activeAssets.filter((a) => !hardIgnoreIds.has(a.id))
+    const mediumIgnoredAssets = hardIgnoredAssets.filter((a) => !mediumIgnoreIds.has(a.id))
+
+    const tries = []
+    if (!cycleEvenly) {
       const softIgnoreIds = Rotator.getSoftIgnoreIds()
-      const hardIgnoredAssets = activeAssets.filter((a) => !hardIgnoreIds.has(a.id))
-      const mediumIgnoredAssets = hardIgnoredAssets.filter((a) => !mediumIgnoreIds.has(a.id))
       const softIgnoredAssets = mediumIgnoredAssets.filter((a) => !softIgnoreIds.has(a.id))
+      tries.push(["soft ignored", softIgnoredAssets])
+    }
 
-      const tries = [
-        ["soft ignored", softIgnoredAssets],
-        ["medium ignored", mediumIgnoredAssets],
-        ["hard ignored", hardIgnoredAssets]
-      ]
-      if (get(config).ALLOW_REPEATS_IN_STOPSET) {
-        // ignore hard ignored
-        tries.push(["all active", activeAssets])
-      }
+    tries.push(["medium ignored", mediumIgnoredAssets])
+    tries.push(["hard ignored", hardIgnoredAssets])
+    if (get(config).ALLOW_REPEATS_IN_STOPSET) {
+      // ignore hard ignored
+      tries.push(["all active", activeAssets])
+    }
 
-      for (const [name, assets] of tries) {
-        asset = pickRandomItemByWeight(assets, endDateMultiplier, startTime)
-        if (asset) {
-          assetListName = name
+    for (const [name, assets] of tries) {
+      if (cycleEvenly) {
+        if (assets.length > 0) {
+          const assetIdAfter = DB._evenlyCycleRotatorTracker.get(this.id) || 0
+          asset = assets.find((a) => a.id > assetIdAfter) || assets[0] // Take the first one if we're at end of list
+          assetListName = `${name} (cycle evenly)`
           break
         }
+      } else {
+        asset = pickRandomItemByWeight(assets, endDateMultiplier, startTime)
+        assetListName = name
+      }
+      if (asset) {
+        break
       }
     }
 
@@ -347,6 +351,8 @@ class DB {
       this._assetPlayTimes.set(asset.id, timestamp())
       this._saveAssetPlayTimes()
     }
+    DB._evenlyCycleRotatorTracker.set(asset.rotator.id, asset.id)
+    DB._saveEvenlyCycleRotatorTracker()
   }
 
   static async cleanup() {

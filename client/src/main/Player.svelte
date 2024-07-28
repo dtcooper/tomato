@@ -17,7 +17,13 @@
   // Object automatically updates on change
   let items = []
 
-  const updateUI = () => (items = items) // Callback for force re-render
+  // Medium ignored assets (everything at exists on the screen right now in items list)
+  let mediumIgnoreIds =  new Set()
+
+  const updateUI = () => {
+    mediumIgnoreIds = new Set(items.filter((i) => i.type === "stopset").map((s) => s.items.map((a) => a.id)).flat(1))
+    items = items // Callback for force re-render
+  }
 
   // These numbers set arbitrarily to fit use case
   const numStopsetsToPreloadAudioFor = 3
@@ -46,14 +52,6 @@
     await tick()
     document.getElementById("playlist").scroll({ top: 0, behavior: "smooth" })
   }
-
-  // Medium ignored assets (everything at exists on the screen right now in items list)
-  $: mediumIgnoreIds = new Set(
-    items
-      .filter((i) => i.type === "stopset")
-      .map((s) => s.items.map((a) => a.id))
-      .flat(1)
-  )
 
   const generateStopsetHelper = (likelyPlayTime, generatedId) => {
     return $db.generateStopset(

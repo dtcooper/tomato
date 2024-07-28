@@ -2,6 +2,8 @@ import { noop } from "svelte/internal"
 import { get } from "svelte/store"
 import { userConfig } from "./config"
 
+// TODO: convert to webmidi.js, much easier to work with
+
 let midi
 let outputs = []
 let buttonPressCallback = noop
