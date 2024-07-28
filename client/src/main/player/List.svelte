@@ -117,6 +117,14 @@
                       >
                         {asset.rotator.name}
                       </span>
+                      {#if asset.isAlternate()}
+                        <span class="badge badge-warning border-secondary-content">
+                          Alt #{asset.alternateNumber}
+                        </span>
+                      {/if}
+                      {#if asset.hasEndDateMultiplier}
+                        <span class="badge badge-success border-secondary-content italic"> Ends today!</span>
+                      {/if}
                     </div>
                     <div class="truncate text-xl">
                       {#if asset.playable}

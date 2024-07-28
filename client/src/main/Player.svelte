@@ -18,10 +18,15 @@
   let items = []
 
   // Medium ignored assets (everything at exists on the screen right now in items list)
-  let mediumIgnoreIds =  new Set()
+  let mediumIgnoreIds = new Set()
 
   const updateUI = () => {
-    mediumIgnoreIds = new Set(items.filter((i) => i.type === "stopset").map((s) => s.items.map((a) => a.id)).flat(1))
+    mediumIgnoreIds = new Set(
+      items
+        .filter((i) => i.type === "stopset")
+        .map((s) => s.items.map((a) => a.id))
+        .flat(1)
+    )
     items = items // Callback for force re-render
   }
 

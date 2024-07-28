@@ -75,66 +75,81 @@ class AssetStopsetHydratableObject extends HydratableObject {
   }
 }
 
+const processFileData = (file, url, filesize, md5sum, db, duration = undefined) => {
+  const filePath = path.join(assetsDir, file)
+  const dirname = path.dirname(filePath)
+  const basename = path.basename(filePath)
+  const tmpPath = path.join(dirname, `${basename}.tmp`)
+  return {
+    duration,
+    url: `${db.host}${url}`,
+    localUrl: pathToFileURL(filePath),
+    path: filePath,
+    basename,
+    size: filesize,
+    md5sum: md5sum,
+    dirname,
+    tmpPath,
+    tmpBasename: path.basename(tmpPath)
+  }
+}
+
 class Asset extends AssetStopsetHydratableObject {
   constructor({ file, url, filesize, md5sum, ...data }, db) {
     super(data, db)
-    const filePath = path.join(assetsDir, file)
-    const dirname = path.dirname(filePath)
-    const basename = path.basename(filePath)
-    const tmpPath = path.join(dirname, `${basename}.tmp`)
-    this.file = {
-      url: `${db.host}${url}`,
-      localUrl: pathToFileURL(filePath),
-      path: filePath,
-      basename,
-      size: filesize,
-      md5sum: md5sum,
-      dirname,
-      tmpPath,
-      tmpBasename: path.basename(tmpPath)
-    }
+    this.file = processFileData(file, url, filesize, md5sum, db)
+    // Ensure they're sorted (backend will do it, but just in case)
+    this.alternates = this.alternates
+      .sort((a, b) => a.id - b.id)
+      .map(({ file, url, filesize, md5sum, duration }) => processFileData(file, url, filesize, md5sum, db, duration))
   }
 
   async download() {
-    const { url, path, size, md5sum, dirname, tmpPath, tmpBasename } = this.file
+    const files = [this.file, ...this.alternates]
 
-    try {
-      let exists = await fileExists(path)
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      const { url, path, size, md5sum, dirname, tmpPath, tmpBasename } = file
 
-      if (exists) {
-        // If it exists, just verify sizes match (md5sum was already checked)
-        if ((await fileSize(path)) !== size) {
-          console.error(`File size mismatch for ${this.name}. Deleting and trying again.`)
-          await fs.unlink(path)
-          exists = false
-        }
-      }
-      if (!exists) {
-        console.log(`Downloading: ${url}`)
-        // Accept any certificate during local development (ie, self-signed ones)
-        await download(url, dirname, {
-          filename: tmpBasename,
-          rejectUnauthorized: !IS_DEV,
-          timeout: { request: 60000 }
-        })
-        const actualMd5sum = await md5File(tmpPath)
-        if (actualMd5sum !== md5sum) {
-          throw new Error(`MD5 sum mismatch. Actual=${actualMd5sum} Expected=${md5sum}`)
-        }
-        fs.rename(tmpPath, path)
-      }
-      return true
-    } catch (e) {
       try {
-        if (await fileExists(tmpPath)) {
-          await fs.unlink(tmpPath)
+        let exists = await fileExists(path)
+
+        if (exists) {
+          // If it exists, just verify sizes match (md5sum was already checked)
+          if ((await fileSize(path)) !== size) {
+            console.error(`File size mismatch for ${this.name}. Deleting and trying again.`)
+            await fs.unlink(path)
+            exists = false
+          }
+        }
+        if (!exists) {
+          console.log(`Downloading: ${url} (asset: ${this.name}${i > 0 ? `, alt #${i}` : ""})`)
+          // Accept any certificate during local development (ie, self-signed ones)
+          await download(url, dirname, {
+            filename: tmpBasename,
+            rejectUnauthorized: !IS_DEV,
+            timeout: { request: 60000 }
+          })
+          const actualMd5sum = await md5File(tmpPath)
+          if (actualMd5sum !== md5sum) {
+            throw new Error(`MD5 sum mismatch. Actual=${actualMd5sum} Expected=${md5sum}`)
+          }
+          fs.rename(tmpPath, path)
         }
       } catch (e) {
-        console.error(`Error cleaning up ${tmpPath}\n`, e)
+        try {
+          if (await fileExists(tmpPath)) {
+            await fs.unlink(tmpPath)
+          }
+        } catch (e) {
+          console.error(`Error cleaning up ${tmpPath}\n`, e)
+        }
+        console.error(`Error downloading asset ${this.name} @ ${url}\n`, e)
+        return false
       }
-      console.error(`Error downloading asset ${this.name} @ ${url}\n`, e)
-      return false
     }
+
+    return true
   }
 }
 
@@ -142,21 +157,21 @@ const pickRandomItemByWeight = (objects, endDateMultiplier = null, startTime = n
   objects = objects.map((obj) => {
     // Apply end date multiplier (if it exists)
     if (endDateMultiplier && endDateMultiplier > 0 && obj.end && startTime && obj.end.isSame(startTime, "day")) {
-      return [obj, obj.weight * endDateMultiplier]
+      return [obj, obj.weight * endDateMultiplier, true]
     } else {
-      return [obj, obj.weight]
+      return [obj, obj.weight, false]
     }
   })
   const totalWeight = objects.reduce((s, [, weight]) => s + weight, 0)
   const randomWeight = Math.random() * totalWeight
   let cumulativeWeight = 0
-  for (const [obj, weight] of objects) {
+  for (const [obj, weight, hasEndDateMultiplier] of objects) {
     if (weight + cumulativeWeight > randomWeight) {
-      return obj
+      return { obj, hasEndDateMultiplier }
     }
     cumulativeWeight += weight
   }
-  return null
+  return { obj: null, hasEndDateMultiplier: false }
 }
 
 const filterItemsByActive = (obj, dt = null) => {
@@ -170,9 +185,7 @@ const filterItemsByActive = (obj, dt = null) => {
 class Rotator extends HydratableObject {
   constructor({ color, ...data }, db) {
     super(data, db)
-    // Ensure's their sorted for evenly_cycle
-    // TODO confirm sort is needed here... do they come sorted from backedn (try -id in reverse to check),
-    // ALSO sort asset alternates, and cycle through them similarly
+    // Ensure's their sorted for evenly_cycle (backend will sort the, but just for sanity)
     this.assets = db.assets.filter((a) => a._rotators.includes(this.id)).sort((a, b) => a.id - b.id)
     this.color = colors.find((c) => c.name === color)
   }
@@ -193,7 +206,7 @@ class Rotator extends HydratableObject {
   }
 
   getRandomAssetForSinglePlay(mediumIgnoreIds = new Set()) {
-    return this.getAsset(mediumIgnoreIds, undefined, undefined, undefined, true) // forceRandom = true
+    return this.getAsset(mediumIgnoreIds, undefined, undefined, undefined, true).asset // forceRandom = true
   }
 
   getAsset(mediumIgnoreIds = new Set(), hardIgnoreIds = new Set(), startTime, endDateMultiplier, forceRandom = false) {
@@ -202,10 +215,11 @@ class Rotator extends HydratableObject {
     }
 
     let asset = null
+    let hasEndDateMultiplier = false
     let assetListName = ""
 
     const activeAssets = filterItemsByActive(this.assets, startTime)
-    const cycleEvenly = this.evenly_cycle && !forceRandom
+    const evenlyCycle = this.evenly_cycle && !forceRandom
 
     // soft ignored = played within a recent amount of time (+ medium and hard)
     // medium ignored = exists on screen already (+ hard)
@@ -214,7 +228,7 @@ class Rotator extends HydratableObject {
     const mediumIgnoredAssets = hardIgnoredAssets.filter((a) => !mediumIgnoreIds.has(a.id))
 
     const tries = []
-    if (!cycleEvenly) {
+    if (!evenlyCycle) {
       const softIgnoreIds = Rotator.getSoftIgnoreIds()
       const softIgnoredAssets = mediumIgnoredAssets.filter((a) => !softIgnoreIds.has(a.id))
       tries.push(["soft ignored", softIgnoredAssets])
@@ -228,7 +242,7 @@ class Rotator extends HydratableObject {
     }
 
     for (const [name, assets] of tries) {
-      if (cycleEvenly) {
+      if (evenlyCycle) {
         if (assets.length > 0) {
           const assetIdAfter = DB._evenlyCycleRotatorTracker.get(this.id) || 0
           asset = assets.find((a) => a.id > assetIdAfter) || assets[0] // Take the first one if we're at end of list
@@ -236,7 +250,7 @@ class Rotator extends HydratableObject {
           break
         }
       } else {
-        asset = pickRandomItemByWeight(assets, endDateMultiplier, startTime)
+        ;({ obj: asset, hasEndDateMultiplier } = pickRandomItemByWeight(assets, endDateMultiplier, startTime))
         assetListName = name
       }
       if (asset) {
@@ -250,7 +264,7 @@ class Rotator extends HydratableObject {
       console.warn(`Failed to pick an asset entirely! [rotator = ${this.name}]`)
     }
 
-    return asset
+    return { asset, hasEndDateMultiplier }
   }
 }
 
@@ -281,14 +295,20 @@ class Stopset extends AssetStopsetHydratableObject {
     const items = []
     for (const rotator of this.rotators) {
       let asset = null
+      let hasEndDateMultiplier = false
       if (rotator.enabled) {
-        asset = rotator.getAsset(mediumIgnoreIds, hardIgnoreIds, startTime, endDateMultiplier)
+        ;({ asset, hasEndDateMultiplier } = rotator.getAsset(
+          mediumIgnoreIds,
+          hardIgnoreIds,
+          startTime,
+          endDateMultiplier
+        ))
         if (asset) {
           hardIgnoreIds.add(asset.id)
           startTime = startTime.add(asset.duration, "seconds")
         }
       }
-      items.push({ rotator, asset })
+      items.push({ rotator, asset, hasEndDateMultiplier }) // XXX
     }
 
     return new GeneratedStopset(this, items, doneCallback, updateCallback, generatedId)
@@ -346,19 +366,27 @@ class DB {
     } catch {}
   }
 
-  static markPlayed(asset) {
+  static markPlayed(asset, rotator = null) {
     if (get(config).NO_REPEAT_ASSETS_TIME > 0) {
       this._assetPlayTimes.set(asset.id, timestamp())
       this._saveAssetPlayTimes()
     }
-    DB._evenlyCycleRotatorTracker.set(asset.rotator.id, asset.id)
-    DB._saveEvenlyCycleRotatorTracker()
+    rotator = rotator || asset.rotator
+    if (rotator.evenly_cycle) {
+      DB._evenlyCycleRotatorTracker.set(rotator.id, asset.id)
+      DB._saveEvenlyCycleRotatorTracker()
+    }
   }
 
   static async cleanup() {
     if (get(conn).ready) {
       // For all non-garbage collected assets, get set of used files
-      const usedFiles = new Set(Array.from(this._nonGarbageCollectedAssets.values()).map((a) => a.file.basename))
+      const usedFiles = new Set(
+        Array.from(this._nonGarbageCollectedAssets.values())
+          .map((a) => [a.file.basename, ...a.alternates.map((a) => a.basename)])
+          .flat(1)
+      )
+      // add alternates to used files
       let deleted = 0
       const newFilesToCleanup = new Set()
 
@@ -386,7 +414,7 @@ class DB {
   generateStopset(startTime, mediumIgnoreIds, endDateMultiplier, doneCallback, updateCallback, generatedId) {
     let generated = null
     for (let i = 0; i < 3; i++) {
-      const stopset = pickRandomItemByWeight(filterItemsByActive(this.stopsets, startTime))
+      const stopset = pickRandomItemByWeight(filterItemsByActive(this.stopsets, startTime)).obj
       if (stopset) {
         generated = stopset.generate(
           startTime,
@@ -497,6 +525,6 @@ export const clearAssetState = () => {
   window.localStorage.removeItem("evenly-cycle-rotator-tracker")
 }
 
-export const markPlayed = (asset) => DB.markPlayed(asset)
+export const markPlayed = (asset, rotator = null) => DB.markPlayed(asset, rotator)
 
 setInterval(() => DB.cleanup(), IS_DEV ? 15 * 1000 : 45 * 60 * 1000) // Clean up every 45 minutes

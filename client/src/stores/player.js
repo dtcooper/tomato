@@ -40,11 +40,14 @@ limiter.release.setValueAtTime(0.02, audioContext.currentTime) // Relatively fas
 compressor.connect(limiter)
 limiter.connect(audioContext.destination)
 
+const assetAlternateTracker = new Map()
+
 class GeneratedStopsetAssetBase {
-  constructor(rotator, generatedStopset, index) {
+  constructor(rotator, generatedStopset, index, hasEndDateMultiplier) {
     this.rotator = rotator
     this.generatedStopset = generatedStopset
     this.index = index
+    this.hasEndDateMultiplier = hasEndDateMultiplier
     this.error = false
     this.playing = false
   }
@@ -93,6 +96,20 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
     // therefore a reference to the _original_ asset is held and it won't be garbage
     // collected and cleaned  up yet
     Object.assign(this, asset)
+    this.alternateNumber = 0
+
+    if (this.alternates.length > 0) {
+      if (assetAlternateTracker.has(this.id)) {
+        this.alternateNumber = (assetAlternateTracker.get(this.id) + 1) % (this.alternates.length + 1)
+      }
+      if (this.alternateNumber > 0) {
+        const alternate = this.alternates[this.alternateNumber - 1]
+        duration = alternate.duration
+        this.file = alternate
+      }
+      assetAlternateTracker.set(this.id, this.alternateNumber)
+    }
+
     this._elapsed = 0
     this.playable = true
     this.audio = null
@@ -129,6 +146,10 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
 
   get elapsed() {
     return this.error ? 0 : this.beforeActive ? this.duration : this._elapsed
+  }
+
+  isAlternate() {
+    return this.alternateNumber > 0
   }
 
   loadAudio() {
@@ -253,8 +274,8 @@ export class GeneratedStopset {
     Object.assign(this, stopset)
     this.updateCallback = updateCallback || noop // UI update function
     this.doneCallback = doneCallback || noop
-    this.items = rotatorsAndAssets.map(({ rotator, asset }, index) => {
-      const args = [rotator, this, index]
+    this.items = rotatorsAndAssets.map(({ rotator, asset, hasEndDateMultiplier }, index) => {
+      const args = [rotator, this, index, hasEndDateMultiplier]
       return asset ? new PlayableAsset(asset, ...args) : new NonPlayableAsset(...args)
     })
     this.current = 0

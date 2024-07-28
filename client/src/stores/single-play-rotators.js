@@ -64,17 +64,22 @@ export const play = (rotator, mediumIgnoreIds = new Set()) => {
     error(rotator, "No assets to play!")
   } else {
     log("played_single", `[Rotator=${rotator.name}] [Asset=${asset.name}]`)
-    markPlayed(asset)
+    const files = [
+      [asset.duration, asset.file.localUrl],
+      ...asset.alternates.map(({ duration, localUrl }) => [duration, localUrl])
+    ]
+    const [duration, localUrl] = files[Math.floor(Math.random() * files.length)] // just pick a file (or alternate) at random
+    markPlayed(asset, rotator)
     playing.update(($playing) => ({
       ...$playing,
       asset,
-      duration: asset.duration,
+      duration,
       elapsed: 0,
       isPlaying: true,
       remaining: 0,
       rotator
     }))
-    audio.src = asset.file.localUrl
+    audio.src = localUrl
     audio.play().catch(() => error(rotator, "Error playing asset"))
     audio.ondurationchange = () =>
       playing.update(($playing) => ({
