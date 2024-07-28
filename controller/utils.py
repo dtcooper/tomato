@@ -49,15 +49,15 @@ class PulsatingLED:
             current_time = time.monotonic()
             elapsed = (current_time - self._pulsate_started) % self._period
             half_period = self._period / 2
-            fading_in = elapsed < half_period
+            fading_out = elapsed < half_period
 
             if self._flash_while_pulsating:
-                duty = 0xFFFF if fading_in else 0x0000
+                duty = 0xFFFF if fading_out else 0x0000
             else:
-                if fading_in:
-                    duty = int(self._min_duty + self._duty_delta * (elapsed / half_period))
+                if fading_out:
+                    duty = 0xFFFF - int(self._min_duty + self._duty_delta * (elapsed / half_period))
                 else:
-                    duty = int(self._max_duty - self._duty_delta * ((elapsed - half_period) / half_period))
+                    duty = 0xFFFF - int(self._max_duty - self._duty_delta * ((elapsed - half_period) / half_period))
             self._pwm.duty_cycle = duty
 
 

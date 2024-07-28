@@ -41,7 +41,6 @@ pwm_frequency = 350
 # In seconds
 flash_period = 1.0
 pulsate_period_slow = 2.25
-pulsate_period_medium = 1.25
 pulsate_period_fast = 0.6
 """
 
@@ -66,7 +65,7 @@ class Config:
     pwm_frequency: int
     flash_period: float
     pulsate_period_slow: float
-    pulsate_period_medium: float
+
     pulsate_period_fast: float
 
     def __init__(self, *, from_boot=False):

@@ -177,13 +177,10 @@
       <button @click="led(0, 'off')">OFF</button>
       <button @click="led(1, 'on')">ON</button>
       <button @click="led(2, 'flash')">Flash</button>
+      <button @click="led(3, 'pulsate slow')">Pulse/slow</button>
+      <button @click="led(4, 'pulsate fast')">Pulse/fast</button>
+      <button @click="led(5, 'invalid')">Invalid</button>
       <button @click="invalidMidiMsg()">Invalid MIDI</button>
-      <br>
-      <strong>Pulse:</strong>
-      <button @click="led(3, 'pulsate slow')">Slow</button>
-      <button @click="led(4, 'pulsate medium')">Medium</button>
-      <button @click="led(5, 'pulsate fast')">Fast</button>
-      <button @click="led(6, 'invalid')">Invalid</button>
       <br>
       <strong>Simulate Button Press:</strong>
       <button @click="sysex('simulate/press')">Press</button>

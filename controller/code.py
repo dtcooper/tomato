@@ -12,11 +12,6 @@ try:
 
     config = Config()
     BOOT_TIME = time.monotonic()
-    PULSATE_PERIODS = {
-        c.LED_PULSATE_SLOW: config.pulsate_period_slow,
-        c.LED_PULSATE_MEDIUM: config.pulsate_period_medium,
-        c.LED_PULSATE_FAST: config.pulsate_period_fast,
-    }
     SHOULD_DEBUG_PRINT = config.debug or config.serial
     SHOULD_DEBUG_SEND_MIDI_MESSAGE = config.debug_messages_over_midi
 
@@ -54,8 +49,10 @@ try:
                     led.solid(num == c.LED_ON)
                 elif num == c.LED_FLASH:
                     led.pulsate(period=config.flash_period, flash=True)
-                elif num in PULSATE_PERIODS:
-                    led.pulsate(period=PULSATE_PERIODS[num])
+                elif num == c.LED_PULSATE_SLOW:
+                    led.pulsate(period=config.pulsate_period_slow)
+                elif num == c.LED_PULSATE_FAST:
+                    led.pulsate(period=config.pulsate_period_fast)
             else:
                 debug(f"WARNING: Invalid LED control msg: {num}")
                 self.send_obj("error", f"Invalid MIDI control number {num}")

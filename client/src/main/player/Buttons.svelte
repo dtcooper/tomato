@@ -30,15 +30,15 @@
 
   let ledState
   $: if (playDisabled) {
-    ledState = 0
+    ledState = 0  // LED_OFF
   } else if (isPaused) {
-    ledState = 2
+    ledState = 2  // LED_FLASH
   } else if (overdue) {
-    ledState = 5
+    ledState = 4  // LED_PULSATE_FAST
   } else if (overtime) {
-    ledState = 3
+    ledState = 3  // LED_PULSATE_SLOW
   } else {
-    ledState = 1
+    ledState = 1  // LED_ON
   }
 
   $: setLED(ledState)

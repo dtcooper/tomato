@@ -1,5 +1,5 @@
 # General
-VERSION = "v0.3.24"
+VERSION = "v0.3.25"
 PRODUCT_NAME = "Tomato Button Box"
 
 # Kindly assigned by pid.codes (https://pid.codes/1209/7111/)
@@ -17,8 +17,7 @@ LED_OFF = LED_RANGE_MIN = 0
 LED_ON = 1
 LED_FLASH = 2
 LED_PULSATE_SLOW = 3
-LED_PULSATE_MEDIUM = 4
-LED_PULSATE_FAST = LED_RANGE_MAX = 5
+LED_PULSATE_FAST = LED_RANGE_MAX = 4
 
 # System Exclusive
 SYSEX_NON_COMMERCIAL = 0x7D  # Non-commercial sysex prefix
