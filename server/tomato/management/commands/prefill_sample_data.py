@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand, CommandError
 from tomato.models import REQUIRED_EMPTY_FOR_IMPORT_MODEL_CLASSES, User, import_data_from_zip
 
 
-SAMPLE_DATA_URL = "https://tomato.nyc3.digitaloceanspaces.com/bmir-sample-data-20231023-185614.zip"
+SAMPLE_DATA_URL = "https://tomato.nyc3.digitaloceanspaces.com/bmir-sample-data-20240728-185614.zip"
 
 
 def show_download_progress(block_num, block_size, total_size):
