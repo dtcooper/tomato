@@ -50,6 +50,7 @@ class GeneratedStopsetAssetBase {
     this.hasEndDateMultiplier = hasEndDateMultiplier
     this.error = false
     this.playing = false
+    this.alternateNumber = 0
   }
 
   updateCallback() {
@@ -71,6 +72,9 @@ class GeneratedStopsetAssetBase {
   }
   get finished() {
     return this.beforeActive
+  }
+  isAlternate() {
+    return this.alternateNumber > 0
   }
 
   get logLine() {
@@ -96,7 +100,6 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
     // therefore a reference to the _original_ asset is held and it won't be garbage
     // collected and cleaned  up yet
     Object.assign(this, asset)
-    this.alternateNumber = 0
 
     if (this.alternates.length > 0) {
       if (assetAlternateTracker.has(this.id)) {
@@ -146,10 +149,6 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
 
   get elapsed() {
     return this.error ? 0 : this.beforeActive ? this.duration : this._elapsed
-  }
-
-  isAlternate() {
-    return this.alternateNumber > 0
   }
 
   loadAudio() {
