@@ -14,11 +14,11 @@
   font-size: 0.9em;
 }
 
-:global(svg) {
+svg {
   @apply h-16 w-16;
 }
 
-:global(.tomato-pulse) {
+.tomato-pulse {
   animation: tomato-pulse 1.5s infinite;
   --pulse-color: var(--su);
   --pulse-size: 15px;
@@ -38,7 +38,7 @@
   }
 }
 
-:global(.tomato-flash-bg) {
+.tomato-flash-bg {
   animation: tomato-flash-bg 2s linear infinite;
   --flash-bg-color: var(--er);
 }
