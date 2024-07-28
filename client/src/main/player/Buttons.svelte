@@ -7,7 +7,15 @@
 
   import { userConfig } from "../../stores/config"
   import { blockSpacebarPlay } from "../../stores/player"
-  import { setLED, registerButtonPressCallback } from "../../stores/midi"
+  import {
+    setLED,
+    registerButtonPressCallback,
+    LED_OFF,
+    LED_ON,
+    LED_FLASH,
+    LED_PULSATE_SLOW,
+    LED_PULSATE_FAST
+  } from "../../stores/midi"
 
   import Icon from "../../components/Icon.svelte"
 
@@ -30,15 +38,15 @@
 
   let ledState
   $: if (playDisabled) {
-    ledState = 0 // LED_OFF
+    ledState = LED_OFF
   } else if (isPaused) {
-    ledState = 2 // LED_FLASH
+    ledState = LED_FLASH
   } else if (overdue) {
-    ledState = 4 // LED_PULSATE_FAST
+    ledState = LED_PULSATE_FAST
   } else if (overtime) {
-    ledState = 3 // LED_PULSATE_SLOW
+    ledState = LED_PULSATE_SLOW
   } else {
-    ledState = 1 // LED_ON
+    ledState = LED_ON
   }
 
   $: setLED(ledState)

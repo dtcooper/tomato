@@ -10,13 +10,19 @@ let buttonPressCallback = noop
 
 let lastLEDValue = 0
 
+export const LED_OFF = 0
+export const LED_ON = 1
+export const LED_FLASH = 2
+export const LED_PULSATE_SLOW = 3
+export const LED_PULSATE_FAST = 4
+
 const updateMidiDevices = (enabled = null) => {
   if (enabled === null) {
     enabled = get(userConfig).enableMIDIButtonBox
   }
 
   if (!enabled) {
-    setLED(0, true)
+    setLED(LED_OFF, true)
   }
 
   outputs = []
@@ -65,3 +71,7 @@ export let registerButtonPressCallback = (callback) => (buttonPressCallback = ca
   updateMidiDevices()
   midi.onstatechange = () => updateMidiDevices()
 })()
+
+window.addEventListener("beforeunload", () => {
+  setLED(LED_OFF, true)
+})

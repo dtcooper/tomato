@@ -12,7 +12,7 @@
   import { singlePlayRotators, stop as stopSinglePlayRotator } from "../stores/single-play-rotators"
   import { db } from "../stores/db"
   import { Wait } from "../stores/player"
-  import { setLED } from "../stores/midi"
+  import { setLED, LED_OFF } from "../stores/midi"
 
   // Object automatically updates on change
   let items = []
@@ -39,7 +39,7 @@
   $: overtime = items.length > 0 && items[0].type === "wait" && items[0].overtime
 
   $: if (items.length === 0) {
-    setLED(0)
+    setLED(LED_OFF)
   }
 
   const doneWaiting = () => {
