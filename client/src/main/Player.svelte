@@ -12,6 +12,7 @@
   import { singlePlayRotators, stop as stopSinglePlayRotator } from "../stores/single-play-rotators"
   import { db } from "../stores/db"
   import { Wait } from "../stores/player"
+  import { setLED } from "../stores/midi"
 
   // Object automatically updates on change
   let items = []
@@ -24,6 +25,11 @@
 
   export let overdue
   $: overdue = items.length > 0 && items[0].type === "wait" && items[0].overdue
+  $: overtime = items.length > 0 && items[0].type === "wait" && items[0].overtime
+
+  $: if (items.length === 0) {
+    setLED(0)
+  }
 
   const doneWaiting = () => {
     // return true = keep waiting and do overtime stuff
@@ -213,7 +219,7 @@
   {#if items.length > 0}
     {@const item = items[0]}
 
-    <PlayButtons {items} {pause} {play} {skip} {regenerateNextStopset} {skipCurrentStopset} />
+    <PlayButtons {items} {pause} {play} {skip} {regenerateNextStopset} {skipCurrentStopset} {overdue} {overtime} />
     <PlayBar {item} />
   {:else}
     <div class="mt-3 text-center text-xl italic text-error">

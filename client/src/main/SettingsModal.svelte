@@ -7,7 +7,7 @@
 
   import cogOutline from "@iconify/icons-mdi/cog-outline"
 
-  import { IS_DEV, upperCaseFirst } from "../utils"
+  import { IS_DEV } from "../utils"
   import { db } from "../stores/db"
   import { settings_descriptions } from "../../../server/constants.json"
   import { logout, protocolVersion, conn } from "../stores/connection"
@@ -104,6 +104,13 @@
             {speakerLocked ? "Unl" : "L"}ock output device
           </button>
         </div>
+      </div>
+
+      <div class="flex items-center justify-end text-lg font-bold">Button box:</div>
+      <div class="flex w-max items-center justify-center gap-4 text-xl font-bold">
+        <span class:text-error={!$userConfig.enableMIDIButtonBox}>OFF</span>
+        <input type="checkbox" class="toggle toggle-success toggle-lg" bind:checked={$userConfig.enableMIDIButtonBox} />
+        <span class:text-success={$userConfig.enableMIDIButtonBox}>ON</span>
       </div>
 
       <!-- svelte-ignore missing-declaration -->

@@ -8,7 +8,7 @@ import { get, readonly, writable } from "svelte/store"
 const config = persisted("config", {})
 const readonlyConfig = readonly(config)
 
-const defaultUserConfig = { uiMode: 0, autoplay: false, powerSaveBlocker: true }
+const defaultUserConfig = { uiMode: 0, autoplay: false, powerSaveBlocker: true, enableMIDIButtonBox: true }
 export const userConfig = persisted("user-config", defaultUserConfig)
 export const resetUserConfig = () => userConfig.set(defaultUserConfig)
 export const isFullscreen = writable(true)

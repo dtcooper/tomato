@@ -1,4 +1,4 @@
-const { app, BrowserWindow, powerSaveBlocker, shell, ipcMain, nativeTheme, dialog, Menu } = require("electron")
+const { app, BrowserWindow, powerSaveBlocker, shell, ipcMain, dialog, Menu } = require("electron")
 const windowStateKeeper = require("electron-window-state")
 const fs = require("fs")
 const fsExtra = require("fs-extra")
@@ -6,14 +6,10 @@ const { parseArgs } = require("util")
 const path = require("path")
 const { check: squirrelCheck } = require("electron-squirrel-startup")
 const { protocol_version } = require("../../server/constants.json")
-const net = require("net")
 
 const cmdArgs = parseArgs({
   options: {
     "enable-dev-mode": { type: "boolean", default: false },
-    "disable-play-server": { type: "boolean", default: false },
-    "play-server-port": { type: "string", default: "8207" },
-    "play-server-host": { type: "string", default: "127.0.0.1" },
     "show-quit-dialog-when-unpackaged": { type: "boolean", default: false }
   },
   strict: false
@@ -184,7 +180,7 @@ if (squirrelCheck || !singleInstanceLock) {
     Menu.setApplicationMenu(menu)
 
     win.webContents.session.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
-      return permission === "media"
+      return ["media", "midi", "midiSysex"].includes(permission)
     })
 
     if (!app.isPackaged && process.env.SVELTE_DEVTOOLS) {
@@ -283,24 +279,4 @@ if (squirrelCheck || !singleInstanceLock) {
   app.on("window-all-closed", () => {
     app.quit()
   })
-
-  if (!cmdArgs["disable-play-server"]) {
-    const playServerPort = +cmdArgs["play-server-port"] || 8207
-    console.log(`Running play server on ${cmdArgs["play-server-host"]}:${playServerPort}`)
-    const playServer = net.createServer((socket) => {
-      setTimeout(() => socket.destroy(), 1000)
-      socket.on("data", (data) => {
-        if (data.toString().toLowerCase().startsWith("play\n")) {
-          socket.write("Sent play command to Tomato!\n")
-          if (window) {
-            window.webContents.send("play-server-cmd-play")
-          }
-        } else {
-          socket.write("Invalid command!\n")
-        }
-        socket.destroySoon()
-      })
-    })
-    playServer.listen(+cmdArgs["play-server-port"] || 8207, cmdArgs["play-server-host"])
-  }
 }

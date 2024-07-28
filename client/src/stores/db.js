@@ -191,7 +191,7 @@ class Rotator extends HydratableObject {
   }
 
   getRandomAssetForSinglePlay(mediumIgnoreIds = new Set()) {
-    return this.getAsset(mediumIgnoreIds, undefined, undefined, undefined, true)  // forceRandom = true
+    return this.getAsset(mediumIgnoreIds, undefined, undefined, undefined, true) // forceRandom = true
   }
 
   getAsset(mediumIgnoreIds = new Set(), hardIgnoreIds = new Set(), startTime, endDateMultiplier, forceRandom = false) {

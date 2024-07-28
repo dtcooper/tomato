@@ -1,6 +1,4 @@
 <script>
-  import { ipcRenderer } from "electron"
-
   import playCircleOutlineIcon from "@iconify/icons-mdi/play-circle-outline"
   import pauseCircleOutlineIcon from "@iconify/icons-mdi/pause-circle-outline"
   import skipNextCircleOutline from "@iconify/icons-mdi/skip-next-circle-outline"
@@ -9,6 +7,7 @@
 
   import { userConfig } from "../../stores/config"
   import { blockSpacebarPlay } from "../../stores/player"
+  import { setLED, registerButtonPressCallback } from "../../stores/midi"
 
   import Icon from "../../components/Icon.svelte"
 
@@ -20,17 +19,36 @@
   export let skip
   export let skipCurrentStopset
   export let regenerateNextStopset
+  export let overtime
+  export let overdue
 
   $: firstItem = items[0]
   $: playDisabled =
     !items.some((item) => item.type === "stopset") || (firstItem.type === "stopset" && firstItem.playing)
   $: pauseDisabled = firstItem.type !== "stopset" || !firstItem.playing
+  $: isPaused = firstItem.type === "stopset" && !firstItem.playing
 
-  ipcRenderer.on("play-server-cmd-play", (...args) => {
+  let ledState
+  $: if (playDisabled) {
+    ledState = 0
+  } else if (isPaused) {
+    ledState = 2
+  } else if (overdue) {
+    ledState = 5
+  } else if (overtime) {
+    ledState = 3
+  } else {
+    ledState = 1
+  }
+
+  $: setLED(ledState)
+  setTimeout(() => setLED(ledState), 500) // Allow 500ms for midi system to initialize
+
+  registerButtonPressCallback(() => {
     if (playDisabled) {
-      console.log("Got command from play server, but currently not eligible to play!")
+      console.log("Got MIDI press, but currently not eligible to play!")
     } else {
-      console.log("Calling play() based on command from play server")
+      console.log("Calling play() based on MIDI key press")
       play()
     }
   })
