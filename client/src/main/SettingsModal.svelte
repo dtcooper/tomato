@@ -15,6 +15,7 @@
   import { config, userConfig } from "../stores/config"
 
   // TODO: host error seems to show when logging, in particular if you press logout when disconnected
+  // TODO: do we want to disable tooltips? They're a bit annoying.
 
   export let show = true
   let showLogout = false

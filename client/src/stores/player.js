@@ -216,6 +216,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   play() {
     if (this.queueForSkip) {
       console.log(`Skipping queued ${this.id}: ${this.name}`)
+      this.generatedStopset.didSkip = true
       this.skip()
     } else {
       console.log(`Playing ${this.id}: ${this.name}`)

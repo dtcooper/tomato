@@ -76,19 +76,26 @@
                           <Icon icon={pauseIcon} class="h-16 w-16" />
                         </button>
                       {:else}
-                        <button
-                          class="btn btn-square btn-success btn-lg"
-                          on:click={() => processItem(index, true, subindex)}
-                          disabled={!(
-                            asset.playable &&
-                            !asset.error &&
-                            !asset.queueForSkip &&
-                            (!isFirstItem || (isFirstItem && (asset.afterActive || (asset.active && !asset.playing))))
-                          )}
-                          tabindex="-1"
+                        <!-- TODO: Tooltip warning log playing anything but first one! -->
+                        <div
+                          class:tooltip={asset.afterActive}
+                          class="tooltip-right tooltip-error flex"
+                          data-tip="This action will be logged!"
                         >
-                          <Icon icon={playIcon} class="h-16 w-16" />
-                        </button>
+                          <button
+                            class="btn btn-square btn-success btn-lg"
+                            on:click={() => processItem(index, true, subindex)}
+                            disabled={!(
+                              asset.playable &&
+                              !asset.error &&
+                              !asset.queueForSkip &&
+                              (!isFirstItem || (isFirstItem && (asset.afterActive || (asset.active && !asset.playing))))
+                            )}
+                            tabindex="-1"
+                          >
+                            <Icon icon={playIcon} class="h-16 w-16" />
+                          </button>
+                        </div>
                       {/if}
                     </div>
                   {/if}
@@ -149,7 +156,7 @@
                     </div>
                   </div>
                   {#if !asset.error && asset.playable}
-                    <div class="flex flex-col items-end self-stretch">
+                    <div class="flex flex-col items-end gap-1">
                       <div class="font-mono text-sm">
                         {#if $userConfig.uiMode >= 1}
                           {prettyDuration(asset.elapsed, asset.duration)} /
@@ -159,41 +166,40 @@
                         {prettyDuration(asset.duration)}
                       </div>
                       {#if $userConfig.uiMode >= 2}
-                        <div class="flex flex-1 items-end gap-1">
+                        <button
+                          class="btn btn-info btn-xs gap-0.5 pl-0.5 pr-1.5"
+                          disabled={asset.queueForSkip ||
+                            (asset.active && asset.playing) ||
+                            (isFirstItem && !asset.afterActive)}
+                          on:click={() => regenerateStopsetItem(index, subindex)}
+                          tabindex="-1"
+                        >
+                          <Icon icon={reloadIcon} class="h-4 w-4" />
+                          Regenerate
+                        </button>
+                        <div
+                          class:tooltip={!asset.queueForSkip &&
+                            !(item.startedPlaying && !asset.active && !asset.afterActive)}
+                          class="tooltip-left tooltip-error flex"
+                          data-tip="This action will be logged!"
+                        >
                           <button
-                            class="btn btn-info btn-xs gap-0.5 pl-0.5 pr-1.5"
-                            disabled={(asset.active && asset.playing) || (isFirstItem && !asset.afterActive)}
-                            on:click={() => regenerateStopsetItem(index, subindex)}
                             tabindex="-1"
+                            class="btn btn-xs {asset.queueForSkip
+                              ? 'btn-neutral'
+                              : 'btn-warning'} gap-0.5 pl-0.5 pr-1.5"
+                            disabled={item.startedPlaying && !asset.active && !asset.afterActive}
+                            on:click={() => {
+                              if (item.startedPlaying && asset.active) {
+                                skip() // Skip as usual if item is active
+                              } else {
+                                asset.queueForSkip = !asset.queueForSkip
+                              }
+                            }}
+                            ><Icon icon={asset.queueForSkip ? playIcon : skipIcon} class="h-4 w-4" />{asset.queueForSkip
+                              ? "Queue"
+                              : "Skip"}</button
                           >
-                            <Icon icon={reloadIcon} class="h-5 w-5" />
-                            Regenerate
-                          </button>
-                          <div
-                            class:tooltip={!asset.queueForSkip &&
-                              !(item.startedPlaying && !asset.active && !asset.afterActive)}
-                            class="tooltip-left tooltip-error flex"
-                            data-tip="This action will be logged!"
-                          >
-                            <button
-                              tabindex="-1"
-                              class="btn btn-xs {asset.queueForSkip
-                                ? 'btn-neutral'
-                                : 'btn-warning'} gap-0.5 pl-0.5 pr-1.5"
-                              disabled={item.startedPlaying && !asset.active && !asset.afterActive}
-                              on:click={() => {
-                                if (item.startedPlaying && asset.active) {
-                                  skip() // Skip as usual if item is active
-                                } else {
-                                  asset.queueForSkip = !asset.queueForSkip
-                                }
-                              }}
-                              ><Icon
-                                icon={asset.queueForSkip ? playIcon : skipIcon}
-                                class="h-5 w-5"
-                              />{asset.queueForSkip ? "Queue" : "Skip"}</button
-                            >
-                          </div>
                         </div>
                       {/if}
                     </div>
@@ -228,6 +234,7 @@
               style:background-image={`linear-gradient(to right, color-mix(in oklab, oklch(var(--n)) 90%, black) 0%, color-mix(in oklab, oklch(var(--n)) 90%, black) ${item.percentDone}%, oklch(var(--n)) ${item.percentDone}%, oklch(var(--n)) 100%)`}
             >
               {#if $userConfig.uiMode >= 2}
+                <!-- TODO if this isn't the first item, and play is clicked, log that a stopset was skipped (tooltip warn as well) -->
                 <div class="flex items-center">
                   <button
                     class="btn btn-square btn-success btn-lg"
