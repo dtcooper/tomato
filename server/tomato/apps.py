@@ -58,7 +58,7 @@ class TomatoConfig(AppConfig):
         group.permissions.add(Permission.objects.get(codename="change_config"))
         all_groups.append(group)
 
-        group, _ = Group.objects.get_or_create(name="Can immediately schedule audio assets to play")
+        group, _ = Group.objects.get_or_create(name="Can manage connected desktop clients")
         group.permissions.add(Permission.objects.get(codename="immediate_play_asset"))
         all_groups.append(group)
 

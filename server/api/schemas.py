@@ -21,11 +21,12 @@ class OutgoingUserMessageTypes(enum.StrEnum):
 
 
 class AdminMessageTypes(enum.StrEnum):
-    pass
+    RELOAD_PLAYLIST = "reload-playlist"
 
 
 class OutgoingAdminMessageTypes(enum.StrEnum):
-    pass
+    RELOAD_PLAYLIST = "reload-playlist"
+    HELLO = "hello"
 
 
 greeting_schema = Schema(
@@ -43,6 +44,14 @@ greeting_schema = Schema(
             "protocol_version": Use(int),
             Optional("admin_mode", default=False): Use(bool),
             "method": "session",
+        },
+        {
+            "key": str,
+            "user_id": int,
+            "tomato": "radio-automation",
+            "protocol_version": Use(int),
+            "admin_mode": True,
+            "method": "secret-key",
         },
     )
 )

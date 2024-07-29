@@ -1,0 +1,17 @@
+{% extends 'admin/extra/base.html' %}
+
+{% block content %}
+  <form method="POST">
+    {% csrf_token %}
+    <fieldset class="module aligned">
+      <h2>Reload all connected clients</h2>
+      <input type="hidden" name="action" value="export">
+      <div class="form-row">
+        <p>Click the button below to reload the plalists in all connected clients.</p>
+      </div>
+    </fieldset>
+    <div class="submit-row">
+      <input type="submit" class="default" value="Reload playlists of all connected desktop clients">
+    </div>
+  </form>
+{% endblock %}

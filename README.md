@@ -123,7 +123,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [ ] Skip track in stopset when we get to it
 - [ ] ~~Mark a bad asset? Interesting. Not sure how it would work.~~ – too difficult
       to implement, too many opinions, person wishing to flag talks to manager-of-the-moment
-- [ ] Refresh playlist from backend. Connected client status from backend? Communicate what's in the playlist?
+- [x] Refresh playlist from backend. ~~Connected client status from backend? Communicate what's in the playlist?~~
   - [x] Minimally completed via `RELOAD_PLAYLIST_AFTER_DATA_CHANGES` setting
 - [ ] ~~Status updates, ie news and traffic? Fullscreen thing?~~ / ~~Custom UI labels unused labels that play every N times (ie for telling the DJ to do something)~~ -- Probably not
 - [x] Round-robin (or "cycle evenly") rotator scheduling, ignoring weight as an option for a rotator

@@ -4,7 +4,7 @@ from tomato.constants import CLIENT_LOG_ENTRY_TYPES
 from tomato.models import ClientLogEntry, get_config_async, serialize_for_api
 
 from .base import Connection, ConnectionsBase
-from .schemas import AdminMessageTypes, OutgoingUserMessageTypes, UserMessageTypes
+from .schemas import AdminMessageTypes, OutgoingAdminMessageTypes, OutgoingUserMessageTypes, UserMessageTypes
 from .utils import retry_on_failure
 
 
@@ -16,7 +16,11 @@ class AdminConnections(ConnectionsBase):
     is_admin = True
 
     async def hello(self, connection: Connection):
-        await connection.send({"test": "You are an admin!"})
+        await connection.message(OutgoingAdminMessageTypes.HELLO, {"num_connected_users": users.num_connections})
+
+    async def process_reload_playlist(self, connection: Connection, data):
+        await users.broadcast(OutgoingAdminMessageTypes.RELOAD_PLAYLIST)
+        await connection.message(OutgoingAdminMessageTypes.RELOAD_PLAYLIST, {"success": True})
 
 
 class UserConnections(ConnectionsBase):

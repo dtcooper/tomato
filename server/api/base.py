@@ -36,7 +36,7 @@ class Connection:
 
     async def receive_message(self):
         data = await self.receive()
-        return (data["type"], data["data"])
+        return (data["type"], data.get("data", {}))
 
     async def message(self, message_type, message=None):
         await self.send({"type": message_type, "data": message})
@@ -81,6 +81,10 @@ class ConnectionsBase(MessagesBase):
     def is_admin(self):
         raise NotImplementedError()
 
+    @property
+    def num_connections(self):
+        return len(self.connections)
+
     async def hello(self, connection: Connection):
         raise NotImplementedError()
 
@@ -99,9 +103,9 @@ class ConnectionsBase(MessagesBase):
             )
             raise TomatoAuthError(f"Server running {what} protocol than you. You'll need to {action} Tomato.")
 
-        is_session = greeting["method"] == "session"
-
-        if is_session:
+        if greeting["method"] == "secret-key":
+            lookup = {"id": greeting["user_id"]}
+        elif greeting["method"] == "session":
             if "sessionid" not in websocket.cookies:
                 raise TomatoAuthError("No sessionid cookie, can't complete session auth!")
             store = SessionStore(session_key=websocket.cookies["sessionid"])
@@ -114,11 +118,15 @@ class ConnectionsBase(MessagesBase):
         except User.DoesNotExist:
             pass
         else:
-            if user.is_active and (not self.is_admin or user.is_superuser):
-                if is_session:
+            if user.is_active and (not self.is_admin or user.is_superuser or greeting["method"] == "secret-key"):
+                if greeting["method"] == "session":
                     session_hash = store.get(HASH_SESSION_KEY)
                     if session_hash and constant_time_compare(session_hash, user.get_session_auth_hash()):
                         logger.info(f"Authorized admin session for {user}")
+                        return Connection(websocket, user)
+                elif greeting["method"] == "secret-key":
+                    if constant_time_compare(greeting["key"], settings.SECRET_KEY):
+                        logger.info(f"Authorized admin via secret key for {user}")
                         return Connection(websocket, user)
                 elif await user.acheck_password(greeting["password"]):
                     logger.info(f"Authorized user connection for {user}")
