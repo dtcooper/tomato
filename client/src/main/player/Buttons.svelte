@@ -120,16 +120,12 @@
             <Icon icon={skipForwardOutlineIcon} class="h-6 w-6" /> Skip current
           </button>
         </div>
-        <div class="tooltip tooltip-bottom tooltip-error" data-tip="This action will be logged!">
-          <button class="btn btn-warning btn-sm w-full pl-1.5" on:click={regenerateNextStopset} tabindex="-1">
-            <Icon icon={reloadIcon} class="h-6 w-6" /> Regenerate next
-          </button>
-        </div>
-        <div class="tooltip tooltip-bottom tooltip-error" data-tip="This action will be logged!">
-          <button class="btn btn-info btn-sm w-full pl-1.5" on:click={reloadPlaylist} tabindex="-1">
-            <Icon icon={reloadAlertIcon} class="h-6 w-6" /> Reload playlist
-          </button>
-        </div>
+        <button class="btn btn-warning btn-sm pl-1.5" on:click={regenerateNextStopset} tabindex="-1">
+          <Icon icon={reloadIcon} class="h-6 w-6" /> Regenerate next
+        </button>
+        <button class="btn btn-info btn-sm pl-1.5" on:click={reloadPlaylist} tabindex="-1">
+          <Icon icon={reloadAlertIcon} class="h-6 w-6" /> Reload playlist
+        </button>
       </div>
     </div>
   {/if}
