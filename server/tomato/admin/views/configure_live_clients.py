@@ -20,7 +20,7 @@ class AdminConfigureLiveClientsView(AdminViewMixin, TemplateView):
     perms = ("tomato.immediate_play_asset",)
     title = "Configure live clients"
 
-    def post(self, request, *args, **kwargs):
+    def do_ws_api_request(self, request, *, reload=False):
         # Probably needs a refactor but okay for now
         try:
             with websocket_connect("ws://api:8000/api") as ws:
@@ -43,19 +43,28 @@ class AdminConfigureLiveClientsView(AdminViewMixin, TemplateView):
                     raise Exception(f"Invalid hello response type: {response}")
                 num_connected_users = response["data"]["num_connected_users"]
 
-                ws.send(json.dumps({"type": "reload-playlist"}))
-                response = json.loads(ws.recv())
-                if not response["type"] == "reload-playlist":
-                    raise Exception(f"Invalid reload-playlist response type: {response}")
-                if not response["data"]["success"]:
-                    raise Exception(f"Failure reloading playlist: {response}")
+                if reload:
+                    ws.send(json.dumps({"type": "reload-playlist"}))
+                    response = json.loads(ws.recv())
+                    if not response["type"] == "reload-playlist":
+                        raise Exception(f"Invalid reload-playlist response type: {response}")
+                    if not response["data"]["success"]:
+                        raise Exception(f"Failure reloading playlist: {response}")
 
         except Exception:
             logger.exception("Error while connecting to api")
             self.message_user(
                 "An error occurred while connecting to the server. Check logs for more information.", messages.ERROR
             )
+            return None
         else:
-            self.message_user(f"Reloaded the playlist of {num_connected_users} connected desktop client(s)!")
+            return num_connected_users
 
+    def get_context_data(self, **kwargs):
+        return {"num_connected_users": self.do_ws_api_request(self.request), **super().get_context_data(**kwargs)}
+
+    def post(self, request, *args, **kwargs):
+        num_connected_users = self.do_ws_api_request(request, reload=True)
+        if num_connected_users is not None:
+            self.message_user(f"Reloaded the playlist of {num_connected_users} connected desktop client(s)!")
         return redirect("admin:extra_configure_live_clients")

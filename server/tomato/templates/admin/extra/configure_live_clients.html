@@ -4,7 +4,11 @@
   <form method="POST">
     {% csrf_token %}
     <fieldset class="module aligned">
-      <h2>Reload all connected clients</h2>
+      <h2>Reload all connected desktop clients</h2>
+      <p>
+        <strong>Current number of connected desktop client(s): {{ num_connected_users|default_if_none:"Unknown" }}</strong>
+        <small><em>(Number not refreshed. Reload page to update.)</em></small>
+      </p>
       <input type="hidden" name="action" value="export">
       <div class="form-row">
         <p>Click the button below to reload the plalists in all connected clients.</p>

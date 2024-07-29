@@ -19,6 +19,7 @@ class AdminConnections(ConnectionsBase):
         await connection.message(OutgoingAdminMessageTypes.HELLO, {"num_connected_users": users.num_connections})
 
     async def process_reload_playlist(self, connection: Connection, data):
+        logger.info("Reloading all playlist via admin request")
         await users.broadcast(OutgoingAdminMessageTypes.RELOAD_PLAYLIST)
         await connection.message(OutgoingAdminMessageTypes.RELOAD_PLAYLIST, {"success": True})
 
