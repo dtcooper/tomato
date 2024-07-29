@@ -11,6 +11,7 @@
   import { config, userConfig } from "../stores/config"
   import { singlePlayRotators, stop as stopSinglePlayRotator } from "../stores/single-play-rotators"
   import { db } from "../stores/db"
+  import { log } from "../stores/client-logs"
   import { Wait } from "../stores/player"
   import { setLED, LED_OFF } from "../stores/midi"
 
@@ -109,8 +110,23 @@
       // Skip all callbacks and logging
       item.done(true, true)
     }
+    updateUI()
+
     // Regenerate stopsets
     let numStopsetsToAdd = Math.max($config.STOPSET_PRELOAD_COUNT, 1)
+    // If current item is a stopset
+    if (items.length === 1 && items[0].type === "stopset") {
+      const item = items[0]
+      // If it's playing, generate one less than needed
+      if (item.startedPlaying) {
+        numStopsetsToAdd--
+      } else {
+        // If it's not playing, remove it
+        items.pop()
+        item.done(true, true)
+      }
+    }
+
     while (numStopsetsToAdd-- > 0) {
       addStopset()
     }
@@ -120,8 +136,9 @@
 
   const regenerateNextStopset = () => {
     let nextStopset
-    for (nextStopset = 1; nextStopset < items.length; nextStopset++) {
-      if (items[nextStopset].type === "stopset") {
+    for (nextStopset = 0; nextStopset < items.length; nextStopset++) {
+      // Find the first non-playing stopset
+      if (items[nextStopset].type === "stopset" && !items[nextStopset].startedPlaying) {
         break
       }
     }
@@ -222,7 +239,17 @@
   {#if items.length > 0}
     {@const item = items[0]}
 
-    <PlayButtons {items} {pause} {play} {skip} {regenerateNextStopset} {skipCurrentStopset} {overdue} {overtime} />
+    <PlayButtons
+      {items}
+      {pause}
+      {play}
+      {skip}
+      {regenerateNextStopset}
+      {reloadPlaylist}
+      {skipCurrentStopset}
+      {overdue}
+      {overtime}
+    />
     <PlayBar {item} />
   {:else}
     <div class="mt-3 text-center text-xl italic text-error">

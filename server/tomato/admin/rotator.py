@@ -7,7 +7,14 @@ from .base import AiringEnabledMixin, NoNullRelatedOnlyFieldFilter, NumAssetsMix
 
 
 class RotatorAdmin(AiringEnabledMixin, NumAssetsMixin, TomatoModelAdminBase):
-    actions = ("enable", "disable", "enable_single_play", "disable_single_play", "enable_evenly_cycle", "disable_evenly_cycle")
+    actions = (
+        "enable",
+        "disable",
+        "enable_single_play",
+        "disable_single_play",
+        "enable_evenly_cycle",
+        "disable_evenly_cycle",
+    )
     list_display = (
         "name",
         "enabled",

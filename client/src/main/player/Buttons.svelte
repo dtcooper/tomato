@@ -4,6 +4,7 @@
   import skipNextCircleOutline from "@iconify/icons-mdi/skip-next-circle-outline"
   import skipForwardOutlineIcon from "@iconify/icons-mdi/skip-forward-outline"
   import reloadIcon from "@iconify/icons-mdi/reload"
+  import reloadAlertIcon from "@iconify/icons-mdi/reload-alert"
 
   import { userConfig } from "../../stores/config"
   import { blockSpacebarPlay } from "../../stores/player"
@@ -27,6 +28,7 @@
   export let skip
   export let skipCurrentStopset
   export let regenerateNextStopset
+  export let reloadPlaylist
   export let overtime
   export let overdue
 
@@ -35,6 +37,7 @@
     !items.some((item) => item.type === "stopset") || (firstItem.type === "stopset" && firstItem.playing)
   $: pauseDisabled = firstItem.type !== "stopset" || !firstItem.playing
   $: isPaused = firstItem.type === "stopset" && !firstItem.playing
+  $: skipCurrentEnabled = firstItem.type === "stopset" && firstItem.startedPlaying
 
   let ledState
   $: if (playDisabled) {
@@ -103,23 +106,30 @@
   {#if $userConfig.uiMode >= 2}
     <div class="flex flex-col gap-2">
       <div class="divider my-0 text-sm italic">Stop set control</div>
-      <div class="flex justify-center gap-2">
+      <div class="grid grid-cols-2 justify-center gap-2 gap-y-1 md:flex">
         <div
-          class={firstItem.type === "stopset" && "tooltip tooltip-bottom tooltip-error"}
-          data-tip="Warning: this action will be logged!"
+          class={skipCurrentEnabled && "tooltip tooltip-bottom tooltip-error"}
+          data-tip="This action will be logged!"
         >
           <button
-            class="btn btn-error btn-sm pl-1.5"
-            disabled={firstItem.type !== "stopset"}
+            class="btn btn-error btn-sm w-full pl-1.5"
+            disabled={!skipCurrentEnabled}
             on:click={skipCurrentStopset}
             tabindex="-1"
           >
             <Icon icon={skipForwardOutlineIcon} class="h-6 w-6" /> Skip current
           </button>
         </div>
-        <button class="btn btn-warning btn-sm pl-1.5" on:click={regenerateNextStopset} tabindex="-1">
-          <Icon icon={reloadIcon} class="h-6 w-6" /> Regenerate next
-        </button>
+        <div class="tooltip tooltip-bottom tooltip-error" data-tip="This action will be logged!">
+          <button class="btn btn-warning btn-sm w-full pl-1.5" on:click={regenerateNextStopset} tabindex="-1">
+            <Icon icon={reloadIcon} class="h-6 w-6" /> Regenerate next
+          </button>
+        </div>
+        <div class="tooltip tooltip-bottom tooltip-error" data-tip="This action will be logged!">
+          <button class="btn btn-info btn-sm w-full pl-1.5" on:click={reloadPlaylist} tabindex="-1">
+            <Icon icon={reloadAlertIcon} class="h-6 w-6" /> Reload playlist
+          </button>
+        </div>
       </div>
     </div>
   {/if}

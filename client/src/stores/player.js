@@ -73,6 +73,7 @@ class GeneratedStopsetAssetBase {
   get finished() {
     return this.beforeActive
   }
+
   isAlternate() {
     return this.alternateNumber > 0
   }
