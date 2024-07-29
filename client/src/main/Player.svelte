@@ -160,6 +160,18 @@
     }
   }
 
+  const regenerateStopsetItem = (window.regen = (index, subindex) => {
+    const stopset = items[index]
+    if (stopset.type === "stopset") {
+      const secondsUntilPlay = items.slice(0, index).reduce((s, item) => s + item.remaining, 0)
+      const likelyPlayTime = dayjs().add(secondsUntilPlay, "seconds")
+      stopset.regenerateItem(subindex, likelyPlayTime, mediumIgnoreIds, $config.END_DATE_PRIORITY_WEIGHT_MULTIPLIER)
+    } else {
+      console.warn(`Item at index ${index} is not a stopset. Can't regenerate!`)
+    }
+    updateUI()
+  })
+
   const skipCurrentStopset = () => {
     items[0].didSkip = true
     processItem()
@@ -263,7 +275,9 @@
   numStopsetsToDisableAddMoreAt={$config.STOPSET_PRELOAD_COUNT + numExtraStopsetsToDisableAddMoreAt}
   {addStopset}
   {processItem}
+  {regenerateStopsetItem}
   {pause}
+  {skip}
 />
 
 {#if $singlePlayRotators.enabled}

@@ -120,7 +120,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
       (Change advanced mode to "admin" mode)
   - [x] Build out "switch back to simple mode" timer feature a little better, ie ~~comma separated times?~~
 - [x] Better datetime picker in admin
-- [ ] Skip track in stopset when we get to it
+- [x] Skip track in stopset when we get to it
 - [ ] ~~Mark a bad asset? Interesting. Not sure how it would work.~~ – too difficult
       to implement, too many opinions, person wishing to flag talks to manager-of-the-moment
 - [x] Refresh playlist from backend. ~~Connected client status from backend? Communicate what's in the playlist?~~
@@ -136,7 +136,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [ ] Make weights for previous 24 hours... AND reflect that in front-end (day-of
       pill) and back-end (sortable)... will require change to `END_DATE_PRIORITY_WEIGHT_MULTIPLIER`
     - [x] Added day-of-event pill
-- [ ] Stop playing at end of current asset. (Stop playing in 3s with fadeout as well?)
+- [x] ~~Stop playing at end of current asset. (Stop playing in 3s with fadeout as well?)~~ (Covered by skip)
 
 Other things
 - [ ] Ability to do speech synthesis / pull asset from API? / weather

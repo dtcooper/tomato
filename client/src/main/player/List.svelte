@@ -1,6 +1,8 @@
 <script>
   import playIcon from "@iconify/icons-mdi/play"
   import pauseIcon from "@iconify/icons-mdi/pause"
+  import skipIcon from "@iconify/icons-mdi/skip-next"
+  import reloadIcon from "@iconify/icons-mdi/reload"
 
   import Icon from "../../components/Icon.svelte"
 
@@ -13,6 +15,8 @@
   export let addStopset
   export let processItem
   export let pause
+  export let skip
+  export let regenerateStopsetItem
 
   export let numStopsetsToDisableAddMoreAt
 
@@ -78,6 +82,7 @@
                           disabled={!(
                             asset.playable &&
                             !asset.error &&
+                            !asset.queueForSkip &&
                             (!isFirstItem || (isFirstItem && (asset.afterActive || (asset.active && !asset.playing))))
                           )}
                           tabindex="-1"
@@ -144,13 +149,53 @@
                     </div>
                   </div>
                   {#if !asset.error && asset.playable}
-                    <div class="self-start font-mono text-sm">
-                      {#if $userConfig.uiMode >= 1}
-                        {prettyDuration(asset.elapsed, asset.duration)} /
-                      {:else}
-                        Length:
+                    <div class="flex flex-col items-end self-stretch">
+                      <div class="font-mono text-sm">
+                        {#if $userConfig.uiMode >= 1}
+                          {prettyDuration(asset.elapsed, asset.duration)} /
+                        {:else}
+                          Length:
+                        {/if}
+                        {prettyDuration(asset.duration)}
+                      </div>
+                      {#if $userConfig.uiMode >= 2}
+                        <div class="flex flex-1 items-end gap-1">
+                          <button
+                            class="btn btn-info btn-xs gap-0.5 pl-0.5 pr-1.5"
+                            disabled={(asset.active && asset.playing) || (isFirstItem && !asset.afterActive)}
+                            on:click={() => regenerateStopsetItem(index, subindex)}
+                            tabindex="-1"
+                          >
+                            <Icon icon={reloadIcon} class="h-5 w-5" />
+                            Regenerate
+                          </button>
+                          <div
+                            class:tooltip={!asset.queueForSkip &&
+                              !(item.startedPlaying && !asset.active && !asset.afterActive)}
+                            class="tooltip-left tooltip-error flex"
+                            data-tip="This action will be logged!"
+                          >
+                            <button
+                              tabindex="-1"
+                              class="btn btn-xs {asset.queueForSkip
+                                ? 'btn-neutral'
+                                : 'btn-warning'} gap-0.5 pl-0.5 pr-1.5"
+                              disabled={item.startedPlaying && !asset.active && !asset.afterActive}
+                              on:click={() => {
+                                if (item.startedPlaying && asset.active) {
+                                  skip() // Skip as usual if item is active
+                                } else {
+                                  asset.queueForSkip = !asset.queueForSkip
+                                }
+                              }}
+                              ><Icon
+                                icon={asset.queueForSkip ? playIcon : skipIcon}
+                                class="h-5 w-5"
+                              />{asset.queueForSkip ? "Queue" : "Skip"}</button
+                            >
+                          </div>
+                        </div>
                       {/if}
-                      {prettyDuration(asset.duration)}
                     </div>
                   {/if}
                 </div>
@@ -216,8 +261,8 @@
                   </div>
                 {/if}
               </div>
-              <div class="flex flex-col self-start font-mono text-sm">
-                <div class="self-start font-mono text-sm">
+              <div class="flex flex-col items-end self-stretch">
+                <div class="font-mono text-sm">
                   {#if $userConfig.uiMode >= 1}
                     {prettyDuration(item.elapsed, item.duration)} /
                   {:else}

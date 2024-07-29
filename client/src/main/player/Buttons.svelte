@@ -91,7 +91,7 @@
     </button>
     <div
       class={firstItem.type === "stopset" && "tooltip tooltip-bottom tooltip-error"}
-      data-tip="Warning: this action will be logged!"
+      data-tip="This action will be logged!"
     >
       <button
         class="btn btn-error btn-lg pl-3"

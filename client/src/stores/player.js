@@ -122,6 +122,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
     this._duration = duration
     this.didSkip = false
     this.didLogError = false
+    this.queueForSkip = false
   }
 
   static getAudioObject() {
@@ -213,21 +214,26 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   }
 
   play() {
-    console.log(`Playing ${this.id}: ${this.name}`)
-    markPlayed(this)
-
-    if (this.error) {
-      this.done()
+    if (this.queueForSkip) {
+      console.log(`Skipping queued ${this.id}: ${this.name}`)
+      this.skip()
     } else {
-      this.playing = true
-      this.audio.play().catch((e) => this._errorHelper(e))
-      clearInterval(this.interval)
-      this.interval = setInterval(() => {
-        if (this.audio && !this.error) {
-          this._elapsed = this.audio.currentTime
-          this.updateCallback()
-        }
-      }, progressBarAnimationFramerate)
+      console.log(`Playing ${this.id}: ${this.name}`)
+      markPlayed(this)
+
+      if (this.error) {
+        this.done()
+      } else {
+        this.playing = true
+        this.audio.play().catch((e) => this._errorHelper(e))
+        clearInterval(this.interval)
+        this.interval = setInterval(() => {
+          if (this.audio && !this.error) {
+            this._elapsed = this.audio.currentTime
+            this.updateCallback()
+          }
+        }, progressBarAnimationFramerate)
+      }
     }
     this.updateCallback()
   }
@@ -303,6 +309,40 @@ export class GeneratedStopset {
 
   get playableItems() {
     return this.items.filter((item) => item.playable)
+  }
+
+  regenerateItem(index, startTime, mediumIgnoreIds, endDateMultiplier) {
+    if (this.items.length > index) {
+      // Item will already be included in medium ignore IDs
+      // Hard ignore IDs should be everything in current stopset (less item)
+      const hardIgnoreIds = new Set(this.items.filter((_, i) => i !== index).map((a) => a.id))
+      const secondsUntilPlay = this.items
+        .slice(0, index)
+        .filter((item) => item.playable)
+        .reduce((s, item) => s + item.remaining, 0)
+      startTime = startTime.add(secondsUntilPlay, "seconds")
+
+      const oldItem = this.items[index]
+      const rotator = oldItem.rotator
+      const { asset, hasEndDateMultiplier } = oldItem.rotator.getAsset(
+        mediumIgnoreIds,
+        hardIgnoreIds,
+        startTime,
+        endDateMultiplier
+      )
+      const args = [rotator, this, index, hasEndDateMultiplier]
+      const newItem = asset ? new PlayableAsset(asset, ...args) : new NonPlayableAsset(...args)
+
+      oldItem.unloadAudio() // Don't forget to unload its audio before we nuke it
+      if (this.loaded && asset) {
+        newItem.loadAudio() // If stopset was already loaded, load audio for swapped in item
+      }
+
+      this.items[index] = newItem
+      this.updateCallback()
+    } else {
+      console.warn("Invalid index in stopset. Won't regenerate")
+    }
   }
 
   skip() {
