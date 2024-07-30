@@ -116,8 +116,8 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [x] Make rotators able to disabled (UI for assets / stopsets needs to show that too)
 - [x] ~~Implement soft delete for assets~~ -- keep the file, but delete the DB entity
   - [x] Behind the scenes track deleted files.
-- [ ] Easier way to toggle, simple / standard / advanced view settings in client. Not in settings.
-      (Change advanced mode to "admin" mode)
+- [x] Easier way to toggle, simple / standard / advanced view settings in client. Not in settings.
+  - [ ] Change advanced mode copy to "admin" mode
   - [x] Build out "switch back to simple mode" timer feature a little better, ie ~~comma separated times?~~
 - [x] Better datetime picker in admin
 - [x] Skip track in stopset when we get to it

@@ -236,14 +236,16 @@
               {#if $userConfig.uiMode >= 2}
                 <!-- TODO if this isn't the first item, and play is clicked, log that a stopset was skipped (tooltip warn as well) -->
                 <div class="flex items-center">
-                  <button
-                    class="btn btn-square btn-success btn-lg"
-                    disabled={isFirstItem}
-                    on:click={() => processItem(index)}
-                    tabindex="-1"
-                  >
-                    <Icon icon={playIcon} class="h-16 w-16" />
-                  </button>
+                  <div class="tooltip tooltip-right tooltip-error flex" data-tip="This action will be logged!">
+                    <button
+                      class="btn btn-square btn-success btn-lg"
+                      disabled={isFirstItem}
+                      on:click={() => processItem(index)}
+                      tabindex="-1"
+                    >
+                      <Icon icon={playIcon} class="h-16 w-16" />
+                    </button>
+                  </div>
                 </div>
               {/if}
               {#if $userConfig.uiMode > 0}

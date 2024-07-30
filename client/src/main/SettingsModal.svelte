@@ -12,7 +12,7 @@
   import { settings_descriptions } from "../../../server/constants.json"
   import { logout, protocolVersion, conn } from "../stores/connection"
   import { playStatus, speaker, setSpeaker } from "../stores/player"
-  import { config, userConfig } from "../stores/config"
+  import { config, userConfig, uiModeInfo } from "../stores/config"
 
   // TODO: host error seems to show when logging, in particular if you press logout when disconnected
   // TODO: do we want to disable tooltips? They're a bit annoying.
@@ -54,8 +54,6 @@
     }
   }
 
-  const uiModeStrings = ["Simple", "Standard", "Advanced"]
-
   $: speakerLocked = show
 </script>
 
@@ -65,18 +63,27 @@
   <svelte:fragment slot="close-text">Close settings</svelte:fragment>
   <svelte:fragment slot="content">
     <div class="grid w-full max-w-full grid-cols-[max-content_auto] items-baseline gap-3">
-      <div class="flex items-center justify-end text-lg font-bold">User interface mode:</div>
-      <div class="tabs-boxed tabs w-max">
-        {#each $config.UI_MODES as uiMode}
-          <button
-            class="tab"
-            class:tab-active={uiMode === $userConfig.uiMode}
-            on:click={() => ($userConfig.uiMode = uiMode)}
-          >
-            {uiModeStrings[uiMode]}
-          </button>
-        {/each}
-      </div>
+      <div class="flex justify-end text-lg font-bold">User interface mode:</div>
+      {#if $config.UI_MODES.length > 1}
+        <div class="tabs-boxed tabs w-max">
+          {#each $config.UI_MODES as uiMode}
+            <button
+              class="tab gap-2"
+              class:tab-active={uiMode === $userConfig.uiMode}
+              on:click={() => ($userConfig.uiMode = uiMode)}
+            >
+              <Icon icon={uiModeInfo[uiMode].icon} class="h-5 w-5" viewBox="0 0 32 32" />
+              {uiModeInfo[uiMode].name}
+            </button>
+          {/each}
+        </div>
+      {:else}
+        <div class="text-md flex w-max items-center gap-2">
+          <Icon icon={uiModeInfo[$userConfig.uiMode].icon} class="h-5 w-5 text-info" viewBox="0 0 32 32" />
+          <b class="text-info">{uiModeInfo[$userConfig.uiMode].name}</b>
+          <em>(Not configurable)</em>
+        </div>
+      {/if}
 
       <div class="flex justify-end text-lg font-bold">Audio output device:</div>
       <div class="flex flex-col items-end">

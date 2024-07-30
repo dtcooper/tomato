@@ -2,6 +2,10 @@ import dayjs from "dayjs"
 
 import { ipcRenderer } from "electron"
 
+import skillLevelAdvanced from "@iconify/icons-carbon/skill-level-advanced"
+import skillLevelBasic from "@iconify/icons-carbon/skill-level-basic"
+import skillLevelIntermediate from "@iconify/icons-carbon/skill-level-intermediate"
+
 import { persisted } from "svelte-local-storage-store"
 import { get, readonly, writable } from "svelte/store"
 
@@ -12,6 +16,12 @@ const defaultUserConfig = { uiMode: 0, autoplay: false, powerSaveBlocker: true, 
 export const userConfig = persisted("user-config", defaultUserConfig)
 export const resetUserConfig = () => userConfig.set(defaultUserConfig)
 export const isFullscreen = writable(true)
+
+export const uiModeInfo = [
+  { name: "Simple", icon: skillLevelBasic },
+  { name: "Standard", icon: skillLevelIntermediate },
+  { name: "Advanced", icon: skillLevelAdvanced }
+]
 
 const resetUIMode = () => {
   userConfig.update(($userConfig) => {
@@ -27,11 +37,10 @@ export const setServerConfig = ({ _numeric: numeric, ...newConfig }) => {
   }
   console.log("Got new config", newConfig)
 
+  config.set(newConfig)
   if (newConfig.UI_MODES && newConfig.UI_MODES.indexOf(get(userConfig).uiMode) === -1) {
     resetUIMode()
   }
-
-  config.set(newConfig)
 }
 
 userConfig.subscribe(({ powerSaveBlocker }) => {

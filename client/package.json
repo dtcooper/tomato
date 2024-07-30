@@ -39,6 +39,7 @@
     "@electron-forge/maker-deb": "^7.4.0",
     "@electron-forge/maker-dmg": "^7.4.0",
     "@electron-forge/maker-squirrel": "^7.4.0",
+    "@iconify/icons-carbon": "^1.2.20",
     "@iconify/icons-mdi": "^1.2.48",
     "autoprefixer": "^10.4.19",
     "axios": "^1.7.2",

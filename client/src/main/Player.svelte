@@ -160,7 +160,7 @@
     }
   }
 
-  const regenerateStopsetItem = (window.regen = (index, subindex) => {
+  const regenerateStopsetItem = (index, subindex) => {
     if (index > items.length) {
       console.warn(`Index ${index} out of band while regenerating item`)
       return
@@ -175,7 +175,7 @@
       console.warn(`Item at index ${index} is not a stopset. Can't regenerate!`)
     }
     updateUI()
-  })
+  }
 
   const skipCurrentStopset = () => {
     items[0].didSkip = true
@@ -185,11 +185,25 @@
   const processItem = async (index = 1, play = false, subindex = null) => {
     await tick() // Wait one tick for finished assets / waits to go black
 
-    // TODO:  = null is for advanced mode, playing an asset inside a stopset
     if (index > items.length) {
       console.warn(`Index ${index} out of band while processing items`)
       return
     }
+
+    // If first item is wait, and we skip to another wait, mark next stopset as skipped
+    if (index > 0 && index < items.length) {
+      const firstItem = items[0]
+      const processItem = items[index]
+
+      if (firstItem.type === "wait" && processItem.type === "wait")
+        for (let i = 0; i < index; i++) {
+          if (items[i].type === "stopset") {
+            log("skipped_stopset", `[Stopset=${items[i].name}]`)
+            break
+          }
+        }
+    }
+
     for (let i = index; i >= 1; i--) {
       // skip callback (first arg) AND skip logs except for first one (second arg)
       // third arg == consider it a "skipped" stopset
