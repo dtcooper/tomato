@@ -308,7 +308,7 @@ class Stopset extends AssetStopsetHydratableObject {
           startTime = startTime.add(asset.duration, "seconds")
         }
       }
-      items.push({ rotator, asset, hasEndDateMultiplier }) // XXX
+      items.push({ rotator, asset, hasEndDateMultiplier })
     }
 
     return new GeneratedStopset(this, items, doneCallback, updateCallback, generatedId)
@@ -380,13 +380,13 @@ class DB {
 
   static async cleanup() {
     if (get(conn).ready) {
-      // For all non-garbage collected assets, get set of used files
+      // For all non-garbage collected assets (+alternates ), get set of used files
       const usedFiles = new Set(
         Array.from(this._nonGarbageCollectedAssets.values())
           .map((a) => [a.file.basename, ...a.alternates.map((a) => a.basename)])
           .flat(1)
       )
-      // add alternates to used files
+
       let deleted = 0
       const newFilesToCleanup = new Set()
 

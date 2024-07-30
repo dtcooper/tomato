@@ -76,7 +76,6 @@
                           <Icon icon={pauseIcon} class="h-16 w-16" />
                         </button>
                       {:else}
-                        <!-- TODO: Tooltip warning log playing anything but first one! -->
                         <div
                           class:tooltip={asset.afterActive && $userConfig.tooltips}
                           class="tooltip-right tooltip-error flex"
