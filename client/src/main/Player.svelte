@@ -161,6 +161,11 @@
   }
 
   const regenerateStopsetItem = (window.regen = (index, subindex) => {
+    if (index > items.length) {
+      console.warn(`Index ${index} out of band while regenerating item`)
+      return
+    }
+
     const stopset = items[index]
     if (stopset.type === "stopset") {
       const secondsUntilPlay = items.slice(0, index).reduce((s, item) => s + item.remaining, 0)

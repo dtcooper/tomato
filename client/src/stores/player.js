@@ -342,7 +342,7 @@ export class GeneratedStopset {
       this.items[index] = newItem
       this.updateCallback()
     } else {
-      console.warn("Invalid index in stopset. Won't regenerate")
+      console.warn(`Invalid subindex ${index} in stopset. Won't regenerate item.`)
     }
   }
 
@@ -389,20 +389,25 @@ export class GeneratedStopset {
   }
 
   play(subindex = null) {
-    this.loadAudio()
-    if (subindex !== null) {
-      this.didSkip = this.didSkip || subindex !== this.current
-      this.items.slice(this.current, subindex).forEach((item) => {
-        log("skipped_asset", item.logLine)
-        if (item.playable) {
-          item.pause()
-        }
-      })
-      this.current = subindex
+    if (this.items.length > 0) {
+      this.loadAudio()
+      if (subindex !== null) {
+        this.didSkip = this.didSkip || subindex !== this.current
+        this.items.slice(this.current, subindex).forEach((item) => {
+          log("skipped_asset", item.logLine)
+          if (item.playable) {
+            item.pause()
+          }
+        })
+        this.current = subindex
+      }
+      this.playing = this.startedPlaying = true
+      this.items[this.current].play()
+      this.updateCallback()
+    } else {
+      // Empty for some reason
+      this.done()
     }
-    this.playing = this.startedPlaying = true
-    this.items[this.current].play()
-    this.updateCallback()
   }
 
   pause() {
