@@ -15,7 +15,6 @@
   import { config, userConfig, uiModeInfo } from "../stores/config"
 
   // TODO: host error seems to show when logging, in particular if you press logout when disconnected
-  // TODO: do we want to disable tooltips? They're a bit annoying.
 
   export let show = true
   let showLogout = false
@@ -89,7 +88,7 @@
       <div class="flex justify-end text-lg font-bold">Audio output device:</div>
       <div class="flex flex-col items-end">
         <div
-          class:tooltip={speakerLocked}
+          class:tooltip={speakerLocked && $userConfig.tooltips}
           class="tooltip-bottom tooltip-warning w-full"
           data-tip="Unlock device by clicking below"
         >
@@ -137,7 +136,8 @@
 
       <div class="flex justify-end text-lg font-bold">Power save blocker:</div>
       <div
-        class="tooltip tooltip-bottom tooltip-warning flex w-max items-center justify-center gap-4 text-xl"
+        class:tooltip={$userConfig.tooltips}
+        class="tooltip-bottom tooltip-warning flex w-max items-center justify-center gap-4 text-xl"
         data-tip="When set to ON, Tomato attempts to suppress your display from going to sleep and your system from suspending"
       >
         <span class="font-bold" class:text-error={!$userConfig.powerSaveBlocker}>OFF</span>
@@ -210,7 +210,7 @@
     />
   </div>
   <svelte:fragment slot="extra-buttons">
-    <div class="tooltip tooltip-error" data-tip="Are you SURE that you're SURE?!">
+    <div class:tooltip={$userConfig.tooltips} class="tooltip-error" data-tip="Are you SURE that you're SURE?!">
       <button type="button" class="btn btn-error" on:click={verifyLogout}>Log out</button>
     </div>
   </svelte:fragment>

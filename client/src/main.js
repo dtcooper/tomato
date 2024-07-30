@@ -179,8 +179,13 @@ if (squirrelCheck || !singleInstanceLock) {
     ])
     Menu.setApplicationMenu(menu)
 
+    // Enable autoplay + midi
+    const allowedPermissions = ["media", "midi", "midiSysex"]
     win.webContents.session.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
-      return ["media", "midi", "midiSysex"].includes(permission)
+      return allowedPermissions.includes(permission)
+    })
+    win.webContents.session.setPermissionRequestHandler((webContents, permission, callback, details) => {
+      callback(allowedPermissions.includes(permission))
     })
 
     if (!app.isPackaged && process.env.SVELTE_DEVTOOLS) {

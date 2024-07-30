@@ -49,7 +49,7 @@
 
 <!-- Fixed fullscreen toggle for login only (z-index of modal is 9999) -->
 <div class="fixed right-2 top-2 z-[10000]">
-  <div class="tooltip tooltip-left" data-tip={`${$isFullscreen ? "Exit" : "Enter"} fullscreen mode`}>
+  <div class="tooltip tooltip-left flex" data-tip={`${$isFullscreen ? "Exit" : "Enter"} fullscreen mode`}>
     <button class="btn btn-circle btn-ghost" on:click={() => setFullscreen(!$isFullscreen)} tabindex="-1">
       <Icon icon={$isFullscreen ? fullscreenExit : fullscreenIcon} class="h-8 w-8" />
     </button>

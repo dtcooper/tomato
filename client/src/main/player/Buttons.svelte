@@ -90,7 +90,8 @@
       <Icon icon={pauseCircleOutlineIcon} class="h-12 w-12" /> Pause
     </button>
     <div
-      class={firstItem.type === "stopset" && "tooltip tooltip-bottom tooltip-error"}
+      class:tooltip={firstItem.type === "stopset" && ($userConfig.uiMode <= 1 || $userConfig.tooltips)}
+      class="tooltip-bottom tooltip-error flex"
       data-tip="This action will be logged!"
     >
       <button
@@ -106,9 +107,10 @@
   {#if $userConfig.uiMode >= 2}
     <div class="flex flex-col gap-2">
       <div class="divider my-0 text-sm italic">Stop set control</div>
-      <div class="grid grid-cols-2 justify-center gap-2 gap-y-1 md:flex">
+      <div class="grid grid-cols-2 justify-center gap-2 md:flex">
         <div
-          class={skipCurrentEnabled && "tooltip tooltip-bottom tooltip-error"}
+          class:tooltip={skipCurrentEnabled && $userConfig.tooltips}
+          class="tooltip-bottom tooltip-error flex"
           data-tip="This action will be logged!"
         >
           <button

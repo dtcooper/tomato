@@ -78,7 +78,7 @@
                       {:else}
                         <!-- TODO: Tooltip warning log playing anything but first one! -->
                         <div
-                          class:tooltip={asset.afterActive}
+                          class:tooltip={asset.afterActive && $userConfig.tooltips}
                           class="tooltip-right tooltip-error flex"
                           data-tip="This action will be logged!"
                         >
@@ -179,7 +179,8 @@
                         </button>
                         <div
                           class:tooltip={!asset.queueForSkip &&
-                            !(item.startedPlaying && !asset.active && !asset.afterActive)}
+                            !(item.startedPlaying && !asset.active && !asset.afterActive) &&
+                            $userConfig.tooltips}
                           class="tooltip-left tooltip-error flex"
                           data-tip="This action will be logged!"
                         >
@@ -234,9 +235,12 @@
               style:background-image={`linear-gradient(to right, color-mix(in oklab, oklch(var(--n)) 90%, black) 0%, color-mix(in oklab, oklch(var(--n)) 90%, black) ${item.percentDone}%, oklch(var(--n)) ${item.percentDone}%, oklch(var(--n)) 100%)`}
             >
               {#if $userConfig.uiMode >= 2}
-                <!-- TODO if this isn't the first item, and play is clicked, log that a stopset was skipped (tooltip warn as well) -->
                 <div class="flex items-center">
-                  <div class="tooltip tooltip-right tooltip-error flex" data-tip="This action will be logged!">
+                  <div
+                    class:tooltip={$userConfig.tooltips}
+                    class="tooltip-right tooltip-error flex"
+                    data-tip="This action will be logged!"
+                  >
                     <button
                       class="btn btn-square btn-success btn-lg"
                       disabled={isFirstItem}
