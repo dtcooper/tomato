@@ -18,11 +18,11 @@
 <Modal bind:show canDismiss={!isFromLogin}>
   <svelte:fragment slot="icon">
     {#if !$conn.connected}
-      <Icon icon={lanDisconnect} />
+      <Icon icon={lanDisconnect} class="h-8 w-8 md:h-12 md:w-12" />
     {:else if $progress.syncing}
-      <Icon icon={autorenew} class="animate-[spin_2s_linear_infinite]" />
+      <Icon icon={autorenew} class="h-8 w-8 animate-[spin_2s_linear_infinite] md:h-12 md:w-12" />
     {:else}
-      <Icon icon={lanConnect} />
+      <Icon icon={lanConnect} class="h-8 w-8 md:h-12 md:w-12" />
     {/if}
   </svelte:fragment>
   <svelte:fragment slot="title">{title}</svelte:fragment>

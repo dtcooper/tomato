@@ -58,11 +58,11 @@
 </script>
 
 <Modal bind:show class="max-w-3xl">
-  <svelte:fragment slot="icon"><Icon icon={cogOutline} /></svelte:fragment>
+  <svelte:fragment slot="icon"><Icon icon={cogOutline} class="h-8 w-8 md:h-12 md:w-12" /></svelte:fragment>
   <svelte:fragment slot="title">Settings</svelte:fragment>
   <svelte:fragment slot="close-text">Close settings</svelte:fragment>
   <svelte:fragment slot="content">
-    <div class="grid w-full max-w-full grid-cols-[max-content_auto] items-baseline gap-3">
+    <div class="grid w-full max-w-full grid-cols-[max-content_auto] items-center gap-x-5 gap-y-2">
       <div class="flex justify-end text-lg font-bold">User interface mode:</div>
       {#if $config.UI_MODES.length > 1}
         <div class="tabs-boxed tabs w-max">
@@ -84,6 +84,7 @@
           <em>(Not configurable)</em>
         </div>
       {/if}
+      <hr class="divider col-span-2 m-0 h-0 p-0" />
 
       <div class="flex justify-end text-lg font-bold">Audio output device:</div>
       <div class="flex flex-col items-end">
@@ -113,25 +114,28 @@
           </button>
         </div>
       </div>
+      <hr class="divider col-span-2 m-0 h-0 p-0" />
 
-      <div class="flex items-center justify-end text-lg font-bold">Button box:</div>
+      <div class="flex justify-end text-lg font-bold">Button box:</div>
       <div class="flex w-max items-center justify-center gap-4 text-xl font-bold">
         <span class:text-error={!$userConfig.enableMIDIButtonBox}>OFF</span>
         <input type="checkbox" class="toggle toggle-success toggle-lg" bind:checked={$userConfig.enableMIDIButtonBox} />
         <span class:text-success={$userConfig.enableMIDIButtonBox}>ON</span>
       </div>
+      <hr class="divider col-span-2 m-0 h-0 p-0" />
 
       <!-- svelte-ignore missing-declaration -->
       {#if IS_DEV}
-        <div class="flex items-center justify-end text-lg font-bold">Autoplay (dev only):</div>
+        <div class="flex justify-end text-lg font-bold">Autoplay (dev only):</div>
         <div class="flex w-max items-center justify-center gap-4 text-xl font-bold">
           <span class:text-error={!$userConfig.autoplay}>OFF</span>
           <input type="checkbox" class="toggle toggle-success toggle-lg" bind:checked={$userConfig.autoplay} />
           <span class:text-success={$userConfig.autoplay}>ON</span>
         </div>
+        <hr class="divider col-span-2 m-0 h-0 p-0" />
       {/if}
 
-      <div class="flex items-center justify-end text-lg font-bold">Power save blocker:</div>
+      <div class="flex justify-end text-lg font-bold">Power save blocker:</div>
       <div
         class="tooltip tooltip-bottom tooltip-warning flex w-max items-center justify-center gap-4 text-xl"
         data-tip="When set to ON, Tomato attempts to suppress your display from going to sleep and your system from suspending"
@@ -140,6 +144,7 @@
         <input type="checkbox" class="toggle toggle-success toggle-lg" bind:checked={$userConfig.powerSaveBlocker} />
         <span class="font-bold" class:text-success={$userConfig.powerSaveBlocker}>ON</span>
       </div>
+      <hr class="divider col-span-2 m-0 h-0 p-0" />
 
       <div class="flex justify-end text-lg font-bold">Connection:</div>
       <div class="w-full truncate">
@@ -148,6 +153,7 @@
           {$conn.prettyHost}
         </span>
       </div>
+      <hr class="divider col-span-2 m-0 h-0 p-0" />
 
       <div class="flex justify-end text-lg font-bold">Server settings:</div>
       <div>
@@ -155,19 +161,22 @@
           Click to view settings from server
         </button>
       </div>
+      <hr class="divider col-span-2 m-0 h-0 p-0" />
 
       <div class="flex justify-end text-lg font-bold">Station admin site:</div>
       <a class="link-hover link link-info text-lg" href={$db.host}>Click to open in web browser</a>
+      <hr class="divider col-span-2 m-0 h-0 p-0" />
 
       <div class="flex justify-end text-lg font-bold">Version:</div>
       <!-- svelte-ignore missing-declaration-->
       <div class="text-md w-max">{TOMATO_VERSION} / protocol: {protocolVersion}</div>
-    </div>
+      <hr class="divider col-span-2 m-0 h-0 p-0" />
 
-    <div class="col-span-2">
-      <button type="button" class="btn btn-error btn-sm" on:click|preventDefault={confirmLogout} tabindex="-1">
-        DANGER: Log out of server
-      </button>
+      <div class="col-span-2">
+        <button type="button" class="btn btn-error btn-sm" on:click|preventDefault={confirmLogout} tabindex="-1">
+          DANGER: Log out of server
+        </button>
+      </div>
     </div>
   </svelte:fragment>
 </Modal>
@@ -208,7 +217,7 @@
 </Modal>
 
 <Modal bind:show={showServerSettings} class="w-[64rem] max-w-[calc(100vw-2rem)]">
-  <svelte:fragment slot="icon"><Icon icon={cogOutline} /></svelte:fragment>
+  <svelte:fragment slot="icon"><Icon icon={cogOutline} class="h-8 w-8 md:h-12 md:w-12" /></svelte:fragment>
   <svelte:fragment slot="title">Server Settings</svelte:fragment>
   <svelte:fragment slot="content">
     <div
