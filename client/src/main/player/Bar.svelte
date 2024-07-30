@@ -80,7 +80,7 @@
           style:width={`${(elapsed / duration) * 100}%`}
         />
         <div
-          class="absolute z-20 h-full w-[6px] border-x-[1px] border-base-100 bg-base-content"
+          class="absolute z-20 h-full w-[6px] border-x-[1px] border-base-100 bg-base-content dark:bg-white"
           class:animate-pulse={!playing}
           style:left={`calc(${(elapsed / duration) * 100}% - 2px)`}
         />

@@ -391,8 +391,8 @@ export class GeneratedStopset {
   play(subindex = null) {
     if (this.items.length > 0) {
       this.loadAudio()
-      if (subindex !== null) {
-        this.didSkip = this.didSkip || subindex !== this.current
+      if (subindex !== null && subindex !== this.current) {
+        // Pause items up to subindex
         this.items.slice(this.current, subindex).forEach((item) => {
           log("skipped_asset", item.logLine)
           if (item.playable) {
@@ -405,7 +405,7 @@ export class GeneratedStopset {
       this.items[this.current].play()
       this.updateCallback()
     } else {
-      // Empty for some reason
+      // Empty for some reason (empty stopset?)
       this.done()
     }
   }
