@@ -18,6 +18,12 @@ svg {
   @apply h-16 w-16;
 }
 
+:not(input):not(textarea),
+:not(input):not(textarea)::after,
+:not(input):not(textarea)::before {
+  @apply select-none;
+}
+
 .tomato-pulse {
   animation: tomato-pulse 1.5s infinite;
   --pulse-color: var(--su);

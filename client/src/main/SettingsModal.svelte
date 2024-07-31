@@ -148,8 +148,8 @@
 
       <div class="flex justify-end text-lg font-bold">Connection:</div>
       <div class="w-full truncate">
-        <span class="font-mono text-sm">
-          {$conn.username} <span class="font-bold text-info">@</span>
+        <span class="select-text font-mono text-sm">
+          {$conn.username} <span class="select-text font-bold text-info">@</span>
           {$conn.prettyHost}
         </span>
       </div>
@@ -172,7 +172,7 @@
       <div class="text-md w-max">{TOMATO_VERSION} / protocol: {protocolVersion}</div>
       <hr class="divider col-span-2 m-0 h-0 p-0" />
 
-      <div class="col-span-2">
+      <div class="col-span-2 flex justify-center">
         <button type="button" class="btn btn-error btn-sm" on:click|preventDefault={confirmLogout} tabindex="-1">
           DANGER: Log out of server
         </button>
@@ -225,15 +225,14 @@
     >
       {#each serverSettings as [key, value], i}
         <div class="flex gap-3">
-          <span class="font-bold"><span class="font-mono">{key}</span>:</span>
-          <span class="font-mono" class:text-success={value === true} class:text-error={value === false}>
+          <span class="font-bold"><span class="select-text font-mono">{key}</span>:</span>
+          <span class="select-text font-mono" class:text-success={value === true} class:text-error={value === false}>
             {#if key === "UI_MODES"}
               {value.map((mode) => ["simple", "standard", "advanced"][mode]).join(", ")}
             {:else if key === "UI_MODE_RESET_TIMES"}
               {value.map(([hour, minute]) => dayjs(`${hour}:${minute}`, "H:m").format("h:mma")).join(", ")}
             {:else}
-              {value}
-              {#if value === 0}<span class="text-error">(disabled)</span>{/if}
+              {value}{#if value === 0}<span class="text-error">&nbsp;(disabled)</span>{/if}
             {/if}
           </span>
         </div>

@@ -41,7 +41,7 @@
       </div>
       <slot name="content" />
       {#if canDismiss || $$slots["extra-buttons"]}
-        <div class="mt-3 w-full space-x-2 text-right">
+        <div class="mt-3 flex w-full justify-end gap-x-2">
           <slot name="extra-buttons" />
           {#if canDismiss}
             <button type="button" class="btn btn-info" on:click|preventDefault={close}>
