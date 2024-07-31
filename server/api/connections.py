@@ -51,7 +51,7 @@ class UserConnections(ConnectionsBase):
 
     async def process_log(self, connection: Connection, data):
         uuid = data.pop("id")
-        if connection.user.enable_client_logs:
+        if connection.user.enable_client_logs or data["type"] == "internal_error":
             data.update({
                 "created_by": connection.user,
                 "ip_address": connection.addr,
@@ -60,10 +60,10 @@ class UserConnections(ConnectionsBase):
             if data["type"] not in CLIENT_LOG_ENTRY_TYPES:
                 data["type"] = "unspecified"
             _, created = await ClientLogEntry.objects.aupdate_or_create(id=uuid, defaults=data)
-            logger.info(f"Acknowledged log {uuid} for {connection.user}, {created=}")
+            logger.info(f"Acknowledged {data['type']} log {uuid} for {connection.user}, {created=}")
             response = {"success": True, "id": uuid, "updated_existing": not created, "ignored": False}
         else:
-            logger.info(f"Ignored log {uuid} for {connection.user}")
+            logger.info(f"Ignored {data['type']} log {uuid} for {connection.user}")
             response = {"success": True, "id": uuid, "updated_existing": False, "ignored": True}
         return (OutgoingUserMessageTypes.ACKNOWLEDGE_LOG, response)
 

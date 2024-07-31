@@ -3,7 +3,7 @@ import { get } from "svelte/store"
 import { v4 as uuid } from "uuid"
 
 import { client_log_entry_types } from "../../../server/constants.json"
-import { IS_DEV } from "../utils"
+import { IS_DEV, debounceFunc } from "../utils"
 import { conn, messageServer } from "./connection"
 
 let pendingLogs = new Map()
@@ -50,14 +50,17 @@ export const acknowledgeLog = (id) => {
 
 setInterval(() => sendPendingLogs(), IS_DEV ? 2500 : 30000) // Run every 30 seconds
 
-// Rudimentary handling of uncaught exceptions / promise rejections (debounced)
-let errorDebounce
-window.addEventListener("error", (event) => {
-  clearTimeout(errorDebounce)
-  errorDebounce = setTimeout(() => log("internal_error", `Error: ${event.error}`), 2500)
-})
+const logErrorDebounced = debounceFunc((s) => log("internal_error", s), 5, 5000) // Don't log more than 5 times in 5 seconds
 
-window.addEventListener("unhandledrejection", (event) => {
-  clearTimeout(errorDebounce)
-  errorDebounce = setTimeout(() => log("internal_error", `Unhandled rejection: ${event.error}`), 2500)
-})
+// Rudimentary handling of uncaught exceptions / promise rejections (debounced)
+window.addEventListener("error", (event) => logErrorDebounced(`Error: ${event.error}`))
+window.addEventListener("unhandledrejection", (event) =>
+  logErrorDebounced(`Unhandled rejection ${event.type}: ${event.reason}`)
+)
+
+window.testErrorReporting = () => {
+  setTimeout(() => {
+    throw new Error("Test regular error!")
+  }, 10)
+  setTimeout(async () => await new Promise((resolve, reject) => reject("Test rejection error!")), 10)
+}

@@ -137,6 +137,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
       pill) and back-end (sortable)... will require change to `END_DATE_PRIORITY_WEIGHT_MULTIPLIER`
     - [x] Added day-of-event pill
 - [x] ~~Stop playing at end of current asset. (Stop playing in 3s with fadeout as well?)~~ (Covered by skip)
+- [ ] Clickable playbar that seeks?
 
 Other things
 - [ ] Ability to do speech synthesis / pull asset from API? / weather
