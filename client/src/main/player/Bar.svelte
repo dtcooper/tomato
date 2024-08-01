@@ -17,9 +17,14 @@
 </script>
 
 <div class="flex justify-center">
-  <div class="truncate font-mono text-2xl font-bold">
+  <div
+    class="truncate font-mono text-2xl font-bold"
+    class:animate-pulse={item.overdue}
+    style="--pulse-color: var(--er)"
+  >
     {#if $singlePlay.isPlaying}
-      {prettyDuration($singlePlay.remaining)} remaining in <span class="italic">{$singlePlay.asset.name}</span>
+      {prettyDuration($singlePlay.remaining)} remaining in
+      <span class="select-text italic">{$singlePlay.asset.name}</span>
     {:else if item.type === "wait" && item.overtime}
       {#if item.overdue}
         <span class="italic text-error">

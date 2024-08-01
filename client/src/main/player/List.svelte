@@ -3,6 +3,7 @@
   import pauseIcon from "@iconify/icons-mdi/pause"
   import skipIcon from "@iconify/icons-mdi/skip-next"
   import reloadIcon from "@iconify/icons-mdi/reload"
+  import reloadAlertIcon from "@iconify/icons-mdi/reload-alert"
 
   import Icon from "../../components/Icon.svelte"
 
@@ -16,7 +17,8 @@
   export let processItem
   export let pause
   export let skip
-  export let regenerateStopsetItem
+  export let regenerateStopsetAsset
+  export let showSwapUI
 
   export let numStopsetsToDisableAddMoreAt
 
@@ -122,7 +124,7 @@
                   <div class="flex w-0 flex-1 flex-col">
                     <div class="font-sm truncate">
                       <span
-                        class="badge border-secondary-content font-medium"
+                        class="badge select-text border-secondary-content font-medium"
                         style:background-color={asset.color.value}
                         style:color={asset.color.content}
                       >
@@ -133,6 +135,9 @@
                           Alt #{asset.alternateNumber}
                         </span>
                       {/if}
+                      {#if asset.isSwapped}
+                        <span class="badge badge-warning border-secondary-content"> Swapped </span>
+                      {/if}
                       {#if asset.hasEndDateMultiplier}
                         <span class="badge badge-success border-secondary-content italic"> Ends today!</span>
                       {/if}
@@ -142,7 +147,7 @@
                         {#if asset.error}
                           <span class="font-bold">Error loading:</span>
                         {/if}
-                        {asset.name}
+                        <span class="select-text">{asset.name}</span>
                       {:else}
                         <span class="text-medium text-base italic">
                           {#if asset.rotator.enabled}
@@ -162,44 +167,58 @@
                         {:else}
                           Length:
                         {/if}
-                        {prettyDuration(asset.duration)}
+                        <span class="select-text">{prettyDuration(asset.duration)}</span>
                       </div>
                       {#if $userConfig.uiMode >= 2}
+                        {@const canRegenerateOrSwap = !(
+                          asset.queueForSkip ||
+                          (asset.active && asset.playing) ||
+                          (isFirstItem && !asset.afterActive)
+                        )}
                         <button
                           class="btn btn-info btn-xs gap-0.5 pl-0.5 pr-1.5"
-                          disabled={asset.queueForSkip ||
-                            (asset.active && asset.playing) ||
-                            (isFirstItem && !asset.afterActive)}
-                          on:click={() => regenerateStopsetItem(index, subindex)}
+                          disabled={!canRegenerateOrSwap}
+                          on:click={() => regenerateStopsetAsset(index, subindex)}
                           tabindex="-1"
                         >
                           <Icon icon={reloadIcon} class="h-4 w-4" />
                           Regenerate
                         </button>
-                        <div
-                          class:tooltip={!asset.queueForSkip &&
-                            !(item.startedPlaying && !asset.active && !asset.afterActive) &&
-                            $userConfig.tooltips}
-                          class="tooltip-left tooltip-error flex"
-                          data-tip="This action will be logged!"
-                        >
+
+                        <div class="flex gap-1">
                           <button
+                            disabled={!canRegenerateOrSwap}
+                            class="btn btn-warning btn-xs gap-0.5 pl-0.5 pr-1.5"
                             tabindex="-1"
-                            class="btn btn-xs {asset.queueForSkip
-                              ? 'btn-neutral'
-                              : 'btn-warning'} gap-0.5 pl-0.5 pr-1.5"
-                            disabled={item.startedPlaying && !asset.active && !asset.afterActive}
-                            on:click={() => {
-                              if (item.startedPlaying && asset.active) {
-                                skip() // Skip as usual if item is active
-                              } else {
-                                asset.queueForSkip = !asset.queueForSkip
-                              }
-                            }}
-                            ><Icon icon={asset.queueForSkip ? playIcon : skipIcon} class="h-4 w-4" />{asset.queueForSkip
-                              ? "Queue"
-                              : "Skip"}</button
+                            on:click={() => showSwapUI(index, subindex)}
+                            ><Icon icon={reloadAlertIcon} class="h-4 w-4" />Swap</button
                           >
+                          <div
+                            class:tooltip={!asset.queueForSkip &&
+                              !(item.startedPlaying && !asset.active && !asset.afterActive) &&
+                              $userConfig.tooltips}
+                            class="tooltip-left tooltip-error flex"
+                            data-tip="This action will be logged!"
+                          >
+                            <button
+                              class="btn btn-xs {asset.queueForSkip
+                                ? 'btn-neutral'
+                                : 'btn-error'} gap-0.5 pl-0.5 pr-1.5"
+                              disabled={item.startedPlaying && !asset.active && !asset.afterActive}
+                              tabindex="-1"
+                              on:click={() => {
+                                if (item.startedPlaying && asset.active) {
+                                  skip() // Skip as usual if item is active
+                                } else {
+                                  asset.queueForSkip = !asset.queueForSkip
+                                }
+                              }}
+                              ><Icon
+                                icon={asset.queueForSkip ? playIcon : skipIcon}
+                                class="h-4 w-4"
+                              />{asset.queueForSkip ? "Queue" : "Skip"}</button
+                            >
+                          </div>
                         </div>
                       {/if}
                     </div>
@@ -268,9 +287,7 @@
                       : " more..."}{/if}
                 </div>
                 {#if item.overtime}
-                  <div class="animate-pulse" class:text-success={!item.overdue} class:text-error={item.overdue}>
-                    Play next stop set now!
-                  </div>
+                  <div class={item.overdue ? "text-error" : "text-success"}>Play next stop set now!</div>
                 {/if}
               </div>
               <div class="flex flex-col items-end self-stretch">
@@ -283,7 +300,13 @@
                   {prettyDuration(item.duration)}
                 </div>
                 {#if item.overtime}
-                  <div class="animate-pulse font-bold text-error">{prettyDuration(item.overtimeElapsed)} overdue</div>
+                  <div
+                    class:animate-pulse={item.overdue}
+                    class="font-mono font-bold text-error"
+                    style="--pulse-color: var(--er)"
+                  >
+                    {prettyDuration(item.overtimeElapsed)} overdue
+                  </div>
                 {/if}
               </div>
             </div>

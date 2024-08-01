@@ -1,10 +1,10 @@
 <script>
-  import Icon from "../components/Icon.svelte"
-  import Modal from "../components/Modal.svelte"
+  import Icon from "../../components/Icon.svelte"
+  import Modal from "../../components/Modal.svelte"
 
-  import { db, syncProgress as progress } from "../stores/db"
-  import { conn, logout } from "../stores/connection"
-  import { prettyDatetime } from "../utils"
+  import { db, syncProgress as progress } from "../../stores/db"
+  import { conn, logout } from "../../stores/connection"
+  import { prettyDatetime } from "../../utils"
 
   import autorenew from "@iconify/icons-mdi/autorenew"
   import lanConnect from "@iconify/icons-mdi/lan-connect"

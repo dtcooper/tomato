@@ -1,5 +1,4 @@
 <script>
-  import { trapFocus } from "trap-focus-svelte"
   import { blockSpacebarPlay } from "../stores/player"
 
   export let canDismiss = true
@@ -14,13 +13,7 @@
 </script>
 
 {#if show}
-  <dialog
-    class="modal bg-black bg-opacity-50 !outline-0"
-    tabindex="-1"
-    open
-    use:trapFocus
-    on:submit|preventDefault={() => false}
-  >
+  <dialog class="modal bg-black bg-opacity-50 !outline-0" tabindex="-1" open on:submit|preventDefault={() => false}>
     <form
       method="dialog"
       class={`${
@@ -30,7 +23,7 @@
       {#if canDismiss}
         <button
           type="button"
-          class="btn btn-circle btn-ghost btn-sm absolute right-2 top-2 text-2xl"
+          class="btn btn-circle btn-ghost btn-sm absolute right-2 top-2 z-50 text-2xl"
           tabindex="-1"
           on:click|preventDefault={close}>✕</button
         >

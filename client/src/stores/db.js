@@ -70,6 +70,14 @@ class AssetStopsetHydratableObject extends HydratableObject {
     this.begin = begin && dayjs(begin)
     this.end = end && dayjs(end)
   }
+
+  isAiring(dt = null) {
+    if (!dt) {
+      dt = dayjs()
+    }
+    return this.enabled && (!this.begin || this.begin.isSameOrBefore(dt)) && (!this.end || this.end.isSameOrAfter(dt))
+  }
+
   get rotators() {
     return this._rotators.map((id) => this._db.rotators.get(id))
   }
@@ -179,7 +187,7 @@ const filterItemsByActive = (obj, dt = null) => {
     dt = dayjs()
   }
 
-  return obj.filter((o) => o.enabled && (!o.begin || o.begin.isSameOrBefore(dt)) && (!o.end || o.end.isSameOrAfter(dt)))
+  return obj.filter((o) => o.isAiring(dt))
 }
 
 class Rotator extends HydratableObject {

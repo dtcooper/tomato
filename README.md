@@ -136,8 +136,10 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [ ] Make weights for previous 24 hours... AND reflect that in front-end (day-of
       pill) and back-end (sortable)... will require change to `END_DATE_PRIORITY_WEIGHT_MULTIPLIER`
     - [x] Added day-of-event pill
+- [x] Rudimentary stopset editor, in the form of "skip/queue", regenerate asset, and swap asset
+  - [ ] Ability to "audition" assets on a second audio output?
 - [x] ~~Stop playing at end of current asset. (Stop playing in 3s with fadeout as well?)~~ (Covered by skip)
-- [ ] Clickable playbar that seeks?
+
 
 Other things
 - [ ] Ability to do speech synthesis / pull asset from API? / weather
@@ -158,6 +160,7 @@ Other things
 - [x] Button to play an asset from a specific rotator
   - [x] Backend done as `SINGLE_PLAY_ROTATORS`
 - [ ] Cursor can be a fun thing?
+- [ ] Clickable playbar that seeks?
 
 ## License
 

@@ -79,7 +79,7 @@
     class="btn btn-success btn-lg pl-3 font-mono italic"
     disabled={!items.some((item) => item.type === "stopset") || (firstItem.type === "stopset" && firstItem.playing)}
     on:click={play}
-    class:tomato-pulse={(firstItem.type === "wait" && firstItem.overtime) ||
+    class:animate-pulse={(firstItem.type === "wait" && firstItem.overtime) ||
       (firstItem.type === "stopset" && !firstItem.playing)}
     tabindex="-1"
   >
@@ -122,10 +122,10 @@
             <Icon icon={skipForwardOutlineIcon} class="h-6 w-6" /> Skip current
           </button>
         </div>
-        <button class="btn btn-warning btn-sm pl-1.5" on:click={regenerateNextStopset} tabindex="-1">
+        <button class="btn btn-info btn-sm pl-1.5" on:click={regenerateNextStopset} tabindex="-1">
           <Icon icon={reloadIcon} class="h-6 w-6" /> Regenerate next
         </button>
-        <button class="btn btn-info btn-sm pl-1.5" on:click={reloadPlaylist} tabindex="-1">
+        <button class="btn btn-warning btn-sm pl-1.5" on:click={reloadPlaylist} tabindex="-1">
           <Icon icon={reloadAlertIcon} class="h-6 w-6" /> Reload playlist
         </button>
       </div>

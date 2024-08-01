@@ -43,7 +43,7 @@ limiter.connect(audioContext.destination)
 const assetAlternateTracker = new Map()
 
 class GeneratedStopsetAssetBase {
-  constructor(rotator, generatedStopset, index, hasEndDateMultiplier) {
+  constructor(rotator, generatedStopset, index, hasEndDateMultiplier, isSwapped = false) {
     this.rotator = rotator
     this.generatedStopset = generatedStopset
     this.index = index
@@ -51,6 +51,7 @@ class GeneratedStopsetAssetBase {
     this.error = false
     this.playing = false
     this.alternateNumber = 0
+    this.isSwapped = isSwapped
   }
 
   updateCallback() {
@@ -201,7 +202,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   }
 
   _errorHelper(e) {
-    console.error("audio error:", e)
+    console.error("audio error:", e, this.name)
     this.error = true
     if (!this.didLogError) {
       this.didLogError = true
@@ -226,7 +227,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
         this.done()
       } else {
         this.playing = true
-        this.audio.play().catch((e) => this._errorHelper(e))
+        this.audio.play()
         clearInterval(this.interval)
         this.interval = setInterval(() => {
           if (this.audio && !this.error) {
@@ -282,7 +283,7 @@ export class GeneratedStopset {
     this.updateCallback = updateCallback || noop // UI update function
     this.doneCallback = doneCallback || noop
     this.items = rotatorsAndAssets.map(({ rotator, asset, hasEndDateMultiplier }, index) => {
-      const args = [rotator, this, index, hasEndDateMultiplier]
+      const args = [rotator, this, index, hasEndDateMultiplier, false]
       return asset ? new PlayableAsset(asset, ...args) : new NonPlayableAsset(...args)
     })
     this.current = 0
@@ -292,6 +293,7 @@ export class GeneratedStopset {
     this.startedPlaying = false
     this.didSkip = false
     this.didLog = false
+    this.destroyed = false
   }
 
   get duration() {
@@ -312,7 +314,7 @@ export class GeneratedStopset {
     return this.items.filter((item) => item.playable)
   }
 
-  regenerateItem(index, startTime, mediumIgnoreIds, endDateMultiplier) {
+  regenerateAsset(index, startTime, mediumIgnoreIds, endDateMultiplier) {
     if (this.items.length > index) {
       // Item will already be included in medium ignore IDs
       // Hard ignore IDs should be everything in current stopset (less item)
@@ -331,7 +333,7 @@ export class GeneratedStopset {
         startTime,
         endDateMultiplier
       )
-      const args = [rotator, this, index, hasEndDateMultiplier]
+      const args = [rotator, this, index, hasEndDateMultiplier, true]
       const newItem = asset ? new PlayableAsset(asset, ...args) : new NonPlayableAsset(...args)
 
       oldItem.unloadAudio() // Don't forget to unload its audio before we nuke it
@@ -344,6 +346,15 @@ export class GeneratedStopset {
     } else {
       console.warn(`Invalid subindex ${index} in stopset. Won't regenerate item.`)
     }
+  }
+
+  swapAsset(index, asset, rotator) {
+    const oldItem = this.items[index]
+    const newItem = new PlayableAsset(asset, rotator, this, index, false, true)
+    oldItem.unloadAudio() // Don't forget to unload its audio before we nuke it
+    newItem.loadAudio() // If stopset was already loaded, load audio for swapped in item
+    this.items[index] = newItem
+    this.updateCallback()
   }
 
   skip() {
@@ -378,6 +389,7 @@ export class GeneratedStopset {
 
   done(skipCallback = false, skipLog = false, forceDidSkip = false) {
     this.playing = false
+    this.destroyed = true
     this.unloadAudio()
     if (!skipCallback) {
       this.doneCallback()

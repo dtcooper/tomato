@@ -2,24 +2,24 @@
   import { tick } from "svelte"
   import dayjs from "dayjs"
 
-  import Icon from "../components/Icon.svelte"
-  import Modal from "../components/Modal.svelte"
+  import Icon from "../../components/Icon.svelte"
+  import Modal from "../../components/Modal.svelte"
 
   import cogOutline from "@iconify/icons-mdi/cog-outline"
 
-  import { IS_DEV } from "../utils"
-  import { db } from "../stores/db"
-  import { settings_descriptions } from "../../../server/constants.json"
-  import { logout, protocolVersion, conn } from "../stores/connection"
-  import { playStatus, speaker, setSpeaker } from "../stores/player"
-  import { config, userConfig, uiModeInfo } from "../stores/config"
+  import { IS_DEV } from "../../utils"
+  import { db } from "../../stores/db"
+  import { settings_descriptions } from "../../../../server/constants.json"
+  import { logout, protocolVersion, conn } from "../../stores/connection"
+  import { playStatus, speaker, setSpeaker } from "../../stores/player"
+  import { config, userConfig, uiModeInfo } from "../../stores/config"
 
   // TODO: host error seems to show when logging, in particular if you press logout when disconnected
 
   export let show = true
   let showLogout = false
   let showServerSettings = false
-  let logoutStationName
+  let logoutStationName = ""
   let showLogoutError
 
   $: serverSettings = Object.entries($config).sort()
@@ -39,6 +39,8 @@
     await tick()
     el.focus()
   }
+
+  $: canLogOut = logoutStationName.trim().toLowerCase() === $config.STATION_NAME.trim().toLowerCase()
 
   const verifyLogout = () => {
     const stationName = logoutStationName.trim().toLowerCase()
@@ -164,7 +166,7 @@
       <hr class="divider col-span-2 m-0 h-0 p-0" />
 
       <div class="flex justify-end text-lg font-bold">Station admin site:</div>
-      <a class="link-hover link link-info text-lg" href={$db.host}>Click to open in web browser</a>
+      <div><a class="link-hover link link-info text-lg" href={$db.host}>Click to open in web browser</a></div>
       <hr class="divider col-span-2 m-0 h-0 p-0" />
 
       <div class="flex justify-end text-lg font-bold">Version:</div>
@@ -192,7 +194,7 @@
     </p>
     <p>If you are, please enter the name of the station exactly as it appears here:</p>
     <p class="my-2 ml-8">
-      <span class="bg-base-content p-2 font-mono text-base-100">{$config.STATION_NAME}</span>
+      <span class="select-text bg-base-content p-2 font-mono text-base-100">{$config.STATION_NAME}</span>
     </p>
     <p class="mb-5">...and then press the logout button below.</p>
     {#if showLogoutError}
@@ -210,8 +212,8 @@
     />
   </div>
   <svelte:fragment slot="extra-buttons">
-    <div class:tooltip={$userConfig.tooltips} class="tooltip-error" data-tip="Are you SURE that you're SURE?!">
-      <button type="button" class="btn btn-error" on:click={verifyLogout}>Log out</button>
+    <div class:tooltip={canLogOut} class="tooltip-error" data-tip="Are you SURE that you're SURE?!">
+      <button disabled={!canLogOut} type="button" class="btn btn-error" on:click={() => logout()}>Log out</button>
     </div>
   </svelte:fragment>
 </Modal>

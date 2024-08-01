@@ -11,7 +11,7 @@
   import { tomatoIcon, IS_DEV, urlParams } from "./utils"
 
   import Icon from "./components/Icon.svelte"
-  import SyncModal from "./main/SyncModal.svelte"
+  import SyncModal from "./main/modals/Sync.svelte"
 
   let showPassword = IS_DEV
   let demoMode = false
@@ -167,13 +167,15 @@
         >
       </div>
       <div class="text-center text-xs">
-        <a class="link-hover link link-secondary" href="https://dtcooper.github.io/tomato/">Tomato Radio Automation</a>,
+        <a class="link-hover link link-secondary" href="https://dtcooper.github.io/tomato/" tabindex="-1"
+          >Tomato Radio Automation</a
+        >,
         <!-- svelte-ignore missing-declaration-->
         version: {TOMATO_VERSION} / protocol: {protocolVersion}
         <br />
         Copyright &copy; 2019-{dayjs().year()}
-        <a class="link-hover link link-secondary" href="https://jew.pizza/">David Cooper</a>
-        &amp; <a class="link-hover link link-secondary" href="https://bmir.org">BMIR</a>.<br />
+        <a class="link-hover link link-secondary" href="https://jew.pizza/" tabindex="-1">David Cooper</a>
+        &amp; <a class="link-hover link link-secondary" href="https://bmir.org" tabindex="-1">BMIR</a>.<br />
         All rights reserved.
       </div>
     </form>

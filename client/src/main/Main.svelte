@@ -1,10 +1,11 @@
 <script>
   import { singlePlayRotators } from "../stores/single-play-rotators"
 
-  import SyncModal from "./SyncModal.svelte"
-  import SettingsModal from "./SettingsModal.svelte"
+  import SyncModal from "./modals/Sync.svelte"
+  import SettingsModal from "./modals/Settings.svelte"
   import Player from "./Player.svelte"
   import Header from "./Header.svelte"
+  import Alerts from "./Alerts.svelte"
 
   let showSettingsModal = false
   let showSyncModal = false
@@ -13,6 +14,8 @@
 
 <SyncModal bind:show={showSyncModal} isFromLogin={false} />
 <SettingsModal bind:show={showSettingsModal} />
+
+<Alerts />
 
 <div class="max-w-screen flex h-screen max-h-screen w-screen flex-col" class:tomato-flash-bg={overdue}>
   <Header bind:showSyncModal bind:showSettingsModal />

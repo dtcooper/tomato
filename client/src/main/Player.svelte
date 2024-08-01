@@ -1,10 +1,14 @@
 <script>
   import dayjs from "dayjs"
   import { tick } from "svelte"
+  import Icon from "../components/Icon.svelte"
   import PlayBar from "./player/Bar.svelte"
   import PlayButtons from "./player/Buttons.svelte"
   import PlayList from "./player/List.svelte"
   import SinglePlayRotators from "./player/SinglePlayRotators.svelte"
+  import AssetPicker from "./modals/AssetPicker.svelte"
+
+  import reloadAlertIcon from "@iconify/icons-mdi/reload-alert"
 
   import { IS_DEV } from "../utils"
   import { reloadPlaylistCallback } from "../stores/connection"
@@ -14,6 +18,7 @@
   import { log } from "../stores/client-logs"
   import { Wait } from "../stores/player"
   import { setLED, LED_OFF } from "../stores/midi"
+  import { alert } from "../stores/alerts"
 
   // Object automatically updates on change
   let items = []
@@ -160,7 +165,7 @@
     }
   }
 
-  const regenerateStopsetItem = (index, subindex) => {
+  const regenerateStopsetAsset = (index, subindex) => {
     if (index > items.length) {
       console.warn(`Index ${index} out of band while regenerating item`)
       return
@@ -170,7 +175,7 @@
     if (stopset.type === "stopset") {
       const secondsUntilPlay = items.slice(0, index).reduce((s, item) => s + item.remaining, 0)
       const likelyPlayTime = dayjs().add(secondsUntilPlay, "seconds")
-      stopset.regenerateItem(subindex, likelyPlayTime, mediumIgnoreIds, $config.END_DATE_PRIORITY_WEIGHT_MULTIPLIER)
+      stopset.regenerateAsset(subindex, likelyPlayTime, mediumIgnoreIds, $config.END_DATE_PRIORITY_WEIGHT_MULTIPLIER)
     } else {
       console.warn(`Item at index ${index} is not a stopset. Can't regenerate!`)
     }
@@ -180,6 +185,40 @@
   const skipCurrentStopset = () => {
     items[0].didSkip = true
     processItem()
+  }
+
+  let swap = null
+
+  export const showSwapUI = (index, subindex) => {
+    if (index > items.length) {
+      console.warn(`Index ${index}:${subindex} out of band while showing swap UI`)
+      swap = null
+      return
+    }
+
+    const stopset = items[index]
+    if (stopset.type === "stopset" && subindex < stopset.items.length) {
+      const asset = stopset.items[subindex]
+      swap = { stopset, asset, subindex }
+    } else {
+      console.warn(`Item at index ${index}:${subindex} is not a stopset/asset. Won't show swap UI`)
+      swap = null
+    }
+  }
+
+  const doAssetSwap = (stopset, subindex, asset, swapAsset) => {
+    if (stopset.destroyed) {
+      alert(`Stop set ${stopset.name} no longer active in the playlist. Can't perform swap!`, "warning")
+    } else if (stopset.startedPlaying && stopset.current >= subindex) {
+      alert(
+        `Asset in stop set ${stopset.name}'s index ${subindex + 1} has already been played. Can't perform swap!`,
+        "warning"
+      )
+    } else {
+      stopset.swapAsset(subindex, asset, swapAsset.rotator)
+      updateUI()
+    }
+    swap = null
   }
 
   const processItem = async (index = 1, play = false, subindex = null) => {
@@ -289,12 +328,46 @@
   {/if}
 </div>
 
+{#if swap}
+  {@const { stopset, asset: swapAsset, subindex } = swap}
+  <AssetPicker rotator={swapAsset.rotator} show={true} close={() => (swap = null)}>
+    <svelte:fragment slot="action-name">Swap</svelte:fragment>
+    <svelte:fragment slot="title">Swap asset in stop set</svelte:fragment>
+    <p class="truncate text-wrap" slot="description">
+      Choose an asset from rotator
+      <span
+        class="badge select-text border-secondary-content font-medium"
+        style:background-color={swapAsset.rotator.color.value}
+        style:color={swapAsset.rotator.color.content}>{swapAsset.rotator.name}</span
+      >
+      to swap asset <span class="select-text truncate font-mono">{swapAsset.name}</span> in stop set
+      <span class="select-text">{stopset.name}</span>
+      (index {subindex + 1}/{stopset.items.length}).
+    </p>
+
+    <button
+      class="btn btn-warning"
+      tabindex="-1"
+      disabled={false}
+      slot="action"
+      let:asset
+      on:click={() => {
+        doAssetSwap(stopset, subindex, asset, swapAsset)
+        swap = null
+      }}
+    >
+      <Icon icon={reloadAlertIcon} class="h-12 w-12" /> Swap
+    </button>
+  </AssetPicker>
+{/if}
+
 <PlayList
   {items}
   numStopsetsToDisableAddMoreAt={$config.STOPSET_PRELOAD_COUNT + numExtraStopsetsToDisableAddMoreAt}
   {addStopset}
   {processItem}
-  {regenerateStopsetItem}
+  {regenerateStopsetAsset}
+  {showSwapUI}
   {pause}
   {skip}
 />

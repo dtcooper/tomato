@@ -24,13 +24,18 @@ svg {
   @apply select-none;
 }
 
-.tomato-pulse {
-  animation: tomato-pulse 1.5s infinite;
+.animate-pulse {
+  animation: animate-pulse 1.5s infinite;
   --pulse-color: var(--su);
   --pulse-size: 15px;
 }
 
-@keyframes tomato-pulse {
+/* Fix for https://github.com/saadeghi/daisyui/issues/3040 */
+:root:has(:is(.modal-open, .modal:target, .modal-toggle:checked + .modal, .modal[open])) {
+  scrollbar-gutter: unset;
+}
+
+@keyframes animate-pulse {
   0% {
     box-shadow: 0 0 0 0 oklch(var(--pulse-color) / 0.85);
   }
