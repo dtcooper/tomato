@@ -37,6 +37,7 @@ class ServerMessages(MessagesBase):
 
         if password_change:
             await disconnect(reason="password change")
+
         else:
             try:
                 user = await User.objects.aget(id=user_id)
@@ -73,12 +74,12 @@ class ServerMessages(MessagesBase):
         logger.info("Forcing broadcast of data message")
         await self.process_db_changes(message, force_broadcast=True)
 
-    async def process_reload_playlist(self, message):
+    async def process_reload_playlist(self, message, notify=False):
         user_id = message.get("user_id") if message else None
         if user_id is None:
-            await users.broadcast(OutgoingUserMessageTypes.RELOAD_PLAYLIST)
+            await users.broadcast(OutgoingUserMessageTypes.RELOAD_PLAYLIST, {"notify": notify})
         else:
-            await users.message(user_id, OutgoingUserMessageTypes.RELOAD_PLAYLIST)
+            await users.message(user_id, OutgoingUserMessageTypes.RELOAD_PLAYLIST, {"notify": notify})
 
     @task
     async def consume_db_notifications_debouncer(self):

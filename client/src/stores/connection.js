@@ -4,6 +4,7 @@ import { persisted } from "svelte-local-storage-store"
 import { noop } from "svelte/internal"
 import { derived, get, writable } from "svelte/store"
 import { protocol_version } from "../../../server/constants.json"
+import { alert } from "./alerts"
 import { acknowledgeLog, log, sendPendingLogs } from "./client-logs"
 import { resetUserConfig, setServerConfig } from "./config"
 import { clearAssetsDB, clearAssetState, syncAssetsDB } from "./db"
@@ -102,8 +103,11 @@ const handleMessages = {
       acknowledgeLog(id)
     }
   },
-  "reload-playlist": () => {
-    console.log("Backend requested a playlist reload")
+  "reload-playlist": (data) => {
+    const { notify } = data
+    if (notify) {
+      alert("An administrator forced a playlist refresh!", "info", 4000)
+    }
     get(reloadPlaylistCallback)()
   }
 }

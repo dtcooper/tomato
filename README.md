@@ -139,6 +139,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [x] Rudimentary stopset editor, in the form of "skip/queue", regenerate asset, and swap asset
   - [ ] Ability to "audition" assets on a second audio output?
 - [x] ~~Stop playing at end of current asset. (Stop playing in 3s with fadeout as well?)~~ (Covered by skip)
+- [ ] A way to send a custom text notification to all connected clients from backend UI
 
 
 Other things
