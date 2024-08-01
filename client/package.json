@@ -48,7 +48,7 @@
     "daisyui": "^4.12.10",
     "dayjs": "^1.11.12",
     "download": "^8.0.0",
-    "electron": "^31.3.0",
+    "electron": "^31.3.1",
     "electron-forge-maker-appimage": "github:duzda/electron-forge-maker-appimage",
     "electron-squirrel-startup": "^1.0.1",
     "electron-window-state": "^5.0.3",
