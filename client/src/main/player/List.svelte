@@ -31,7 +31,7 @@
   class:col-span-2={!$singlePlayRotators.enabled}
 >
   {#if $singlePlayRotators.enabled}
-    <div class="divider m-0 mb-2 font-mono text-sm italic text-primary">Playlist</div>
+    <div class="divider m-0 mb-2 font-mono text-sm italic">Playlist</div>
   {/if}
   <div class="flex flex-1 flex-col gap-2 overflow-y-auto" id="playlist">
     {#each items as item, index (item.generatedId)}

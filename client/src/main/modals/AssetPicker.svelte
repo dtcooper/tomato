@@ -33,23 +33,30 @@
         <div class="sticky top-0 bg-base-100 p-2 font-bold">Alternates?</div>
 
         {#each assets as asset, i}
-          <div class="border-content-base mb-1 flex items-center border-b-2 px-2 pb-1">
+          {@const oddRow = i % 2 == 1}
+          <div class:bg-base-200={oddRow} class="flex items-center border-b border-base-content p-1.5">
             <slot name="action" {asset} />
           </div>
-          <div class="border-content-base mb-1 flex items-center justify-end border-b-2 px-2 pb-1 font-mono font-bold">
+          <div
+            class:bg-base-200={oddRow}
+            class="flex items-center justify-end border-b border-base-content p-1.5 font-mono font-bold"
+          >
             {prettyDuration(asset.duration)}
           </div>
-          <div class="border-content-base mb-1 flex select-text items-center overflow-x-hidden border-b-2 px-2 pb-1">
+          <div
+            class:bg-base-200={oddRow}
+            class="flex select-text items-center overflow-x-hidden border-b border-base-content p-1.5"
+          >
             <span class="select-text truncate">{asset.name}</span>
           </div>
-          <div class="border-content-base mb-1 flex items-center border-b-2 px-2 pb-1">
+          <div class:bg-base-200={oddRow} class="flex items-center border-b border-base-content p-1.5">
             {#if asset.isAiring()}
               <span class="badge badge-success">Airing</span>
             {:else}
               <span class="badge badge-error">Not airing</span>
             {/if}
           </div>
-          <div class="border-content-base mb-1 flex items-center border-b-2 px-2 pb-1">
+          <div class:bg-base-200={oddRow} class="flex items-center border-b border-base-content p-1.5">
             {#if asset.alternates.length > 0}
               <span class="badge badge-info">{asset.alternates.length} alternates</span>
             {:else}

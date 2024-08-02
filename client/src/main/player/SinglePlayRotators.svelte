@@ -55,7 +55,7 @@
 </AssetPicker>
 
 <div class="flex h-0 min-h-full w-full flex-col rounded-lg border-base-content bg-base-200 p-1.5 pt-2">
-  <div class="divider m-0 mb-2 w-full font-mono text-sm italic text-primary">Play single asset from&hellip;</div>
+  <div class="divider m-0 mb-2 w-full font-mono text-sm italic">Play single asset from&hellip;</div>
   <div class="flex flex-1 flex-col gap-1 overflow-y-auto px-2">
     {#each $singlePlayRotators.rotators as rotator}
       {@const disabled =

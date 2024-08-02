@@ -54,7 +54,7 @@
             on:click={() => ($userConfig.tooltips = !$userConfig.tooltips)}
             tabindex="-1"
           >
-            <Icon icon={$userConfig.tooltips ? tooltipRemoveOutline : tooltipCheckOutline} class="h-8 w-8" />
+            <Icon icon={$userConfig.tooltips ? tooltipCheckOutline : tooltipRemoveOutline} class="h-8 w-8" />
           </button>
         </div>
       {/if}
