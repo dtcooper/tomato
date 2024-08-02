@@ -38,20 +38,21 @@
       style:color={modalRotator.color.content}>{modalRotator.name}</span
     > below.
   </p>
-  <button
-    class="btn btn-square btn-success"
-    tabindex="-1"
-    disabled={playDisabled}
-    slot="action"
-    let:asset
-    on:click={() => {
-      play(asset, modalRotator)
-      modalRotator = null
-      showModal = false
-    }}
-  >
-    <Icon icon={playIcon} class="h-12 w-12" />
-  </button>
+  <div slot="action" class="tooltip-right flex" data-tip="Play now!" class:tooltip={$userConfig.tooltips}>
+    <button
+      class="btn btn-square btn-success"
+      tabindex="-1"
+      disabled={playDisabled}
+      let:asset
+      on:click={() => {
+        play(asset, modalRotator)
+        modalRotator = null
+        showModal = false
+      }}
+    >
+      <Icon icon={playIcon} class="h-12 w-12" />
+    </button>
+  </div>
 </AssetPicker>
 
 <div class="flex h-0 min-h-full w-full flex-col rounded-lg border-base-content bg-base-200 p-1.5 pt-2">
@@ -77,11 +78,7 @@
           <span class="w-0 flex-1 truncate py-2">{rotator.name}</span>
         </button>
         {#if $userConfig.uiMode >= 2}
-          <div
-            class:tooltip={$userConfig.tooltips}
-            class="tooltip-left flex"
-            data-tip="Select specific asset from rotator"
-          >
+          <div class:tooltip={$userConfig.tooltips} class="tooltip-left flex" data-tip="Browse assets in rotator">
             <button
               class="btn btn-square btn-warning h-full"
               on:click={() => {

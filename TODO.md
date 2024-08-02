@@ -81,5 +81,5 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [ ] Denser progress radials - decrease to 4rem
 - [ ] First asset of next stop doesn't show log tooltip if current stop startedPlaying
 - [ ] Assets queued for skipping should grey out
-- [ ] Seed, leaf, flower icon for simple, intermediate, advanced
+- [x] Seed, leaf, flower icon for simple, intermediate, advanced
 - [x] Alternating grey/white rows in AssetPicker component

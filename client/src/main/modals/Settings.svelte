@@ -73,14 +73,14 @@
               class:tab-active={uiMode === $userConfig.uiMode}
               on:click={() => ($userConfig.uiMode = uiMode)}
             >
-              <Icon icon={uiModeInfo[uiMode].icon} class="h-5 w-5" viewBox="0 0 32 32" />
+              <Icon icon={uiModeInfo[uiMode].icon} class="h-6 w-6" />
               {uiModeInfo[uiMode].name}
             </button>
           {/each}
         </div>
       {:else}
         <div class="text-md flex w-max items-center gap-2">
-          <Icon icon={uiModeInfo[$userConfig.uiMode].icon} class="h-5 w-5 text-info" viewBox="0 0 32 32" />
+          <Icon icon={uiModeInfo[$userConfig.uiMode].icon} class="h-6 w-6 text-info" />
           <b class="text-info">{uiModeInfo[$userConfig.uiMode].name}</b>
           <em>(Not configurable)</em>
         </div>

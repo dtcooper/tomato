@@ -9,7 +9,7 @@ import { WeakRefSet } from "weak-ref-collections"
 import { get, readonly, writable } from "svelte/store"
 
 import { colors } from "../../../server/constants.json"
-import { IS_DEV, urlParams } from "../utils"
+import { IS_DEV, prettyDate, urlParams } from "../utils"
 import { log } from "./client-logs"
 import { config } from "./config"
 import { conn } from "./connection"
@@ -76,6 +76,21 @@ class AssetStopsetHydratableObject extends HydratableObject {
       dt = dayjs()
     }
     return this.enabled && (!this.begin || this.begin.isSameOrBefore(dt)) && (!this.end || this.end.isSameOrAfter(dt))
+  }
+
+  airingInfo() {
+    console.log(dayjs)
+    if (!this.enabled) {
+      return "Not enabled"
+    } else if (this.begin && this.end) {
+      return `${prettyDate(this.begin)} to ${prettyDate(this.end)}`
+    } else if (this.begin) {
+      return `Starts ${prettyDate(this.begin)}`
+    } else if (this.end) {
+      return `Ends ${prettyDate(this.end)}`
+    } else {
+      return "Always airs"
+    }
   }
 
   get rotators() {

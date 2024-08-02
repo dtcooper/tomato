@@ -2,9 +2,9 @@ import dayjs from "dayjs"
 
 import { ipcRenderer } from "electron"
 
-import skillLevelAdvanced from "@iconify/icons-carbon/skill-level-advanced"
-import skillLevelBasic from "@iconify/icons-carbon/skill-level-basic"
-import skillLevelIntermediate from "@iconify/icons-carbon/skill-level-intermediate"
+import flowerIcon from "@iconify/icons-mdi/flower"
+import seedIcon from "@iconify/icons-mdi/seed-outline"
+import sproutIcon from "@iconify/icons-mdi/sprout"
 
 import { persisted } from "svelte-local-storage-store"
 import { get, readonly, writable } from "svelte/store"
@@ -24,9 +24,9 @@ export const resetUserConfig = () => userConfig.set(defaultUserConfig)
 export const isFullscreen = writable(true)
 
 export const uiModeInfo = [
-  { name: "Simple", icon: skillLevelBasic },
-  { name: "Standard", icon: skillLevelIntermediate },
-  { name: "Advanced", icon: skillLevelAdvanced }
+  { name: "Simple", icon: seedIcon },
+  { name: "Standard", icon: sproutIcon },
+  { name: "Advanced", icon: flowerIcon }
 ]
 
 const resetUIMode = () => {

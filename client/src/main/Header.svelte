@@ -61,7 +61,7 @@
       {#if $config.UI_MODES.length > 1}
         <div class="tooltip tooltip-bottom flex" data-tip={`${uiModeInfo[$userConfig.uiMode].name} mode`}>
           <button class="btn btn-circle btn-ghost" on:click={() => ($userConfig.uiMode = nextUiMode)} tabindex="-1">
-            <Icon icon={uiModeInfo[$userConfig.uiMode].icon} class="h-7 w-7" viewBox="0 0 32 32" />
+            <Icon icon={uiModeInfo[$userConfig.uiMode].icon} class="h-8 w-8" />
           </button>
         </div>
       {/if}

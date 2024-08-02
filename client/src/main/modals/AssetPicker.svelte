@@ -49,7 +49,11 @@
           >
             <span class="select-text truncate">{asset.name}</span>
           </div>
-          <div class:bg-base-200={oddRow} class="flex items-center border-b border-base-content p-1.5">
+          <div
+            class:bg-base-200={oddRow}
+            class="tooltip tooltip-left flex items-center border-b border-base-content p-1.5"
+            data-tip={asset.airingInfo()}
+          >
             {#if asset.isAiring()}
               <span class="badge badge-success">Airing</span>
             {:else}
