@@ -17,16 +17,17 @@ jobs:
         name: Set variables
         shell: bash
         run: |
-          CURRENT_DATE="${year}${month}${day}"
-          CURRENT_YEAR="${year}"
+          DATE=$(date +%Y%m%d)
+          YEAR=$(date +%Y)
 
           # Only build on amd64 around the event (faster)
-          LABOR_DAY=$(date -d "${CURRENT_YEAR}-09-01 +$(( (8 - $(date -d "${CURRENT_YEAR}-09-01" +%u) ) % 7 )) days" +%Y-%m-%d)
+          LABOR_DAY=$(date -d "${YEAR}-09-01 +$(( (8 - $(date -d "${YEAR}-09-01" +%u) ) % 7 )) days" +%Y-%m-%d)
           BEFORE_DATE=$(date -d "$LABOR_DAY -17 days" +%Y%m%d)
           AFTER_DATE=$(date -d "$LABOR_DAY +3 days" +%Y%m%d)
 
-          echo "$CURRENT_DATE - $LABOR_DAY"
-          if [ "$CURRENT_DATE" -ge "$BEFORE_DATE" -a "$CURRENT_DATE" -le "$AFTER_DATE" ]; then
+          echo "$DATE - $LABOR_DAY"
+          if [ "$DATE" -ge "$BEFORE_DATE" -a "$DATE" -le "$AFTER_DATE" ]; then
+              echo 'Close to Labor Day! Building for am64 only for performance reasons.'
               echo 'PLATFORMS=linux/amd64' >> "$GITHUB_ENV"
           else
               echo 'PLATFORMS=linux/amd64,linux/arm64' >> "$GITHUB_ENV"
