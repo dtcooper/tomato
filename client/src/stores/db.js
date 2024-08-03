@@ -551,3 +551,4 @@ export const clearAssetState = () => {
 export const markPlayed = (asset, rotator = null) => DB.markPlayed(asset, rotator)
 
 setInterval(() => DB.cleanup(), IS_DEV ? 15 * 1000 : 45 * 60 * 1000) // Clean up every 45 minutes
+window.dbCleanup = () => DB.cleanup()

@@ -25,50 +25,53 @@
   <div slot="content" class="flex h-0 max-h-full w-full flex-1 flex-col gap-2">
     <div><slot name="description" /></div>
     <div class="min-h-[340px] flex-1 overflow-y-auto">
-      <div class="relative grid grid-cols-[max-content,max-content,auto,max-content,max-content] rounded">
-        <div class="sticky top-0 z-10 bg-base-100 p-2 font-bold"><slot name="action-name" /></div>
-        <div class="sticky top-0 z-10 bg-base-100 p-2 font-bold">Length</div>
-        <div class="sticky top-0 z-10 bg-base-100 p-2 font-bold">Name</div>
-        <div class="sticky top-0 z-10 bg-base-100 p-2 font-bold">Is Airing?</div>
-        <div class="sticky top-0 z-10 bg-base-100 p-2 font-bold">Alternates?</div>
-
-        {#each assets as asset, i}
-          {@const oddRow = i % 2 == 1}
-          <div class:bg-base-200={oddRow} class="flex items-center border-b border-base-content p-1.5">
-            <slot name="action" {asset} />
-          </div>
-          <div
-            class:bg-base-200={oddRow}
-            class="flex items-center justify-end border-b border-base-content p-1.5 font-mono font-bold"
-          >
-            {prettyDuration(asset.duration)}
-          </div>
-          <div
-            class:bg-base-200={oddRow}
-            class="flex select-text items-center overflow-x-hidden border-b border-base-content p-1.5"
-          >
-            <span class="select-text truncate">{asset.name}</span>
-          </div>
-          <div
-            class:bg-base-200={oddRow}
-            class="tooltip tooltip-left flex items-center border-b border-base-content p-1.5"
-            data-tip={asset.airingInfo()}
-          >
-            {#if asset.isAiring()}
-              <span class="badge badge-success">Airing</span>
-            {:else}
-              <span class="badge badge-error">Not airing</span>
-            {/if}
-          </div>
-          <div class:bg-base-200={oddRow} class="flex items-center border-b border-base-content p-1.5">
-            {#if asset.alternates.length > 0}
-              <span class="badge badge-info">{asset.alternates.length} alternates</span>
-            {:else}
-              <em>None</em>
-            {/if}
-          </div>
-        {/each}
-      </div>
+      {#if assets.length > 0}
+        <div class="grid grid-cols-[max-content,max-content,auto,max-content,max-content] rounded">
+          <div class="sticky top-0 z-10 bg-base-100 p-2 font-bold"><slot name="action-name" /></div>
+          <div class="sticky top-0 z-10 bg-base-100 p-2 font-bold">Length</div>
+          <div class="sticky top-0 z-10 bg-base-100 p-2 font-bold">Name</div>
+          <div class="sticky top-0 z-10 bg-base-100 p-2 font-bold">Is Airing?</div>
+          <div class="sticky top-0 z-10 bg-base-100 p-2 font-bold">Alternates?</div>
+          {#each assets as asset, i}
+            {@const oddRow = i % 2 == 1}
+            <div class:bg-base-200={oddRow} class="flex items-center border-b border-base-content p-1.5">
+              <slot name="action" {asset} />
+            </div>
+            <div
+              class:bg-base-200={oddRow}
+              class="flex items-center justify-end border-b border-base-content p-1.5 font-mono font-bold"
+            >
+              {prettyDuration(asset.duration)}
+            </div>
+            <div
+              class:bg-base-200={oddRow}
+              class="flex select-text items-center overflow-x-hidden border-b border-base-content p-1.5"
+            >
+              <span class="select-text truncate">{asset.name}</span>
+            </div>
+            <div
+              class:bg-base-200={oddRow}
+              class="tooltip tooltip-left flex items-center border-b border-base-content p-1.5"
+              data-tip={asset.airingInfo()}
+            >
+              {#if asset.isAiring()}
+                <span class="badge badge-success">Airing</span>
+              {:else}
+                <span class="badge badge-error">Not airing</span>
+              {/if}
+            </div>
+            <div class:bg-base-200={oddRow} class="flex items-center border-b border-base-content p-1.5">
+              {#if asset.alternates.length > 0}
+                <span class="badge badge-info">{asset.alternates.length} alternates</span>
+              {:else}
+                <em>None</em>
+              {/if}
+            </div>
+          {/each}
+        </div>
+      {:else}
+        <div class="flex items-center justify-center p-1.5 italic">No assets found in rotator!</div>
+      {/if}
     </div>
   </div>
 </Modal>

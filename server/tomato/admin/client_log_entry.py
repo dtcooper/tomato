@@ -23,8 +23,8 @@ class ClientLogEntryAdmin(ListPrefetchRelatedMixin, admin.ModelAdmin):
     fields = ("id", "created_at_display", "category", "type", "created_by", "ip_address", "description_display")
     list_display = ("created_at_display", "category", "type", "created_by", "ip_address", "description_display")
     list_filter = ("created_by", "type")
-    list_max_show_all = 2500
-    list_per_page = 250
+    list_max_show_all = 5000
+    list_per_page = 500
     list_prefetch_related = ("created_by",)
     readonly_fields = ("created_at_display", "category", "description_display")
     save_on_top = True
