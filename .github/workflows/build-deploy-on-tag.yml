@@ -25,7 +25,6 @@ jobs:
           BEFORE_DATE=$(date -d "$LABOR_DAY -17 days" +%Y%m%d)
           AFTER_DATE=$(date -d "$LABOR_DAY +3 days" +%Y%m%d)
 
-          echo "$DATE - $LABOR_DAY"
           if [ "$DATE" -ge "$BEFORE_DATE" -a "$DATE" -le "$AFTER_DATE" ]; then
               echo 'Close to Labor Day! Building for am64 only for performance reasons.'
               echo 'PLATFORMS=linux/amd64' >> "$GITHUB_ENV"
