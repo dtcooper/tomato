@@ -42,13 +42,19 @@
           &ShortLeftArrow; Back to simple view
         </button>
       {/if}
-      <div class="tooltip tooltip-bottom flex" data-tip={`${$isFullscreen ? "Exit" : "Enter"} fullscreen mode`}>
+      <div
+        class="tooltip tooltip-bottom tooltip-info flex"
+        data-tip={`${$isFullscreen ? "Exit" : "Enter"} fullscreen mode`}
+      >
         <button class="btn btn-circle btn-ghost" on:click={() => setFullscreen(!$isFullscreen)} tabindex="-1">
           <Icon icon={$isFullscreen ? fullscreenExit : fullscreenIcon} class="h-8 w-8" />
         </button>
       </div>
       {#if $userConfig.uiMode === 2}
-        <div class="tooltip tooltip-bottom flex" data-tip={`${$userConfig.tooltips ? "Disable" : "Enable"} tooltips`}>
+        <div
+          class="tooltip tooltip-bottom tooltip-info flex"
+          data-tip={`${$userConfig.tooltips ? "Disable" : "Enable"} tooltips`}
+        >
           <button
             class="btn btn-circle btn-ghost"
             on:click={() => ($userConfig.tooltips = !$userConfig.tooltips)}
@@ -59,14 +65,14 @@
         </div>
       {/if}
       {#if $config.UI_MODES.length > 1}
-        <div class="tooltip tooltip-bottom flex" data-tip={`${uiModeInfo[$userConfig.uiMode].name} mode`}>
+        <div class="tooltip tooltip-bottom tooltip-info flex" data-tip={`${uiModeInfo[$userConfig.uiMode].name} view`}>
           <button class="btn btn-circle btn-ghost" on:click={() => ($userConfig.uiMode = nextUiMode)} tabindex="-1">
             <Icon icon={uiModeInfo[$userConfig.uiMode].icon} class="h-8 w-8" />
           </button>
         </div>
       {/if}
       <div
-        class="tooltip tooltip-bottom flex"
+        class="tooltip tooltip-bottom tooltip-info flex"
         data-tip={!$conn.connected ? "Disconnected" : $syncProgress.syncing ? "Synchronizing" : "Connected"}
       >
         <button
@@ -85,7 +91,7 @@
           {/if}
         </button>
       </div>
-      <div class="tooltip tooltip-bottom flex" data-tip="Settings">
+      <div class="tooltip tooltip-bottom tooltip-info flex" data-tip="Settings">
         <button class="btn btn-circle btn-ghost" on:click={() => (showSettingsModal = true)} tabindex="-1">
           <Icon icon={cogOutline} class="h-8 w-8" />
         </button>

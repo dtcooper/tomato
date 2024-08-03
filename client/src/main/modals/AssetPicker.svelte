@@ -22,15 +22,15 @@
     <Icon icon={musicIcon} class="h-8 w-8 md:h-12 md:w-12" />
   </svelte:fragment>
   <svelte:fragment slot="title"><slot name="title" /></svelte:fragment>
-  <div slot="content" class="flex h-0 w-full flex-1 flex-col gap-2">
+  <div slot="content" class="flex h-0 max-h-full w-full flex-1 flex-col gap-2">
     <div><slot name="description" /></div>
     <div class="min-h-[340px] flex-1 overflow-y-auto">
       <div class="relative grid grid-cols-[max-content,max-content,auto,max-content,max-content] rounded">
-        <div class="sticky top-0 bg-base-100 p-2 font-bold"><slot name="action-name" /></div>
-        <div class="sticky top-0 bg-base-100 p-2 font-bold">Length</div>
-        <div class="sticky top-0 bg-base-100 p-2 font-bold">Name</div>
-        <div class="sticky top-0 bg-base-100 p-2 font-bold">Is Airing?</div>
-        <div class="sticky top-0 bg-base-100 p-2 font-bold">Alternates?</div>
+        <div class="sticky top-0 z-10 bg-base-100 p-2 font-bold"><slot name="action-name" /></div>
+        <div class="sticky top-0 z-10 bg-base-100 p-2 font-bold">Length</div>
+        <div class="sticky top-0 z-10 bg-base-100 p-2 font-bold">Name</div>
+        <div class="sticky top-0 z-10 bg-base-100 p-2 font-bold">Is Airing?</div>
+        <div class="sticky top-0 z-10 bg-base-100 p-2 font-bold">Alternates?</div>
 
         {#each assets as asset, i}
           {@const oddRow = i % 2 == 1}

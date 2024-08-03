@@ -22,4 +22,6 @@ export const alert = (msg, level = "info", timeout = null) => {
 setInterval(() => {
   const now = window.performance.now()
   data.update(($alerts) => $alerts.filter(({ expires }) => expires === null || expires > now))
-}, 50)
+}, 100)
+
+window.testAlert = alert

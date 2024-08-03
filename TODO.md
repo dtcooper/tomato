@@ -75,11 +75,11 @@ Changes for 2024 based on real world usage in 2023 and feedback
 
 ## August 2024 UX review with [Miranda Kay](mailto:miranda.e.kay@gmail.com)
 
-- [ ] Button box flashes between assets (debounce?)
-- [ ] Switch connected icons with feather wifi on/off
-- [ ] Danger button in settings
-- [ ] Denser progress radials - decrease to 4rem
-- [ ] First asset of next stop doesn't show log tooltip if current stop startedPlaying
-- [ ] Assets queued for skipping should grey out
+- [x] Button box flashes between assets
+- [ ] ~~Switch connected icons with feather wifi on/off~~
+- [x] Danger button in settings
+- [x] Denser progress radials - decrease to 4rem
+- [x] First asset of next stop doesn't show log tooltip if current stop startedPlaying
+- [x] Assets queued for skipping should grey out
 - [x] Seed, leaf, flower icon for simple, intermediate, advanced
 - [x] Alternating grey/white rows in AssetPicker component

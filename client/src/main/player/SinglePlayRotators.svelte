@@ -58,27 +58,39 @@
 <div class="flex h-0 min-h-full w-full flex-col rounded-lg border-base-content bg-base-200 p-1.5 pt-2">
   <div class="divider m-0 mb-2 w-full font-mono text-sm italic">Play single asset from&hellip;</div>
   <div class="flex flex-1 flex-col gap-1 overflow-y-auto px-2">
-    {#each $singlePlayRotators.rotators as rotator}
+    {#each $singlePlayRotators.rotators as rotator, i}
       {@const disabled =
         playDisabled && (!$singlePlayRotators.rotator || $singlePlayRotators.rotator.id !== rotator.id)}
       {@const playing =
         $singlePlayRotators.isPlaying && $singlePlayRotators.rotator && $singlePlayRotators.rotator.id === rotator.id}
       <div class="grid grid-cols-[auto,min-content] gap-1">
-        <button
-          class="btn flex-1 text-left hover:brightness-110"
-          class:btn-lg={$singlePlayRotators.rotators.length <= 2}
-          class:hover:brightness-110={!disabled}
-          class:btn-error={playing}
-          style={playDisabled ? "" : `background-color: ${rotator.color.value}; color: ${rotator.color.content}`}
-          {disabled}
-          on:click={() => (playing ? stop() : playFromRotator(rotator, mediumIgnoreIds))}
-          tabindex="-1"
+        <div
+          class:tooltip={$userConfig.tooltips || $userConfig.uiMode <= 1}
+          class="tooltip-info flex flex-1 {i < $singlePlayRotators.rotators.length - 1
+            ? 'tooltip-bottom'
+            : 'tooltip-top'}"
+          data-tip="Play random asset from rotator"
         >
-          <Icon icon={playing ? stopCircleOutlineIcon : playCircleOutlineIcon} class="h-10 w-10" />
-          <span class="w-0 flex-1 truncate py-2">{rotator.name}</span>
-        </button>
+          <button
+            class="btn flex-1 text-left hover:brightness-110"
+            class:btn-lg={$singlePlayRotators.rotators.length <= 2}
+            class:hover:brightness-110={!disabled}
+            class:btn-error={playing}
+            style={playDisabled ? "" : `background-color: ${rotator.color.value}; color: ${rotator.color.content}`}
+            {disabled}
+            on:click={() => (playing ? stop() : playFromRotator(rotator, mediumIgnoreIds))}
+            tabindex="-1"
+          >
+            <Icon icon={playing ? stopCircleOutlineIcon : playCircleOutlineIcon} class="h-10 w-10" />
+            <span class="w-0 flex-1 truncate py-2">{rotator.name}</span>
+          </button>
+        </div>
         {#if $userConfig.uiMode >= 2}
-          <div class:tooltip={$userConfig.tooltips} class="tooltip-left flex" data-tip="Browse assets in rotator">
+          <div
+            class:tooltip={$userConfig.tooltips}
+            class="tooltip-left tooltip-info flex"
+            data-tip="Browse assets in rotator"
+          >
             <button
               class="btn btn-square btn-warning h-full"
               on:click={() => {

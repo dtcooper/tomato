@@ -1,12 +1,14 @@
 <script>
   import dayjs from "dayjs"
+
   import { tick } from "svelte"
+  import AssetPicker from "./modals/AssetPicker.svelte"
+  import AssetSwapper from "./player/AssetSwapper.svelte"
   import Icon from "../components/Icon.svelte"
   import PlayBar from "./player/Bar.svelte"
   import PlayButtons from "./player/Buttons.svelte"
   import PlayList from "./player/List.svelte"
   import SinglePlayRotators from "./player/SinglePlayRotators.svelte"
-  import AssetPicker from "./modals/AssetPicker.svelte"
 
   import reloadAlertIcon from "@iconify/icons-mdi/reload-alert"
 
@@ -329,36 +331,7 @@
 </div>
 
 {#if swap}
-  {@const { stopset, asset: swapAsset, subindex } = swap}
-  <AssetPicker rotator={swapAsset.rotator} show={true} close={() => (swap = null)}>
-    <svelte:fragment slot="action-name">Swap</svelte:fragment>
-    <svelte:fragment slot="title">Swap asset in stop set</svelte:fragment>
-    <p class="truncate text-wrap" slot="description">
-      Choose an asset from rotator
-      <span
-        class="badge select-text border-secondary-content font-medium"
-        style:background-color={swapAsset.rotator.color.value}
-        style:color={swapAsset.rotator.color.content}>{swapAsset.rotator.name}</span
-      >
-      to swap asset <span class="select-text truncate font-mono">{swapAsset.name}</span> in stop set
-      <span class="select-text">{stopset.name}</span>
-      (index {subindex + 1}/{stopset.items.length}).
-    </p>
-
-    <button
-      class="btn btn-warning"
-      tabindex="-1"
-      disabled={false}
-      slot="action"
-      let:asset
-      on:click={() => {
-        doAssetSwap(stopset, subindex, asset, swapAsset)
-        swap = null
-      }}
-    >
-      <Icon icon={reloadAlertIcon} class="h-12 w-12" /> Swap
-    </button>
-  </AssetPicker>
+  <AssetSwapper {doAssetSwap} bind:swap />
 {/if}
 
 <PlayList

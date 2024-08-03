@@ -36,6 +36,7 @@
   <div class="flex flex-1 flex-col gap-2 overflow-y-auto" id="playlist">
     {#each items as item, index (item.generatedId)}
       {@const isFirstItem = index === 0}
+      {@const firstStopsetIndex = items.findIndex((item) => item.type === "stopset")}
       <div class="flex flex-col gap-2 px-2" out:fade={{ duration: 650 }}>
         <div
           class="divider m-0"
@@ -51,25 +52,28 @@
             {#if asset.playable || $config.WARN_ON_EMPTY_ROTATORS}
               <div
                 class="border-l-4 pl-2"
-                class:border-error={asset.error}
+                class:border-error={asset.error || (asset.playable && asset.queueForSkip)}
                 class:border-warning={!asset.playable}
-                class:border-base-300={asset.playable && !asset.error && asset.finished}
+                class:border-base-300={asset.playable && !asset.error && asset.finished && !asset.queueForSkip}
                 class:border-success={asset.playable && isFirstItem && asset.active}
                 class:border-base-content={!isFirstItem ||
                   (asset.playable && !asset.error && !asset.finished && !asset.active)}
               >
                 <div
-                  class="flex min-h-[5rem] items-center gap-3 overflow-hidden px-3 py-1"
-                  style={asset.playable && !asset.error && !asset.finished
+                  class="flex min-h-[4.75rem] items-center gap-3 overflow-hidden px-3 py-1"
+                  style={asset.playable && !asset.error && !asset.finished && !asset.queueForSkip
                     ? `background: linear-gradient(to right, color-mix(in oklab, oklch(var(--s)) 90%, black) 0%, color-mix(in oklab, oklch(var(--s)) 90%, black) ${asset.percentDone}%, oklch(var(--s)) ${asset.percentDone}%, oklch(var(--s)) 100%);`
                     : ""}
-                  class:text-secondary-content={asset.playable && !asset.error && !asset.finished}
+                  class:text-secondary-content={asset.playable &&
+                    !asset.error &&
+                    !asset.finished &&
+                    !asset.queueForSkip}
                   class:text-error-content={asset.error && !asset.finished}
                   class:bg-error={asset.error && !asset.finished}
                   class:text-warning-content={!asset.playable && !asset.finished}
                   class:bg-warning={!asset.playable && !asset.finished}
-                  class:bg-base-300={asset.finished}
-                  class:text-base-content={asset.finished}
+                  class:bg-base-300={asset.finished || asset.queueForSkip}
+                  class:text-base-content={asset.finished || asset.queueForSkip}
                 >
                   {#if $userConfig.uiMode >= 2}
                     <div class="flex items-center">
@@ -79,7 +83,8 @@
                         </button>
                       {:else}
                         <div
-                          class:tooltip={asset.afterActive && $userConfig.tooltips}
+                          class:tooltip={(firstStopsetIndex !== index && items[firstStopsetIndex].startedPlaying) ||
+                            (asset.afterActive && $userConfig.tooltips && !asset.queueForSkip)}
                           class="tooltip-right tooltip-error flex"
                           data-tip="This action will be logged!"
                         >
@@ -102,7 +107,8 @@
                   {/if}
                   {#if $userConfig.uiMode > 0}
                     <div
-                      class="flex h-[5rem] w-[5rem] items-center justify-center font-mono text-sm"
+                      class="flex h-[4.75rem] w-[4.75rem] items-center justify-center font-mono text-sm"
+                      style="--size: 4.75rem"
                       class:radial-progress={!asset.error &&
                         asset.playable &&
                         item.startedPlaying &&
@@ -110,7 +116,7 @@
                       class:italic={asset.error || !asset.playable}
                       class:font-bold={asset.error || !asset.playable}
                       style:--value={(asset.elapsed / asset.duration) * 100}
-                      style:--thickness="0.4rem"
+                      style:--thickness="0.3rem"
                     >
                       {#if asset.error}
                         Error!
@@ -136,10 +142,10 @@
                         </span>
                       {/if}
                       {#if asset.isSwapped}
-                        <span class="badge badge-warning border-secondary-content"> Swapped </span>
+                        <span class="badge badge-warning border-secondary-content">Swapped</span>
                       {/if}
                       {#if asset.hasEndDateMultiplier}
-                        <span class="badge badge-success border-secondary-content italic"> Ends today!</span>
+                        <span class="badge badge-success border-secondary-content italic">Ends today!</span>
                       {/if}
                     </div>
                     <div class="truncate text-xl">
@@ -160,7 +166,7 @@
                     </div>
                   </div>
                   {#if !asset.error && asset.playable}
-                    <div class="flex flex-col items-end gap-1">
+                    <div class="flex flex-col items-end gap-1 self-stretch">
                       <div class="font-mono text-sm">
                         {#if $userConfig.uiMode >= 1}
                           {prettyDuration(asset.elapsed, asset.duration)} /
@@ -230,11 +236,13 @@
           {#if item.items.length === 0 || (!$config.WARN_ON_EMPTY_ROTATORS && item.items.every((asset) => !asset.playable))}
             <div class="border-l-4 border-warning pl-2">
               <div
-                class="flex min-h-[5rem] items-center gap-3 overflow-hidden bg-warning px-3 py-1 text-warning-content"
+                class="flex min-h-[4.75rem] items-center gap-3 overflow-hidden bg-warning px-3 py-1 text-warning-content"
               >
                 <!-- in the place of the radial -->
                 {#if $userConfig.uiMode >= 1}
-                  <div class="flex h-[5rem] w-[5rem] items-center justify-center font-mono text-sm font-bold italic">
+                  <div
+                    class="flex h-[4.75rem] w-[4.75rem] items-center justify-center font-mono text-sm font-bold italic"
+                  >
                     Warning!
                   </div>
                 {/if}
@@ -249,7 +257,7 @@
         {:else if item.type === "wait"}
           <div class="border-l-4 pl-2" class:border-base-content={!isFirstItem} class:border-success={isFirstItem}>
             <div
-              class="flex min-h-[5rem] items-center gap-3 overflow-hidden px-3 py-1 text-neutral-content"
+              class="flex min-h-[4.75rem] items-center gap-3 overflow-hidden px-3 py-1 text-neutral-content"
               style:background-image={`linear-gradient(to right, color-mix(in oklab, oklch(var(--n)) 90%, black) 0%, color-mix(in oklab, oklch(var(--n)) 90%, black) ${item.percentDone}%, oklch(var(--n)) ${item.percentDone}%, oklch(var(--n)) 100%)`}
             >
               {#if $userConfig.uiMode >= 2}
@@ -272,9 +280,10 @@
               {/if}
               {#if $userConfig.uiMode > 0}
                 <div
-                  class="radial-progress h-[5rem] w-[5rem] font-mono text-sm"
+                  class="radial-progress h-[4.75rem] w-[4.75rem] font-mono text-sm"
+                  style="--size: 4.75rem"
                   style:--value={(item.elapsed / item.duration) * 100}
-                  style:--thickness={item.elapsed === 0 ? "0" : "0.4rem"}
+                  style:--thickness={item.elapsed === 0 ? "0" : "0.3rem"}
                 >
                   {prettyDuration(item.remaining)}
                 </div>
@@ -315,10 +324,10 @@
       </div>
     {:else}
       <div class="border-l-4 border-error pl-2">
-        <div class="flex min-h-[5rem] items-center gap-3 overflow-hidden bg-error px-3 py-1 text-error-content">
+        <div class="flex min-h-[4.75rem] items-center gap-3 overflow-hidden bg-error px-3 py-1 text-error-content">
           <!-- in the place of the radial -->
           {#if $userConfig.uiMode >= 1}
-            <div class="flex h-[5rem] w-[5rem] items-center justify-center font-mono text-sm font-bold italic">
+            <div class="flex h-[4.75rem] w-[4.75rem] items-center justify-center font-mono text-sm font-bold italic">
               Error!
             </div>
           {/if}

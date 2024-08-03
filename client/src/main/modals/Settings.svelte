@@ -176,7 +176,7 @@
 
       <div class="col-span-2 flex justify-center">
         <button type="button" class="btn btn-error btn-sm" on:click|preventDefault={confirmLogout} tabindex="-1">
-          DANGER: Log out of server
+          Click here to <strong class="underline">COMPLETELY LOG OUT</strong> of server
         </button>
       </div>
     </div>

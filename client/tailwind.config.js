@@ -23,7 +23,6 @@ const colors = Object.keys(materialUIColors).reduce(
 
 module.exports = {
   content: ["index.html", "./src/**/*.{html,js,svelte}"],
-  safelist: ["alert-success", "alert-info", "alert-warning", "alert-error"], // For Alerts.svelte
   theme: {
     screens: {
       md: "900px"

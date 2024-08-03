@@ -121,6 +121,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
     this.error = false
     this.interval = null
     this._duration = duration
+    this.doNotPauseStopsetOnPause = false
     this.didSkip = false
     this.didLogError = false
     this.queueForSkip = false
@@ -170,7 +171,9 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
       this.audio.onerror = (e) => this._errorHelper(e)
       this.audio.onpause = () => {
         if (this.playing) {
-          this.generatedStopset.playing = false
+          if (this.doNotPauseStopset) {
+            this.generatedStopset.playing = false
+          }
           this.pause()
         }
       }
@@ -408,6 +411,9 @@ export class GeneratedStopset {
         this.items.slice(this.current, subindex).forEach((item) => {
           log("skipped_asset", item.logLine)
           if (item.playable) {
+            // Avoids LED and button flash since the pause as the pause() called on the asset
+            // here is to pause the underlying MediaElement, not pause the whole stopset
+            item.doNotPauseStopsetOnPause = true
             item.pause()
           }
         })

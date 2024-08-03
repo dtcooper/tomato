@@ -67,7 +67,7 @@ if (IS_DEV) {
     const id = originalSetInterval(...args)
     intervals.add(id)
     if (intervals.size > 5) {
-      console.warning("More than 5 active intervals exist. Something may be very wrong.")
+      console.warn("More than 5 active intervals exist. Something may be very wrong.")
     }
     return id
   }
