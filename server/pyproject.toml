@@ -21,11 +21,11 @@ psycopg = "^3.2.1"
 python-dotenv = "^1.0.1"
 schema = "^0.7.7"
 starlette = "^0.38.2"
-uvicorn = {extras = ["standard"], version = "^0.30.3"}
+uvicorn = {extras = ["standard"], version = "^0.30.5"}
 wait-for-it = "^2.2.2"
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.4.2"
+black = "^24.8.0"
 django-debug-toolbar = "^4.4.6"
 django-extensions = "^3.2.3"
 flake8 = "^7.1.0"
