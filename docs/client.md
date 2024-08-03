@@ -13,8 +13,9 @@ download [preview builds](#preview-builds) or [run the development code yourself
 
 ### User Interface Modes
 
-Tomato has three different user interface modes: **simple**, **standard**, and
-**advanced** to accommodate varying levels of literacy with audio software.
+Tomato has three different user interface modes: :material-seed-outline: **simple**,
+:material-seed: **standard**, and :material-flower: **advanced** to accommodate varying
+levels of literacy with audio software.
 
 Select a tab below to find out more about each mode.
 

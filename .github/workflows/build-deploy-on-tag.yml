@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - 'v*'
-  workflow_dispatch:
 
 jobs:
   build:
@@ -18,18 +17,19 @@ jobs:
         name: Set variables
         shell: bash
         run: |
-          CURRENT_DATE=$(date +%Y%m%d)
-          CURRENT_YEAR=$(date +%Y)
+          CURRENT_DATE="${year}${month}${day}"
+          CURRENT_YEAR="${year}"
 
           # Only build on amd64 around the event (faster)
           LABOR_DAY=$(date -d "${CURRENT_YEAR}-09-01 +$(( (8 - $(date -d "${CURRENT_YEAR}-09-01" +%u) ) % 7 )) days" +%Y-%m-%d)
           BEFORE_DATE=$(date -d "$LABOR_DAY -17 days" +%Y%m%d)
           AFTER_DATE=$(date -d "$LABOR_DAY +3 days" +%Y%m%d)
 
+          echo "$CURRENT_DATE - $LABOR_DAY"
           if [ "$CURRENT_DATE" -ge "$BEFORE_DATE" -a "$CURRENT_DATE" -le "$AFTER_DATE" ]; then
-              echo "$CURRENT_DATE: YES! [$LABOR_DAY]"
+              echo 'PLATFORMS=linux/amd64' >> "$GITHUB_ENV"
           else
-              echo "$CURRENT_DATE: no   [$LABOR_DAY]"
+              echo 'PLATFORMS=linux/amd64,linux/arm64' >> "$GITHUB_ENV"
           fi
       -
         name: Build container
@@ -39,28 +39,28 @@ jobs:
           container: server
           tag: ${{ github.ref_name }}
           no-cache: true
-          platforms: linux/amd64  # XXX around event, since this is faster
+          platforms: ${{ env.PLATFORMS }}
           build-args: |
             TOMATO_VERSION=${{ github.ref_name }}
 
-  # deploy:
-  #   runs-on: ubuntu-22.04
-  #   name: Deploy
-  #   needs: [build]
-  #   steps:
-  #     -
-  #       name: Checkout
-  #       uses: actions/checkout@v4
-  #     -
-  #       name: Deploy containers
-  #       uses: appleboy/ssh-action@master
-  #       env:
-  #         TOMATO_TAG: ${{ github.ref_name }}
-  #       with:
-  #         host: ${{ secrets.SSH_HOST }}
-  #         port: ${{ secrets.SSH_PORT }}
-  #         username: ${{ secrets.SSH_USERNAME }}
-  #         key: ${{ secrets.SSH_KEY }}
-  #         fingerprint: ${{ secrets.SSH_FINGERPRINT }}
-  #         envs: TOMATO_TAG
-  #         script: ${{ secrets.DEPLOY_PROD_SCRIPT_PATH }}
+  deploy:
+    runs-on: ubuntu-22.04
+    name: Deploy
+    needs: [build]
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Deploy containers
+        uses: appleboy/ssh-action@master
+        env:
+          TOMATO_TAG: ${{ github.ref_name }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          fingerprint: ${{ secrets.SSH_FINGERPRINT }}
+          envs: TOMATO_TAG
+          script: ${{ secrets.DEPLOY_PROD_SCRIPT_PATH }}
