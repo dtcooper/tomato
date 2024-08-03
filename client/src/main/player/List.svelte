@@ -137,15 +137,15 @@
                         {asset.rotator.name}
                       </span>
                       {#if asset.isAlternate()}
-                        <span class="badge badge-warning border-secondary-content">
+                        <span class="badge badge-warning border-secondary-content font-medium">
                           Alt #{asset.alternateNumber}
                         </span>
                       {/if}
                       {#if asset.isSwapped}
-                        <span class="badge badge-warning border-secondary-content">Swapped</span>
+                        <span class="badge badge-warning border-secondary-content font-medium">Swapped</span>
                       {/if}
                       {#if asset.hasEndDateMultiplier}
-                        <span class="badge badge-success border-secondary-content italic">Ends today!</span>
+                        <span class="badge badge-success border-secondary-content font-medium italic">Ends today!</span>
                       {/if}
                     </div>
                     <div class="truncate text-xl">
