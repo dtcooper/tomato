@@ -12,7 +12,7 @@
 
 {#if $alerts.length > 0}
   <div class="toast z-[10000] items-end">
-    {#each $alerts as { msg, level, time }, i}
+    {#each $alerts as { msg, level }, i}
       <div
         class="alert {classes[level]} w-max max-w-lg animate-pulse"
         style:--pulse-color="var(--{level.substring(0, 2)})"
