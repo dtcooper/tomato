@@ -75,28 +75,24 @@ Preview builds
 [are available on GitHub](https://github.com/dtcooper/tomato/releases/tag/preview-build)
 or can be download below.
 
-  * [:material-download: macOS :material-apple:](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-macos.dmg)
+  * [**:material-download: Download macOS :material-apple: client here**](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-macos.dmg)
     &mdash; An application bundle with a  **universal binary** for Intel or Apple M1 chips
 
-  * [:material-download: Windows :material-microsoft-windows:](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-windows.exe)
+  * [**:material-download: Download Windows :material-microsoft-windows: client here**](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-windows.exe)
     &mdash; a Windows executable that automatically installs Tomato on first run (using
     [Squirrel.Windows](https://github.com/Squirrel/Squirrel.Windows))
 
-  * Linux :material-linux: downloads:
-      * Ubuntu :material-ubuntu:, Debian :material-debian: (and its derivatives), or Raspberry Pi :fontawesome-brands-raspberry-pi:
-          * `.deb` package: [:material-download: x86_64 (64-bit)](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_amd64.deb)
-            or [:material-download: arm64 (Raspberry Pi)](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_arm64.deb)
+  * **Linux :material-linux: downloads**:
+      * **Ubuntu :material-ubuntu:**, **Debian :material-debian:** (and their derivatives), or **Raspberry Pi :fontawesome-brands-raspberry-pi:,**
+          * [**:material-download: Download x86_64 (64-bit) `.deb` here**](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_amd64.deb)
+          * [**:material-download: Download arm64 (Raspberry Pi) `.deb` here**](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_arm64.deb)
 
-      * Arch :material-arch: or Manjaro :material-manjaro: &mdash; Packages for Tomato are available in the
+      * **Arch :material-arch: or Manjaro :material-manjaro:** &mdash; Packages for Tomato are available in the
         [Arch User Repository (AUR)](https://aur.archlinux.org/)
           * [Latest preview build (`tomato-radio-automation-git`)](https://aur.archlinux.org/packages/tomato-radio-automation-git)
-
           * [Latest stable release (`tomato-radio-automation`)](https://aur.archlinux.org/packages/tomato-radio-automation)
-            &mdash; may ***NOT*** be compatible with the latest server version
 
-      * Universal [AppImage](https://appimage.org/) format
-          * `.AppImage` file: [:material-download: x86_64 (64-bit)](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_amd64.AppImage) _only_
-
+      * [**Download :material-download: Universal AppImage (x86_64) format here**](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_amd64.AppImage)
           * To run using an AppImage, do the following on whatever Linux :material-linux: distribution
             you're using,
 
