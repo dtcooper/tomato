@@ -574,6 +574,8 @@ navigator.mediaDevices.ondevicechange = async () => {
 config.subscribe(($config) => {
   setCompression($config.BROADCAST_COMPRESSION || false)
 })
+
+// Async code called at startup
 ;(async () => {
   setCompression(get(config).BROADCAST_COMPRESSION || false)
   await updateSpeakers()

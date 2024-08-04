@@ -126,7 +126,7 @@ Prerequisites:
   * [Git](https://git-scm.com/)
     * On Windows, install [Git for Windows](https://gitforwindows.org/) and
       **make sure to use its included "Git Bash" terminal.**
-  * [Node.js v18+](https://nodejs.org/)
+  * [Node.js v20+](https://nodejs.org/)
 
 To get the development code running, in your terminal run the following (use
 "Git Bash" on Windows),

@@ -15,7 +15,7 @@
   import { db } from "../stores/db"
   import { log } from "../stores/client-logs"
   import { Wait } from "../stores/player"
-  import { setLED, LED_OFF } from "../stores/midi"
+  import { midiSetLED, LED_OFF } from "../stores/midi"
   import { alert } from "../stores/alerts"
 
   // Object automatically updates on change
@@ -43,7 +43,7 @@
   $: overtime = items.length > 0 && items[0].type === "wait" && items[0].overtime
 
   $: if (items.length === 0) {
-    setLED(LED_OFF)
+    midiSetLED(LED_OFF)
   }
 
   const doneWaiting = () => {

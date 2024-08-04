@@ -9,8 +9,8 @@
   import { userConfig } from "../../stores/config"
   import { blockSpacebarPlay } from "../../stores/player"
   import {
-    setLED,
-    registerButtonPressCallback,
+    midiSetLED,
+    midiButtonPresses,
     LED_OFF,
     LED_ON,
     LED_FLASH,
@@ -52,10 +52,10 @@
     ledState = LED_ON
   }
 
-  $: setLED(ledState)
-  setTimeout(() => setLED(ledState), 500) // Allow 500ms for midi system to initialize
+  $: midiSetLED(ledState)
+  setTimeout(() => midiSetLED(ledState), 500) // Allow 500ms for midi system to initialize
 
-  registerButtonPressCallback(() => {
+  midiButtonPresses.addListener("pressed", () => {
     if (playDisabled) {
       console.log("Got MIDI press, but currently not eligible to play!")
     } else {
