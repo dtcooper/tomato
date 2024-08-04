@@ -149,19 +149,23 @@ jobs:
           tag_name: preview-build
           github_token: ${{ secrets.GITHUB_TOKEN }}
       -
-        name: Wait for old preview release deletion
+        name: Set variables & wait for last preview deletion
         shell: bash
         if: github.ref_type != 'tag'
         run: |
-          sleep 30s
+          echo "TOMATO_RELEASE=${TOMATO_VERSION}-r$(git rev-list --count HEAD).$(git rev-parse --short=8 HEAD)" >> "$GITHUB_ENV"
+          sleep 20s
       -
         name: Tag and upload preview release
         uses: ncipollo/release-action@v1
         if: github.ref_type != 'tag'
         with:
           artifacts: "./client-build-files/*"
-          name: 'Tomato Preview Build'
-          body: 'This development preview build may not be safe: use it at your own risk.'
+          name: 'Tomato Preview Build ${{ env.TOMATO_RELEASE }}'
+          body: |
+            This development preview build may not be safe: use it at your own risk.
+
+            Release version: ${{ env.TOMATO_RELEASE }}
           tag: 'preview-build'
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
