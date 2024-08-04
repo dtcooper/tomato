@@ -75,20 +75,6 @@
     {/if}
     <hr class="divider col-span-2 m-0 h-0 p-0" />
 
-    <div class="flex justify-end text-lg font-bold">Clock:</div>
-    <div class="tabs-boxed tabs w-max">
-      {#each [false, "12h", "24h"] as clock}
-        <button
-          class="tab gap-2"
-          class:tab-active={$userConfig.clock === clock}
-          on:click={() => ($userConfig.clock = clock)}
-        >
-          {clock ? `${clock.substring(0, 2)} hour` : "Off"}
-        </button>
-      {/each}
-    </div>
-    <hr class="divider col-span-2 m-0 h-0 p-0" />
-
     <div class="flex justify-end text-lg font-bold">Audio output device:</div>
     <div class="flex flex-col items-end">
       <div
@@ -116,6 +102,20 @@
           {speakerLocked ? "Unl" : "L"}ock output device
         </button>
       </div>
+    </div>
+    <hr class="divider col-span-2 m-0 h-0 p-0" />
+
+    <div class="flex justify-end text-lg font-bold">Clock:</div>
+    <div class="tabs-boxed tabs w-max">
+      {#each [false, "12h", "24h"] as clock}
+        <button
+          class="tab gap-2"
+          class:tab-active={$userConfig.clock === clock}
+          on:click={() => ($userConfig.clock = clock)}
+        >
+          {clock ? `${clock.substring(0, 2)} hour` : "Off"}
+        </button>
+      {/each}
     </div>
     <hr class="divider col-span-2 m-0 h-0 p-0" />
 
