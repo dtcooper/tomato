@@ -65,11 +65,11 @@
         $singlePlayRotators.isPlaying && $singlePlayRotators.rotator && $singlePlayRotators.rotator.id === rotator.id}
       <div class="grid grid-cols-[auto,min-content] gap-1">
         <div
-          class:tooltip={$userConfig.tooltips || $userConfig.uiMode <= 1}
-          class="tooltip-info flex flex-1 {i < $singlePlayRotators.rotators.length - 1
+          class:tooltip={!disabled && ($userConfig.tooltips || $userConfig.uiMode <= 1)}
+          class="{playing ? 'tooltip-error' : 'tooltip-info'} flex flex-1 {i < $singlePlayRotators.rotators.length - 1
             ? 'tooltip-bottom'
             : 'tooltip-top'}"
-          data-tip="Play random asset from rotator"
+          data-tip={playing ? "Stop playing this asset now!" : "Play random asset from rotator"}
         >
           <button
             class="btn flex-1 text-left hover:brightness-110"

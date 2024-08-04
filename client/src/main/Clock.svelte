@@ -9,17 +9,17 @@
   let time
   let classes
   let interval
-  let is12Hour = false
+  let is24Hour = false
 
   const update = () => {
     const now = dayjs()
-    date = now.format("ddd MMM d, YYYY")
-    time = now.format(is12Hour ? "h:mm:ssa" : "HH:mm:ss")
+    date = now.format("ddd MMM D, YYYY")
+    time = now.format(is24Hour ? "HH:mm:ss" : "h:mm:ssa")
   }
 
   $: {
     clearInterval(interval)
-    is12Hour = $userConfig.clock !== "12h"
+    is24Hour = $userConfig.clock === "24h"
     update()
     if ($userConfig.clock) {
       interval = setInterval(() => update(), 250)
@@ -28,10 +28,10 @@
 
   $: if (isWide) {
     classes =
-      "min-[1500px]:bottom-0 min-[1500px]:right-0 min-[1500px]:rounded-tl-lg min-[1500px]:flex-col min-[1500px]:rounded-bl-none min-[1500px]:p-3"
+      "min-[1500px]:bottom-0 min-[1500px]:right-0 min-[1500px]:rounded-tl-lg min-[1500px]:flex-col min-[1500px]:rounded-bl-none min-[1500px]:pt-3 min-[1500px]:px-3 min-[1500px]:pb-1"
   } else {
     classes =
-      "min-[1125px]:bottom-0 min-[1125px]:right-0 min-[1125px]:rounded-tl-lg min-[1125px]:flex-col min-[1125px]:rounded-bl-none min-[1125px]:p-3"
+      "min-[1125px]:bottom-0 min-[1125px]:right-0 min-[1125px]:rounded-tl-lg min-[1125px]:flex-col min-[1125px]:rounded-bl-none min-[1125px]:pt-3 min-[1125px]:px-3 min-[1125px]:pb-1"
   }
 </script>
 
