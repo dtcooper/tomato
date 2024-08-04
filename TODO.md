@@ -40,7 +40,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [x] Mini-player column in asset list view
 - [x] Asset alternates (single asset has 4-5 underlying audio files that are cycled through)
   - [x] Backend done
-- [ ] A large clock in the UI
+- [x] A large clock in the UI
 - [ ] Make weights for previous 24 hours... AND reflect that in front-end (day-of
       pill) and back-end (sortable)... will require change to `END_DATE_PRIORITY_WEIGHT_MULTIPLIER`
     - [x] Added day-of-event pill

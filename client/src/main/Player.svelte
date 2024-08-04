@@ -2,15 +2,11 @@
   import dayjs from "dayjs"
 
   import { tick } from "svelte"
-  import AssetPicker from "./modals/AssetPicker.svelte"
   import AssetSwapper from "./player/AssetSwapper.svelte"
-  import Icon from "../components/Icon.svelte"
   import PlayBar from "./player/Bar.svelte"
   import PlayButtons from "./player/Buttons.svelte"
   import PlayList from "./player/List.svelte"
   import SinglePlayRotators from "./player/SinglePlayRotators.svelte"
-
-  import reloadAlertIcon from "@iconify/icons-mdi/reload-alert"
 
   import { IS_DEV } from "../utils"
   import { reloadPlaylistCallback } from "../stores/connection"
