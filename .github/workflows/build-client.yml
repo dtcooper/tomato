@@ -8,6 +8,7 @@ on:
       - .github/workflows/build-client.yml
       - client/**
       - server/constants.json
+    tags:
       - 'v*'
   workflow_dispatch:
 
