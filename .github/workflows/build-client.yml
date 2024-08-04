@@ -8,9 +8,7 @@ on:
       - .github/workflows/build-client.yml
       - client/**
       - server/constants.json
-    # Keep this uncommented until we're ready to start releasing client on a tag
-    # tags:
-    #   - 'v*'
+      - 'v*'
   workflow_dispatch:
 
 env:
@@ -157,5 +155,8 @@ jobs:
         with:
           artifacts: "./client-build-files/*"
           name: 'Tomato Release ${{ github.ref_name }}'
+          body: |
+            Choose a client to download below. Server containers
+            [can be found here](https://github.com/dtcooper/tomato/pkgs/container/tomato-server).
           tag: ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
