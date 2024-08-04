@@ -110,9 +110,10 @@ jobs:
           retention-days: 2
 
 
-  upload:
+  merge:
     runs-on: ubuntu-22.04
     needs: build
+    name: Merge artifacts
     steps:
       -
         name: Merge Artifacts
@@ -121,20 +122,21 @@ jobs:
           name: client-build-files
           pattern: client-build-files-*
           retention-days: 2
+          compression-level: 0
           delete-merged: true
 
   tag:
     runs-on: ubuntu-22.04
     name: Tag release
     if: github.ref_type == 'tag' || github.ref_name == 'main'
-    needs: upload
+    needs: merge
     steps:
       -
         name: Checkout
         uses: actions/checkout@v4
       -
         name: Download build artifacts
-        uses: actions/download-artifact@v3  # Can't update to v4, doesn't support merging files
+        uses: actions/download-artifact@v4
         with:
           name: client-build-files
           path: client-build-files
@@ -172,7 +174,6 @@ jobs:
           artifacts: "./client-build-files/*"
           name: 'Tomato Release ${{ github.ref_name }}'
           body: |
-            Choose a client to download below. Server containers
-            [can be found here](https://github.com/dtcooper/tomato/pkgs/container/tomato-server).
+            Choose a client to download below. Server containers [can be found here](https://github.com/dtcooper/tomato/pkgs/container/tomato-server).
           tag: ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
