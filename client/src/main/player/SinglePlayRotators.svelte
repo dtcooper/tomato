@@ -38,7 +38,7 @@
       style:color={modalRotator.color.content}>{modalRotator.name}</span
     > below.
   </p>
-  <div slot="action" class="tooltip-right flex" data-tip="Play now!" class:tooltip={$userConfig.tooltips}>
+  <div let:asset slot="action" class="tooltip-right flex" data-tip="Play now!" class:tooltip={$userConfig.tooltips}>
     <button
       class="btn btn-square btn-success"
       tabindex="-1"
