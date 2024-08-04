@@ -102,17 +102,32 @@ jobs:
           fi
       -
         name: Upload build artifact
-        uses: actions/upload-artifact@v3  # Can't update to v4, doesn't support merging files
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-build-files-${{ matrix.platform }}-${{ matrix.arch }}
+          path: client-build-files
+          compression-level: 0
+          retention-days: 2
+
+
+  upload:
+    runs-on: ubuntu-22.04
+    needs: build
+    steps:
+      -
+        name: Merge Artifacts
+        uses: actions/upload-artifact/merge@v4
         with:
           name: client-build-files
-          path: client-build-files
+          pattern: client-build-files-*
           retention-days: 2
+          delete-merged: true
 
   tag:
     runs-on: ubuntu-22.04
     name: Tag release
     if: github.ref_type == 'tag' || github.ref_name == 'main'
-    needs: build
+    needs: upload
     steps:
       -
         name: Checkout
