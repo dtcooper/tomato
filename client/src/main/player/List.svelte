@@ -108,7 +108,7 @@
                   {#if $userConfig.uiMode > 0}
                     <div
                       class="flex h-[4.75rem] w-[4.75rem] items-center justify-center font-mono text-sm"
-                      style="--size: 4.75rem"
+                      style="--size: 4.72rem"
                       class:radial-progress={!asset.error &&
                         asset.playable &&
                         item.startedPlaying &&
@@ -281,7 +281,7 @@
               {#if $userConfig.uiMode > 0}
                 <div
                   class="radial-progress h-[4.75rem] w-[4.75rem] font-mono text-sm"
-                  style="--size: 4.75rem"
+                  style="--size: 4.72rem"
                   style:--value={(item.elapsed / item.duration) * 100}
                   style:--thickness={item.elapsed === 0 ? "0" : "0.3rem"}
                 >
