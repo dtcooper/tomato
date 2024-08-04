@@ -134,7 +134,7 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v4
-        with:  # For rev number in TOMATO_RELEASE
+        with:  # For rev number in TOMATO_VERSION_SUFFIX
           fetch-depth: 0
       -
         name: Download build artifacts
@@ -154,20 +154,20 @@ jobs:
         name: Set variables & wait for last preview deletion
         shell: bash
         if: github.ref_type != 'tag'
-        run: |
-          echo "TOMATO_RELEASE=${TOMATO_VERSION}-r$(git rev-list --count HEAD).$(git rev-parse --short=8 HEAD)" >> "$GITHUB_ENV"
-          sleep 20s
+        run: |  # Omits "-" character, which is included above
+          echo "TOMATO_VERSION_SUFFIX=r$(git rev-list --count HEAD).$(git rev-parse --short=8 HEAD)" >> "$GITHUB_ENV"
+          sleep 15s
       -
         name: Tag and upload preview release
         uses: ncipollo/release-action@v1
         if: github.ref_type != 'tag'
         with:
           artifacts: "./client-build-files/*"
-          name: 'Tomato Preview Build ${{ env.TOMATO_RELEASE }}'
+          name: 'Tomato Preview Build ${{ env.TOMATO_VERSION_SUFFIX }}'
           body: |
-            This development preview build may not be safe: use it at your own risk.
+            _**This development preview build may not be safe: use it at your own risk!**_
 
-            Release version: ${{ env.TOMATO_RELEASE }}
+            Release version: `${{ env.TOMATO_VERSION }}-${{ env.TOMATO_VERSION_SUFFIX }}`
           tag: 'preview-build'
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
