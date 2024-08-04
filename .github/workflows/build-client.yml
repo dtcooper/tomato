@@ -147,8 +147,7 @@ jobs:
         with:
           delete_release: true
           tag_name: preview-build
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Wait for old preview release deletion
         shell: bash
