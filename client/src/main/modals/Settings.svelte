@@ -6,6 +6,9 @@
   import Modal from "../../components/Modal.svelte"
 
   import cogOutline from "@iconify/icons-mdi/cog-outline"
+  import moonAndStars from "@iconify/icons-mdi/moon-and-stars"
+  import whiteBalanceSunny from "@iconify/icons-mdi/white-balance-sunny"
+  import themeLightDark from "@iconify/icons-mdi/theme-light-dark"
 
   import { IS_DEV } from "../../utils"
   import { db } from "../../stores/db"
@@ -39,6 +42,12 @@
     await tick()
     el.focus()
   }
+
+  const themes = [
+    ["System default", null, themeLightDark],
+    ["Light", "emerald", whiteBalanceSunny],
+    ["Dark", "night", moonAndStars]
+  ]
 
   $: canLogOut = logoutStationName.trim().toLowerCase() === $config.STATION_NAME.trim().toLowerCase()
   $: speakerLocked = show
@@ -114,6 +123,21 @@
           on:click={() => ($userConfig.clock = clock)}
         >
           {clock ? `${clock.substring(0, 2)} hour` : "Off"}
+        </button>
+      {/each}
+    </div>
+    <hr class="divider col-span-2 m-0 h-0 p-0" />
+
+    <div class="flex justify-end text-lg font-bold">Theme:</div>
+    <div class="tabs-boxed tabs w-max">
+      {#each themes as [name, theme, icon]}
+        <button
+          class="tab gap-2"
+          class:tab-active={$userConfig.theme === theme}
+          on:click={() => ($userConfig.theme = theme)}
+        >
+          <Icon {icon} class="h-6 w-6" />
+          {name}
         </button>
       {/each}
     </div>

@@ -18,7 +18,8 @@ const defaultUserConfig = {
   powerSaveBlocker: true,
   enableMIDIButtonBox: true,
   tooltips: true,
-  clock: "12h"
+  clock: "12h",
+  theme: null
 }
 export const userConfig = persisted("user-config", defaultUserConfig)
 export const resetUserConfig = () => userConfig.set(defaultUserConfig)

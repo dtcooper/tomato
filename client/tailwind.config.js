@@ -23,6 +23,10 @@ const colors = Object.keys(materialUIColors).reduce(
 
 module.exports = {
   content: ["index.html", "./src/**/*.{html,js,svelte}"],
+  darkMode: [
+    "variant",
+    ["@media (prefers-color-scheme: dark) { &:not([data-theme=emerald] *) }", "&:is([data-theme=night] *)"]
+  ],
   theme: {
     screens: {
       md: "900px"
