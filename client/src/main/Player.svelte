@@ -133,6 +133,11 @@
     while (numStopsetsToAdd-- > 0) {
       addStopset()
     }
+
+    // Make sure a wait item is running
+    if (items.length >= 1 && items[0].type === "wait") {
+      items[0].run()
+    }
   }
 
   $reloadPlaylistCallback = reloadPlaylist

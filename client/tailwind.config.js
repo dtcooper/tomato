@@ -1,4 +1,5 @@
 const materialUIColors = require("material-ui-colors")
+const daisyui = require("daisyui")
 const { emerald, night } = require("daisyui/src/theming/themes")
 
 // Use material UI colors
@@ -56,5 +57,5 @@ module.exports = {
       }
     ]
   },
-  plugins: [require("daisyui")]
+  plugins: [daisyui]
 }
