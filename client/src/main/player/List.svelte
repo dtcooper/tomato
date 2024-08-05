@@ -179,7 +179,7 @@
                         {@const canRegenerateOrSwap = !(
                           asset.queueForSkip ||
                           (asset.active && asset.playing) ||
-                          (isFirstItem && !asset.afterActive)
+                          (isFirstItem && !asset.afterActive && item.startedPlaying)
                         )}
                         <button
                           class="btn btn-info btn-xs gap-0.5 pl-0.5 pr-1.5"

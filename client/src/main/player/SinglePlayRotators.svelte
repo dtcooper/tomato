@@ -25,6 +25,8 @@
   $: if (!showModal) {
     modalRotator = null
   }
+
+  $: renderLg = $singlePlayRotators.rotators.length <= 8
 </script>
 
 <AssetPicker bind:show={showModal} rotator={modalRotator}>
@@ -43,7 +45,6 @@
       class="btn btn-square btn-success"
       tabindex="-1"
       disabled={playDisabled}
-      let:asset
       on:click={() => {
         play(asset, modalRotator)
         modalRotator = null
@@ -72,8 +73,8 @@
           data-tip={playing ? "Stop playing this asset now!" : "Play random asset from rotator"}
         >
           <button
-            class="btn flex-1 text-left hover:brightness-110"
-            class:btn-lg={$singlePlayRotators.rotators.length <= 2}
+            class="btn flex-1 px-2 text-left hover:brightness-110"
+            class:btn-lg={renderLg}
             class:hover:brightness-110={!disabled}
             class:btn-error={playing}
             style={playDisabled ? "" : `background-color: ${rotator.color.value}; color: ${rotator.color.content}`}
@@ -81,7 +82,10 @@
             on:click={() => (playing ? stop() : playFromRotator(rotator, mediumIgnoreIds))}
             tabindex="-1"
           >
-            <Icon icon={playing ? stopCircleOutlineIcon : playCircleOutlineIcon} class="h-10 w-10" />
+            <Icon
+              icon={playing ? stopCircleOutlineIcon : playCircleOutlineIcon}
+              class={renderLg ? "h-12 w-12" : "h-10 w-10"}
+            />
             <span class="w-0 flex-1 truncate py-2">{rotator.name}</span>
           </button>
         </div>
@@ -99,7 +103,7 @@
               }}
               tabindex="-1"
             >
-              <Icon icon={playlistPlayIcon} class="h-8 w-8" />
+              <Icon icon={playlistPlayIcon} class={renderLg ? "h-10 w-10" : "h-8 w-8"} />
             </button>
           </div>
         {/if}

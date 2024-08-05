@@ -81,9 +81,16 @@ class GeneratedStopsetAssetBase {
 
   get logLine() {
     const stopset = this.generatedStopset
-    return `[Stopset=${stopset.name}] [Rotator=${this.rotator.name}] [${this.index + 1}/${
+    let line = `[Stopset=${stopset.name}] [Rotator=${this.rotator.name}] [${this.index + 1}/${
       stopset.items.length
     }] [Asset=${this.name}]`
+    if (this.alternateNumber > 0) {
+      line += ` [Alt=${this.alternateNumber}]`
+    }
+    if (this.isSwapped) {
+      line += " [Swapped]"
+    }
+    return line
   }
 
   done() {

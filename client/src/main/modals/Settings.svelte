@@ -114,7 +114,7 @@
     </div>
     <hr class="divider col-span-2 m-0 h-0 p-0" />
 
-    <div class="flex justify-end text-lg font-bold">Clock:</div>
+    <div class="flex justify-end text-lg font-bold">System clock:</div>
     <div class="tabs-boxed tabs w-max">
       {#each [false, "12h", "24h"] as clock}
         <button

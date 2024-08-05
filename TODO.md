@@ -83,3 +83,4 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [x] Assets queued for skipping should grey out
 - [x] Seed, leaf, flower icon for simple, intermediate, advanced
 - [x] Alternating grey/white rows in AssetPicker component
+- [x] Fix regenerate/swap not working button when wait intervals are disabled

@@ -65,6 +65,7 @@
   })
 </script>
 
+<!-- TODO: confirm when this component is destroyed, that this listener is uninstalled -->
 <svelte:window
   on:keydown={(event) => {
     if (!playDisabled && !$blockSpacebarPlay && event.code === "Space") {
