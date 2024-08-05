@@ -1,4 +1,5 @@
 const materialUIColors = require("material-ui-colors")
+const { emerald, night } = require("daisyui/src/theming/themes")
 
 // Use material UI colors
 const colors = Object.keys(materialUIColors).reduce(
@@ -23,10 +24,6 @@ const colors = Object.keys(materialUIColors).reduce(
 
 module.exports = {
   content: ["index.html", "./src/**/*.{html,js,svelte}"],
-  darkMode: [
-    "variant",
-    ["@media (prefers-color-scheme: dark) { &:not([data-theme=emerald] *) }", "&:is([data-theme=night] *)"]
-  ],
   theme: {
     screens: {
       md: "900px"
@@ -36,13 +33,29 @@ module.exports = {
         sans: "Inter Local",
         mono: "Space Mono Local"
       },
-      colors
+      colors: {
+        playhead: "oklch(var(--playhead) / <alpha-value>)"
+      }
     }
   },
   daisyui: {
     logs: false,
     darkTheme: "night",
-    themes: ["emerald", "night"]
+    themes: [
+      {
+        emerald: {
+          ...emerald,
+          "--playhead": "var(--bc)" // base-content
+        }
+      },
+      {
+        night: {
+          ...night,
+          primary: emerald.primary,
+          "--playhead": "100% 0 0" // white
+        }
+      }
+    ]
   },
   plugins: [require("daisyui")]
 }
