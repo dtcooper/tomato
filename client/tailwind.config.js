@@ -51,7 +51,6 @@ module.exports = {
       {
         night: {
           ...night,
-          primary: emerald.primary,
           "--playhead": "100% 0 0" // white
         }
       }
