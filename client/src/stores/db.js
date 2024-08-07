@@ -178,7 +178,6 @@ class Asset extends AssetStopsetHydratableObject {
 
 const pickRandomItemByWeight = (objects, endDateMultiplier = null, startTime = null) => {
   objects = objects.map((obj) => {
-    console.error(obj.constructor.name, startTime && startTime.format())
     if (
       endDateMultiplier &&
       endDateMultiplier > 0 &&
