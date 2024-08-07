@@ -79,7 +79,6 @@ class AssetStopsetHydratableObject extends HydratableObject {
   }
 
   airingInfo() {
-    console.log(dayjs)
     if (!this.enabled) {
       return "Not enabled"
     } else if (this.begin && this.end) {
