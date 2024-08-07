@@ -178,7 +178,14 @@ class Asset extends AssetStopsetHydratableObject {
 
 const pickRandomItemByWeight = (objects, endDateMultiplier = null, startTime = null) => {
   objects = objects.map((obj) => {
-    if (endDateMultiplier && endDateMultiplier > 0 && obj.end && startTime && startTime.isSameOrAfter(obj.end.subtract(1, "day"))) {
+    console.error(obj.constructor.name, startTime && startTime.format())
+    if (
+      endDateMultiplier &&
+      endDateMultiplier > 0 &&
+      obj.end &&
+      startTime &&
+      startTime.isSameOrAfter(obj.end.subtract(1, "day"))
+    ) {
       return [obj, obj.weight * endDateMultiplier, true]
     } else {
       return [obj, obj.weight, false]
@@ -436,6 +443,7 @@ class DB {
   generateStopset(startTime, mediumIgnoreIds, endDateMultiplier, doneCallback, updateCallback, generatedId) {
     let generated = null
     for (let i = 0; i < 3; i++) {
+      // Don't pass startTime to pickRandomItemByWeight() – since stop sets DO NOT apply the END_DATE_PRIORITY_WEIGHT_MULTIPLIER multiplier
       const stopset = pickRandomItemByWeight(filterItemsByActive(this.stopsets, startTime)).obj
       if (stopset) {
         generated = stopset.generate(
