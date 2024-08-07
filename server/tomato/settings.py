@@ -334,8 +334,8 @@ CONSTANCE_CONFIG = {
     "END_DATE_PRIORITY_WEIGHT_MULTIPLIER": (
         Decimal(0),
         mark_safe(
-            "Multiply an asset's weight by this number if it has an end date <strong>and</strong> the current date is"
-            " the end date. <strong>Set to 0 to disable</strong> this feature."
+            "Multiply an asset's weight by this number if it has an end date <strong>and</strong> the end date is"
+            " in the next 24 hours (one day). <strong>Set to 0 to disable</strong> this feature."
         ),
         "asset_end_date_priority_weight_multiplier",
     ),

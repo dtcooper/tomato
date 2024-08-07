@@ -178,8 +178,7 @@ class Asset extends AssetStopsetHydratableObject {
 
 const pickRandomItemByWeight = (objects, endDateMultiplier = null, startTime = null) => {
   objects = objects.map((obj) => {
-    // Apply end date multiplier (if it exists)
-    if (endDateMultiplier && endDateMultiplier > 0 && obj.end && startTime && obj.end.isSame(startTime, "day")) {
+    if (endDateMultiplier && endDateMultiplier > 0 && obj.end && startTime && startTime.isSameOrAfter(obj.end.subtract(1, "day"))) {
       return [obj, obj.weight * endDateMultiplier, true]
     } else {
       return [obj, obj.weight, false]
