@@ -183,7 +183,7 @@
     console.log(`Admin ${connection_id} subscribed`)
     subscriptionConnectionId = connection_id
     sendClientDataToSubscriber()
-    subscriptionInterval = setInterval(sendClientDataToSubscriber, 15000) // Update 3 times per sec
+    subscriptionInterval = setInterval(sendClientDataToSubscriber, 333) // Update 3 times per sec
   })
 
   registerMessageHandler("unsubscribe", unsubscribe)
