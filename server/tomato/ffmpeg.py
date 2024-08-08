@@ -3,6 +3,7 @@ import datetime
 import json
 import logging
 import math
+import re
 import shlex
 import subprocess
 
@@ -11,6 +12,7 @@ from constance import config
 
 logger = logging.getLogger(__name__)
 FFProbe = namedtuple("FFProbe", ("format", "duration", "title"))
+SILENCEDETECT_RE = re.compile(r"^\[silencedetect.+silence_duration: ([\d\.]+)", re.MULTILINE)
 
 
 def run_command(args):
@@ -123,3 +125,34 @@ def ffmpeg_convert(infile, outfile):
         trimmed_wav_file.unlink(missing_ok=True)
 
     return cmd.returncode == 0
+
+
+def silence_detect(infile):
+    if config.REJECT_SILENCE_LENGTH == 0:
+        return (False, 0)
+
+    cmd = run_command(
+        (
+            "ffmpeg",
+            "-y",
+            "-i",
+            infile,
+            "-hide_banner",
+            "-af",
+            f"silencedetect=n=-32dB:d={config.REJECT_SILENCE_LENGTH}",
+            "-f",
+            "null",
+            "-",
+        ),
+    )
+    if cmd.returncode != 0:
+        logger.error(f"ffmpeg returned {cmd.returncode} while detecting silence in {infile}: {cmd.stderr}")
+        return (False, 0)
+
+    silences = SILENCEDETECT_RE.findall(cmd.stderr)
+    if silences:
+        max_silence = max(math.ceil(float(s)) for s in SILENCEDETECT_RE.findall(cmd.stderr))
+        logger.warning(f"{infile} has a silence of {max_silence} seconds in it!")
+        return (True, max_silence)
+    else:
+        return (False, 0)

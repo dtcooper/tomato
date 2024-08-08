@@ -17,6 +17,7 @@ from django.utils.safestring import mark_safe
 from constance import config
 from dirtyfields import DirtyFieldsMixin
 
+from ..ffmpeg import silence_detect
 from ..utils import listdir_recursive
 from .base import (
     FILE_MAX_LENGTH,
@@ -87,22 +88,33 @@ class AssetBase(DirtyFieldsMixin, TomatoModelBase):
 
     def full_clean(self, *args, **kwargs):
         super().full_clean(*args, **kwargs)
-        if config.PREVENT_DUPLICATE_ASSETS and self.file and "file" in self.get_dirty_fields():
-            md5sum = self.generate_md5sum()
-            querysets = {
-                Asset: Asset.objects.filter(pre_process_md5sum=md5sum),
-                AssetAlternate: AssetAlternate.objects.filter(pre_process_md5sum=md5sum),
-            }
-            if self.id is not None:
-                querysets[self._meta.model] = querysets[self._meta.model].exclude(id=self.id)
-            if any(qs.exists() for qs in querysets.values()):
-                raise ValidationError({
-                    "__all__": mark_safe(
-                        "An audio asset already exists with this audio file. Rejecting duplicate. You can turn this"
-                        " feature off with setting <code>PREVENT_DUPLICATES</code>."
-                    ),
-                    "file": "A duplicate of this file already exists.",
-                })
+        if self.file and "file" in self.get_dirty_fields():
+            if config.PREVENT_DUPLICATE_ASSETS:
+                md5sum = self.generate_md5sum()
+                querysets = {
+                    Asset: Asset.objects.filter(pre_process_md5sum=md5sum),
+                    AssetAlternate: AssetAlternate.objects.filter(pre_process_md5sum=md5sum),
+                }
+                if self.id is not None:
+                    querysets[self._meta.model] = querysets[self._meta.model].exclude(id=self.id)
+                if any(qs.exists() for qs in querysets.values()):
+                    raise ValidationError({
+                        "__all__": mark_safe(
+                            "An audio asset already exists with this audio file. Rejecting duplicate. You can turn this"
+                            " feature off with setting <code>PREVENT_DUPLICATES</code>."
+                        ),
+                        "file": "A duplicate of this file already exists.",
+                    })
+            if config.REJECT_SILENCE_LENGTH > 0:
+                has_silence, silence_duration = silence_detect(self.file.real_path)
+                if has_silence:
+                    raise ValidationError({
+                        "__all__": mark_safe(
+                            f"This audio asset contains a silence of {silence_duration}s. Rejecting. You feature off"
+                            " with setting <code>REJECT_SILENCE_LENGTH</code>."
+                        ),
+                        "file": f"This asset contains a silence of {silence_duration} seconds.",
+                    })
 
     def save(self, dont_overwrite_original_filename=False, *args, **kwargs):
         if not dont_overwrite_original_filename and "file" in self.get_dirty_fields():

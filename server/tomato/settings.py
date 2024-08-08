@@ -313,6 +313,14 @@ CONSTANCE_ADDITIONAL_FIELDS = {
             "validators": (validate_reset_times,),
         },
     ),
+    "silence": (
+        "django.forms.IntegerField",
+        {
+            "widget": "django.forms.TextInput",
+            "min_value": 0,
+            "max_value": 60,
+        },
+    ),
 }
 
 CONSTANCE_CONFIG = {
@@ -439,6 +447,11 @@ CONSTANCE_CONFIG = {
     "WARN_ON_EMPTY_ROTATORS": (True, "Warn when a rotator is disabled or has no eligible assets to choose from."),
     "RELOAD_PLAYLIST_AFTER_DATA_CHANGES": (False, "Reload all connected client playlists when a data change occurs."),
     "ONE_CLIENT_LOGIN_PER_ACCOUNT": (False, "Only allow one desktop client to be connected per account."),
+    "REJECT_SILENCE_LENGTH": (
+        0,
+        mark_safe("Reject silence assets of this many seconds. <strong>Set to 0 disable</strong>."),
+        "silence",
+    ),
 }
 
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
@@ -458,6 +471,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
             "EXTRACT_METADATA_FROM_FILE",
             "PREVENT_DUPLICATE_ASSETS",
             "TRIM_SILENCE",
+            "REJECT_SILENCE_LENGTH",
             "RELOAD_PLAYLIST_AFTER_DATA_CHANGES",
         ),
     ),
@@ -483,7 +497,7 @@ SHELL_PLUS_IMPORTS = [
     "from constance import config",
     "from user_messages import api as user_messages_api",
     "from tomato import constants",
-    "from tomato.ffmpeg import ffmpeg_convert, ffprobe",
+    "from tomato.ffmpeg import ffmpeg_convert, ffprobe, silence_detect",
     "from tomato.models import export_data_as_zip, import_data_from_zip, serialize_for_api",
     "from tomato.tasks import bulk_process_assets, process_asset, cleanup",
 ]

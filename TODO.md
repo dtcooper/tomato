@@ -63,7 +63,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [x] Single app client lock (ie only ONE client per username/password)'
 - [ ] Way to parse filename into rotator, start/end date
   - [ ] Submit form built into Tomato?
-- [ ] Silence detection REJECTs audio assets in backend (if there's more than 2 seconds?) (behind FEATURE flag)
+- [x] Silence detection REJECTs audio assets in backend (if there's more than 2 seconds?) (behind FEATURE flag)
 - [x] Export all audio assets as zip
   - [x] Import as well (have to be careful with different `protocol.json:protocol_version`)
 - [ ] Add configurable silence between ads. Crossfade, with fade points? Fancy!
