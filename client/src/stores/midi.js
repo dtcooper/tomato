@@ -1,9 +1,12 @@
+import { decode as msgpackDecode } from "@msgpack/msgpack"
 import { EventEmitter } from "eventemitter3"
 import { WebMidi } from "webmidi"
 
 import { alert } from "./alerts"
 import { userConfig } from "./config"
 
+const SYSEX_PREFIX = "!T~"
+const SYSEX_NON_COMMERCIAL = 0x7d
 const MIDI_BTN_CTRL = 0x10
 const MIDI_LED_CTRL = 0x11
 const BTN_PRESSED = 0x7f
@@ -24,18 +27,51 @@ window.addEventListener("beforeunload", () => {
   midiSetLED(LED_OFF, true)
 })
 
+const sysexMsgPack7bitDecode = (msg) => {
+  // Decode most significant bit of following 7 bytes first as 0b07654321 0b01111111 0b02222222 ... 0b07777777
+  // Then use msgpack to decode binary data
+  const unpacked = []
+  for (let index = 0; index < msg.length; index += 8) {
+    const msbByte = msg[index] // Every 8th byte is the most significant bit for the following 7 bytes as above
+    const chunk = msg.slice(index + 1, index + 8)
+    for (let chunkIndex = 0; chunkIndex < chunk.length; chunkIndex++) {
+      const msb = (msbByte << (7 - chunkIndex)) & 0x80
+      unpacked.push(chunk[chunkIndex] | msb) // Reassemble chunk byte
+    }
+  }
+  return msgpackDecode(unpacked)
+}
+
 const enableListeners = () => {
   WebMidi.addListener("connected", ({ port }) => {
     if (port.type === "input") {
       console.log(`Got midi input: ${port.name} (installing press listener)`)
-      port.channels[1].addListener("controlchange", (event) => {
-        if (event.controller.number === MIDI_BTN_CTRL) {
-          midiButtonPresses.emit(event.rawValue === BTN_PRESSED ? "pressed" : "released")
+      port.channels[1].addListener("controlchange", ({ controller, rawValue: value }) => {
+        if (controller.number === MIDI_BTN_CTRL) {
+          midiButtonPresses.emit(value === BTN_PRESSED ? "pressed" : "released")
+        }
+      })
+      port.addListener("reset", () => {
+        console.log(`Midi input ${port.name} was reset.`)
+      })
+      port.addListener("sysex", ({ message: { rawDataBytes: message } }) => {
+        const prefix = new TextDecoder().decode(message.slice(0, SYSEX_PREFIX.length))
+        if (prefix === SYSEX_PREFIX) {
+          const encoded = message.slice(SYSEX_PREFIX.length)
+          const [type, obj] = sysexMsgPack7bitDecode(encoded)
+          console.log(
+            `Received ${type} sysex from ${port.name}${obj === null ? "" : ": " + JSON.stringify(obj, undefined, Object.keys(obj).length === 1 ? undefined : 2)}`
+          )
         }
       })
     } else if (port.type === "output") {
       console.log(`Got midi output: ${port.name} (set LED to ${ledStrings[lastLEDValue]})`)
       port.channels[1].sendControlChange(MIDI_LED_CTRL, lastLEDValue)
+    }
+  })
+  WebMidi.addListener("disconnected", ({ port }) => {
+    if (port.type === "input") {
+      port.removeListener() // Uninstall listeners on disconnect
     }
   })
 }
@@ -79,3 +115,11 @@ userConfig.subscribe(({ enableMIDIButtonBox }) => {
 })
 
 window.WebMidi = WebMidi
+window.sendButtonBoxSysex = (cmd = "stats") => {
+  if (enabled) {
+    const data = Array.from(SYSEX_PREFIX + cmd).map((letter) => letter.charCodeAt(0))
+    for (const output of WebMidi.outputs) {
+      output.sendSysex(SYSEX_NON_COMMERCIAL, data)
+    }
+  }
+}

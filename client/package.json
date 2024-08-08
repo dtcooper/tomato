@@ -40,6 +40,7 @@
     "@electron-forge/maker-dmg": "^7.4.0",
     "@electron-forge/maker-squirrel": "^7.4.0",
     "@iconify/icons-mdi": "^1.2.48",
+    "@msgpack/msgpack": "^3.0.0-beta2",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.3",
     "browser-sync": "^3.0.2",
