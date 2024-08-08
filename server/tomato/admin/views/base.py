@@ -7,6 +7,7 @@ class AdminViewMixin:
     path = None
     perms = None
     template_name = None
+    hide_from_app_list = False
 
     def __init__(self, admin_site, *args, **kwargs):
         self.admin_site = admin_site

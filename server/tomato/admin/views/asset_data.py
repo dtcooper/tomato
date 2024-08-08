@@ -28,13 +28,7 @@ class ImportUploadForm(FileFormMixin, forms.Form):
 
 class AdminAssetDataView(AdminViewMixin, TemplateView):
     name = "asset_data"
-    perms = (
-        "tomato.add_asset",
-        "tomato.add_assetalternate",
-        "tomato.add_rotator",
-        "tomato.add_stopset",
-        "tomato.add_stopsetrotator",
-    )
+    perms = ("tomato.export_import",)
     title = "Manage asset data"
 
     def get_context_data(self, **kwargs):

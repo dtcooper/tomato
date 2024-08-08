@@ -5,28 +5,44 @@ from schema import Optional, Or, Schema, Use
 
 class ServerMessageTypes(enum.StrEnum):
     DB_CHANGE = "db-change"
-    DB_CHANGES = "db-changes"  # de-duped
     DB_CHANGE_FORCE_UPDATE = "db-changes-force"  # forced
-    RELOAD_PLAYLIST = "reload-playlist"
+    DB_CHANGES = "db-changes"  # de-duped
 
 
 class UserMessageTypes(enum.StrEnum):
+    CLIENT_DATA = "client-data"
     SEND_LOG = "log"
+    UNSUBSCRIBE = "unsubscribe"
+    ACK_ACTION = "ack-action"
 
 
 class OutgoingUserMessageTypes(enum.StrEnum):
-    DATA = "data"
     ACKNOWLEDGE_LOG = "ack-log"
+    DATA = "data"
+    NOTIFY = "notify"
     RELOAD_PLAYLIST = "reload-playlist"
+    SUBSCRIBE = "subscribe"
+    SWAP = "swap"
+    UNSUBSCRIBE = "unsubscribe"
+    PLAY = "play"
 
 
 class AdminMessageTypes(enum.StrEnum):
+    NOTIFY = "notify"
     RELOAD_PLAYLIST = "reload-playlist"
+    SUBSCRIBE = "subscribe"
+    SWAP = "swap"
+    UNSUBSCRIBE = "unsubscribe"
+    PLAY = "play"
 
 
 class OutgoingAdminMessageTypes(enum.StrEnum):
+    ACK_ACTION = "ack-action"
+    CLIENT_DATA = "client-data"
     RELOAD_PLAYLIST = "reload-playlist"
-    HELLO = "hello"
+    SUBSCRIBE = "subscribe"
+    UNSUBSCRIBE = "unsubscribe"
+    USER_CONNECTIONS = "user-connections"
 
 
 greeting_schema = Schema(
@@ -44,14 +60,6 @@ greeting_schema = Schema(
             "protocol_version": Use(int),
             Optional("admin_mode", default=False): Use(bool),
             "method": "session",
-        },
-        {
-            "key": str,
-            "user_id": int,
-            "tomato": "radio-automation",
-            "protocol_version": Use(int),
-            "admin_mode": True,
-            "method": "secret-key",
         },
     )
 )

@@ -156,7 +156,10 @@ class Asset(EnabledBeginEndWeightMixin, AssetBase):
         db_table = "assets"
         verbose_name = "audio asset"
         ordering = ("-created_at",)
-        permissions = [("immediate_play_asset", "Can immediately play audio assets")]
+        permissions = [
+            ("configure_live_clients", "Can configure live desktop clients"),
+            ("export_import", "Can manage (import/export/delete all) asset data"),
+        ]
 
     def __str__(self):
         return f"{self.name}{' (archived)' if self.archived else ''}"

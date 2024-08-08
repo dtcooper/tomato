@@ -98,6 +98,6 @@ export const playFromRotator = (rotator, mediumIgnoreIds = new Set()) => {
   if (asset) {
     play(asset, rotator)
   } else {
-    error(`No assets to play from ${rotator.name}!`)
+    error(`No assets currently airing to play from ${rotator.name}!`)
   }
 }

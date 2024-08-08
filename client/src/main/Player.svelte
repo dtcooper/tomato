@@ -9,7 +9,7 @@
   import SinglePlayRotators from "./player/SinglePlayRotators.svelte"
 
   import { IS_DEV } from "../utils"
-  import { reloadPlaylistCallback } from "../stores/connection"
+  import { registerMessageHandler, messageServer, conn } from "../stores/connection"
   import { config, userConfig } from "../stores/config"
   import { singlePlayRotators, stop as stopSinglePlayRotator } from "../stores/single-play-rotators"
   import { db } from "../stores/db"
@@ -140,7 +140,91 @@
     }
   }
 
-  $reloadPlaylistCallback = reloadPlaylist
+  let subscriptionConnectionId = null
+  let subscriptionLastItems = null
+  let subscriptionInterval
+
+  registerMessageHandler("reload-playlist", ({ notify, connection_id }) => {
+    console.warn("Received playlist reload from server")
+    if (notify) {
+      alert("An administrator forced a playlist refresh!", "info", 4000)
+    }
+    reloadPlaylist()
+    if (connection_id) {
+      messageServer("ack-action", { connection_id, msg: "Successfully reloaded playlist!" })
+    }
+  })
+
+  const unsubscribe = () => {
+    if (subscriptionConnectionId) {
+      if ($conn.connected) {
+        messageServer("unsubscribe")
+      }
+      console.log(`Admin ${subscriptionConnectionId} unsubscribed`)
+      clearInterval(subscriptionInterval)
+      subscriptionConnectionId = subscriptionLastItems = null
+    }
+  }
+
+  $: if (subscriptionConnectionId && !$conn.connected) {
+    console.log("Disconnected while admin was subscribed. Unsubscribing.")
+    unsubscribe()
+  }
+
+  const sendClientDataToSubscriber = () => {
+    if (subscriptionConnectionId) {
+      const serialized = items.map((item) => item.serializeForSubscriber())
+      messageServer("client-data", { connection_id: subscriptionConnectionId, items: serialized })
+    }
+  }
+
+  registerMessageHandler("subscribe", ({ connection_id }) => {
+    unsubscribe() // Unsubscribe any existing connections
+    console.log(`Admin ${connection_id} subscribed`)
+    subscriptionConnectionId = connection_id
+    sendClientDataToSubscriber()
+    subscriptionInterval = setInterval(sendClientDataToSubscriber, 15000) // Update 3 times per sec
+  })
+
+  registerMessageHandler("unsubscribe", unsubscribe)
+
+  registerMessageHandler("swap", ({ action, asset_id, rotator_id, generated_id, subindex, connection_id }) => {
+    const stopset = items.find((item) => item.type === "stopset" && item.generatedId === generated_id)
+    if (!stopset) {
+      console.warn("An swap action was requested on a stopset that doesn't exist!")
+      messageServer("ack-action", { connection_id, msg: `An action was requested on a stopset that doesn't exist!` })
+      return
+    }
+
+    let success = false
+    if (action === "delete") {
+      success = stopset.deleteAsset(subindex)
+    } else {
+      const asset = $db.assets.find((asset) => asset.id === asset_id)
+      const rotator = $db.rotators.get(rotator_id)
+
+      if (!asset || !rotator) {
+        console.warn("An swap action was requested on an asset/rotator that doesn't exist!")
+        messageServer("ack-action", {
+          connection_id,
+          msg: `An action was requested on a asset/rotator that doesn't exist!`
+        })
+        return
+      }
+
+      if (action === "swap") {
+        success = stopset.swapAsset(subindex, asset, rotator)
+      } else {
+        success = stopset.insertAsset(subindex, asset, rotator, action === "before")
+      }
+    }
+
+    updateUI()
+    messageServer("ack-action", {
+      connection_id,
+      msg: `${success ? "Successfully performed" : "FAILED to perform"} action of type: ${action}!`
+    })
+  })
 
   const regenerateNextStopset = () => {
     let nextStopset
@@ -212,13 +296,10 @@
   const doAssetSwap = (stopset, subindex, asset, swapAsset) => {
     if (stopset.destroyed) {
       alert(`Stop set ${stopset.name} no longer active in the playlist. Can't perform swap!`, "warning")
-    } else if (stopset.startedPlaying && stopset.current >= subindex) {
-      alert(
-        `Asset in stop set ${stopset.name}'s index ${subindex + 1} has already been played. Can't perform swap!`,
-        "warning"
-      )
     } else {
-      stopset.swapAsset(subindex, asset, swapAsset.rotator)
+      if (!stopset.swapAsset(subindex, asset, swapAsset.rotator)) {
+        alert(`Asset in stop set ${stopset.name}'s index ${subindex + 1} can no longer be swapped.`, "warning")
+      }
       updateUI()
     }
     swap = null

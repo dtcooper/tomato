@@ -42,6 +42,8 @@ class TomatoConfig(AppConfig):
         stopset_rotator = ContentType.objects.get_for_model(StopsetRotator)
         client_log_entry = ContentType.objects.get_for_model(ClientLogEntry)
 
+        extra_perms = Asset._meta.permissions
+
         for name, content_types in (
             (EDIT_ALL_GROUP_NAME, (asset, asset_alternate, rotator, stopset, stopset_rotator)),
             (EDIT_ONLY_ASSETS_GROUP_NAME, (asset,)),
@@ -49,7 +51,9 @@ class TomatoConfig(AppConfig):
         ):
             group, _ = Group.objects.get_or_create(name=name)
             group.permissions.add(
-                *Permission.objects.filter(content_type__in=content_types).exclude(codename="immediate_play_asset")
+                *Permission.objects.filter(content_type__in=content_types).exclude(
+                    codename__in=[codename for codename, _ in extra_perms]
+                )
             )
             all_groups.append(group)
 
@@ -58,8 +62,9 @@ class TomatoConfig(AppConfig):
         group.permissions.add(Permission.objects.get(codename="change_config"))
         all_groups.append(group)
 
-        group, _ = Group.objects.get_or_create(name="Can manage connected desktop clients")
-        group.permissions.add(Permission.objects.get(codename="immediate_play_asset"))
-        all_groups.append(group)
+        for codename, perm_name in extra_perms:
+            group, _ = Group.objects.get_or_create(name=perm_name)
+            group.permissions.add(Permission.objects.get(codename=codename))
+            all_groups.append(group)
 
         Group.objects.exclude(id__in=[group.id for group in all_groups]).delete()

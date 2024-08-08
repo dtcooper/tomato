@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+  {% load static %}
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Configure Live Client</title>
+    <link rel="stylesheet" href="{% static 'admin/tomato/configure_live_clients/deps/simple.css' %}" />
+    <link rel="stylesheet" href="{% static 'admin/tomato/configure_live_clients/deps/choices.css' %}" />
+    <script src="{% static 'admin/tomato/configure_live_clients/deps/reconnecting-websocket.js' %}"></script>
+    <script src="{% static 'admin/tomato/configure_live_clients/deps/alpinejs.js' %}" defer></script>
+    <script src="{% static 'admin/tomato/configure_live_clients/deps/dayjs.js' %}"></script>
+    <script src="{% static 'admin/tomato/configure_live_clients/deps/dayjs-duration.js' %}"></script>
+    <script src="{% static 'admin/tomato/configure_live_clients/deps/choices.js' %}"></script>
+    <style>
+      :root {
+        --bg: #fff;
+        --accent-bg: #f5f7ff;
+        --text: #212121;
+        --text-light: #585858;
+        --border: #898ea4;
+        --accent: #0d47a1;
+        --accent-hover: #1266e2;
+        --accent-text: var(--bg);
+        --code: #d81b60;
+        --preformatted: #444;
+        --marked: #ffdd33;
+        --disabled: #efefef;
+        font-size: 13px;
+      }
+      body {
+        width: 100%;
+        grid-template-columns: 0px 100% 0px;
+      }
+
+      table {
+        width: 100%;
+      }
+
+      article {
+        height: 125px;
+        overflow-y: auto;
+        padding: 3px;
+        font-size: 12px;
+        font-family: var(--mono-font);
+      }
+    </style>
+    {{ configure_live_clients_data|json_script:'tomato-configure-live-clients-data' }}
+    <script src="{% static 'admin/tomato/configure_live_clients/configure_live_clients.js' %}"></script>
+  </head>
+  <body>
+    <div x-data="tomato" style="padding-top: 5px">
+      <p x-show="error">An error occurred: <span x-text="error"></span></p>
+      <article>
+        <em x-show="logs.length === 0">Log is empty!</em>
+        <template x-for="log in logs">
+          <div x-text="log"></div>
+        </template>
+      </article>
+      <p>
+        <button @click="logs = []">Clear logs</button>
+        <button :disabled="!connected" @click.debounce="send('reload-playlist')">
+          Refresh ALL connected clients playlists
+        </button>
+      </p>
+      <template x-if="connected">
+        <div>
+          <p x-text="`There are ${connections.length} user(s) connected.`"></p>
+          <p></p>
+          <p>
+            Notification:
+            <input
+              x-model="notifyMsg"
+              placeholder="Enter your notification text here"
+              size="75"
+              style="margin-right: 5px"
+            />
+            Level:
+            <select x-model="notifyLevel">
+              <option value="success">Success</option>
+              <option value="info">Info</option>
+              <option value="warning">Warning</option>
+              <option value="error">Error</option>
+            </select>
+          </p>
+          <div style="display: flex; align-items: center; gap: 5px">
+            <div>Asset to swap:</div>
+            <div style="flex: 1 1 0%">
+              <select
+                x-init="$nextTick(() => new Choices($el, {searchResultLimit: 8, noResultsText: 'No asset found!', searchPlaceholderValue: 'Start typing to search for an asset'}))"
+                @change="() => {
+                  if ($el.value) {
+                    const [assetId, rotatorId] = JSON.parse($el.value)
+                    asset = db.assets.find(a => a.id === assetId)
+                    rotator = db.rotators.find(r => r.id === rotatorId)
+                  } else {
+                    asset = rotator = null
+                  }
+                }"
+              >
+                <option value="">Select an asset here</option>
+                <template x-for="rotator in db.rotators">
+                  <optgroup :label="rotator.name">
+                    <template x-for="asset in db.assets.filter(a => a.rotators.includes(rotator.id))">
+                      <option
+                        :value="`[${asset.id}, ${rotator.id}]`"
+                        x-text="`${asset.name} [${prettyDuration(asset.duration)}] (${rotator.name})`"
+                      ></option>
+                    </template>
+                  </optgroup>
+                </template>
+              </select>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th width="20%">Connect</th>
+                <th width="20%">User</th>
+                <th width="60%">Actions</th>
+              </tr>
+            </thead>
+            <template x-for="conn in connections" :key="conn.connection_id">
+              <tbody x-show="!subscribed || subscribed === conn.connection_id">
+                <tr :style="{'background-color': subscribed === conn.connection_id && '#e6ffe6'}">
+                  <td>
+                    <button
+                      x-show="subscribed !== conn.connection_id"
+                      @click="send('subscribe', {'connection_id': conn.connection_id})"
+                    >
+                      Connect
+                    </button>
+                    <button
+                      x-show="subscribed === conn.connection_id"
+                      @click="send('unsubscribe', {'connection_id': conn.connection_id})"
+                    >
+                      Disconnect
+                    </button>
+                  </td>
+                  <td x-text="conn.username"></td>
+                  <td>
+                    <button @click.debounce="send('reload-playlist', {'connection_id': conn.connection_id})">
+                      Refresh playlist
+                    </button>
+                    <button
+                      @click.debounce="() => {
+                        if(notifyMsg.trim().length > 0) {
+                          send('notify', {'connection_id': conn.connection_id, msg: notifyMsg, level: notifyLevel})
+                          notifyMsg = ''
+                        } else {
+                          alert('You must enter some text to notify user with!')
+                        }
+                      }"
+                    >
+                      Notify as above
+                    </button>
+                    <button @click.debounce="() =>  send('play', {'connection_id': conn.connection_id })">Play</button>
+                  </td>
+                </tr>
+              </tbody>
+            </template>
+          </table>
+          <template x-if="subscribed">
+            <table>
+              <thead>
+                <caption>
+                  Connected to client
+                  <strong x-text="getConn(subscribed).username"></strong
+                  >!
+                </caption>
+                <tr>
+                  <th width="2%">#</th>
+                  <th width="6%">Type</th>
+                  <th width="90%">Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="item, i in items" :key="item.id">
+                  <tr :style="i === 0 && `background-color: #e6ffe6`">
+                    <td x-text="`${i + 1}`"></td>
+                    <td x-text="item.type"></td>
+                    <template x-if="item.type === 'wait'">
+                      <td>
+                        <span x-show="!item.active">
+                          Wait for <code x-text="prettyDuration(item.duration)"></code>
+                        </span>
+                        <span x-show="item.active && !item.overtime">
+                          Progress: <code x-text="prettyDuration(item.elapsed)"></code> of
+                          <code x-text="prettyDuration(item.duration)"></code>
+                        </span>
+                        <span x-show="item.active && item.overtime">
+                          Waited for <code x-text="prettyDuration(item.duration)"></code> and now
+                          <code x-text="prettyDuration(item.overtimeElapsed)"></code> overdue.
+                        </span>
+                        <strong x-show="item.overdue"><em>Overtime notice has been issued!</em></strong>
+                      </td>
+                    </template>
+                    <template x-if="item.type === 'stopset'">
+                      <td>
+                        <strong x-show="item.startedPlaying && !item.playing">[Paused]</strong>
+                        Stopset: <span x-text="item.name"></span><br />
+                        <span x-show="item.startedPlaying">
+                          Progress: <code x-text="prettyDuration(item.elapsed)"></code> of
+                          <code x-text="prettyDuration(item.duration)"></code>
+                        </span>
+                        <span x-show="!item.startedPlaying">
+                          Length: <code x-text="prettyDuration(item.duration)"></code>
+                        </span>
+                        <ol style="padding-left: 0; list-style-position: inside">
+                          <template
+                            x-for="stopsetAsset, subindex in item.items"
+                            :key="`${subindex}-${stopsetAsset.name}`"
+                          >
+                            <li style="min-height: 28px; font-size: 12.5px">
+                              <template x-if="stopsetAsset.playable">
+                                <div style="display: contents">
+                                  <span
+                                    :style="{
+                                      'text-decoration': item.startedPlaying && stopsetAsset.beforeActive && 'line-through',
+                                      'font-weight': item.startedPlaying && stopsetAsset.active && 'bold',
+                                      'background-color': item.startedPlaying && stopsetAsset.active && 'yellow',
+                                    }"
+                                  >
+                                    [<code x-text="prettyDuration(stopsetAsset.elapsed)"></code> of
+                                    <code x-text="prettyDuration(stopsetAsset.duration)"></code>]
+                                    <span x-text="`[${stopsetAsset.rotator.name}] ${stopsetAsset.name}`"></span>
+                                  </span>
+                                  <span
+                                    x-data="{action: 'swap'}"
+                                    x-show="!item.startedPlaying || stopsetAsset.afterActive"
+                                  >
+                                    &mdash;
+                                    <select x-model="action" x-show="asset">
+                                      <option value="before" x-text="`Insert ${assetNameShort()} before`"></option>
+                                      <option value="swap" x-text="`Swap with ${assetNameShort()}`"></option>
+                                      <option value="after" x-text="`Insert ${assetNameShort()} after`"></option>
+                                    </select>
+                                    <select disabled x-show="!asset">
+                                      <option>Select an asset above</option>
+                                    </select>
+                                    <button
+                                      @click.debounce="swapAsset(action, item.id, subindex)"
+                                      x-text="`Perform ${action !== 'swap' ? 'insert ' : ''}${action}`"
+                                      :disabled="!asset"
+                                    ></button>
+                                    <button @click.debounce="deleteAsset(item.id, subindex)">Delete</button>
+                                  </span>
+                                </div>
+                              </template>
+                              <template x-if="!stopsetAsset.playable">
+                                <em x-text="`Rotator ${stopsetAsset.rotator.name} had no playable assets!`"></em>
+                              </template>
+                            </li>
+                          </template>
+                          <li x-show="item.items.length === 0"><em>No assets in this stopset!</em></li>
+                        </ol>
+                      </td>
+                    </template>
+                  </tr>
+                </template>
+                <tr x-show="items.length === 0">
+                  <td colspan="3"><em>No items in client's playlist!</em></td>
+                </tr>
+              </tbody>
+            </table>
+          </template>
+          <p x-show="connections.length === 0">
+            <em>No clients currently connected!</em>
+          </p>
+        </div>
+      </template>
+    </div>
+  </body>
+</html>

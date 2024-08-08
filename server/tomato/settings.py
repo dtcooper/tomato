@@ -57,8 +57,9 @@ if DOMAIN_NAME:
 ALLOWED_HOSTS = list(ALLOWED_HOSTS)
 
 if DEBUG:
+    DENIED_PATHS = ("/utils/configure_live_clients_iframe/",)
     # Show debug toolbar
-    DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda request: True}
+    DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda request: request.path not in DENIED_PATHS}
 
 INSTALLED_APPS = [
     # Django

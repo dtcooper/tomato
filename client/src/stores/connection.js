@@ -1,7 +1,6 @@
 import { ipcRenderer } from "electron"
 import ReconnectingWebSocket from "reconnecting-websocket"
 import { persisted } from "svelte-local-storage-store"
-import { noop } from "svelte/internal"
 import { derived, get, writable } from "svelte/store"
 import { protocol_version } from "../../../server/constants.json"
 import { alert } from "./alerts"
@@ -86,30 +85,30 @@ export const logout = (error) => {
   }
 }
 
-export const reloadPlaylistCallback = writable(noop)
-
 // Functions defined for various message types we get from server after authentication
 const handleMessages = {
-  data: async (data) => {
-    const { config, ...jsonData } = data
+  data: async ({ config, ...data }) => {
     setServerConfig(config)
-    await syncAssetsDB(jsonData)
+    await syncAssetsDB(data)
     updateConn({ didFirstSync: true })
   },
-  "ack-log": (data) => {
-    const { success, id } = data
+  "ack-log": ({ success, id }) => {
     if (success) {
       console.log(`Acknowledged log ${id}`)
       acknowledgeLog(id)
     }
   },
-  "reload-playlist": (data) => {
-    const { notify } = data
-    if (notify) {
-      alert("An administrator forced a playlist refresh!", "info", 4000)
-    }
-    get(reloadPlaylistCallback)()
+  notify: ({ msg, level, timeout, connection_id }) => {
+    alert(msg, level, timeout)
+    messageServer("ack-action", { connection_id, msg: "Successfully notified user!" })
   }
+}
+
+export const registerMessageHandler = (name, handler) => {
+  if (Object.hasOwn(handleMessages, name)) {
+    console.warn(`Message handler ${name} already registered`)
+  }
+  handleMessages[name] = handler
 }
 
 export const messageServer = (type, data) => {
@@ -123,7 +122,7 @@ export const messageServer = (type, data) => {
       return false
     }
   } else {
-    console.error("Tried to send a message when websocket wasn't created")
+    console.error(`Tried to send a ${type} message when websocket wasn't created`)
     return false
   }
 }

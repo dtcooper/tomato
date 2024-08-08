@@ -2,7 +2,9 @@ from collections import defaultdict
 from importlib import import_module
 from inspect import iscoroutinefunction
 import logging
-from weakref import WeakSet
+import uuid
+
+from asgiref.sync import sync_to_async
 
 from django.conf import settings
 from django.contrib.auth import HASH_SESSION_KEY, SESSION_KEY
@@ -25,6 +27,7 @@ SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 class Connection:
     def __init__(self, websocket: WebSocket, user: User):
         self._ws: WebSocket = websocket
+        self.id = str(uuid.uuid4())
         self.user: User = user
 
     @property
@@ -73,8 +76,8 @@ class MessagesBase:
 
 class ConnectionsBase(MessagesBase):
     def __init__(self):
-        self.connections: WeakSet[Connection] = WeakSet()
-        self.user_ids_to_connections: defaultdict[int, WeakSet[Connection]] = defaultdict(WeakSet)
+        self.connections: dict[str, Connection] = {}
+        self.user_ids_to_connections: defaultdict[int, set[Connection]] = defaultdict(set)
         super().__init__()
 
     @property
@@ -86,15 +89,13 @@ class ConnectionsBase(MessagesBase):
         return len(self.connections)
 
     async def hello(self, connection: Connection):
-        raise NotImplementedError()
+        pass
 
-    async def authorize_extra(self, user: User) -> bool:
-        raise NotImplementedError()
+    async def on_connect(self, connection: Connection):
+        pass
 
-    def cleanup_user_ids_to_connections(self):
-        for user_id in list(self.user_ids_to_connections.keys()):
-            if len(self.user_ids_to_connections[user_id]) == 0:
-                del self.user_ids_to_connections[user_id]
+    async def on_disconnect(self, connection: Connection):
+        pass
 
     async def authorize(self, greeting: dict, websocket: WebSocket) -> Connection:
         if greeting["protocol_version"] != PROTOCOL_VERSION:
@@ -103,13 +104,11 @@ class ConnectionsBase(MessagesBase):
             )
             raise TomatoAuthError(f"Server running {what} protocol than you. You'll need to {action} Tomato.")
 
-        if greeting["method"] == "secret-key":
-            lookup = {"id": greeting["user_id"]}
-        elif greeting["method"] == "session":
+        if is_session := greeting["method"] == "session":
             if "sessionid" not in websocket.cookies:
                 raise TomatoAuthError("No sessionid cookie, can't complete session auth!")
             store = SessionStore(session_key=websocket.cookies["sessionid"])
-            lookup = {"id": store.get(SESSION_KEY)}
+            lookup = {"id": await sync_to_async(store.get)(SESSION_KEY)}
         else:
             lookup = {"username": greeting["username"]}
 
@@ -118,15 +117,15 @@ class ConnectionsBase(MessagesBase):
         except User.DoesNotExist:
             pass
         else:
-            if user.is_active and (not self.is_admin or user.is_superuser or greeting["method"] == "secret-key"):
-                if greeting["method"] == "session":
+            if user.is_active and (
+                not self.is_admin or await sync_to_async(user.has_perm)("tomato.configure_live_clients")
+            ):
+                if is_session:
                     session_hash = store.get(HASH_SESSION_KEY)
-                    if session_hash and constant_time_compare(session_hash, user.get_session_auth_hash()):
+                    if session_hash and await sync_to_async(constant_time_compare)(
+                        session_hash, await sync_to_async(user.get_session_auth_hash)()
+                    ):
                         logger.info(f"Authorized admin session for {user}")
-                        return Connection(websocket, user)
-                elif greeting["method"] == "secret-key":
-                    if constant_time_compare(greeting["key"], settings.SECRET_KEY):
-                        logger.info(f"Authorized admin via secret key for {user}")
                         return Connection(websocket, user)
                 elif await user.acheck_password(greeting["password"]):
                     logger.info(f"Authorized user connection for {user}")
@@ -150,23 +149,28 @@ class ConnectionsBase(MessagesBase):
 
     async def broadcast(self, message_type, message=None):
         raw_message = django_json_dumps({"type": message_type, "data": message})  # No sense serializing more than once
-        count = 0
-        for count, connection in enumerate(self.connections, 1):
+        for connection in self.connections.values():
             try:
                 await connection.send_raw(raw_message)
             except Exception:
-                logger.exception("Error sending to websocket")
-        logger.info(f"Broadcasted {message_type} message to {count} {'admins' if self.is_admin else 'users'}")
+                logger.exception("Recoverable error while sending to websocket")
 
-    async def message(self, user_id: int, message_type, message=None):
+    async def message_user(self, user_id: int, message_type, message=None):
         raw_message = django_json_dumps({"type": message_type, "data": message})  # No sense serializing more than once
         if user_id in self.user_ids_to_connections:
             for connection in self.user_ids_to_connections[user_id]:
                 try:
                     await connection.send_raw(raw_message)
                 except Exception:
-                    logger.exception("Error sending to websocket")
-        logger.info(f"Sent {message_type} message to {user_id=}")
+                    logger.exception("Recoverable error while sending to websocket")
+
+    async def message(self, connection_id: int, message_type, message=None):
+        raw_message = django_json_dumps({"type": message_type, "data": message})  # No sense serializing more than once
+        try:
+            connection = self.connections[connection_id]
+            await connection.send_raw(raw_message)
+        except Exception:
+            logger.exception("Recoverable error while sending to websocket")
 
     async def authorize_and_process_new_websocket(self, greeting: dict, websocket: WebSocket):
         connection: Connection = await self.authorize(greeting, websocket)
@@ -174,14 +178,23 @@ class ConnectionsBase(MessagesBase):
             {"success": True, "admin_mode": self.is_admin, "user": connection.user.username, **SERVER_STATUS}
         )
         await self.hello(connection)
-        self.connections.add(connection)
+        self.connections[connection.id] = connection
         self.user_ids_to_connections[connection.user.id].add(connection)
-
-        self.cleanup_user_ids_to_connections()
-        await self.run_for_connection(connection)
+        await self.on_connect(connection)
+        try:
+            await self.run_for_connection(connection)
+        finally:
+            del self.connections[connection.id]
+            user_id = connection.user.id
+            self.user_ids_to_connections[user_id].remove(connection)
+            if len(self.user_ids_to_connections[user_id]) == 0:
+                del self.user_ids_to_connections[user_id]
+            await self.on_disconnect(connection)
 
     async def process(self, connection, message_type, message):
-        assert message_type in self.Types, f"Invalid message type: {message_type}"
+        assert (
+            message_type in self.Types
+        ), f"Invalid message type: process_{message_type}() needed on {type(self).__name__}"
         return await self.process_methods[message_type](connection, message)
 
     async def run_for_connection(self, connection: Connection):

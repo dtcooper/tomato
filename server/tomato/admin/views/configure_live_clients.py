@@ -1,14 +1,12 @@
-import json
 import logging
 
-from websockets.sync.client import connect as websocket_connect
-
 from django.conf import settings
-from django.contrib import messages
-from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.generic import TemplateView
 
 from ...constants import PROTOCOL_VERSION
+from ...models import serialize_for_api_sync
 from .base import AdminViewMixin
 
 
@@ -17,54 +15,25 @@ logger = logging.getLogger(__name__)
 
 class AdminConfigureLiveClientsView(AdminViewMixin, TemplateView):
     name = "configure_live_clients"
-    perms = ("tomato.immediate_play_asset",)
+    perms = ("tomato.configure_live_clients",)
     title = "Configure live clients"
 
-    def do_ws_api_request(self, request, *, reload=False):
-        # Probably needs a refactor but okay for now
-        try:
-            with websocket_connect("ws://api:8000/api") as ws:
-                ws.send(
-                    json.dumps({
-                        "user_id": request.user.id,
-                        "tomato": "radio-automation",
-                        "protocol_version": PROTOCOL_VERSION,
-                        "admin_mode": True,
-                        "method": "secret-key",
-                        "key": settings.SECRET_KEY,
-                    })
-                )
-                response = json.loads(ws.recv())
-                if not response["success"]:
-                    raise Exception(f"Error connecting: {response}")
 
-                response = json.loads(ws.recv())
-                if not response["type"] == "hello":
-                    raise Exception(f"Invalid hello response type: {response}")
-                num_connected_users = response["data"]["num_connected_users"]
-
-                if reload:
-                    ws.send(json.dumps({"type": "reload-playlist"}))
-                    response = json.loads(ws.recv())
-                    if not response["type"] == "reload-playlist":
-                        raise Exception(f"Invalid reload-playlist response type: {response}")
-                    if not response["data"]["success"]:
-                        raise Exception(f"Failure reloading playlist: {response}")
-
-        except Exception:
-            logger.exception("Error while connecting to api")
-            self.message_user(
-                "An error occurred while connecting to the server. Check logs for more information.", messages.ERROR
-            )
-            return None
-        else:
-            return num_connected_users
+@method_decorator(xframe_options_sameorigin, name="dispatch")
+class AdminConfigureLiveClientsIFrameView(AdminViewMixin, TemplateView):
+    hide_from_app_list = True
+    name = "configure_live_clients_iframe"
+    perms = ("tomato.configure_live_clients",)
+    title = "Configure live clients"
 
     def get_context_data(self, **kwargs):
-        return {"num_connected_users": self.do_ws_api_request(self.request), **super().get_context_data(**kwargs)}
-
-    def post(self, request, *args, **kwargs):
-        num_connected_users = self.do_ws_api_request(request, reload=True)
-        if num_connected_users is not None:
-            self.message_user(f"Reloaded the playlist of {num_connected_users} connected desktop client(s)!")
-        return redirect("admin:extra_configure_live_clients")
+        return {
+            "configure_live_clients_data": {
+                "is_secure": self.request.is_secure(),
+                "debug": settings.DEBUG,
+                "protocol_version": PROTOCOL_VERSION,
+                "serialized_data": serialize_for_api_sync(skip_config=True),
+                "admin_username": self.request.user.username,
+            },
+            **super().get_context_data(**kwargs),
+        }

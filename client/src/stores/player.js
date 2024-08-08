@@ -54,6 +54,19 @@ class GeneratedStopsetAssetBase {
     this.isSwapped = isSwapped
   }
 
+  serializeForSubscriber() {
+    return {
+      playable: this.playable,
+      beforeActive: this.beforeActive,
+      afterActive: this.afterActive,
+      active: this.active,
+      rotator: {
+        id: this.rotator.id,
+        name: this.rotator.name
+      }
+    }
+  }
+
   updateCallback() {
     this.generatedStopset.updateCallback()
   }
@@ -134,6 +147,17 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
     this.queueForSkip = false
   }
 
+  serializeForSubscriber() {
+    return {
+      name: this.name,
+      id: this.id,
+      duration: this.duration,
+      elapsed: this.elapsed,
+      remaining: this.remaining,
+      ...super.serializeForSubscriber()
+    }
+  }
+
   static getAudioObject() {
     let audio = PlayableAsset._reusableAudioObjects.find((item) => !item.__tomato_used)
 
@@ -204,7 +228,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   }
 
   get remaining() {
-    return this.duration - this.elapsed
+    return Math.max(this.duration - this.elapsed, 0)
   }
 
   get percentDone() {
@@ -306,6 +330,21 @@ export class GeneratedStopset {
     this.destroyed = false
   }
 
+  serializeForSubscriber() {
+    return {
+      name: this.name,
+      id: this.generatedId,
+      type: this.type,
+      startedPlaying: this.startedPlaying,
+      current: this.current,
+      duration: this.duration,
+      elapsed: this.elapsed,
+      remaining: this.remaining,
+      playing: this.playing,
+      items: this.items.map((item) => item.serializeForSubscriber())
+    }
+  }
+
   get duration() {
     return this.playableItems.reduce((s, item) => s + item.duration, 0)
   }
@@ -359,12 +398,57 @@ export class GeneratedStopset {
   }
 
   swapAsset(index, asset, rotator) {
+    if (!this._validateIndexForAssetAction(index, "swap")) {
+      return false
+    }
     const oldItem = this.items[index]
     const newItem = new PlayableAsset(asset, rotator, this, index, false, true)
     oldItem.unloadAudio() // Don't forget to unload its audio before we nuke it
-    newItem.loadAudio() // If stopset was already loaded, load audio for swapped in item
-    this.items[index] = newItem
+    if (this.loaded) {
+      newItem.loadAudio() // If stopset was already loaded, load audio for swapped in item
+    }
+    this.items[index] = newItem // Swap it
     this.updateCallback()
+    return true
+  }
+
+  insertAsset(index, asset, rotator, before) {
+    if (!this._validateIndexForAssetAction(index, `insert ${before ? "before" : "after"}`)) {
+      return false
+    }
+    const newItem = new PlayableAsset(asset, rotator, this, index, false, true)
+    if (this.loaded) {
+      newItem.loadAudio()
+    }
+    const insertIndex = index + (before ? 0 : 1)
+    this.items.splice(insertIndex, 0, newItem) // Splice it in
+    this.items.forEach((item, i) => (item.index = i)) // Fix item indexes
+    return true
+  }
+
+  deleteAsset(index) {
+    if (!this._validateIndexForAssetAction(index, "delete")) {
+      return false
+    }
+    const oldItem = this.items[index]
+    oldItem.unloadAudio() // Don't forget to unload its audio before we nuke it
+    this.items.splice(index, 1) // Nuke it
+    this.items.forEach((item, i) => (item.index = i)) // Fix item indexes
+    return true
+  }
+
+  _validateIndexForAssetAction(index, description) {
+    if (this.startedPlaying && index <= this.current) {
+      console.warn(
+        `Stopset action ${description} on ${this.name} index ${index} cannot occur since that item is playing/played!`
+      )
+      return false
+    } else if (index >= this.items.length) {
+      console.warn(`Stopset action ${description} on ${this.name} index ${index} cannot occur since that index invalid`)
+      return false
+    } else {
+      return true
+    }
   }
 
   skip() {
@@ -462,8 +546,22 @@ export class Wait {
     this.didLog = false
   }
 
+  serializeForSubscriber() {
+    return {
+      id: this.generatedId,
+      type: this.type,
+      active: this.active,
+      duration: this.duration,
+      elapsed: this.elapsed,
+      overdue: this.overdue,
+      overtime: this.overtime,
+      overtimeElapsed: this.overtimeElapsed,
+      remaining: this.remaining
+    }
+  }
+
   get remaining() {
-    return this.duration - this.elapsed
+    return Math.max(this.duration - this.elapsed, 0)
   }
 
   get percentDone() {

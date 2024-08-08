@@ -1,1 +1,1 @@
-alpinejs-3.14.1.min.js
+../../../server/tomato/static/admin/tomato/configure_live_clients/deps/alpinejs.js

@@ -1,21 +1,31 @@
 {% extends 'admin/extra/base.html' %}
 
+{% block extrahead %}
+  {{ block.super }}
+  <style>
+    #configure-live-clients-iframe {
+      border: 0;
+      width: 100%;
+      min-height: 85vh;
+    }
+  </style>
+  <script>
+    const resizeIframe = (iframe) => {
+      iframe.style.height = `${iframe.contentWindow.document.body.scrollHeight + 35}px`;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const iframe = document.getElementById("configure-live-clients-iframe")
+      iframe.onload = () => {
+        setInterval(() => resizeIframe(iframe), 50)
+      }
+    })
+  </script>
+{% endblock %}
+
 {% block content %}
-  <form method="POST">
-    {% csrf_token %}
-    <fieldset class="module aligned">
-      <h2>Reload all connected desktop clients</h2>
-      <p>
-        <strong>Current number of connected desktop client(s): {{ num_connected_users|default_if_none:"Unknown" }}</strong>
-        <small><em>(Number not refreshed. Reload page to update.)</em></small>
-      </p>
-      <input type="hidden" name="action" value="export">
-      <div class="form-row">
-        <p>Click the button below to reload the plalists in all connected clients.</p>
-      </div>
-    </fieldset>
-    <div class="submit-row">
-      <input type="submit" class="default" value="Reload playlists of all connected desktop clients">
-    </div>
-  </form>
+  <iframe
+    id="configure-live-clients-iframe"
+    src="{% url 'admin:extra_configure_live_clients_iframe' %}">
+  </iframe>
 {% endblock %}

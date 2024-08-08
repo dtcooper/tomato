@@ -8,6 +8,7 @@
 
   import { userConfig } from "../../stores/config"
   import { blockSpacebarPlay } from "../../stores/player"
+  import { registerMessageHandler, messageServer } from "../../stores/connection"
   import {
     midiSetLED,
     midiButtonPresses,
@@ -36,7 +37,7 @@
   $: playDisabled =
     !items.some((item) => item.type === "stopset") || (firstItem.type === "stopset" && firstItem.playing)
   $: pauseDisabled = firstItem.type !== "stopset" || !firstItem.playing
-  $: isPaused = firstItem.type === "stopset" && !firstItem.playing
+  $: isPaused = firstItem.type === "stopset" && firstItem.startedPlaying && !firstItem.playing
   $: skipCurrentEnabled = firstItem.type === "stopset" && firstItem.startedPlaying
 
   let ledState
@@ -60,6 +61,17 @@
       console.log("Got MIDI press, but currently not eligible to play!")
     } else {
       console.log("Calling play() based on MIDI key press")
+      play()
+    }
+  })
+
+  registerMessageHandler("play", ({ connection_id }) => {
+    if (playDisabled) {
+      console.log("Got play message, but currently not eligible to play!")
+      messageServer("ack-action", { connection_id, msg: "Got play command, but currently not eligble to play!" })
+    } else {
+      console.log("Got play command from server")
+      messageServer("ack-action", { connection_id, msg: "Successfully started playing!" })
       play()
     }
   })

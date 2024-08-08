@@ -90,7 +90,7 @@ class TomatoAdminSite(admin.AdminSite):
             "app_list_extra": [
                 {"url": f"admin:extra_{view.name}", "title": view.title}
                 for view in extra_views
-                if view.check_perms(request)
+                if view.check_perms(request) and not view.hide_from_app_list
             ],
             "app_list_extra_highlight": request.resolver_match.view_name in [
                 f"admin:extra_{view.name}" for view in extra_views

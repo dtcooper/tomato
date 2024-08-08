@@ -12,7 +12,7 @@ from tomato.models import User
 
 from .base import MessagesBase
 from .connections import admins, users
-from .schemas import OutgoingUserMessageTypes, ServerMessageTypes
+from .schemas import ServerMessageTypes
 from .utils import task
 
 
@@ -73,13 +73,6 @@ class ServerMessages(MessagesBase):
     async def process_db_changes_force(self, message):
         logger.info("Forcing broadcast of data message")
         await self.process_db_changes(message, force_broadcast=True)
-
-    async def process_reload_playlist(self, message, notify=False):
-        user_id = message.get("user_id") if message else None
-        if user_id is None:
-            await users.broadcast(OutgoingUserMessageTypes.RELOAD_PLAYLIST, {"notify": notify})
-        else:
-            await users.message(user_id, OutgoingUserMessageTypes.RELOAD_PLAYLIST, {"notify": notify})
 
     @task
     async def consume_db_notifications_debouncer(self):
