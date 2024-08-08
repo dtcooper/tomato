@@ -28,7 +28,7 @@ class ClientLogEntryAdmin(ListPrefetchRelatedMixin, admin.ModelAdmin):
     list_prefetch_related = ("created_by",)
     readonly_fields = ("created_at_display", "category", "description_display")
     save_on_top = True
-    search_fields = ("description",)
+    search_fields = ("description", "ip_address")
     show_facets = admin.ShowFacets.ALWAYS
 
     @admin.display(ordering="-created_at", description="Created at")

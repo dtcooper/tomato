@@ -33,6 +33,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
       to implement, too many opinions, person wishing to flag talks to manager-of-the-moment
 - [x] Refresh playlist from backend. ~~Connected client status from backend? Communicate what's in the playlist?~~
   - [x] Minimally completed via `RELOAD_PLAYLIST_AFTER_DATA_CHANGES` setting
+- [x] Backend client playlist editor
 - [ ] ~~Status updates, ie news and traffic? Fullscreen thing?~~ / ~~Custom UI labels unused labels that play every N times (ie for telling the DJ to do something)~~ -- Probably not
 - [x] Round-robin (or "cycle evenly") rotator scheduling, ignoring weight as an option for a rotator
 - [x] Check / validate randomization algorithm
@@ -47,7 +48,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [x] Rudimentary stopset editor, in the form of "skip/queue", regenerate asset, and swap asset
   - [ ] Ability to "audition" assets on a second audio output?
 - [x] ~~Stop playing at end of current asset. (Stop playing in 3s with fadeout as well?)~~ (Covered by skip)
-- [ ] A way to send a custom text notification to all connected clients from backend UI
+- [x] A way to send a custom text notification to all connected clients from backend UI
 
 
 ## Other things
