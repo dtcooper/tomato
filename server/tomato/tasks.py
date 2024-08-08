@@ -31,6 +31,8 @@ def process_asset(asset, empty_name=False, user=None, no_success_message=False, 
                 " check the server logs.",
                 deliver_once=False,
             )
+        # Actually delete it from DB
+        asset.delete()
 
     try:
         asset.refresh_from_db()
