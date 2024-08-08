@@ -531,9 +531,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#desktop-client-options" class="md-nav__link">
+  <a href="#play-out-options" class="md-nav__link">
     <span class="md-ellipsis">
-      Desktop client options
+      Play out options
     </span>
   </a>
   
@@ -659,6 +659,11 @@ heavily leveraging its automatic admin interface.</p>
 <p>Reset UI mode to the simplest enabled mode according to this setting. Enter a list of times (<code>HH:MM</code> format) with each time on a single line. <strong>Set to 0 disable</strong>. The below example would reset the UI mode at midnight, 6am, noon, and 6pm:<br><br><code>00:00<br>06:00<br>12:00<br>18:00</code></p>
 <p>Default: <code>'0'</code></p>
 </dd>
+<dt><code>ONE_CLIENT_LOGIN_PER_ACCOUNT</code> --- <strong>Type: Boolean (true or false)</strong></dt>
+<dd>
+<p>Only allow one desktop client to be connected per account.</p>
+<p>Default: <code>False</code></p>
+</dd>
 </dl>
 </div>
 <h3 id="server-processing-audio-options">Server &amp; Processing Audio Options<a class="headerlink" href="#server-processing-audio-options" title="Permanent link">←</a></h3>
@@ -684,6 +689,11 @@ heavily leveraging its automatic admin interface.</p>
 <p>Trim silence from the beginning and end of audio files when <code>True</code>. Since this processing is done on the server, it's applied <strong>only</strong> at the time an audio file is uploaded. This means files will have silence trimmed (or not) according to this setting at the time of upload.</p>
 <p>Default: <code>True</code></p>
 </dd>
+<dt><code>REJECT_SILENCE_LENGTH</code> --- <strong>Type: Numeric</strong></dt>
+<dd>
+<p>Reject silence assets of this many seconds. <strong>Set to 0 disable</strong>.</p>
+<p>Default: <code>0</code></p>
+</dd>
 <dt><code>RELOAD_PLAYLIST_AFTER_DATA_CHANGES</code> --- <strong>Type: Boolean (true or false)</strong></dt>
 <dd>
 <p>Reload all connected client playlists when a data change occurs.</p>
@@ -691,7 +701,7 @@ heavily leveraging its automatic admin interface.</p>
 </dd>
 </dl>
 </div>
-<h3 id="desktop-client-options">Desktop client options<a class="headerlink" href="#desktop-client-options" title="Permanent link">←</a></h3>
+<h3 id="play-out-options">Play out options<a class="headerlink" href="#play-out-options" title="Permanent link">←</a></h3>
 <div class="admonition info">
 <dl>
 <dt><code>BROADCAST_COMPRESSION</code> --- <strong>Type: Boolean (true or false)</strong></dt>
