@@ -70,10 +70,10 @@
     "svelte": "^4.2.18",
     "svelte-devtools-standalone": "github:RedHatter/svelte-devtools-standalone",
     "svelte-local-storage-store": "^0.6.4",
-    "tailwindcss": "^3.4.7",
+    "tailwindcss": "^3.4.9",
     "uuid": "^10.0.0",
     "wait-on": "^7.2.0",
     "weak-ref-collections": "^1.2.4",
-    "webmidi": "^3.1.9"
+    "webmidi": "^3.1.11"
   }
 }
