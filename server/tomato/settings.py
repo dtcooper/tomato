@@ -438,6 +438,7 @@ CONSTANCE_CONFIG = {
     ),
     "WARN_ON_EMPTY_ROTATORS": (True, "Warn when a rotator is disabled or has no eligible assets to choose from."),
     "RELOAD_PLAYLIST_AFTER_DATA_CHANGES": (False, "Reload all connected client playlists when a data change occurs."),
+    "ONE_CLIENT_LOGIN_PER_ACCOUNT": (False, "Only allow one desktop client to be connected per account."),
 }
 
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
@@ -447,6 +448,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
             "STATION_NAME",
             "UI_MODES",
             "UI_MODE_RESET_TIMES",
+            "ONE_CLIENT_LOGIN_PER_ACCOUNT",
         ),
     ),
     (
@@ -460,7 +462,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
         ),
     ),
     (
-        "Desktop client options",
+        "Play out options",
         (
             "BROADCAST_COMPRESSION",
             "WARN_ON_EMPTY_ROTATORS",

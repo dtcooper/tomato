@@ -13,7 +13,7 @@ from django.utils.crypto import constant_time_compare
 from starlette.websockets import WebSocket
 
 from tomato.constants import PROTOCOL_VERSION
-from tomato.models import User
+from tomato.models import User, get_config_async
 from tomato.utils import django_json_dumps
 
 from .utils import TomatoAuthError
@@ -174,6 +174,14 @@ class ConnectionsBase(MessagesBase):
 
     async def authorize_and_process_new_websocket(self, greeting: dict, websocket: WebSocket):
         connection: Connection = await self.authorize(greeting, websocket)
+
+        if (
+            not self.is_admin
+            and connection.user.id in self.user_ids_to_connections
+            and await get_config_async("ONE_CLIENT_LOGIN_PER_ACCOUNT")
+        ):
+            raise TomatoAuthError("That user account is already logged in on another computer.")
+
         await connection.send(
             {"success": True, "admin_mode": self.is_admin, "user": connection.user.username, **SERVER_STATUS}
         )

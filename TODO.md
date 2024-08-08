@@ -60,7 +60,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [ ] "Island Mode" with an embedded [standalone Python distribution](https://python-build-standalone.readthedocs.io/en/latest/)
 - [ ] Login interstitial to populate with demo data
 - [ ] Integrated Twilio call board
-- [ ] Single app client lock (ie only ONE client per username/password)'
+- [x] Single app client lock (ie only ONE client per username/password)'
 - [ ] Way to parse filename into rotator, start/end date
   - [ ] Submit form built into Tomato?
 - [ ] Silence detection REJECTs audio assets in backend (if there's more than 2 seconds?) (behind FEATURE flag)
