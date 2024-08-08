@@ -28,6 +28,8 @@ try:
             debug("USB now in connected state. Sending reset byte and hello message.")
             if config.flash_on_usb_disconnect:
                 led.solid(on=False)
+                self.last_led_num = c.LED_OFF
+
             midi.send_bytes((smolmidi.SYSTEM_RESET,))
             midi.send_obj(
                 "hello",
@@ -41,18 +43,24 @@ try:
                 led.solid(on=False)
 
     class MIDISystem(MIDISystemBase):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.last_led_num = c.LED_OFF
+
         def on_led_change(self, num):
             if c.LED_RANGE_MIN <= num <= c.LED_RANGE_MAX:
                 debug(f"Received LED control msg: {num}")
                 self.send_bytes(b"%c%c%c" % (smolmidi.CC, c.MIDI_LED_CTRL, num))  # Acknowledge by sending bytes back
-                if num in (c.LED_ON, c.LED_OFF):
-                    led.solid(num == c.LED_ON)
-                elif num == c.LED_FLASH:
-                    led.pulsate(period=config.flash_period, flash=True)
-                elif num == c.LED_PULSATE_SLOW:
-                    led.pulsate(period=config.pulsate_period_slow)
-                elif num == c.LED_PULSATE_FAST:
-                    led.pulsate(period=config.pulsate_period_fast)
+                if self.last_led_num != num:
+                    if num in (c.LED_ON, c.LED_OFF):
+                        led.solid(num == c.LED_ON)
+                    elif num == c.LED_FLASH:
+                        led.pulsate(period=config.flash_period, flash=True)
+                    elif num == c.LED_PULSATE_SLOW:
+                        led.pulsate(period=config.pulsate_period_slow)
+                    elif num == c.LED_PULSATE_FAST:
+                        led.pulsate(period=config.pulsate_period_fast)
+                    self.last_led_num = num
             else:
                 debug(f"WARNING: Invalid LED control msg: {num}")
                 self.send_obj("error", f"Invalid MIDI control number {num}")
