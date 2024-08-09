@@ -5,6 +5,7 @@ on:
     branches:
       - '*'
     paths:
+      - .github/actions/version/action.yml
       - .github/workflows/build-client.yml
       - client/**
       - server/constants.json

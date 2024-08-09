@@ -18,11 +18,10 @@ runs:
       shell: bash
       run: |
         if [ "${GITHUB_REF_TYPE}" == 'tag' ]; then
-          echo "version=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          VERSION="${GITHUB_REF_NAME}"
         else
-          if $(git rev-parse --is-shallow-repository); then
-            echo "ERROR: checkout is a shallow clone, so can't get Tomato version!"
-            exit 1
-          fi
-          echo "version=$(git rev-list --count HEAD).$(git rev-parse --short=8 HEAD)" >> "$GITHUB_OUTPUT"
+          VERSION="$(git rev-list --count HEAD).$(git rev-parse --short=8 HEAD)"
         fi
+
+        echo "Setting Tomato version to ${VERSION}"
+        echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
