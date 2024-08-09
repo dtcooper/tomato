@@ -14,7 +14,7 @@
   <div class="toast z-[10000] items-end">
     {#each $alerts as { msg, level, html }, i}
       <div
-        class="alert {classes[level]} w-max max-w-lg animate-pulse border-2 border-neutral"
+        class="alert {classes[level]} w-max max-w-lg animate-pulse border-2 border-neutral md:max-w-[75%]"
         style:--pulse-color="var(--{level.substring(0, 2)})"
       >
         <span class="text-wrap">
