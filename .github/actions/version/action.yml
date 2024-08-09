@@ -22,8 +22,8 @@ runs:
         if [ "${GITHUB_REF_TYPE}" == 'tag' ]; then
           VERSION="${GITHUB_REF_NAME}"
         else
-          VERSION="$(git rev-list --count HEAD).$(git rev-parse --short=8 HEAD)"
+          VERSION="r$(git rev-list --count HEAD).$(git rev-parse --short=8 HEAD)"
         fi
 
         echo "Setting Tomato version to ${VERSION}"
-        echo "version=r${VERSION}" >> "$GITHUB_OUTPUT"
+        echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
