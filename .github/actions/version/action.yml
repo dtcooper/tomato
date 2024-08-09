@@ -12,6 +12,8 @@ runs:
       name: Full checkout to compute version
       if: github.ref_type != 'tag'
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     -
       name: Export version
       id: vars
