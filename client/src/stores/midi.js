@@ -23,6 +23,10 @@ export const midiButtonPresses = new EventEmitter()
 let lastLEDValue = LED_OFF
 let enabled = false
 
+// Filter midi loopback (through port) on Linux
+const portUsable = (port) => !IS_LINUX || !port.name.toLowerCase().includes("midi through port")
+const filterPorts = (ports) => ports.filter((p) => portUsable(p))
+
 window.addEventListener("beforeunload", () => {
   midiSetLED(LED_OFF, true)
 })
@@ -44,29 +48,31 @@ const sysexMsgPack7bitDecode = (msg) => {
 
 const enableListeners = () => {
   WebMidi.addListener("connected", ({ port }) => {
-    if (port.type === "input") {
-      console.log(`Got midi input: ${port.name} (installing press listener)`)
-      port.channels[1].addListener("controlchange", ({ controller, rawValue: value }) => {
-        if (controller.number === MIDI_BTN_CTRL) {
-          midiButtonPresses.emit(value === BTN_PRESSED ? "pressed" : "released")
-        }
-      })
-      port.addListener("reset", () => {
-        console.log(`Midi input ${port.name} was reset.`)
-      })
-      port.addListener("sysex", ({ message: { rawDataBytes: message } }) => {
-        const prefix = new TextDecoder().decode(message.slice(0, SYSEX_PREFIX.length))
-        if (prefix === SYSEX_PREFIX) {
-          const encoded = message.slice(SYSEX_PREFIX.length)
-          const [type, obj] = sysexMsgPack7bitDecode(encoded)
-          console.log(
-            `Received ${type} sysex from ${port.name}${obj === null ? "" : ": " + JSON.stringify(obj, undefined, Object.keys(obj).length === 1 ? undefined : 2)}`
-          )
-        }
-      })
-    } else if (port.type === "output") {
-      console.log(`Got midi output: ${port.name} (set LED to ${ledStrings[lastLEDValue]})`)
-      port.channels[1].sendControlChange(MIDI_LED_CTRL, lastLEDValue)
+    if (portUsable(port)) {
+      if (port.type === "input") {
+        console.log(`Got midi input: ${port.name} (installing press listener)`)
+        port.channels[1].addListener("controlchange", ({ controller, rawValue: value }) => {
+          if (controller.number === MIDI_BTN_CTRL) {
+            midiButtonPresses.emit(value === BTN_PRESSED ? "pressed" : "released")
+          }
+        })
+        port.addListener("reset", () => {
+          console.log(`Midi input ${port.name} was reset.`)
+        })
+        port.addListener("sysex", ({ message: { rawDataBytes: message } }) => {
+          const prefix = new TextDecoder().decode(message.slice(0, SYSEX_PREFIX.length))
+          if (prefix === SYSEX_PREFIX) {
+            const encoded = message.slice(SYSEX_PREFIX.length)
+            const [type, obj] = sysexMsgPack7bitDecode(encoded)
+            console.log(
+              `Received ${type} sysex from ${port.name}${obj === null ? "" : ": " + JSON.stringify(obj, undefined, Object.keys(obj).length === 1 ? undefined : 2)}`
+            )
+          }
+        })
+      } else if (port.type === "output") {
+        console.log(`Got midi output: ${port.name} (set LED to ${ledStrings[lastLEDValue]})`)
+        port.channels[1].sendControlChange(MIDI_LED_CTRL, lastLEDValue)
+      }
     }
   })
   WebMidi.addListener("disconnected", ({ port }) => {
@@ -79,7 +85,7 @@ const enableListeners = () => {
 export const midiSetLED = (value, skipSave = false) => {
   if (enabled) {
     console.log(`Set LED to ${ledStrings[value]}`)
-    for (const output of WebMidi.outputs) {
+    for (const output of filterPorts(WebMidi.outputs)) {
       output.channels[1].sendControlChange(MIDI_LED_CTRL, value)
     }
   }
@@ -118,7 +124,7 @@ window.WebMidi = WebMidi
 window.sendButtonBoxSysex = (cmd = "stats") => {
   if (enabled) {
     const data = Array.from(SYSEX_PREFIX + cmd).map((letter) => letter.charCodeAt(0))
-    for (const output of WebMidi.outputs) {
+    for (const output of filterPorts(WebMidi.outputs)) {
       output.sendSysex(SYSEX_NON_COMMERCIAL, data)
     }
   }
