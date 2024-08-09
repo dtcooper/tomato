@@ -66,6 +66,9 @@ class AdminConnections(ConnectionsBase):
     async def process_play(self, connection: Connection, data):
         await users.message(data.pop("connection_id"), OutgoingUserMessageTypes.PLAY, {"connection_id": connection.id})
 
+    async def process_logout(self, connection: Connection, data):
+        await users.message(data.pop("connection_id"), OutgoingUserMessageTypes.LOGOUT)
+
 
 class UserConnections(ConnectionsBase):
     Types = UserMessageTypes

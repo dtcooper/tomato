@@ -141,7 +141,6 @@
   }
 
   let subscriptionConnectionId = null
-  let subscriptionLastItems = null
   let subscriptionInterval
 
   registerMessageHandler("reload-playlist", ({ notify, connection_id }) => {
@@ -162,7 +161,7 @@
       }
       console.log(`Admin ${subscriptionConnectionId} unsubscribed`)
       clearInterval(subscriptionInterval)
-      subscriptionConnectionId = subscriptionLastItems = null
+      subscriptionConnectionId = null
     }
   }
 

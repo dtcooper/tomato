@@ -47,6 +47,7 @@ async def api(websocket: WebSocket):
         await connections.authorize_and_process_new_websocket(greeting, websocket)
 
     except TomatoAuthError as auth_error:
+        logger.warning(f"An authorization error occurred: {auth_error}")
         if auth_error.should_sleep:
             await asyncio.sleep(0.5, 1.5)
         error_msg = {"success": False, "error": str(auth_error)}

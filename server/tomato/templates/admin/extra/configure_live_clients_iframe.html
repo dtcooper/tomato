@@ -88,7 +88,7 @@
             <div>Asset to swap:</div>
             <div style="flex: 1 1 0%">
               <select
-                x-init="$nextTick(() => new Choices($el, {searchResultLimit: 8, noResultsText: 'No asset found!', searchPlaceholderValue: 'Start typing to search for an asset'}))"
+                x-init="$nextTick(() => new Choices($el, {allowHTML: false, searchResultLimit: 8, noResultsText: 'No asset found!', searchPlaceholderValue: 'Start typing to search for an asset'}))"
                 @change="() => {
                   if ($el.value) {
                     const [assetId, rotatorId] = JSON.parse($el.value)
@@ -143,6 +143,7 @@
                     <button @click.debounce="send('reload-playlist', {'connection_id': conn.connection_id})">
                       Refresh playlist
                     </button>
+                    <button @click.debounce="() =>  send('play', {'connection_id': conn.connection_id })">Play</button>
                     <button
                       @click.debounce="() => {
                         if(notifyMsg.trim().length > 0) {
@@ -155,7 +156,24 @@
                     >
                       Notify as above
                     </button>
-                    <button @click.debounce="() =>  send('play', {'connection_id': conn.connection_id })">Play</button>
+                    <button
+                      @click="() => {
+                        const username = prompt(`Are you COMPLETELY sure you want to log out ${conn.username}?\n\nIf so, enter the username '${conn.username}' below`)
+                        if (username) {
+                          const [actual, expected] = [conn.username, username].map(u => u.replace(/[^a-z0-9_@\.\+\-]/g, ''))
+                          if (actual === expected) {
+                            send('logout', { connection_id: conn.connection_id })
+                            log(`Logged out ${conn.username}`)
+                          } else {
+                            alert('You did not enter the username properly. Logout cancelled.')
+                          }
+                        } else {
+                          log(`Logout of user ${conn.username} cancelled.`)
+                        }
+                      }"
+                    >
+                      Log out user
+                    </button>
                   </td>
                 </tr>
               </tbody>

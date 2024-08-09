@@ -125,10 +125,8 @@ class ConnectionsBase(MessagesBase):
                     if session_hash and await sync_to_async(constant_time_compare)(
                         session_hash, await sync_to_async(user.get_session_auth_hash)()
                     ):
-                        logger.info(f"Authorized admin session for {user}")
                         return Connection(websocket, user)
                 elif await user.acheck_password(greeting["password"]):
-                    logger.info(f"Authorized user connection for {user}")
                     return Connection(websocket, user)
         raise TomatoAuthError("Invalid username or password.", should_sleep=True, field="userpass")
 
@@ -136,6 +134,7 @@ class ConnectionsBase(MessagesBase):
         if user_id in self.user_ids_to_connections:
             for connection in self.user_ids_to_connections[user_id]:
                 try:
+                    await connection.message(self.OutgoingTypes.LOGOUT)
                     await connection.disconnect()
                 except Exception:
                     logger.exception(f"Error disconnecting websocket {user_id=}")
@@ -180,7 +179,11 @@ class ConnectionsBase(MessagesBase):
             and connection.user.id in self.user_ids_to_connections
             and await get_config_async("ONE_CLIENT_LOGIN_PER_ACCOUNT")
         ):
-            raise TomatoAuthError("That user account is already logged in on another computer.")
+            raise TomatoAuthError("Your user account is already logged in on another computer.")
+
+        logger.info(
+            f"Authorized {'admin' if self.is_admin else 'user'} connection for {connection.user} [id={connection.id}]"
+        )
 
         await connection.send(
             {"success": True, "admin_mode": self.is_admin, "user": connection.user.username, **SERVER_STATUS}
@@ -197,6 +200,7 @@ class ConnectionsBase(MessagesBase):
             self.user_ids_to_connections[user_id].remove(connection)
             if len(self.user_ids_to_connections[user_id]) == 0:
                 del self.user_ids_to_connections[user_id]
+            logger.info(f"{'Admin' if self.is_admin else 'User'} {connection.user} disconnected [id={connection.id}]")
             await self.on_disconnect(connection)
 
     async def process(self, connection, message_type, message):

@@ -10,35 +10,38 @@ class ServerMessageTypes(enum.StrEnum):
 
 
 class UserMessageTypes(enum.StrEnum):
+    ACK_ACTION = "ack-action"
     CLIENT_DATA = "client-data"
     SEND_LOG = "log"
     UNSUBSCRIBE = "unsubscribe"
-    ACK_ACTION = "ack-action"
 
 
 class OutgoingUserMessageTypes(enum.StrEnum):
     ACKNOWLEDGE_LOG = "ack-log"
     DATA = "data"
+    LOGOUT = "logout"
     NOTIFY = "notify"
+    PLAY = "play"
     RELOAD_PLAYLIST = "reload-playlist"
     SUBSCRIBE = "subscribe"
     SWAP = "swap"
     UNSUBSCRIBE = "unsubscribe"
-    PLAY = "play"
 
 
 class AdminMessageTypes(enum.StrEnum):
+    LOGOUT = "logout"
     NOTIFY = "notify"
+    PLAY = "play"
     RELOAD_PLAYLIST = "reload-playlist"
     SUBSCRIBE = "subscribe"
     SWAP = "swap"
     UNSUBSCRIBE = "unsubscribe"
-    PLAY = "play"
 
 
 class OutgoingAdminMessageTypes(enum.StrEnum):
     ACK_ACTION = "ack-action"
     CLIENT_DATA = "client-data"
+    LOGOUT = "logout"
     RELOAD_PLAYLIST = "reload-playlist"
     SUBSCRIBE = "subscribe"
     UNSUBSCRIBE = "unsubscribe"

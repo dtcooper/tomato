@@ -98,6 +98,10 @@ const handleMessages = {
       acknowledgeLog(id)
     }
   },
+  logout: () => {
+    console.log("Got logout from server. Logging out.")
+    logout({ type: "host", message: "An administrator logged you out." })
+  },
   notify: ({ msg, level, timeout, connection_id }) => {
     alert(msg, level, timeout)
     messageServer("ack-action", { connection_id, msg: "Successfully notified user!" })
