@@ -26,4 +26,4 @@ runs:
         fi
 
         echo "Setting Tomato version to ${VERSION}"
-        echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+        echo "version=r${VERSION}" >> "$GITHUB_OUTPUT"
