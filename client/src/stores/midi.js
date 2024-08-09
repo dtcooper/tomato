@@ -24,7 +24,7 @@ let lastLEDValue = LED_OFF
 let enabled = false
 
 // Filter midi loopback (through port) on Linux
-const portUsable = (port) => !IS_LINUX || !port.name.toLowerCase().includes("midi through port")
+const portUsable = (port) => !(IS_LINUX && port.name.toLowerCase().includes("midi through port"))
 const filterPorts = (ports) => ports.filter((p) => portUsable(p))
 
 window.addEventListener("beforeunload", () => {
