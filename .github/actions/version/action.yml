@@ -9,6 +9,10 @@ runs:
   using: composite
   steps:
     -
+      name: Full checkout to compute version
+      if: github.ref_type != 'tag'
+      uses: actions/checkout@v4
+    -
       name: Export version
       id: vars
       shell: bash
