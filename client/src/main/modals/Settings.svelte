@@ -17,8 +17,6 @@
   import { playStatus, speaker, setSpeaker } from "../../stores/player"
   import { config, userConfig, uiModeInfo } from "../../stores/config"
 
-  // TODO: host error seems to show when logging, in particular if you press logout when disconnected
-
   export let show = true
   let showLogout = false
   let showServerSettings = false
