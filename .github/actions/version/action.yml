@@ -24,5 +24,5 @@ runs:
             echo "ERROR: checkout is a shallow clone, so can't get Tomato version!"
             exit 1
           fi
-          echo "version=$(git rev-list --count HEAD).$(git rev-parse --short=8 HEAD)"
+          echo "version=$(git rev-list --count HEAD).$(git rev-parse --short=8 HEAD)" >> "$GITHUB_OUTPUT"
         fi
