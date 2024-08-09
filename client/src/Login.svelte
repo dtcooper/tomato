@@ -166,12 +166,15 @@
           >{#if demoMode}Try Demo{:else}Login{/if}</button
         >
       </div>
-      <div class="text-center text-xs">
+      <div class="text-center text-sm">
         <a class="link-hover link link-secondary" href="https://dtcooper.github.io/tomato/" tabindex="-1"
           >Tomato Radio Automation</a
         >,
         <!-- svelte-ignore missing-declaration-->
-        version: {TOMATO_VERSION} / protocol: {protocolVersion}
+        version:
+        <span class="select-text font-mono">{TOMATO_VERSION}</span>
+        / protocol:
+        <span class="select-text font-mono">{protocolVersion}</span>
         <br />
         Copyright &copy; 2019-{dayjs().year()}
         <a class="link-hover link link-secondary" href="https://jew.pizza/" tabindex="-1">David Cooper</a>

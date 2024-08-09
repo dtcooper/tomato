@@ -195,7 +195,10 @@
 
     <div class="flex justify-end text-lg font-bold">Version:</div>
     <!-- svelte-ignore missing-declaration-->
-    <div class="text-md w-max">{TOMATO_VERSION} / protocol: {protocolVersion}</div>
+    <div class="text-md w-max">
+      <span class="select-text font-mono">{TOMATO_VERSION}</span> / protocol:
+      <span class="select-text font-mono">{protocolVersion}</span>
+    </div>
     <hr class="divider col-span-2 m-0 h-0 p-0" />
 
     <div class="col-span-2 flex justify-center">
