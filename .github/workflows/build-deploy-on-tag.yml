@@ -14,6 +14,10 @@ jobs:
         name: Checkout
         uses: actions/checkout@v4
       -
+        name: Get version
+        id: version
+        uses: ./.github/actions/version
+      -
         name: Set variables
         shell: bash
         run: |
@@ -41,7 +45,7 @@ jobs:
           no-cache: true
           platforms: ${{ env.PLATFORMS }}
           build-args: |
-            TOMATO_VERSION=${{ github.ref_name }}
+            TOMATO_VERSION=${{ steps.version.outputs.version }}
 
   deploy:
     runs-on: ubuntu-22.04

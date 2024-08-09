@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 env:
-  TOMATO_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || 'preview' }}
+  CLIENT_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || 'preview' }}
   NODE_VERSION: 20
 
 concurrency:
@@ -59,18 +59,17 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v4
-        with:  # For rev number in TOMATO_VERSION_SUFFIX
+        with:
           fetch-depth: 0
+      -
+        name: Get version
+        id: version
+        uses: ./.github/actions/version
       -
         name: Set variables
         shell: bash
         run: |
-          echo "CLIENT_FILENAME=tomato-client-${{ env.TOMATO_VERSION }}-${{ matrix.filename_suffix }}" >> "$GITHUB_ENV"
-          if [ "$GITHUB_REF_TYPE" = tag ]; then
-            echo "TOMATO_VERSION_SUFFIX=" >> "$GITHUB_ENV"
-          else
-            echo "TOMATO_VERSION_SUFFIX=-r$(git rev-list --count HEAD).$(git rev-parse --short=8 HEAD)" >> "$GITHUB_ENV"
-          fi
+          echo "CLIENT_FILENAME=tomato-client-${{ env.CLIENT_VERSION }}-${{ matrix.filename_suffix }}" >> "$GITHUB_ENV"
       -
         name: Setup Node v${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
@@ -87,13 +86,13 @@ jobs:
         name: Build package
         shell: bash
         run: |
-          echo "Building Tomato for ${{ matrix.title }}"
+          echo "Building Tomato for ${{ matrix.title }} (${{ steps.version.outputs.version }})"
           cd client
           if [ "${{ matrix.platform }}" = "win32" ]; then
             npm config set script-shell $(which bash)
           fi
           npm clean-install
-          TOMATO_VERSION=${{ env.TOMATO_VERSION }}${{ env.TOMATO_VERSION_SUFFIX }} npm run build
+          TOMATO_VERSION=${{ steps.version.outputs.version }} npm run build
           npx electron-forge make --arch ${{ matrix.arch }} --platform ${{ matrix.platform }}
           mkdir ../client-build-files
           mv -v out/make/${{ matrix.out_path }} ../client-build-files/${{ env.CLIENT_FILENAME }}
@@ -134,8 +133,12 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v4
-        with:  # For rev number in TOMATO_VERSION_SUFFIX
-          fetch-depth: 0
+        #with:
+          #fetch-depth: 0  # XXX
+      -
+        name: Get version
+        id: version
+        uses: ./.github/actions/version
       -
         name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -151,11 +154,10 @@ jobs:
           tag_name: preview-build
           github_token: ${{ secrets.GITHUB_TOKEN }}
       -
-        name: Set variables & wait for last preview deletion
+        name: Wait for last preview deletion
         shell: bash
         if: github.ref_type != 'tag'
         run: |  # Omits "-" character, which is included above
-          echo "TOMATO_VERSION_SUFFIX=r$(git rev-list --count HEAD).$(git rev-parse --short=8 HEAD)" >> "$GITHUB_ENV"
           sleep 15s
       -
         name: Tag and upload preview release
@@ -163,11 +165,11 @@ jobs:
         if: github.ref_type != 'tag'
         with:
           artifacts: "./client-build-files/*"
-          name: 'Tomato Preview Build ${{ env.TOMATO_VERSION_SUFFIX }}'
+          name: 'Tomato Preview Build ${{ steps.version.outputs.version }}'
           body: |
             _**This development preview build may not be safe: use it at your own risk!**_
 
-            Release version: `${{ env.TOMATO_VERSION }}-${{ env.TOMATO_VERSION_SUFFIX }}`
+            Release version: `${{ steps.version.outputs.version }}`
           tag: 'preview-build'
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}

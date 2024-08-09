@@ -1,0 +1,24 @@
+name: Version
+description: Get Tomato build Version
+outputs:
+  version:
+    description: "Random number"
+    value: ${{ steps.vars.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    -
+      name: Export version
+      id: vars
+      shell: bash
+      run: |
+        if [ "${GITHUB_REF_TYPE}" == 'tag' ]; then
+          echo "version=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+        else
+          if $(git rev-parse --is-shallow-repository); then
+            echo "ERROR: checkout is a shallow clone, so can't get Tomato version!"
+            exit 1
+          fi
+          echo "version=$(git rev-list --count HEAD).$(git rev-parse --short=8 HEAD)"
+        fi
