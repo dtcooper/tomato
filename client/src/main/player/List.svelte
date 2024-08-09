@@ -19,6 +19,7 @@
   export let skip
   export let regenerateStopsetAsset
   export let showSwapUI
+  export let rebalanceWaits
 
   export let numStopsetsToDisableAddMoreAt
 
@@ -217,6 +218,7 @@
                                   skip() // Skip as usual if item is active
                                 } else {
                                   asset.queueForSkip = !asset.queueForSkip
+                                  rebalanceWaits()
                                 }
                               }}
                               ><Icon

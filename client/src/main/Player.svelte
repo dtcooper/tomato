@@ -73,6 +73,23 @@
     )
   }
 
+  const rebalanceWaits = () => {
+    if ($config.WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME) {
+      // Avoid active waits and the first wait
+      for (let i = 1; i < items.length; i++) {
+        const stopset = items[i - 1]
+        const wait = items[i]
+        if (!wait.active && wait.type === "wait" && stopset.type === "stopset") {
+          wait.duration = Math.max(
+            $config.WAIT_INTERVAL - stopset.remainingAfterQueuedSkips,
+            $config.WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME_MIN_LENGTH
+          )
+          updateUI()
+        }
+      }
+    }
+  }
+
   const addStopset = () => {
     // Prepend a full wait interval IF:
     // There's nothing in the items list, or the previous item is a stopset
@@ -90,17 +107,9 @@
       // Always add a stopset AND THEN a wait interval
       items.push(generatedStopset)
       if ($config.WAIT_INTERVAL > 0) {
-        let duration = $config.WAIT_INTERVAL
-        if ($config.WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME) {
-          duration = Math.max(
-            duration - generatedStopset.duration,
-            $config.WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME_MIN_LENGTH
-          )
-        }
-        if (duration > 0) {
-          items.push(new Wait(duration, doneWaiting, updateUI))
-        }
+        items.push(new Wait($config.WAIT_INTERVAL, doneWaiting, updateUI))
       }
+      rebalanceWaits()
     } else {
       console.warn("Couldn't generate a stopset!")
     }
@@ -218,6 +227,10 @@
       }
     }
 
+    if (success) {
+      rebalanceWaits()
+    }
+
     updateUI()
     messageServer("ack-action", {
       connection_id,
@@ -246,6 +259,7 @@
         generatedStopset.loadAudio()
         items[nextStopset].done(true, true) // Mark swap out one as done and don't log
         items[nextStopset] = generatedStopset
+        rebalanceWaits()
         updateUI()
       }
     }
@@ -265,6 +279,7 @@
     } else {
       console.warn(`Item at index ${index} is not a stopset. Can't regenerate!`)
     }
+    rebalanceWaits()
     updateUI()
   }
 
@@ -296,7 +311,9 @@
     if (stopset.destroyed) {
       alert(`Stop set ${stopset.name} no longer active in the playlist. Can't perform swap!`, "warning")
     } else {
-      if (!stopset.swapAsset(subindex, asset, swapAsset.rotator)) {
+      if (stopset.swapAsset(subindex, asset, swapAsset.rotator)) {
+        rebalanceWaits()
+      } else {
         alert(`Asset in stop set ${stopset.name}'s index ${subindex + 1} can no longer be swapped.`, "warning")
       }
       updateUI()
@@ -421,6 +438,7 @@
   {addStopset}
   {processItem}
   {regenerateStopsetAsset}
+  {rebalanceWaits}
   {showSwapUI}
   {pause}
   {skip}
