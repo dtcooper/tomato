@@ -12,12 +12,18 @@
 
 {#if $alerts.length > 0}
   <div class="toast z-[10000] items-end">
-    {#each $alerts as { msg, level }, i}
+    {#each $alerts as { msg, level, html }, i}
       <div
         class="alert {classes[level]} w-max max-w-lg animate-pulse border-2 border-neutral"
         style:--pulse-color="var(--{level.substring(0, 2)})"
       >
-        <span class="text-wrap">{msg}</span>
+        <span class="text-wrap">
+          {#if html}
+            {@html msg}
+          {:else}
+            {msg}
+          {/if}
+        </span>
         <div class="w-max">
           <button class="btn btn-neutral btn-sm" tabindex="-1" on:click={() => dismiss(i)}>
             <span>✕</span><span>Dismiss</span>

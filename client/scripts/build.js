@@ -35,7 +35,7 @@ const runBuild = async () => {
   const distDir = "dist"
   const { node: nodeVersion } = electronReleases.find((release) => release.version === electronVersion) || {}
 
-  const TOMATO_VERSION = isDev ? `"dev"` : `"${process.env.TOMATO_VERSION || "unknown"}"`
+  const TOMATO_VERSION = `"${process.env.TOMATO_VERSION || (isDev ? "dev" : "unknown")}"`
   console.log(
     `Building for ${isDev ? "development" : "production"} (version: ${TOMATO_VERSION.slice(1, -1)}), ` +
       `electron ${electronVersion}, node ${nodeVersion || "unknown"}${watch ? ", watching" : ""}...`

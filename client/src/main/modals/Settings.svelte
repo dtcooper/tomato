@@ -61,17 +61,25 @@
   >
     <div class="flex justify-end text-lg font-bold">User interface mode:</div>
     {#if $config.UI_MODES.length > 1}
-      <div class="tabs-boxed tabs w-max">
-        {#each $config.UI_MODES as uiMode}
-          <button
-            class="tab gap-2"
-            class:tab-active={uiMode === $userConfig.uiMode}
-            on:click={() => ($userConfig.uiMode = uiMode)}
-          >
-            <Icon icon={uiModeInfo[uiMode].icon} class="h-6 w-6" />
-            {uiModeInfo[uiMode].name}
-          </button>
-        {/each}
+      <div class="flex w-max flex-col gap-0.5">
+        <div class="tabs-boxed tabs">
+          {#each $config.UI_MODES as uiMode}
+            <button
+              class="tab gap-2"
+              class:tab-active={uiMode === $userConfig.uiMode}
+              on:click={() => ($userConfig.uiMode = uiMode)}
+            >
+              <Icon icon={uiModeInfo[uiMode].icon} class="h-6 w-6" />
+              {uiModeInfo[uiMode].name}
+            </button>
+          {/each}
+        </div>
+        {#if $config.UI_MODE_RESET_TIMES && $config.UI_MODE_RESET_TIMES.length > 0}
+          <div class="text-center text-sm">
+            <strong>NOTE:</strong>
+            resets to {uiModeInfo[Math.min(...$config.UI_MODES)]?.name?.toLowerCase()} mode periodically.
+          </div>
+        {/if}
       </div>
     {:else}
       <div class="text-md flex w-max items-center gap-2">
@@ -90,7 +98,7 @@
         data-tip="Unlock device by clicking below"
       >
         <select
-          class="select select-bordered select-lg w-full"
+          class="select select-bordered w-full"
           on:change={(e) => setSpeaker(e.target.value)}
           disabled={speakerLocked}
         >
@@ -196,8 +204,8 @@
     <div class="flex justify-end text-lg font-bold">Version:</div>
     <!-- svelte-ignore missing-declaration-->
     <div class="text-md w-max">
-      <span class="select-text font-mono">{TOMATO_VERSION}</span> / protocol:
-      <span class="select-text font-mono">{protocolVersion}</span>
+      <span class="select-text font-mono">{TOMATO_VERSION}</span>
+      &mdash; protocol: <span class="select-text font-mono">{protocolVersion}</span>
     </div>
     <hr class="divider col-span-2 m-0 h-0 p-0" />
 

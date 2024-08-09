@@ -10,13 +10,13 @@ export const dismiss = (index) =>
     return $alerts
   })
 
-export const alert = (msg, level = "info", timeout = null) => {
+export const alert = (msg, level = "info", timeout = null, html = false) => {
   if (!alertLevels.includes(level)) {
     console.warn(`Invalid alert level: ${level}`)
     level = "info"
   }
   const expires = timeout !== null ? window.performance.now() + timeout : null
-  data.update(($alerts) => [{ msg, level, expires }, ...$alerts])
+  data.update(($alerts) => [{ msg, level, expires, html }, ...$alerts])
 }
 
 setInterval(() => {
