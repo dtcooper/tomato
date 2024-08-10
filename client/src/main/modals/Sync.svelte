@@ -12,7 +12,7 @@
 
   export let show = true
   export let isFromLogin = true
-  export let title = `Sync status`
+  export let title = `Connection status`
 </script>
 
 <Modal bind:show canDismiss={!isFromLogin}>
@@ -36,7 +36,7 @@
       <span class="max-w-md truncate font-mono text-sm italic">{$progress.item}</span>
     {:else if $conn.connected}
       {#if $conn.ready}
-        <h2 class="text-xl italic text-success">You are fully up-to-date with the server!</h2>
+        <h2 class="text-xl italic text-success">You are <strong>connected</strong> and up-to-date with the server!</h2>
       {:else}
         <h2 class="text-xl italic">Connecting...</h2>
       {/if}
@@ -47,7 +47,23 @@
     {/if}
     {#if $db.lastSync}
       <div>
-        Last update processed: <span class="font-bold">{prettyDatetime($db.lastSync)}</span>
+        <ul class="w-full list-disc text-left">
+          <li>
+            <div class="break-all">
+              Conection: <span class="select-text font-mono text-sm">
+                {$conn.username} <span class="select-text font-bold text-info">@</span>
+                {$conn.prettyHost}
+              </span>
+            </div>
+          </li>
+          <li>Last update processed: <span class="font-bold">{prettyDatetime($db.lastSync)}</span></li>
+          <li>
+            Database contains
+            {$db.assets.length} asset{$db.assets.length !== 1 ? "s" : ""},
+            {$db.rotators.size} rotator{$db.rotators.size !== 1 ? "s" : ""}, and
+            {$db.stopsets.length} rotator{$db.stopsets.length !== 1 ? "s" : ""}.
+          </li>
+        </ul>
       </div>
     {/if}
   </svelte:fragment>

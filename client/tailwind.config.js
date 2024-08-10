@@ -35,7 +35,9 @@ module.exports = {
         mono: "Space Mono Local"
       },
       colors: {
-        playhead: "oklch(var(--playhead) / <alpha-value>)"
+        playhead: "oklch(var(--playhead) / <alpha-value>)",
+        "settings-modal-bg": "oklch(var(--settings-modal-bg) / <alpha-value>)",
+        "settings-modal-outer-bg": "oklch(var(--settings-modal-outer-bg) / <alpha-value>)"
       }
     }
   },
@@ -46,13 +48,17 @@ module.exports = {
       {
         emerald: {
           ...emerald,
-          "--playhead": "var(--bc)" // base-content
+          "--playhead": "var(--bc)", // base-content
+          "--settings-modal-bg": "var(--b1)",
+          "--settings-modal-outer-bg": "var(--b3)"
         }
       },
       {
         night: {
           ...night,
-          "--playhead": "100% 0 0" // white
+          "--playhead": "100% 0 0", // white
+          "--settings-modal-bg": "var(--b3)",
+          "--settings-modal-outer-bg": "var(--b1)"
         }
       }
     ]

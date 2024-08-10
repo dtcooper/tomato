@@ -22,6 +22,7 @@
   let showServerSettings = false
   let logoutStationName = ""
   let showLogoutError
+  export let showSyncModal
 
   $: serverSettings = Object.entries($config).sort()
 
@@ -51,12 +52,12 @@
   $: speakerLocked = show
 </script>
 
-<Modal bind:show class="max-w-3xl">
+<Modal bind:show class="max-w-[52rem] bg-settings-modal-outer-bg">
   <svelte:fragment slot="icon"><Icon icon={cogOutline} class="h-8 w-8 md:h-12 md:w-12" /></svelte:fragment>
   <svelte:fragment slot="title">Settings</svelte:fragment>
   <svelte:fragment slot="close-text">Close settings</svelte:fragment>
   <div
-    class="grid h-0 w-full max-w-full flex-1 grid-cols-[max-content_auto] items-center gap-x-5 gap-y-2 overflow-y-auto"
+    class="grid h-0 w-full max-w-full flex-1 grid-cols-[max-content_auto] items-center gap-x-5 gap-y-2 overflow-y-auto rounded-xl bg-settings-modal-bg p-2"
     slot="content"
   >
     <div class="flex justify-end text-lg font-bold">User interface mode:</div>
@@ -181,11 +182,24 @@
     <hr class="divider col-span-2 m-0 h-0 p-0" />
 
     <div class="flex justify-end text-lg font-bold">Connection:</div>
-    <div class="w-full truncate">
-      <span class="select-text font-mono text-sm">
-        {$conn.username} <span class="select-text font-bold text-info">@</span>
-        {$conn.prettyHost}
-      </span>
+    <div class="flex w-full flex-col items-baseline">
+      <div class="w-full break-all">
+        <span class="select-text font-mono text-sm">
+          {$conn.username} <span class="select-text font-bold text-info">@</span>
+          {$conn.prettyHost}
+        </span>
+      </div>
+      <div>
+        <span class="text-xs"
+          >[<button
+            class="link-hover link link-info"
+            on:click={() => {
+              show = false
+              showSyncModal = true
+            }}>Connection status</button
+          >]</span
+        >
+      </div>
     </div>
     <hr class="divider col-span-2 m-0 h-0 p-0" />
 

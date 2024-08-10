@@ -32,9 +32,11 @@ export const uiModeInfo = [
 ]
 
 const resetUIMode = () => {
-  userConfig.update(($userConfig) => {
-    return { ...$userConfig, uiMode: Math.min(...get(config).UI_MODES) }
-  })
+  userConfig.update(($userConfig) => ({
+    ...$userConfig,
+    uiMode: Math.min(...get(config).UI_MODES),
+    tooltips: true // Renew tooltips
+  }))
 }
 
 export const setServerConfig = ({ _numeric: numeric, ...newConfig }) => {

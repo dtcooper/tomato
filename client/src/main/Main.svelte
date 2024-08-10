@@ -16,7 +16,7 @@
 </script>
 
 <SyncModal bind:show={showSyncModal} isFromLogin={false} />
-<SettingsModal bind:show={showSettingsModal} />
+<SettingsModal bind:show={showSettingsModal} bind:showSyncModal />
 
 <Alerts />
 
