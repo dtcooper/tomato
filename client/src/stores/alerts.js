@@ -16,7 +16,7 @@ export const alert = (msg, level = "info", timeout = null, html = false) => {
     level = "info"
   }
   const expires = timeout !== null ? window.performance.now() + timeout : null
-  data.update(($alerts) => [{ msg, level, expires, html }, ...$alerts])
+  data.update(($alerts) => [{ msg, level, expires, html }, ...$alerts.slice(0, 9)])
 }
 
 setInterval(() => {

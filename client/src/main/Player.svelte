@@ -309,12 +309,12 @@
 
   const doAssetSwap = (stopset, subindex, asset, swapAsset) => {
     if (stopset.destroyed) {
-      alert(`Stop set ${stopset.name} no longer active in the playlist. Can't perform swap!`, "warning")
+      alert(`Stop set ${stopset.name} no longer active in the playlist. Can't perform swap!`, "warning", 10000)
     } else {
       if (stopset.swapAsset(subindex, asset, swapAsset.rotator)) {
         rebalanceWaits()
       } else {
-        alert(`Asset in stop set ${stopset.name}'s index ${subindex + 1} can no longer be swapped.`, "warning")
+        alert(`Asset in stop set ${stopset.name}'s index ${subindex + 1} can no longer be swapped.`, "warning", 10000)
       }
       updateUI()
     }
