@@ -60,7 +60,7 @@
       </article>
       <p>
         <button @click="logs = []">Clear logs</button>
-        <button :disabled="!connected" @click.debounce="send('reload-playlist')">
+        <button :disabled="!connected" @click.throttle.500ms="send('reload-playlist')">
           Refresh ALL connected clients playlists
         </button>
       </p>
@@ -140,12 +140,14 @@
                   </td>
                   <td x-text="conn.username"></td>
                   <td>
-                    <button @click.debounce="send('reload-playlist', {'connection_id': conn.connection_id})">
+                    <button @click.throttle.500ms="send('reload-playlist', {'connection_id': conn.connection_id})">
                       Refresh playlist
                     </button>
-                    <button @click.debounce="() =>  send('play', {'connection_id': conn.connection_id })">Play</button>
+                    <button @click.throttle.500ms="() =>  send('play', {'connection_id': conn.connection_id })">
+                      Play
+                    </button>
                     <button
-                      @click.debounce="() => {
+                      @click.throttle.500ms="() => {
                         if(notifyMsg.trim().length > 0) {
                           send('notify', {'connection_id': conn.connection_id, msg: notifyMsg, level: notifyLevel})
                           notifyMsg = ''
@@ -258,11 +260,11 @@
                                       <option>Select an asset above</option>
                                     </select>
                                     <button
-                                      @click.debounce="swapAsset(action, item.id, subindex)"
+                                      @click.throttle.500ms="swapAsset(action, item.id, subindex)"
                                       x-text="`Perform ${action !== 'swap' ? 'insert ' : ''}${action}`"
                                       :disabled="!asset"
                                     ></button>
-                                    <button @click.debounce="deleteAsset(item.id, subindex)">Delete</button>
+                                    <button @click.throttle.500ms="deleteAsset(item.id, subindex)">Delete</button>
                                   </span>
                                 </div>
                               </template>
