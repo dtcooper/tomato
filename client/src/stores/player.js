@@ -354,8 +354,8 @@ export class GeneratedStopset {
   get remaining() {
     return this.playableItems.reduce((s, item) => s + item.remaining, 0)
   }
-  get remainingAfterQueuedSkips() {
-    return this.playableItems.filter((item) => !item.queueForSkip).reduce((s, item) => s + item.remaining, 0)
+  get durationAfterQueuedSkips() {
+    return this.playableItems.filter((item) => !item.queueForSkip).reduce((s, item) => s + item.duration, 0)
   }
 
   get playableNonErrorItems() {

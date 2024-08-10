@@ -81,7 +81,7 @@
         const wait = items[i]
         if (!wait.active && wait.type === "wait" && stopset.type === "stopset") {
           wait.duration = Math.max(
-            $config.WAIT_INTERVAL - stopset.remainingAfterQueuedSkips,
+            $config.WAIT_INTERVAL - stopset.durationAfterQueuedSkips,
             $config.WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME_MIN_LENGTH
           )
           updateUI()
