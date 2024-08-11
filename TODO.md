@@ -85,3 +85,4 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [x] Seed, leaf, flower icon for simple, intermediate, advanced
 - [x] Alternating grey/white rows in AssetPicker component
 - [x] Fix regenerate/swap not working button when wait intervals are disabled
+- [ ] Seems to be a startup delay. Do profiling to figure it out.
