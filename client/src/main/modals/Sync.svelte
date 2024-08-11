@@ -61,7 +61,7 @@
             Database contains
             {$db.assets.length} asset{$db.assets.length !== 1 ? "s" : ""},
             {$db.rotators.size} rotator{$db.rotators.size !== 1 ? "s" : ""}, and
-            {$db.stopsets.length} rotator{$db.stopsets.length !== 1 ? "s" : ""}.
+            {$db.stopsets.length} stop sets{$db.stopsets.length !== 1 ? "s" : ""}.
           </li>
         </ul>
       </div>
