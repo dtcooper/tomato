@@ -4,7 +4,7 @@ const fs = require("fs")
 const fsExtra = require("fs-extra")
 const { parseArgs } = require("util")
 const path = require("path")
-const { check: squirrelCheck } = require("electron-squirrel-startup")
+const squirrelCheck = require("electron-squirrel-startup")
 const { protocol_version } = require("../../server/constants.json")
 
 const cmdArgs = parseArgs({
@@ -225,10 +225,17 @@ if (squirrelCheck || !singleInstanceLock) {
       win.webContents.openDevTools({ mode: "detach" })
     }
 
+    win.menuBarVisible = !win.isFullScreen()
     win.on("enter-full-screen", () => {
+      if (IS_LINUX || IS_WIN32) {
+        win.menuBarVisible = false
+      }
       win.webContents.send("set-fullscreen", true)
     })
     win.on("leave-full-screen", () => {
+      if (IS_LINUX || IS_WIN32) {
+        win.menuBarVisible = true
+      }
       win.webContents.send("set-fullscreen", false)
     })
 
