@@ -16,6 +16,7 @@
   import { logout, protocolVersion, conn } from "../../stores/connection"
   import { playStatus, speaker, setSpeaker } from "../../stores/player"
   import { config, userConfig, uiModeInfo } from "../../stores/config"
+  import { buttonBoxDetected, buttonBoxVersion } from "../../stores/midi"
 
   export let show = true
   let showLogout = false
@@ -150,11 +151,24 @@
     </div>
     <hr class="divider col-span-2 m-0 h-0 p-0" />
 
-    <div class="flex justify-end text-lg font-bold">Button box:</div>
+    <div class="flex justify-end text-lg font-bold">MIDI Button box:</div>
     <div class="flex w-max items-center justify-center gap-4 text-xl font-bold">
       <span class:text-error={!$userConfig.enableMIDIButtonBox}>OFF</span>
       <input type="checkbox" class="toggle toggle-success toggle-lg" bind:checked={$userConfig.enableMIDIButtonBox} />
       <span class:text-success={$userConfig.enableMIDIButtonBox}>ON</span>
+      {#if $userConfig.enableMIDIButtonBox}
+        <span class="text-base font-normal">
+          (Button box
+          {#if $buttonBoxDetected}
+            {#if $buttonBoxVersion}
+              <span class="select-text font-mono text-sm">{$buttonBoxVersion}</span>
+            {/if}
+            was <span class="font-bold text-success">detected</span>!)
+          {:else}
+            was <span class="text-error">not detected</span>.)
+          {/if}
+        </span>
+      {/if}
     </div>
     <hr class="divider col-span-2 m-0 h-0 p-0" />
 
