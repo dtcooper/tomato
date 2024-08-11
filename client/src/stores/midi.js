@@ -29,21 +29,16 @@ export const buttonBoxVersion = readonly(version)
 
 const detectButtonBox = (ports) => {
   if (!ports) {
-    ports = filterPorts([...WebMidi.inputs, ...WebMidi.outputs])
+    ports = [...WebMidi.inputs, ...WebMidi.outputs]
   }
 
   version.set(false)
   let found = false
-  for (const port of ports) {
-    if (
-      port.manufacturer.toLocaleLowerCase().includes(BOX_MANUFACTURER) ||
-      port.name.toLocaleLowerCase().includes(BOX_NAME)
-    ) {
-      found = true
-      if (port.type === "output") {
-        // Ask box version 250ms after it comes online
-        setTimeout(() => sendSysex("stats", [port], true), 250)
-      }
+  for (const port of buttonBoxPorts(ports)) {
+    found = true
+    if (port.type === "output") {
+      // Ask box version 250ms after it comes online
+      setTimeout(() => sendSysex("stats", [port], true), 250)
     }
   }
   detected.set(found)
@@ -57,6 +52,11 @@ let enabled = false
 // Filter midi loopback (through port) on Linux
 const portUsable = (port) => !(IS_LINUX && port.name.toLowerCase().includes(MIDI_THROUGH_PORT_LINUX))
 const filterPorts = (ports) => ports.filter((p) => portUsable(p))
+const buttonBoxPorts = (ports) =>
+  filterPorts(ports).filter(
+    (p) =>
+      p.manufacturer.toLocaleLowerCase().includes(BOX_MANUFACTURER) || p.name.toLocaleLowerCase().includes(BOX_NAME)
+  )
 
 window.addEventListener("beforeunload", () => {
   midiSetLED(LED_OFF, true)
@@ -168,3 +168,7 @@ const sendSysex = (window.sendButtonBoxSysex = (cmd = "stats", ports = undefined
     }
   }
 })
+
+export const resetButtonBox = () => {
+  sendSysex("reset", buttonBoxPorts(WebMidi.outputs))
+}

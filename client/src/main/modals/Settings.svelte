@@ -16,13 +16,14 @@
   import { logout, protocolVersion, conn } from "../../stores/connection"
   import { playStatus, speaker, setSpeaker } from "../../stores/player"
   import { config, userConfig, uiModeInfo } from "../../stores/config"
-  import { buttonBoxDetected, buttonBoxVersion } from "../../stores/midi"
+  import { buttonBoxDetected, buttonBoxVersion, resetButtonBox } from "../../stores/midi"
 
   export let show = true
   let showLogout = false
   let showServerSettings = false
   let logoutStationName = ""
   let showLogoutError
+  let resettingButtonBox = false
   export let showSyncModal
 
   $: serverSettings = Object.entries($config).sort()
@@ -161,11 +162,23 @@
           (Button box
           {#if $buttonBoxDetected}
             {#if $buttonBoxVersion}
-              <span class="select-text font-mono text-sm">{$buttonBoxVersion}</span>
+              <span class="select-text font-mono text-sm tracking-tighter">{$buttonBoxVersion}</span>
             {/if}
-            was <span class="font-bold text-success">detected</span>!)
+            <span class="font-bold text-success">detected</span>!)
+            {#if !resettingButtonBox}
+              <span class="text-sm"
+                >[<button
+                  class="link-hover link link-primary link-info"
+                  on:click={() => {
+                    resettingButtonBox = true
+                    resetButtonBox()
+                    setTimeout(() => (resettingButtonBox = false), 1500)
+                  }}>Click to reset</button
+                >]</span
+              >
+            {/if}
           {:else}
-            was <span class="text-error">not detected</span>.)
+            <span class="text-error">not detected</span>.)
           {/if}
         </span>
       {/if}
@@ -198,7 +211,7 @@
     <div class="flex justify-end text-lg font-bold">Connection:</div>
     <div class="flex w-full flex-col items-baseline">
       <div class="w-full break-all">
-        <span class="select-text font-mono text-sm">
+        <span class="select-text font-mono text-sm tracking-tight">
           {$conn.username} <span class="select-text font-bold text-info">@</span>
           {$conn.prettyHost}
         </span>
