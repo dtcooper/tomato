@@ -28,10 +28,10 @@
 
   $: if (isWide) {
     classes =
-      "min-[1525px]:bottom-0 min-[1525px]:right-0 min-[1525px]:rounded-tl-lg min-[1525px]:flex-col min-[1525px]:rounded-bl-none min-[1525px]:pt-3 min-[1525px]:px-3 min-[1525px]:pb-1"
+      "clk-wd:bottom-0 clk-wd:right-0 clk-wd:rounded-tl-lg clk-wd:flex-col clk-wd:rounded-bl-none clk-wd:pt-3 clk-wd:px-3 clk-wd:pb-1"
   } else {
     classes =
-      "min-[1145px]:bottom-0 min-[1145px]:right-0 min-[1145px]:rounded-tl-lg min-[1145px]:flex-col min-[1145px]:rounded-bl-none min-[1145px]:pt-3 min-[1145px]:px-3 min-[1145px]:pb-1"
+      "clk-sm:bottom-0 clk-sm:right-0 clk-sm:rounded-tl-lg clk-sm:flex-col clk-sm:rounded-bl-none clk-sm:pt-3 clk-sm:px-3 clk-sm:pb-1"
   }
 </script>
 
@@ -40,15 +40,15 @@
     <div
       class="fixed right-0 flex w-max items-end gap-1 rounded-bl-lg bg-base-200 px-2 py-1 font-mono leading-none {classes}"
     >
-      <div class="hidden {isWide ? 'min-[1525px]:block' : 'min-[1145px]:block'}">{date}</div>
+      <div class="hidden {isWide ? 'clk-wd:block' : 'clk-sm:block'}">{date}</div>
       <div
         class="text-lg font-bold {is24Hour
           ? isWide
-            ? 'min-[1525px]:text-3xl'
-            : 'min-[1145px]:text-3xl'
+            ? 'clk-wd:text-3xl'
+            : 'clk-sm:text-3xl'
           : isWide
-            ? 'min-[1525px]:text-2xl'
-            : 'min-[1145px]:text-2xl'}"
+            ? 'clk-wd:text-2xl'
+            : 'clk-sm:text-2xl'}"
       >
         {time}
       </div>

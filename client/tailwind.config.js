@@ -27,7 +27,9 @@ module.exports = {
   content: ["index.html", "./src/**/*.{html,js,svelte}"],
   theme: {
     screens: {
-      md: "900px"
+      md: "900px",
+      "clk-sm": "1145px", // Clock when not wide
+      "clk-wd": "1525px" // Clock when wide
     },
     extend: {
       fontFamily: {
