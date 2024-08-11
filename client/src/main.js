@@ -225,15 +225,17 @@ if (squirrelCheck || !singleInstanceLock) {
       win.webContents.openDevTools({ mode: "detach" })
     }
 
-    win.menuBarVisible = !win.isFullScreen()
+    if (IS_WIN32) {
+      win.menuBarVisible = !win.isFullScreen()
+    }
     win.on("enter-full-screen", () => {
-      if (IS_LINUX || IS_WIN32) {
+      if (IS_WIN32) {
         win.menuBarVisible = false
       }
       win.webContents.send("set-fullscreen", true)
     })
     win.on("leave-full-screen", () => {
-      if (IS_LINUX || IS_WIN32) {
+      if (IS_WIN32) {
         win.menuBarVisible = true
       }
       win.webContents.send("set-fullscreen", false)
