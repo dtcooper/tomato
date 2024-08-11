@@ -2,8 +2,11 @@ name: Version
 description: Get Tomato build Version
 outputs:
   version:
-    description: "Random number"
+    description: "Version"
     value: ${{ steps.vars.outputs.version }}
+  protocol:
+    description: "Protocol"
+    value: ${{ steps.vars.outputs.protocol }}
 
 runs:
   using: composite
@@ -24,6 +27,8 @@ runs:
         else
           VERSION="r$(git rev-list --count HEAD).$(git rev-parse --short=8 HEAD)"
         fi
+        PROTOCOL="$(jq -r .protocol_version server/constants.json)"
 
-        echo "Setting Tomato version to ${VERSION}"
+        echo "Setting Tomato version to ${VERSION} [protocol=${PROTOCOL}]"
         echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+        echo "protocol=${PROTOCOL}" >> "$GITHUB_OUTPUT"

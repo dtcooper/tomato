@@ -154,7 +154,7 @@ jobs:
         name: Wait for last preview deletion
         shell: bash
         if: github.ref_type != 'tag'
-        run: |  # Omits "-" character, which is included above
+        run: |
           sleep 15s
       -
         name: Tag and upload preview release
@@ -166,7 +166,8 @@ jobs:
           body: |
             _**This development preview build may not be safe: use it at your own risk!**_
 
-            Release version: `${{ steps.version.outputs.version }}`
+            * Release version: `${{ steps.version.outputs.version }}`
+            * Protocol version: `${{ steps.version.outputs.protocol }}`
           tag: 'preview-build'
           prerelease: true
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -179,5 +180,8 @@ jobs:
           name: 'Tomato Release ${{ steps.version.outputs.version }}'
           body: |
             Choose a client to download below. Server containers [can be found here](https://github.com/dtcooper/tomato/pkgs/container/tomato-server).
+
+            * Release version: `${{ steps.version.outputs.version }}`
+            * Protocol version: `${{ steps.version.outputs.protocol }}`
           tag: ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
