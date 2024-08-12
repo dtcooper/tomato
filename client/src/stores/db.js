@@ -9,7 +9,7 @@ import { WeakRefSet } from "weak-ref-collections"
 import { get, readonly, writable } from "svelte/store"
 
 import { colors } from "../../../server/constants.json"
-import { IS_DEV, prettyDate, urlParams } from "../utils"
+import { IS_DEV, prettyDatetimeShort, urlParams } from "../utils"
 import { log } from "./client-logs"
 import { config } from "./config"
 import { conn } from "./connection"
@@ -82,11 +82,11 @@ class AssetStopsetHydratableObject extends HydratableObject {
     if (!this.enabled) {
       return "Not enabled"
     } else if (this.begin && this.end) {
-      return `${prettyDate(this.begin)} to ${prettyDate(this.end)}`
+      return `${prettyDatetimeShort(this.begin)} to ${prettyDatetimeShort(this.end)}`
     } else if (this.begin) {
-      return `Starts ${prettyDate(this.begin)}`
+      return `Starts ${prettyDatetimeShort(this.begin)}`
     } else if (this.end) {
-      return `Ends ${prettyDate(this.end)}`
+      return `Ends ${prettyDatetimeShort(this.end)}`
     } else {
       return "Always airs"
     }

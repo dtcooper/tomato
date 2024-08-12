@@ -4,10 +4,6 @@ export const urlParams = Object.fromEntries(new URLSearchParams(window.location.
 export const IS_DEV = urlParams.dev === "1"
 export const progressBarAnimationFramerate = 30
 
-export const prettyDate = (item) => {
-  return item.format("YYYY/M/D @ h:mm")
-}
-
 export const prettyDuration = (item, max) => {
   item = dayjs.duration(Math.round(item), "seconds")
   max = max ? dayjs.duration(Math.round(max), "seconds") : item
@@ -34,6 +30,7 @@ export const humanDuration = (item) => {
 }
 
 export const prettyDatetime = (datetime) => datetime.format("MMM D, YYYY @ h:mm:ssa")
+export const prettyDatetimeShort = (datetime) => datetime.format("YYYY/M/D @ h:mma")
 
 export const upperCaseFirst = (s) => `${s.charAt(0).toUpperCase()}${s.substr(1)}`
 
