@@ -36,5 +36,5 @@ runs:
 
         echo 'Setting Tomato versions'
         echo "version=${VERSION}" | tee -a "$GITHUB_OUTPUT"
+        echo "protocol=${PROTOCOL}" | tee -a "$GITHUB_OUTPUT"
         echo "version-short=${VERSION_SHORT}" | tee -a "$GITHUB_OUTPUT"
-        echo "package-json=${PACKAGE_JSON}" | tee -a "$GITHUB_OUTPUT"
