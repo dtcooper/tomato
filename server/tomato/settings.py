@@ -88,6 +88,7 @@ INSTALLED_APPS.extend([
 ])
 
 AUTH_USER_MODEL = "tomato.User"
+SESSION_COOKIE_AGE = 60 * 24 * 60 * 60  # 60 days
 
 MIDDLEWARE = []
 if DEBUG:

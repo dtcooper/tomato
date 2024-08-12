@@ -83,16 +83,16 @@ or can be download below.
     [Squirrel.Windows](https://github.com/Squirrel/Squirrel.Windows))
 
   * **Linux :material-linux: downloads**:
-      * **Ubuntu :material-ubuntu:**, **Debian :material-debian:** (and their derivatives), or **Raspberry Pi :fontawesome-brands-raspberry-pi:,**
+      * For **Ubuntu :material-ubuntu:**, **Debian :material-debian:** (and their derivatives), or **Raspberry Pi :fontawesome-brands-raspberry-pi:,**
           * [**:material-download: Download x86_64 (64-bit) `.deb` here**](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_amd64.deb)
           * [**:material-download: Download arm64 (Raspberry Pi) `.deb` here**](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_arm64.deb)
 
-      * **Arch :material-arch: or Manjaro :material-manjaro:** &mdash; Packages for Tomato are available in the
-        [Arch User Repository (AUR)](https://aur.archlinux.org/)
+      * For **Arch :material-arch: or Manjaro :material-manjaro:** &mdash; packages for Tomato are provided in the
+        [Arch User Repository (AUR)](https://aur.archlinux.org/),
           * [Latest preview build (`tomato-radio-automation-git`)](https://aur.archlinux.org/packages/tomato-radio-automation-git)
           * [Latest stable release (`tomato-radio-automation`)](https://aur.archlinux.org/packages/tomato-radio-automation)
 
-      * [**Download :material-download: Universal AppImage (x86_64) format here**](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_amd64.AppImage)
+      * All others distributions: [**Download :material-download: universal AppImage (x86_64) format here**](https://github.com/dtcooper/tomato/releases/download/preview-build/tomato-client-preview-linux_amd64.AppImage)
           * To run using an AppImage, do the following on whatever Linux :material-linux: distribution
             you're using,
 
