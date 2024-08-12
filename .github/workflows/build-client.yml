@@ -86,9 +86,9 @@ jobs:
         shell: bash
         run: |
           echo "Building Tomato for ${{ matrix.title }} (${{ steps.version.outputs.version }})"
+          cd client
           jq '.version = "${{ steps.version.outputs.short-version }}"' package.json > package.json.tmp
           mv -v package.json.tmp package.json
-          cd client
           if [ "${{ matrix.platform }}" = "win32" ]; then
             npm config set script-shell $(which bash)
           fi
