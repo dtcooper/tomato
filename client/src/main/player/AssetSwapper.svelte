@@ -14,13 +14,14 @@
   <svelte:fragment slot="action-name">Swap</svelte:fragment>
   <svelte:fragment slot="title">Swap asset in stop set</svelte:fragment>
   <p class="truncate text-wrap" slot="description">
-    Choose an asset from rotator
+    Choose from below to swap asset <span class="select-text truncate font-mono">{swapAsset.name}</span>
+    in rotator
     <span
       class="badge select-text border-secondary-content font-medium"
       style:background-color={swapAsset.rotator.color.value}
       style:color={swapAsset.rotator.color.content}>{swapAsset.rotator.name}</span
     >
-    to swap asset <span class="select-text truncate font-mono">{swapAsset.name}</span> in stop set
+    and stop set
     <span class="select-text">{stopset.name}</span>
     (index {subindex + 1}/{stopset.items.length}).
   </p>

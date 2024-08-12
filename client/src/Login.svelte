@@ -172,9 +172,9 @@
         >,
         <!-- svelte-ignore missing-declaration-->
         version:
-        <span class="select-text font-mono">{TOMATO_VERSION}</span>
+        <span class="select-text font-mono tracking-tighter">{TOMATO_VERSION}</span>
         / protocol:
-        <span class="select-text font-mono">{protocolVersion}</span>
+        <span class="select-text font-mono tracking-tighter">{protocolVersion}</span>
         <br />
         Copyright &copy; 2019-{dayjs().year()}
         <a class="link-hover link link-secondary" href="https://jew.pizza/" tabindex="-1">David Cooper</a>

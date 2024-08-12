@@ -244,8 +244,8 @@
     <div class="flex justify-end text-lg font-bold">Version:</div>
     <!-- svelte-ignore missing-declaration-->
     <div class="text-md w-max">
-      <span class="select-text font-mono">{TOMATO_VERSION}</span>
-      &mdash; protocol: <span class="select-text font-mono">{protocolVersion}</span>
+      <span class="select-text font-mono tracking-tighter">{TOMATO_VERSION}</span>
+      &mdash; protocol: <span class="select-text font-mono tracking-tighter">{protocolVersion}</span>
     </div>
     <hr class="divider col-span-2 m-0 h-0 p-0" />
 
@@ -286,7 +286,11 @@
     />
   </div>
   <svelte:fragment slot="extra-buttons">
-    <div class:tooltip={canLogOut} class="tooltip-error" data-tip="Are you SURE that you're SURE?!">
+    <div
+      class:tooltip-error={canLogOut}
+      class="tooltip"
+      data-tip={canLogOut ? "Are you SURE that you're SURE?!" : `Enter "${$config.STATION_NAME}" above!`}
+    >
       <button disabled={!canLogOut} type="button" class="btn btn-error" on:click={() => logout()}>Log out</button>
     </div>
   </svelte:fragment>

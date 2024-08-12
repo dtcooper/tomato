@@ -33,12 +33,12 @@
   <svelte:fragment slot="action-name">Play</svelte:fragment>
   <svelte:fragment slot="title">Play single asset</svelte:fragment>
   <p slot="description">
-    Click on a single asset to immediate play from
+    Click below to immediately play an asset from rotator
     <span
       class="badge select-text border-secondary-content font-medium"
       style:background-color={modalRotator.color.value}
       style:color={modalRotator.color.content}>{modalRotator.name}</span
-    > below.
+    >.
   </p>
   <div let:asset slot="action" class="tooltip-right flex" data-tip="Play now!" class:tooltip={$userConfig.tooltips}>
     <button
