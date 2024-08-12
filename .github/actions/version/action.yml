@@ -30,7 +30,7 @@ runs:
           VERSION_SHORT="${VERSION}"
         else
           VERSION_SHORT="$(git describe --exclude=preview-build --tags | sed 's/^v//' | sed 's/-g.*$//' | sed 's/-/-next./')"
-          VERSION="${VERSION}-$(git rev-parse --short=8 HEAD)"
+          VERSION="${VERSION_SHORT}-$(git rev-parse --short=8 HEAD)"
         fi
         PROTOCOL="$(jq -r .protocol_version server/constants.json)"
 
