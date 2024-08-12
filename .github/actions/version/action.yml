@@ -7,6 +7,9 @@ outputs:
   protocol:
     description: "Protocol"
     value: ${{ steps.vars.outputs.protocol }}
+  version-short:
+    description: "Version (Short)"
+    value: ${{ steps.vars.outputs.version-short }}
 
 runs:
   using: composite
@@ -23,12 +26,15 @@ runs:
       shell: bash
       run: |
         if [ "${GITHUB_REF_TYPE}" == 'tag' ]; then
-          VERSION="${GITHUB_REF_NAME}"
+          VERSION="$(echo "${GITHUB_REF_NAME}" | sed 's/^v//')"
+          VERSION_SHORT="${VERSION}"
         else
-          VERSION="r$(git rev-list --count HEAD).$(git rev-parse --short=8 HEAD)"
+          VERSION_SHORT="$(git describe --exclude=preview-build --tags | sed 's/^v//' | sed 's/-g.*$//' | sed 's/-/-next./')"
+          VERSION="${VERSION}-$(git rev-parse --short=8 HEAD)"
         fi
         PROTOCOL="$(jq -r .protocol_version server/constants.json)"
 
-        echo "Setting Tomato version to ${VERSION} [protocol=${PROTOCOL}]"
-        echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
-        echo "protocol=${PROTOCOL}" >> "$GITHUB_OUTPUT"
+        echo 'Setting Tomato versions'
+        echo "version=${VERSION}" | tee -a "$GITHUB_OUTPUT"
+        echo "version-short=${VERSION_SHORT}" | tee -a "$GITHUB_OUTPUT"
+        echo "package-json=${PACKAGE_JSON}" | tee -a "$GITHUB_OUTPUT"
