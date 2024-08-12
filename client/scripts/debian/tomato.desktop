@@ -2,8 +2,8 @@
 Name=Tomato Radio Automation
 Comment=Tomato Radio Automation (Desktop App)
 GenericName=Tomato Radio Automation
-StartupWMClass=Tomato Radio Automation
 Exec=env ELECTRON_OZONE_PLATFORM_HINT=auto tomato %U
+StartupWMClass=Tomato
 Icon=tomato
 Type=Application
 StartupNotify=false
