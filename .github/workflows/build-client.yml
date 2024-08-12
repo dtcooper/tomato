@@ -82,9 +82,6 @@ jobs:
         with:
           python-version: '3.11'
       -
-        name: Setup tmate session (debug)
-        uses: mxschmitt/action-tmate@v3
-      -
         name: Build package
         shell: bash
         run: |
@@ -101,9 +98,6 @@ jobs:
           if [ "${{ matrix.platform }}" = "linux" -a "${{ matrix.arch }}" = "x64" ]; then
             mv -v out/make/AppImage/x64/*.AppImage ../client-build-files/${CLIENT_FILENAME%.*}.AppImage
           fi
-
-          echo 'Failing on purpose'
-          exit 1
       -
         name: Upload build artifact
         uses: actions/upload-artifact@v4
