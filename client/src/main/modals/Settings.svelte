@@ -185,7 +185,6 @@
     </div>
     <hr class="divider col-span-2 m-0 h-0 p-0" />
 
-    <!-- svelte-ignore missing-declaration -->
     {#if IS_DEV}
       <div class="flex justify-end text-lg font-bold">Autoplay (dev only):</div>
       <div class="flex w-max items-center justify-center gap-4 text-xl font-bold">

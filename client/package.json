@@ -22,7 +22,8 @@
     "package": "NODE_ENV=production npm-run-all clean build package:forge",
     "make:forge": "electron-forge make",
     "package:forge": "electron-forge package",
-    "format": "prettier --config .prettierrc --plugin prettier-plugin-organize-imports --plugin prettier-plugin-svelte --plugin prettier-plugin-tailwindcss --write . ../server/constants.json ../server/tomato/static/admin/tomato/configure_live_clients/configure_live_clients.js ../server/tomato/templates/admin/extra/configure_live_clients_iframe.html"
+    "format": "prettier --config .prettierrc --plugin prettier-plugin-organize-imports --plugin prettier-plugin-svelte --plugin prettier-plugin-tailwindcss --write . ../server/constants.json ../server/tomato/static/admin/tomato/configure_live_clients/configure_live_clients.js ../server/tomato/templates/admin/extra/configure_live_clients_iframe.html",
+    "lint": "eslint src/ scripts/"
   },
   "repository": {
     "type": "git",

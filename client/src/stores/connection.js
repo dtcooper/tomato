@@ -29,7 +29,9 @@ export const conn = derived(
     let prettyHost = "unknown"
     try {
       prettyHost = new URL($connPersisted.host).host
-    } catch {}
+    } catch {
+      /* empty */
+    }
     return {
       ...$connPersisted,
       ...$connEphemeral,
@@ -166,7 +168,7 @@ export const login = (username, password, host) => {
       host = url.toString()
     } else {
       // Called with no args = logging back in on first load
-      ;({ username, password, host } = get(conn))
+      ;({ username, password, host } = get(conn)) // eslint-disable-line no-extra-semi
     }
 
     if (!username || !password) {

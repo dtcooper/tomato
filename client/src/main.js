@@ -181,10 +181,10 @@ if (squirrelCheck || !singleInstanceLock) {
 
     // Enable autoplay + midi
     const allowedPermissions = ["media", "midi", "midiSysex"]
-    win.webContents.session.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) => {
+    win.webContents.session.setPermissionCheckHandler((webContents, permission) => {
       return allowedPermissions.includes(permission)
     })
-    win.webContents.session.setPermissionRequestHandler((webContents, permission, callback, details) => {
+    win.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
       callback(allowedPermissions.includes(permission))
     })
 

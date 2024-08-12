@@ -277,6 +277,7 @@ class Rotator extends HydratableObject {
           break
         }
       } else {
+        // eslint-disable-next-line no-extra-semi
         ;({ obj: asset, hasEndDateMultiplier } = pickRandomItemByWeight(assets, endDateMultiplier, startTime))
         assetListName = name
       }
@@ -324,6 +325,7 @@ class Stopset extends AssetStopsetHydratableObject {
       let asset = null
       let hasEndDateMultiplier = false
       if (rotator.enabled) {
+        // eslint-disable-next-line no-extra-semi
         ;({ asset, hasEndDateMultiplier } = rotator.getAsset(
           mediumIgnoreIds,
           hardIgnoreIds,
@@ -377,7 +379,9 @@ class DB {
   static _loadAssetPlayTimes() {
     try {
       this._assetPlayTimes = new Map(JSON.parse(window.localStorage.getItem("soft-ignored-ids")))
-    } catch {}
+    } catch {
+      /* empty */
+    }
   }
 
   static _saveEvenlyCycleRotatorTracker() {
@@ -390,7 +394,9 @@ class DB {
   static _loadEvenlyCycleRotatorTracker() {
     try {
       this._evenlyCycleRotatorTracker = new Map(JSON.parse(window.localStorage.getItem("evenly-cycle-rotator-tracker")))
-    } catch {}
+    } catch {
+      /* empty */
+    }
   }
 
   static markPlayed(asset, rotator = null) {
