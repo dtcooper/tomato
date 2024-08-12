@@ -62,7 +62,7 @@ if (squirrelCheck || !singleInstanceLock) {
     website: "https://github.com/dtcooper/tomato",
     iconPath,
     applicationVersion: TOMATO_VERSION,
-    version: TOMATO_VERSION
+    version: ""  // hide on macOS
   })
 
   const baseUrl = isNotPackagedAndDev
