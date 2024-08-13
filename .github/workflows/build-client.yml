@@ -173,3 +173,4 @@ jobs:
             * Protocol version: `${{ steps.version.outputs.protocol }}`
           tag: ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
+          generateReleaseNotes: true
