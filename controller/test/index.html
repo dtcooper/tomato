@@ -6,7 +6,7 @@
   <meta http-equiv="Content-Language" content="en">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tomato MIDI Controller Tester</title>
-  <link rel="stylesheet" href="deps/simple.css">
+  <link rel="stylesheet" href="node_modules/simpledotcss/simple.min.css">
   <style>
     body {
       grid-template-columns: 1fr min(65rem, 90%) 1fr
@@ -15,10 +15,10 @@
       display: none;
     }
   </style>
-  <script src="deps/msgpack.js"></script>
-  <script src="deps/webmidi.js"></script>
-  <script defer src="deps/alpinejs-persist.js"></script>
-  <script src="deps/alpinejs.js" defer></script>
+  <script src="node_modules/@msgpack/msgpack/dist.es5+umd/msgpack.min.js"></script>
+  <script src="node_modules/webmidi/dist/iife/webmidi.iife.min.js"></script>
+  <script src="node_modules/@alpinejs/persist/dist/cdn.min.js" defer></script>
+  <script src="node_modules/alpinejs/dist/cdn.min.js" defer></script>
   <script>
     // From constants.py
     const SYSEX_NON_COMMERCIAL = 0x7D

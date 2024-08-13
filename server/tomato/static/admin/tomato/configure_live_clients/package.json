@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "alpinejs": "^3.14.1",
+    "choices.js": "^10.2.0",
+    "dayjs": "^1.11.12",
+    "reconnecting-websocket": "^4.4.0",
+    "simpledotcss": "^2.3.2"
+  }
+}

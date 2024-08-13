@@ -33,6 +33,13 @@ if [ -z "$__RUN_HUEY" -a -z "$__RUN_API" ]; then
         if [ "$(./manage.py shell -c 'from tomato.models import User; print("" if User.objects.exists() else "1")')" = 1 ]; then
             DJANGO_SUPERUSER_PASSWORD=tomato ./manage.py createsuperuser --noinput --username tomato
         fi
+
+        if [ ! -d 'tomato/static/admin/tomato/configure_live_clients/node_modules' ]; then
+            echo "Installing node modules for configure_live_clients..."
+            cd tomato/static/admin/tomato/configure_live_clients
+            npm install
+            cd "$(dirname "$0")"
+        fi
     fi
 
 elif [ "$NO_SECRET_KEY" ]; then

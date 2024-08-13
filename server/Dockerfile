@@ -1,3 +1,12 @@
+ARG NODE_VERSION=22
+FROM "node:${NODE_VERSION}-bookworm-slim" AS node-packages
+
+COPY tomato/static/admin/tomato/configure_live_clients/package*.json /app/
+WORKDIR /app
+
+RUN npm install
+
+
 FROM python:3.12-bookworm
 
 ENV DJANGO_SETTINGS_MODULE=tomato.settings \
@@ -6,7 +15,10 @@ ENV DJANGO_SETTINGS_MODULE=tomato.settings \
     POETRY_VIRTUALENVS_CREATE=false
 
 ARG DEBUG=0
-RUN apt-get update \
+RUN if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
+        curl -fsSL "https://deb.nodesource.com/setup_${NODE_VERSION}.x" | sh \
+    ; fi \
+    && apt-get update \
     && apt-get upgrade -y \
     && apt-get install --no-install-recommends -y \
         ffmpeg \
@@ -17,6 +29,7 @@ RUN apt-get update \
             less \
             nano \
             netcat-openbsd \
+            npm \
             postgresql-client \
             sqlite3 \
             watchman \
@@ -47,6 +60,7 @@ RUN poetry install $([ -z "$DEBUG" -o "$DEBUG" = '0' ] && echo '--without=dev') 
 COPY *.py *.sh constants.json /app/
 COPY tomato/ /app/tomato/
 COPY api/ /app/api/
+COPY --from=node-packages /app/node_modules/ /app/tomato/static/admin/tomato/configure_live_clients/node_modules/
 WORKDIR /app
 
 ENTRYPOINT ["/app/entrypoint.sh"]
