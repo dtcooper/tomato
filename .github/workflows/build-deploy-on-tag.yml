@@ -26,7 +26,7 @@ jobs:
 
           # Only build on amd64 around the event (faster)
           LABOR_DAY=$(date -d "${YEAR}-09-01 +$(( (8 - $(date -d "${YEAR}-09-01" +%u) ) % 7 )) days" +%Y-%m-%d)
-          BEFORE_DATE=$(date -d "$LABOR_DAY -17 days" +%Y%m%d)
+          BEFORE_DATE=$(date -d "$LABOR_DAY -21 days" +%Y%m%d)
           AFTER_DATE=$(date -d "$LABOR_DAY +3 days" +%Y%m%d)
 
           if [ "$DATE" -ge "$BEFORE_DATE" -a "$DATE" -le "$AFTER_DATE" ]; then
