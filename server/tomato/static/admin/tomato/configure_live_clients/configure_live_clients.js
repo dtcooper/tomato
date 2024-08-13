@@ -2,7 +2,6 @@ dayjs.extend(dayjs_plugin_duration)
 
 const DATA = JSON.parse(document.getElementById("tomato-configure-live-clients-data").textContent)
 const db = DATA.serialized_data
-console.log(db)
 
 const prettyDuration = (item, max) => {
   item = dayjs.duration(Math.round(item), "seconds")

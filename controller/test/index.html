@@ -1,199 +1,221 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="google" content="notranslate">
-  <meta http-equiv="Content-Language" content="en">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tomato MIDI Controller Tester</title>
-  <link rel="stylesheet" href="node_modules/simpledotcss/simple.min.css">
-  <style>
-    body {
-      grid-template-columns: 1fr min(65rem, 90%) 1fr
-    }
-    [x-cloak] {
-      display: none;
-    }
-  </style>
-  <script src="node_modules/@msgpack/msgpack/dist.es5+umd/msgpack.min.js"></script>
-  <script src="node_modules/webmidi/dist/iife/webmidi.iife.min.js"></script>
-  <script src="node_modules/@alpinejs/persist/dist/cdn.min.js" defer></script>
-  <script src="node_modules/alpinejs/dist/cdn.min.js" defer></script>
-  <script>
-    // From constants.py
-    const SYSEX_NON_COMMERCIAL = 0x7D
-    const SYSEX_PREFIX = '!T~'
-    const MIDI_BTN_CTRL = 0x10
-    const MIDI_LED_CTRL = 0x11
-    const BTN_PRESSED = 0x7F
-
-    const sysexMsgPack7bitDecode = (msg) => {
-      // Decode most significant bit of following 7 bytes first as 0b07654321 0b01111111 0b02222222 ... 0b07777777
-      // Then use msgpack to decode binary data
-      const unpacked = []
-      for (let index = 0; index < msg.length; index += 8) {
-        const msbByte = msg[index] // Every 8th byte is the most significant bit for the following 7 bytes as above
-        const chunk = msg.slice(index + 1, index + 8)
-        for (let chunkIndex = 0; chunkIndex < chunk.length; chunkIndex++) {
-          const msb = (msbByte << (7 - chunkIndex)) & 0x80
-          unpacked.push(chunk[chunkIndex] | msb)  // Reassemble chunk byte
-        }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="google" content="notranslate" />
+    <meta http-equiv="Content-Language" content="en" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tomato MIDI Controller Tester</title>
+    <link rel="stylesheet" href="node_modules/simpledotcss/simple.min.css" />
+    <style>
+      body {
+        grid-template-columns: 1fr min(65rem, 90%) 1fr;
       }
-      return MessagePack.decode(unpacked)
-    }
+      [x-cloak] {
+        display: none;
+      }
+    </style>
+    <script src="node_modules/@msgpack/msgpack/dist.es5+umd/msgpack.min.js"></script>
+    <script src="node_modules/webmidi/dist/iife/webmidi.iife.min.js"></script>
+    <script src="node_modules/@alpinejs/persist/dist/cdn.min.js" defer></script>
+    <script src="node_modules/alpinejs/dist/cdn.min.js" defer></script>
+    <script>
+      // From constants.py
+      const SYSEX_NON_COMMERCIAL = 0x7d
+      const SYSEX_PREFIX = "!T~"
+      const MIDI_BTN_CTRL = 0x10
+      const MIDI_LED_CTRL = 0x11
+      const BTN_PRESSED = 0x7f
 
-    document.addEventListener('alpine:init', () => {
-      let midi
-
-      Alpine.data('main', function() {
-        return {
-          connected: false,
-          turnLedOff: this.$persist(true),
-          showWarnings: this.$persist(true),
-          logLines: [],
-          log(s) {
-            const date = new Date()
-            this.logLines.unshift(`${date.toLocaleDateString()} ${date.toLocaleTimeString()} - ${s}`)
-          },
-          async init() {
-            window.midi = midi = await WebMidi.enable({sysex: true})
-            midi.addListener("connected", (event) => {
-              const port = event.port
-              if (port instanceof Input) {
-                this.registerInput(port)
-              }
-            })
-            midi.inputs.forEach(input => this.registerInput(input))
-            this.connected = true
-            this.log("Connected!")
-            window.tester = this
-          },
-          led(num, description) {
-            this.log(`Setting LED to ${num} (${description})`)
-            midi.outputs.forEach((output) => {
-              output.channels[1].sendControlChange(MIDI_LED_CTRL, num)
-            })
-          },
-          invalidMidiMsg() {
-            midi.outputs.forEach((output) => {
-              output.channels[1].sendNoteOn("A4")
-            })
-          },
-          sysex(data, firstByte = SYSEX_NON_COMMERCIAL, prefix = SYSEX_PREFIX) {
-            this.log(`Sending sysex: ${data}`)
-            const message = Array.from(prefix + data).map(letter => letter.charCodeAt(0))
-            midi.outputs.forEach((output) => {
-              output.sendSysex(firstByte, message)
-            })
-          },
-          restart() {
-            this.log("Sending restart (reset) byte")
-            midi.outputs.forEach((output) => {
-              output.sendReset()
-            })
-          },
-          sysexWarning(data, message) {
-            if (!this.showWarnings || confirm(message)) {
-              this.sysex(data)
-              return true
-            } else {
-              this.log(`Aborted sending sysex: ${data}`)
-              return false
-            }
-          },
-          registerInput(input) {
-            this.log(`Input: ${input.name}`)
-            input.channels[1].removeListener() // Remove all existing listeners
-            input.removeListener()
-            input.channels[1].addListener("controlchange", (event) => {
-              if (event.controller.number === MIDI_BTN_CTRL) {
-                const pressed = event.rawValue === BTN_PRESSED
-                this.log(`Button ${pressed ? "pressed" : "released"}`)
-                if (pressed && this.turnLedOff) {
-                  this.led(0, 'off, button press')
-                }
-              } else if (event.controller.number === MIDI_LED_CTRL) {
-                this.log(`Device ack'd LED change: ${event.rawValue}`)
-              } else {
-                this.log(`Bad controller number: ${event.controller.number}`)
-              }
-            })
-            input.addListener("sysex", (event) => {
-              const message = event.message.rawDataBytes
-              const prefix = new TextDecoder().decode(message.slice(0, SYSEX_PREFIX.length))
-              if (prefix === SYSEX_PREFIX) {
-                const encoded = message.slice(SYSEX_PREFIX.length)
-                const [ type, obj ] = sysexMsgPack7bitDecode(encoded)
-                if (type === "exception") {
-                  this.log(`Received exception...\n${obj}`)
-                } else {
-                  this.log(`Received ${type} sysex${obj === null ? '' : ': ' + JSON.stringify(obj, undefined, Object.keys(obj).length === 1 ? undefined : 2)}`)
-                }
-              } else {
-                this.log(`Received INVALID sysex: ${message}`)
-              }
-            })
-            input.addListener("reset", (event) => {
-              this.log("Received reset byte: restarted or reconnected")
-            })
+      const sysexMsgPack7bitDecode = (msg) => {
+        // Decode most significant bit of following 7 bytes first as 0b07654321 0b01111111 0b02222222 ... 0b07777777
+        // Then use msgpack to decode binary data
+        const unpacked = []
+        for (let index = 0; index < msg.length; index += 8) {
+          const msbByte = msg[index] // Every 8th byte is the most significant bit for the following 7 bytes as above
+          const chunk = msg.slice(index + 1, index + 8)
+          for (let chunkIndex = 0; chunkIndex < chunk.length; chunkIndex++) {
+            const msb = (msbByte << (7 - chunkIndex)) & 0x80
+            unpacked.push(chunk[chunkIndex] | msb) // Reassemble chunk byte
           }
         }
-      })
-    })
-  </script>
-</head>
-<body x-data="main">
-  <header>
-    <h1>Tomato MIDI Controller Tester</h1>
-  </header>
+        return MessagePack.decode(unpacked)
+      }
 
-  <main x-show="connected" x-cloak>
-    <p>
-      <strong>SysEx:</strong>
-      <button @click="sysex('ping')">Ping</button>
-      <button @click="sysex('stats')">Stats</button>
-      <button @click="sysex('invalid')">Invalid 1</button>
-      <button @click="sysex('invalid', 0x3D)">Invalid 2</button>
-      <button @click="sysex('invalid', undefined, 'test')">Invalid 3</button>
-      <button @click="sysexWarning('~~~!TeSt-ExCePtIoN!~~~', 'Are you sure you want to send a test exception?')">Test exception</button>
-      <button @click="logLines = []">Clear log</button>
-      <br>
-      <strong>Reset:</strong>
-      <button @click="restart()">Restart</button>
-      <button @click="sysexWarning('reset', 'Are you SURE you want to RESET the device?')">Reset</button>
-      <button @click="sysexWarning('next-boot/debug', 'Are you SURE you want to RESET into DEBUG mode?') && sysex('reset')">Reset (debug = true)</button>
-      <button @click="sysexWarning('~~~!fLaSh!~~~', 'Are you SURE you want to RESET and FLASH?')">Reset (FLASH)</button>
-      <label style="display: inline; cursor: pointer">
-        <input type="checkbox" x-model="showWarnings"> Show warning prompts
-      </label>
-      <br>
-      <strong>Next boot:</strong>
-      <button @click="sysexWarning('next-boot/debug', 'Are you SURE you want to set `debug = true` next boot?')">debug = true</button>
-      <button @click="sysexWarning('next-boot/debug_messages_over_midi', 'Are you SURE you want to set `debug_messages_over_midi = true` next boot?')">debug_messages_over_midi = true</button>
-      <button @click="sysexWarning('next-boot/serial', 'Are you SURE you want to set `serial = true` next boot?')">serial = true</button>
-    </p>
-    <p>
-      <strong>LED Control:</strong>
-      <button @click="led(0, 'off')">OFF</button>
-      <button @click="led(1, 'on')">ON</button>
-      <button @click="led(2, 'flash')">Flash</button>
-      <button @click="led(3, 'pulsate slow')">Pulse/slow</button>
-      <button @click="led(4, 'pulsate fast')">Pulse/fast</button>
-      <button @click="led(5, 'invalid')">Invalid</button>
-      <button @click="invalidMidiMsg()">Invalid MIDI</button>
-      <br>
-      <strong>Simulate Button Press:</strong>
-      <button @click="sysex('simulate/press')">Press</button>
-      <button @click="sysex('simulate/release')">Release</button>
-      <button @click="() => {
-        sysex('simulate/press')
-        setTimeout(() => sysex('simulate/release'), 350)
-      }">Full</button>
-      <label style="display: inline; cursor: pointer">
-        <input type="checkbox" x-model="turnLedOff"> Turn LED off on press
-      </label>
-    </p>
-    <small><pre x-text="logLines.join('\n')"></pre></small>
-  </main>
-</body>
+      document.addEventListener("alpine:init", () => {
+        let midi
+
+        Alpine.data("main", function () {
+          return {
+            connected: false,
+            turnLedOff: this.$persist(true),
+            showWarnings: this.$persist(true),
+            logLines: [],
+            log(s) {
+              const date = new Date()
+              this.logLines.unshift(`${date.toLocaleDateString()} ${date.toLocaleTimeString()} - ${s}`)
+            },
+            async init() {
+              window.midi = midi = await WebMidi.enable({ sysex: true })
+              midi.addListener("connected", (event) => {
+                const port = event.port
+                if (port instanceof Input) {
+                  this.registerInput(port)
+                }
+              })
+              midi.inputs.forEach((input) => this.registerInput(input))
+              this.connected = true
+              this.log("Connected!")
+              window.tester = this
+            },
+            led(num, description) {
+              this.log(`Setting LED to ${num} (${description})`)
+              midi.outputs.forEach((output) => {
+                output.channels[1].sendControlChange(MIDI_LED_CTRL, num)
+              })
+            },
+            invalidMidiMsg() {
+              midi.outputs.forEach((output) => {
+                output.channels[1].sendNoteOn("A4")
+              })
+            },
+            sysex(data, firstByte = SYSEX_NON_COMMERCIAL, prefix = SYSEX_PREFIX) {
+              this.log(`Sending sysex: ${data}`)
+              const message = Array.from(prefix + data).map((letter) => letter.charCodeAt(0))
+              midi.outputs.forEach((output) => {
+                output.sendSysex(firstByte, message)
+              })
+            },
+            restart() {
+              this.log("Sending restart (reset) byte")
+              midi.outputs.forEach((output) => {
+                output.sendReset()
+              })
+            },
+            sysexWarning(data, message) {
+              if (!this.showWarnings || confirm(message)) {
+                this.sysex(data)
+                return true
+              } else {
+                this.log(`Aborted sending sysex: ${data}`)
+                return false
+              }
+            },
+            registerInput(input) {
+              this.log(`Input: ${input.name}`)
+              input.channels[1].removeListener() // Remove all existing listeners
+              input.removeListener()
+              input.channels[1].addListener("controlchange", (event) => {
+                if (event.controller.number === MIDI_BTN_CTRL) {
+                  const pressed = event.rawValue === BTN_PRESSED
+                  this.log(`Button ${pressed ? "pressed" : "released"}`)
+                  if (pressed && this.turnLedOff) {
+                    this.led(0, "off, button press")
+                  }
+                } else if (event.controller.number === MIDI_LED_CTRL) {
+                  this.log(`Device ack'd LED change: ${event.rawValue}`)
+                } else {
+                  this.log(`Bad controller number: ${event.controller.number}`)
+                }
+              })
+              input.addListener("sysex", (event) => {
+                const message = event.message.rawDataBytes
+                const prefix = new TextDecoder().decode(message.slice(0, SYSEX_PREFIX.length))
+                if (prefix === SYSEX_PREFIX) {
+                  const encoded = message.slice(SYSEX_PREFIX.length)
+                  const [type, obj] = sysexMsgPack7bitDecode(encoded)
+                  if (type === "exception") {
+                    this.log(`Received exception...\n${obj}`)
+                  } else {
+                    this.log(
+                      `Received ${type} sysex${obj === null ? "" : ": " + JSON.stringify(obj, undefined, Object.keys(obj).length === 1 ? undefined : 2)}`
+                    )
+                  }
+                } else {
+                  this.log(`Received INVALID sysex: ${message}`)
+                }
+              })
+              input.addListener("reset", (event) => {
+                this.log("Received reset byte: restarted or reconnected")
+              })
+            }
+          }
+        })
+      })
+    </script>
+  </head>
+  <body x-data="main">
+    <header>
+      <h1>Tomato MIDI Controller Tester</h1>
+    </header>
+
+    <main x-show="connected" x-cloak>
+      <p>
+        <strong>SysEx:</strong>
+        <button @click="sysex('ping')">Ping</button>
+        <button @click="sysex('stats')">Stats</button>
+        <button @click="sysex('invalid')">Invalid 1</button>
+        <button @click="sysex('invalid', 0x3D)">Invalid 2</button>
+        <button @click="sysex('invalid', undefined, 'test')">Invalid 3</button>
+        <button @click="sysexWarning('~~~!TeSt-ExCePtIoN!~~~', 'Are you sure you want to send a test exception?')">
+          Test exception
+        </button>
+        <button @click="logLines = []">Clear log</button>
+        <br />
+        <strong>Reset:</strong>
+        <button @click="restart()">Restart</button>
+        <button @click="sysexWarning('reset', 'Are you SURE you want to RESET the device?')">Reset</button>
+        <button
+          @click="sysexWarning('next-boot/debug', 'Are you SURE you want to RESET into DEBUG mode?') && sysex('reset')"
+        >
+          Reset (debug = true)
+        </button>
+        <button @click="sysexWarning('~~~!fLaSh!~~~', 'Are you SURE you want to RESET and FLASH?')">
+          Reset (FLASH)
+        </button>
+        <label style="display: inline; cursor: pointer">
+          <input type="checkbox" x-model="showWarnings" /> Show warning prompts
+        </label>
+        <br />
+        <strong>Next boot:</strong>
+        <button @click="sysexWarning('next-boot/debug', 'Are you SURE you want to set `debug = true` next boot?')">
+          debug = true
+        </button>
+        <button
+          @click="sysexWarning('next-boot/debug_messages_over_midi', 'Are you SURE you want to set `debug_messages_over_midi = true` next boot?')"
+        >
+          debug_messages_over_midi = true
+        </button>
+        <button @click="sysexWarning('next-boot/serial', 'Are you SURE you want to set `serial = true` next boot?')">
+          serial = true
+        </button>
+      </p>
+      <p>
+        <strong>LED Control:</strong>
+        <button @click="led(0, 'off')">OFF</button>
+        <button @click="led(1, 'on')">ON</button>
+        <button @click="led(2, 'flash')">Flash</button>
+        <button @click="led(3, 'pulsate slow')">Pulse/slow</button>
+        <button @click="led(4, 'pulsate fast')">Pulse/fast</button>
+        <button @click="led(5, 'invalid')">Invalid</button>
+        <button @click="invalidMidiMsg()">Invalid MIDI</button>
+        <br />
+        <strong>Simulate Button Press:</strong>
+        <button @click="sysex('simulate/press')">Press</button>
+        <button @click="sysex('simulate/release')">Release</button>
+        <button
+          @click="() => {
+            sysex('simulate/press')
+            setTimeout(() => sysex('simulate/release'), 350)
+          }"
+        >
+          Full
+        </button>
+        <label style="display: inline; cursor: pointer">
+          <input type="checkbox" x-model="turnLedOff" /> Turn LED off on press
+        </label>
+      </p>
+      <small><pre x-text="logLines.join('\n')"></pre></small>
+    </main>
+  </body>
 </html>
