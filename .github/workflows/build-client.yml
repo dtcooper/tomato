@@ -110,27 +110,11 @@ jobs:
           compression-level: 0
           retention-days: 2
 
-
-  merge:
-    runs-on: ubuntu-22.04
-    needs: build
-    name: Merge artifacts
-    steps:
-      -
-        name: Merge Artifacts
-        uses: actions/upload-artifact/merge@v4
-        with:
-          name: client-build-files
-          pattern: client-build-files-*
-          retention-days: 2
-          compression-level: 0
-          delete-merged: true
-
   tag:
     runs-on: ubuntu-22.04
     name: Tag release
     if: github.ref_type == 'tag' || github.ref_name == 'main'
-    needs: merge
+    needs: build
     steps:
       -
         name: Checkout
@@ -143,8 +127,9 @@ jobs:
         name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: client-build-files
+          pattern: client-build-files-*
           path: client-build-files
+          merge-multiple: true
       -
         name: Remove old preview release
         uses: dev-drprasad/delete-tag-and-release@v1.1
