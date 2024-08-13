@@ -1,4 +1,5 @@
 <script>
+  import { onDestroy } from "svelte"
   import playCircleOutlineIcon from "@iconify/icons-mdi/play-circle-outline"
   import pauseCircleOutlineIcon from "@iconify/icons-mdi/pause-circle-outline"
   import skipNextCircleOutline from "@iconify/icons-mdi/skip-next-circle-outline"
@@ -63,6 +64,11 @@
       console.log("Calling play() based on MIDI key press")
       play()
     }
+  })
+
+  onDestroy(() => {
+    // Needs to be unregistered when component is destroyed
+    midiButtonPresses.removeListener("pressed")
   })
 
   registerMessageHandler("play", ({ connection_id }) => {

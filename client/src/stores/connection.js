@@ -112,7 +112,7 @@ const handleMessages = {
 
 export const registerMessageHandler = (name, handler) => {
   if (Object.hasOwn(handleMessages, name)) {
-    console.warn(`Message handler ${name} already registered`)
+    console.warn(`Message handler ${name} already registered. Safely re-registering.`)
   }
   handleMessages[name] = handler
 }
