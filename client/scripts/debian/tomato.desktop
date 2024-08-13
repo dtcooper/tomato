@@ -2,7 +2,9 @@
 Name=Tomato Radio Automation
 Comment=Tomato Radio Automation (Desktop App)
 GenericName=Tomato Radio Automation
-Exec=env ELECTRON_OZONE_PLATFORM_HINT=auto tomato %U
+# Wonky on GNOME 43 with Wayland, so use X11 (or user preference) for now
+#Exec=env ELECTRON_OZONE_PLATFORM_HINT=auto tomato %U
+Exec=tomato %U
 StartupWMClass=Tomato
 Icon=tomato
 Type=Application
