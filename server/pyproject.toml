@@ -22,7 +22,7 @@ psycopg = "^3.2.1"
 python-dotenv = "^1.0.1"
 schema = "^0.7.7"
 starlette = "^0.38.2"
-uvicorn = {extras = ["standard"], version = "^0.30.5"}
+uvicorn = {extras = ["standard"], version = "^0.30.6"}
 wait-for-it = "^2.2.2"
 
 [tool.poetry.group.dev.dependencies]
