@@ -45,8 +45,6 @@ const runBuild = async () => {
       `electron ${electronVersion}, node ${nodeVersion || "unknown"}${watch ? ", watching" : ""}...`
   )
 
-  const now = dayjs.utc()
-
   const defaults = {
     bundle: true,
     logLevel: "info",
@@ -58,8 +56,7 @@ const runBuild = async () => {
       IS_MAC: IS_MAC.toString(),
       IS_WIN32: IS_WIN32.toString(),
       IS_LINUX: IS_LINUX.toString(),
-      BUILD_DATETIME: `"${now.format()}"`,
-      BUILD_YEAR: `"${now.format("YYYY")}"`
+      BUILD_TIME: Date.now().toString()
     }
   }
 

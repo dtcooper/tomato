@@ -1,4 +1,5 @@
 const { app, BrowserWindow, powerSaveBlocker, shell, ipcMain, dialog, Menu } = require("electron")
+const dayjs = require("dayjs")
 const windowStateKeeper = require("electron-window-state")
 const fs = require("fs")
 const fsExtra = require("fs-extra")
@@ -54,14 +55,16 @@ if (squirrelCheck || !singleInstanceLock) {
     }
   }
 
+  const buildTime = dayjs(BUILD_TIME)
+
   app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors,HardwareMediaKeyHandling,MediaSessionService")
   app.commandLine.appendSwitch("disable-pinch")
   app.setAboutPanelOptions({
-    applicationName: "Tomato Radio Automation\n(Desktop App)",
-    copyright: `\u00A9 2019-${BUILD_YEAR} David Cooper & BMIR.\nAll rights reserved.`,
+    applicationName: "Tomato Radio Automation",
+    copyright: `Released under the MIT license.\n\u00A9 2019-${buildTime.format("YYYY")} David Cooper, Miranda Kay, & the BMIR team.\nAll rights reserved.`,
     website: "https://github.com/dtcooper/tomato",
     iconPath,
-    applicationVersion: `${TOMATO_VERSION}\n(${BUILD_DATETIME})`,
+    applicationVersion: `${TOMATO_VERSION}\n(Built on ${buildTime.format("YYYY/MM/DD HH:mm:ss")})`,
     version: "" // hide on macOS
   })
 

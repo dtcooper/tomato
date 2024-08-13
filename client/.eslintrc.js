@@ -1,6 +1,5 @@
 const globals = {
-  BUILD_YEAR: true,
-  BUILD_DATETIME: true,
+  BUILD_TIME: true,
   IS_LINUX: true,
   IS_MAC: true,
   IS_WIN32: true,
