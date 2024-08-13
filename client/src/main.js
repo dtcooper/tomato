@@ -58,10 +58,10 @@ if (squirrelCheck || !singleInstanceLock) {
   app.commandLine.appendSwitch("disable-pinch")
   app.setAboutPanelOptions({
     applicationName: "Tomato Radio Automation\n(Desktop App)",
-    copyright: `\u00A9 2019-${new Date().getFullYear()} David Cooper & BMIR.\nAll rights reserved.`,
+    copyright: `\u00A9 2019-${BUILD_YEAR} David Cooper & BMIR.\nAll rights reserved.`,
     website: "https://github.com/dtcooper/tomato",
     iconPath,
-    applicationVersion: TOMATO_VERSION,
+    applicationVersion: `${TOMATO_VERSION}\n(${BUILD_DATETIME})`,
     version: "" // hide on macOS
   })
 

@@ -1,10 +1,14 @@
 const axios = require("axios")
+const dayjs = require("dayjs")
+const dayjsUtc = require("dayjs/plugin/utc")
 const { context: esbuildContext, build: esbuild } = require("esbuild")
 const { version: electronVersion } = require("electron/package.json")
 const path = require("path")
 const process = require("process")
 const sveltePlugin = require("esbuild-svelte")
 const stylePlugin = require("esbuild-style-plugin")
+
+dayjs.extend(dayjsUtc)
 
 process.chdir(path.join(__dirname, ".."))
 
@@ -41,13 +45,22 @@ const runBuild = async () => {
       `electron ${electronVersion}, node ${nodeVersion || "unknown"}${watch ? ", watching" : ""}...`
   )
 
+  const now = dayjs.utc()
+
   const defaults = {
     bundle: true,
     logLevel: "info",
     minify: !isDev,
     platform: "node",
     sourcemap: true,
-    define: { TOMATO_VERSION, IS_MAC: IS_MAC.toString(), IS_WIN32: IS_WIN32.toString(), IS_LINUX: IS_LINUX.toString() }
+    define: {
+      TOMATO_VERSION,
+      IS_MAC: IS_MAC.toString(),
+      IS_WIN32: IS_WIN32.toString(),
+      IS_LINUX: IS_LINUX.toString(),
+      BUILD_DATETIME: `"${now.format()}"`,
+      BUILD_YEAR: `"${now.format("YYYY")}"`
+    }
   }
 
   if (nodeVersion) {
