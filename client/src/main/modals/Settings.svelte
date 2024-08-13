@@ -9,6 +9,8 @@
   import moonAndStars from "@iconify/icons-mdi/moon-and-stars"
   import whiteBalanceSunny from "@iconify/icons-mdi/white-balance-sunny"
   import themeLightDark from "@iconify/icons-mdi/theme-light-dark"
+  import hours12 from "@iconify/icons-mdi/hours-12"
+  import hours24 from "@iconify/icons-mdi/hours-24"
 
   import { IS_DEV } from "../../utils"
   import { db } from "../../stores/db"
@@ -78,7 +80,7 @@
           {/each}
         </div>
         {#if $config.UI_MODE_RESET_TIMES && $config.UI_MODE_RESET_TIMES.length > 0}
-          <div class="text-center text-sm">
+          <div class="text-center text-xs">
             <strong>NOTE:</strong>
             resets to {uiModeInfo[Math.min(...$config.UI_MODES)]?.name?.toLowerCase()} mode periodically.
           </div>
@@ -125,13 +127,16 @@
 
     <div class="flex justify-end text-lg font-bold">System clock:</div>
     <div class="tabs-boxed tabs w-max">
-      {#each [false, "12h", "24h"] as clock}
+      {#each [[null, false], [hours12, "12h"], [hours24, "24h"]] as [icon, clock]}
         <button
           class="tab gap-2"
           class:tab-active={$userConfig.clock === clock}
           on:click={() => ($userConfig.clock = clock)}
         >
-          {clock ? `${clock.substring(0, 2)} hour` : "Off"}
+          {#if icon}
+            <Icon {icon} class="h-6 w-6" />
+          {/if}
+          <span class:font-bold={!clock}>{clock ? `${clock.substring(0, 2)} hour` : "OFF"}</span>
         </button>
       {/each}
     </div>
@@ -153,9 +158,9 @@
     <hr class="divider col-span-2 m-0 h-0 p-0" />
 
     <div class="flex justify-end text-lg font-bold">MIDI Button box:</div>
-    <div class="flex w-max items-center justify-center gap-4 text-xl font-bold">
+    <div class="flex w-max items-center justify-center gap-3 text-xl font-bold">
       <span class:text-error={!$userConfig.enableMIDIButtonBox}>OFF</span>
-      <input type="checkbox" class="toggle toggle-success toggle-lg" bind:checked={$userConfig.enableMIDIButtonBox} />
+      <input type="checkbox" class="toggle toggle-success" bind:checked={$userConfig.enableMIDIButtonBox} />
       <span class:text-success={$userConfig.enableMIDIButtonBox}>ON</span>
       {#if $userConfig.enableMIDIButtonBox}
         <span class="text-base font-normal">
@@ -185,11 +190,19 @@
     </div>
     <hr class="divider col-span-2 m-0 h-0 p-0" />
 
+    <div class="flex justify-end text-lg font-bold">Start fullscreen:</div>
+    <div class="flex w-max items-center justify-center gap-3 text-xl font-bold">
+      <span class:text-error={!$userConfig.startFullscreen}>OFF</span>
+      <input type="checkbox" class="toggle toggle-success" bind:checked={$userConfig.startFullscreen} />
+      <span class:text-success={$userConfig.startFullscreen}>ON</span>
+    </div>
+    <hr class="divider col-span-2 m-0 h-0 p-0" />
+
     {#if IS_DEV}
       <div class="flex justify-end text-lg font-bold">Autoplay (dev only):</div>
-      <div class="flex w-max items-center justify-center gap-4 text-xl font-bold">
+      <div class="flex w-max items-center justify-center gap-3 text-xl font-bold">
         <span class:text-error={!$userConfig.autoplay}>OFF</span>
-        <input type="checkbox" class="toggle toggle-success toggle-lg" bind:checked={$userConfig.autoplay} />
+        <input type="checkbox" class="toggle toggle-success" bind:checked={$userConfig.autoplay} />
         <span class:text-success={$userConfig.autoplay}>ON</span>
       </div>
       <hr class="divider col-span-2 m-0 h-0 p-0" />
@@ -198,11 +211,11 @@
     <div class="flex justify-end text-lg font-bold">Power save blocker:</div>
     <div
       class:tooltip={$userConfig.tooltips}
-      class="tooltip-bottom tooltip-warning flex w-max items-center justify-center gap-4 text-xl"
+      class="tooltip-bottom tooltip-warning flex w-max items-center justify-center gap-3 text-xl"
       data-tip="When set to ON, Tomato attempts to suppress your display from going to sleep and your system from suspending"
     >
       <span class="font-bold" class:text-error={!$userConfig.powerSaveBlocker}>OFF</span>
-      <input type="checkbox" class="toggle toggle-success toggle-lg" bind:checked={$userConfig.powerSaveBlocker} />
+      <input type="checkbox" class="toggle toggle-success" bind:checked={$userConfig.powerSaveBlocker} />
       <span class="font-bold" class:text-success={$userConfig.powerSaveBlocker}>ON</span>
     </div>
     <hr class="divider col-span-2 m-0 h-0 p-0" />

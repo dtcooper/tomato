@@ -18,6 +18,7 @@ const defaultUserConfig = {
   powerSaveBlocker: true,
   enableMIDIButtonBox: true,
   tooltips: true,
+  startFullscreen: false,
   clock: "12h",
   theme: null
 }
@@ -87,5 +88,9 @@ const resetUIModeTimer = () => {
   setTimeout(() => resetUIModeTimer(), whenToRunNext)
 }
 resetUIModeTimer()
+
+if (get(userConfig).startFullscreen) {
+  setTimeout(() => setFullscreen(true), 500)
+}
 
 export { readonlyConfig as config }
