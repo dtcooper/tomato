@@ -9,8 +9,6 @@
   import moonAndStars from "@iconify/icons-mdi/moon-and-stars"
   import whiteBalanceSunny from "@iconify/icons-mdi/white-balance-sunny"
   import themeLightDark from "@iconify/icons-mdi/theme-light-dark"
-  import hours12 from "@iconify/icons-mdi/hours-12"
-  import hours24 from "@iconify/icons-mdi/hours-24"
 
   import { IS_DEV, lightTheme, darkTheme } from "../../utils"
   import { db } from "../../stores/db"

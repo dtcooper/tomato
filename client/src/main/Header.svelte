@@ -10,6 +10,7 @@
   import fullscreenIcon from "@iconify/icons-mdi/fullscreen"
   import tooltipRemoveOutline from "@iconify/icons-mdi/tooltip-remove-outline"
   import tooltipCheckOutline from "@iconify/icons-mdi/tooltip-check-outline"
+  import seedIcon from "@iconify/icons-mdi/seed-outline"
   import { conn } from "../stores/connection"
   import { config, userConfig, isFullscreen, setFullscreen, uiModeInfo } from "../stores/config"
   import { syncProgress } from "../stores/db"
@@ -38,8 +39,8 @@
     </div>
     <div class="flex items-center gap-2 md:gap-3">
       {#if $config.UI_MODES.includes(0) && $userConfig.uiMode >= 1}
-        <button class="btn btn-accent" on:click={() => ($userConfig.uiMode = 0)} tabindex="-1">
-          &ShortLeftArrow; Back to simple view
+        <button class="btn btn-accent gap-0" on:click={() => ($userConfig.uiMode = 0)} tabindex="-1">
+          &ShortLeftArrow; Back to <Icon icon={seedIcon} class="ml-1 mr-0.5 h-6 w-6" /> simple view
         </button>
       {/if}
       <div
