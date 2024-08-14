@@ -649,10 +649,10 @@ heavily leveraging its automatic admin interface.</p>
 <p>The name of your station.</p>
 <p>Default: <code>'Tomato Radio Automation'</code></p>
 </dd>
-<dt><code>CLOCK</code> --- <strong>Type: String</strong></dt>
+<dt><code>CLOCK</code> --- <strong>Type: Off, 12-hour, and 24-hour</strong></dt>
 <dd>
 <p>This will enable a clock that displays the current time in the desktop app (12- or 24-hour display). On larger screens the date will also display.</p>
-<p>Default: <code>''</code></p>
+<p>Default: <code>Off</code></p>
 </dd>
 <dt><code>UI_MODES</code> --- <strong>Type: Simple, standard, and/or advanced mode</strong></dt>
 <dd>
@@ -661,8 +661,8 @@ heavily leveraging its automatic admin interface.</p>
 </dd>
 <dt><code>UI_MODE_RESET_TIMES</code> --- <strong>Type: String</strong></dt>
 <dd>
-<p>Reset UI mode to the simplest enabled mode according to this setting. Enter a list of times (<code>HH:MM</code> format) with each time on a single line. <strong>Set to 0 disable</strong>. The below example would reset the UI mode at midnight, 6am, noon, and 6pm:<br><br><code>00:00<br>06:00<br>12:00<br>18:00</code></p>
-<p>Default: <code>'0'</code></p>
+<p>Reset UI mode to the simplest enabled mode according to this setting. Enter a list of times (in 24-hour <code>HH:MM</code> format) with each time on a single line. <strong>Set to 0 disable</strong>. The below example would reset the UI mode at midnight, 6am, noon, and 6pm:<br><br><code>00:00<br>06:00<br>12:00<br>18:00</code></p>
+<p>Default: <code>0 (feature disabled)</code></p>
 </dd>
 <dt><code>ONE_CLIENT_LOGIN_PER_ACCOUNT</code> --- <strong>Type: Boolean (true or false)</strong></dt>
 <dd>
@@ -697,7 +697,7 @@ heavily leveraging its automatic admin interface.</p>
 <dt><code>REJECT_SILENCE_LENGTH</code> --- <strong>Type: Numeric</strong></dt>
 <dd>
 <p>Reject silence assets of this many seconds. <strong>Set to 0 disable</strong>.</p>
-<p>Default: <code>0</code></p>
+<p>Default: <code>0 (feature disabled)</code></p>
 </dd>
 <dt><code>RELOAD_PLAYLIST_AFTER_DATA_CHANGES</code> --- <strong>Type: Boolean (true or false)</strong></dt>
 <dd>
@@ -737,12 +737,12 @@ heavily leveraging its automatic admin interface.</p>
 <dt><code>NO_REPEAT_ASSETS_TIME</code> --- <strong>Type: Numeric</strong></dt>
 <dd>
 <p>The time (in seconds) required to elapse for the Desktop app to attempt to not repeat any assets. <strong>Set to 0 to disable</strong> and allow potential repetition in the randomization algorithm. If there are not enough assets in a rotator to respect this setting, it will be ignored.</p>
-<p>Default: <code>0</code></p>
+<p>Default: <code>0 (feature disabled)</code></p>
 </dd>
 <dt><code>STOPSET_OVERDUE_TIME</code> --- <strong>Type: Numeric</strong></dt>
 <dd>
 <p>The time (in seconds) after the <code>WAIT_INTERVAL</code> after which an "overdue" message will flash. <strong>Set to 0 disable</strong>.</p>
-<p>Default: <code>0</code></p>
+<p>Default: <code>0 (feature disabled)</code></p>
 </dd>
 <dt><code>STOPSET_PRELOAD_COUNT</code> --- <strong>Type: Numeric</strong></dt>
 <dd>
@@ -757,7 +757,7 @@ heavily leveraging its automatic admin interface.</p>
 <dt><code>END_DATE_PRIORITY_WEIGHT_MULTIPLIER</code> --- <strong>Type: Numeric</strong></dt>
 <dd>
 <p>Multiply an asset's weight by this number if it has an end date <strong>and</strong> the end date is in the next 24 hours (one day). <strong>Set to 0 to disable</strong> this feature.</p>
-<p>Default: <code>0</code></p>
+<p>Default: <code>0 (feature disabled)</code></p>
 </dd>
 </dl>
 </div>
