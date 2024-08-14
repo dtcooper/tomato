@@ -10,7 +10,7 @@
   import whiteBalanceSunny from "@iconify/icons-mdi/white-balance-sunny"
   import themeLightDark from "@iconify/icons-mdi/theme-light-dark"
 
-  import { IS_DEV, lightTheme, darkTheme } from "../../utils"
+  import { IS_DEV, lightTheme, darkTheme, isPackaged } from "../../utils"
   import { db } from "../../stores/db"
   import { settings_descriptions } from "../../../../server/constants.json"
   import { logout, protocolVersion, conn } from "../../stores/connection"
@@ -22,14 +22,14 @@
   let showLogout = false
   let showServerSettings = false
   let logoutStationName = ""
-  let showLogoutError
   let resettingButtonBox = false
+  let hardLogout = false
   export let showSyncModal
 
   $: serverSettings = Object.entries($config).sort()
 
   const confirmLogout = () => {
-    show = showLogoutError = false
+    show = hardLogout = false
     showLogout = true
     logoutStationName = ""
   }
@@ -271,19 +271,24 @@
       <span class="select-text bg-base-content p-2 font-mono text-base-100">{$config.STATION_NAME}</span>
     </p>
     <p class="mb-5">...and then press the logout button below.</p>
-    {#if showLogoutError}
-      <div class="text-right text-sm text-error">Wrong station name. Try again.</div>
-    {/if}
     <input
       use:focus
-      id="logout-confirm-input"
       bind:value={logoutStationName}
-      on:input={() => (showLogoutError = false)}
       type="text"
       placeholder="Enter station name"
-      class:input-error={showLogoutError}
       class="input input-lg input-bordered font-mono"
     />
+    <div class="form-control mt-2">
+      <label class="label w-max cursor-pointer gap-3 italic" class:text-error={hardLogout} class:font-bold={hardLogout}>
+        <input class="checkbox-error checkbox" type="checkbox" bind:checked={hardLogout} />
+        <span>
+          {#if hardLogout}
+            <span class="underline">CAUTION</span>:
+          {/if}
+          <em>{hardLogout ? "Will" : "Check this box to"} remove all data after logging out{hardLogout ? "!" : "."}</em>
+        </span>
+      </label>
+    </div>
   </div>
   <svelte:fragment slot="extra-buttons">
     <div
@@ -291,7 +296,9 @@
       class="tooltip"
       data-tip={canLogOut ? "Are you SURE that you're SURE?!" : `Enter "${$config.STATION_NAME}" above!`}
     >
-      <button disabled={!canLogOut} type="button" class="btn btn-error" on:click={() => logout()}>Log out</button>
+      <button disabled={!canLogOut} type="button" class="btn btn-error" on:click={() => logout(null, hardLogout)}
+        >Log out</button
+      >
     </div>
   </svelte:fragment>
 </Modal>

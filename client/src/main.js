@@ -15,7 +15,7 @@ const cmdArgs = parseArgs({
   },
   strict: false
 }).values
-const isDev = cmdArgs["enable-dev-mode"] || process.env.NODE_ENV === "development"
+const isDev = !!(cmdArgs["enable-dev-mode"] || process.env.NODE_ENV === "development")
 const isNotPackagedAndDev = !app.isPackaged && isDev
 
 // getting appData path *needs* to happen before single instance lock check (otherwise old path gets created)
@@ -24,6 +24,13 @@ const getUserDataDir = (version = protocol_version) =>
   path.join(appDataDir, `tomato-radio-automation-p${version}${isNotPackagedAndDev ? "-dev" : ""}`)
 
 const userDataDir = getUserDataDir()
+const hardResetFile = path.join(userDataDir, ".tomato-clear-dir")
+
+if (fs.existsSync(hardResetFile)) {
+  console.warn(`Got hard reset file (${hardResetFile}). Clearing user data dir`)
+  fs.rmSync(userDataDir, { recursive: true, force: true })
+}
+
 console.log(`Using user data dir: ${userDataDir}`)
 fs.mkdirSync(userDataDir, { recursive: true, permission: 0o700 })
 app.setPath("userData", userDataDir)
@@ -75,7 +82,7 @@ if (squirrelCheck || !singleInstanceLock) {
   const baseUrl = isNotPackagedAndDev
     ? "http://localhost:3000/"
     : `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
-  const baseParams = new URLSearchParams({ userDataDir, dev: isDev ? "1" : "0" })
+  const baseParams = new URLSearchParams({ userDataDir, dev: isDev ? "1" : "0", packaged: app.isPackaged ? "1" : "0" })
   const url = `${baseUrl}?${baseParams.toString()}`
 
   const createWindow = () => {
@@ -228,7 +235,7 @@ if (squirrelCheck || !singleInstanceLock) {
     }
 
     win.loadURL(url)
-    if (!app.isPackaged) {
+    if (isNotPackagedAndDev) {
       win.webContents.openDevTools({ mode: "detach" })
     }
 
@@ -255,7 +262,7 @@ if (squirrelCheck || !singleInstanceLock) {
     window = createWindow()
   })
 
-  ipcMain.handle("refresh", (event, params) => {
+  const doRefresh = (params) => {
     if (window) {
       let extra = ""
       if (params) {
@@ -263,6 +270,18 @@ if (squirrelCheck || !singleInstanceLock) {
         extra = "&" + new URLSearchParams(urlParams).toString()
       }
       window.loadURL(`${url}${extra}`)
+    }
+  }
+
+  ipcMain.handle("refresh", (event, params) => doRefresh(params))
+
+  ipcMain.handle("clear-user-data-and-restart", () => {
+    if (app.isPackaged) {
+      fs.closeSync(fs.openSync(hardResetFile, "w"))
+      app.relaunch()
+      app.exit()
+    } else {
+      doRefresh({ type: "host", message: "Can't hard logout unless app is packaged!" })
     }
   })
 

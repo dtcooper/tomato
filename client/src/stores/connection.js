@@ -60,7 +60,7 @@ const updateConn = ({ connecting, connected, ...restPersisted }) => {
 
 let ws = (window._websocket = null)
 
-export const logout = (error) => {
+export const logout = (error = null, hardLogout = false) => {
   if (loggingOut) return
   loggingOut = true
 
@@ -78,12 +78,14 @@ export const logout = (error) => {
   setServerConfig({})
   resetUserConfig()
 
+  const ipcChannel = hardLogout ? "clear-user-data-and-restart" : "refresh"
+
   if (wasInReadyState) {
     reloading.set(true)
     // Give some time for purge of pending logs to take effect
-    setTimeout(() => ipcRenderer.invoke("refresh", error), 2500)
+    setTimeout(() => ipcRenderer.invoke(ipcChannel, error), 2500)
   } else {
-    ipcRenderer.invoke("refresh", error)
+    ipcRenderer.invoke(ipcChannel, error)
   }
 }
 
