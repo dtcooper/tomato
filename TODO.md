@@ -49,6 +49,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
   - [ ] Ability to "audition" assets on a second audio output?
 - [x] ~~Stop playing at end of current asset. (Stop playing in 3s with fadeout as well?)~~ (Covered by skip)
 - [x] A way to send a custom text notification to all connected clients from backend UI
+- [x] Audio visualization with WaveSurfer
 
 
 ## Other things

@@ -1,5 +1,4 @@
 <script>
-  import { onDestroy } from "svelte"
   import playCircleOutlineIcon from "@iconify/icons-mdi/play-circle-outline"
   import pauseCircleOutlineIcon from "@iconify/icons-mdi/pause-circle-outline"
   import skipNextCircleOutline from "@iconify/icons-mdi/skip-next-circle-outline"
@@ -57,6 +56,8 @@
   $: midiSetLED(ledState)
   setTimeout(() => midiSetLED(ledState), 500) // Allow 500ms for midi system to initialize
 
+  // Remove previously installed press listeners (if component was destroyed and re-created)
+  midiButtonPresses.removeListener("pressed")
   midiButtonPresses.addListener("pressed", () => {
     if (playDisabled) {
       console.log("Got MIDI press, but currently not eligible to play!")
@@ -66,11 +67,7 @@
     }
   })
 
-  onDestroy(() => {
-    // Needs to be unregistered when component is destroyed
-    midiButtonPresses.removeListener("pressed")
-  })
-
+  // registerMessageHandler overwrites previously registered handle when called again (if component re-created)
   registerMessageHandler("play", ({ connection_id }) => {
     if (playDisabled) {
       console.log("Got play message, but currently not eligible to play!")

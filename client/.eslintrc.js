@@ -3,6 +3,7 @@ const globals = {
   IS_LINUX: true,
   IS_MAC: true,
   IS_WIN32: true,
+  TOMATO_EXTRA_BUILD_INFO: true,
   TOMATO_VERSION: true
 }
 
@@ -22,7 +23,7 @@ module.exports = {
       env: {
         node: true
       },
-      files: [".eslintrc.{js,cjs}", "src/main*.js", "scripts/**/*"],
+      files: ["src/main*.js", "scripts/**/*", ".eslintrc.js", "*.config.js"],
       parserOptions: {
         sourceType: "script"
       },

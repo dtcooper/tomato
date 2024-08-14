@@ -59,12 +59,16 @@ if (squirrelCheck || !singleInstanceLock) {
 
   app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors,HardwareMediaKeyHandling,MediaSessionService")
   app.commandLine.appendSwitch("disable-pinch")
+  let applicationVersion = `${TOMATO_VERSION}\n(Built on ${buildTime.format("YYYY/MM/DD HH:mm:ss")})`
+  if (TOMATO_EXTRA_BUILD_INFO) {
+    applicationVersion = `${applicationVersion}\n${TOMATO_EXTRA_BUILD_INFO}`
+  }
   app.setAboutPanelOptions({
     applicationName: "Tomato Radio Automation",
     copyright: `Released under the MIT license.\n\u00A9 2019-${buildTime.format("YYYY")} David Cooper, Miranda Kay, & the BMIR team.\nAll rights reserved.`,
     website: "https://github.com/dtcooper/tomato",
     iconPath,
-    applicationVersion: `${TOMATO_VERSION}\n(Built on ${buildTime.format("YYYY/MM/DD HH:mm:ss")})`,
+    applicationVersion,
     version: "" // hide on macOS
   })
 

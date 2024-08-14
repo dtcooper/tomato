@@ -50,7 +50,7 @@
         <ul class="w-full list-disc text-left">
           <li>
             <div class="break-all">
-              Conection: <span class="select-text font-mono text-sm">
+              Connection: <span class="select-text font-mono">
                 {$conn.username} <span class="select-text font-bold text-info">@</span>
                 {$conn.prettyHost}
               </span>
@@ -58,7 +58,7 @@
           </li>
           <li>Last update processed: <span class="font-bold">{prettyDatetime($db.lastSync)}</span></li>
           <li>
-            Database contains
+            Local DB contains
             {$db.assets.length} asset{$db.assets.length !== 1 ? "s" : ""},
             {$db.rotators.size} rotator{$db.rotators.size !== 1 ? "s" : ""}, and
             {$db.stopsets.length} stop set{$db.stopsets.length !== 1 ? "s" : ""}.

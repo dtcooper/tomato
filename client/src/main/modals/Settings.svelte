@@ -12,12 +12,12 @@
   import hours12 from "@iconify/icons-mdi/hours-12"
   import hours24 from "@iconify/icons-mdi/hours-24"
 
-  import { IS_DEV } from "../../utils"
+  import { IS_DEV, lightTheme, darkTheme } from "../../utils"
   import { db } from "../../stores/db"
   import { settings_descriptions } from "../../../../server/constants.json"
   import { logout, protocolVersion, conn } from "../../stores/connection"
   import { playStatus, speaker, setSpeaker } from "../../stores/player"
-  import { config, userConfig, uiModeInfo } from "../../stores/config"
+  import { config, userConfig, uiModeInfo, isDark } from "../../stores/config"
   import { buttonBoxDetected, buttonBoxVersion, resetButtonBox } from "../../stores/midi"
 
   export let show = true
@@ -48,20 +48,22 @@
 
   const themes = [
     ["System default", null, themeLightDark],
-    ["Light", "emerald", whiteBalanceSunny],
-    ["Dark", "night", moonAndStars]
+    ["Light", lightTheme, whiteBalanceSunny],
+    ["Dark", darkTheme, moonAndStars]
   ]
 
   $: canLogOut = logoutStationName.trim().toLowerCase() === $config.STATION_NAME.trim().toLowerCase()
   $: speakerLocked = show
 </script>
 
-<Modal bind:show class="max-w-[52rem] bg-settings-modal-outer-bg">
+<Modal bind:show class="max-w-[52rem] {$isDark ? 'bg-base-100' : 'bg-base-300'}">
   <svelte:fragment slot="icon"><Icon icon={cogOutline} class="h-8 w-8 md:h-12 md:w-12" /></svelte:fragment>
   <svelte:fragment slot="title">Settings</svelte:fragment>
   <svelte:fragment slot="close-text">Close settings</svelte:fragment>
   <div
-    class="grid h-0 w-full max-w-full flex-1 grid-cols-[max-content_auto] items-center gap-x-5 gap-y-2 overflow-y-auto rounded-xl bg-settings-modal-bg p-2"
+    class="grid h-0 w-full max-w-full flex-1 grid-cols-[max-content_auto] items-center gap-x-5 gap-y-1.5 overflow-y-auto rounded-xl p-2 {$isDark
+      ? 'bg-base-300'
+      : 'bg-base-100'}"
     slot="content"
   >
     <div class="flex justify-end text-lg font-bold">User interface mode:</div>
@@ -157,6 +159,14 @@
     </div>
     <hr class="divider col-span-2 m-0 h-0 p-0" />
 
+    <div class="flex justify-end text-lg font-bold">Visualize audio:</div>
+    <div class="flex w-max items-center justify-center gap-3 text-xl font-bold">
+      <span class:text-error={!$userConfig.showViz}>OFF</span>
+      <input type="checkbox" class="toggle toggle-success" bind:checked={$userConfig.showViz} />
+      <span class:text-success={$userConfig.showViz}>ON</span>
+    </div>
+    <hr class="divider col-span-2 m-0 h-0 p-0" />
+
     <div class="flex justify-end text-lg font-bold">MIDI Button box:</div>
     <div class="flex w-max items-center justify-center gap-3 text-xl font-bold">
       <span class:text-error={!$userConfig.enableMIDIButtonBox}>OFF</span>
@@ -171,16 +181,14 @@
             {/if}
             <span class="font-bold text-success">detected</span>!)
             {#if !resettingButtonBox}
-              <span class="text-sm"
-                >[<button
-                  class="link-hover link link-primary link-info"
-                  on:click={() => {
-                    resettingButtonBox = true
-                    resetButtonBox()
-                    setTimeout(() => (resettingButtonBox = false), 1500)
-                  }}>Click to reset</button
-                >]</span
-              >
+              [<button
+                class="link-hover link link-primary link-info contents"
+                on:click={() => {
+                  resettingButtonBox = true
+                  resetButtonBox()
+                  setTimeout(() => (resettingButtonBox = false), 1500)
+                }}>Reset</button
+              >]
             {/if}
           {:else}
             <span class="text-error">not detected</span>.)
@@ -221,23 +229,21 @@
     <hr class="divider col-span-2 m-0 h-0 p-0" />
 
     <div class="flex justify-end text-lg font-bold">Connection:</div>
-    <div class="flex w-full flex-col items-baseline">
-      <div class="w-full break-all">
-        <span class="select-text font-mono text-sm tracking-tight">
+    <div class="flex w-full items-baseline gap-1">
+      <div class="break-all">
+        <span class="select-text font-mono tracking-tight">
           {$conn.username} <span class="select-text font-bold text-info">@</span>
           {$conn.prettyHost}
         </span>
       </div>
-      <div>
-        <span class="text-xs"
-          >[<button
-            class="link-hover link link-info"
-            on:click={() => {
-              show = false
-              showSyncModal = true
-            }}>Connection status</button
-          >]</span
-        >
+      <div class="w-max text-left">
+        [<button
+          class="link-hover link link-info contents text-left"
+          on:click={() => {
+            show = false
+            showSyncModal = true
+          }}>Status</button
+        >]
       </div>
     </div>
     <hr class="divider col-span-2 m-0 h-0 p-0" />
@@ -262,7 +268,7 @@
     </div>
     <hr class="divider col-span-2 m-0 h-0 p-0" />
 
-    <div class="col-span-2 flex justify-center">
+    <div class="col-span-2 mt-1 flex justify-center">
       <button type="button" class="btn btn-error btn-sm" on:click|preventDefault={confirmLogout} tabindex="-1">
         Click here to <strong class="underline">COMPLETELY LOG OUT</strong> of server
       </button>

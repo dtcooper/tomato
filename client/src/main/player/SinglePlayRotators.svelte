@@ -17,7 +17,7 @@
   let showModal = false
 
   $: playDisabled =
-    $singlePlayRotators.isPlaying ||
+    $singlePlayRotators.playing ||
     (playlistItems.some((item) => item.type === "stopset") &&
       playlistItems[0].type === "stopset" &&
       playlistItems[0].playing)
@@ -63,7 +63,7 @@
       {@const disabled =
         playDisabled && (!$singlePlayRotators.rotator || $singlePlayRotators.rotator.id !== rotator.id)}
       {@const playing =
-        $singlePlayRotators.isPlaying && $singlePlayRotators.rotator && $singlePlayRotators.rotator.id === rotator.id}
+        $singlePlayRotators.playing && $singlePlayRotators.rotator && $singlePlayRotators.rotator.id === rotator.id}
       <div class="grid grid-cols-[auto,min-content] gap-1">
         <div
           class:tooltip={!disabled && ($userConfig.tooltips || $userConfig.uiMode <= 1)}

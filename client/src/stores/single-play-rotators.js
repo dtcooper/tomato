@@ -14,7 +14,7 @@ let interval = null
 
 const notPlayingTemplate = {
   asset: null,
-  isPlaying: false,
+  playing: false,
   duration: 0,
   elapsed: 0,
   remaining: 0,
@@ -62,7 +62,7 @@ export const play = (asset, rotator) => {
     asset,
     duration,
     elapsed: 0,
-    isPlaying: true,
+    playing: true,
     remaining: 0,
     rotator
   }))

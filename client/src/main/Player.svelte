@@ -405,7 +405,11 @@
   })
 </script>
 
-<div class="col-span-2 mb-5 mt-7 flex flex-col gap-5">
+{#if swap}
+  <AssetSwapper {doAssetSwap} bind:swap />
+{/if}
+
+<div class="col-span-2 flex flex-col {$userConfig.showViz && items.length > 0 ? 'mt-6 gap-4' : 'mt-7 gap-5'}">
   {#if items.length > 0}
     {@const item = items[0]}
 
@@ -422,15 +426,11 @@
     />
     <PlayBar {item} />
   {:else}
-    <div class="mt-3 text-center text-xl italic text-error">
-      Can't generate a stopset. You're sure the server has data that's set to air now?
+    <div class="mb-16 mt-7 text-center text-xl font-bold italic text-error">
+      Can't generate a stop set. Are you SURE that airable stop sets exists on the server?
     </div>
   {/if}
 </div>
-
-{#if swap}
-  <AssetSwapper {doAssetSwap} bind:swap />
-{/if}
 
 <PlayList
   {items}

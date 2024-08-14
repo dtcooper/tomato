@@ -4,7 +4,7 @@ import { noop } from "svelte/internal"
 import { derived, get, writable } from "svelte/store"
 import { prettyDuration, progressBarAnimationFramerate } from "../utils"
 import { log } from "./client-logs"
-import { config } from "./config"
+import { config, userConfig } from "./config"
 import { markPlayed } from "./db"
 
 export const speaker = persisted("speaker", null)
@@ -15,13 +15,20 @@ export const playStatus = derived([speaker, speakers], ([$speaker, $speakers]) =
 }))
 export const blockSpacebarPlay = writable(false)
 
+// Web Audio API stuff
 let compressorEnabled = false
-let currentGeneratedId = 0
+let vizEnabled = false
+
 export const audioContext = new AudioContext()
 
-export const inputNode = audioContext.createGain()
+export const inputNode = audioContext.createGain() // Used by single play rotators too
 inputNode.gain.value = 1
-inputNode.connect(audioContext.destination)
+
+const mediaStreamDest = audioContext.createMediaStreamDestination()
+export const mediaStreamMonitor = mediaStreamDest.stream
+
+const outputNode = audioContext.createGain()
+outputNode.gain.value = 1
 
 // Thanks ChatGPT!
 const compressor = audioContext.createDynamicsCompressor()
@@ -38,8 +45,57 @@ limiter.attack.setValueAtTime(0.001, audioContext.currentTime) // Fast attack ti
 limiter.release.setValueAtTime(0.02, audioContext.currentTime) // Relatively fast release time
 
 compressor.connect(limiter)
-limiter.connect(audioContext.destination)
+limiter.connect(outputNode) // Route limiter to outputNode (path has no audio input when compression off)
 
+outputNode.connect(audioContext.destination) // Route outputNode to speaker
+
+/*
+  Without compression:
+    >>> inputNode => outputNode => destination
+
+  With compression:
+    >>> inputNode => compressor => limiter => outputNode => destination
+
+  When visualizer is turned on (connection severed when visualizer off)
+    >>> outputNode => mediaStreamDest
+*/
+
+// To start, route inputNode to outputNode (compression disabled)
+inputNode.connect(outputNode)
+
+config.subscribe(({ BROADCAST_COMPRESSION: enabled }) => {
+  enabled = !!enabled // Make sure it's a bool
+  if (enabled !== compressorEnabled) {
+    if (enabled) {
+      // Swap inputNode routing from outputNode to compressor (begin of compression chain)
+      inputNode.disconnect(outputNode)
+      inputNode.connect(compressor)
+    } else {
+      // Swap inputNode routing from compressor to outputNode (disabled compression chain)
+      inputNode.disconnect(compressor)
+      inputNode.connect(outputNode)
+    }
+    compressorEnabled = enabled
+    console.log(`${enabled ? "Enabled" : "Disabled"} broadcast compression`)
+  }
+})
+
+userConfig.subscribe(({ showViz: enabled }) => {
+  enabled = !!enabled // Make sure it's a bool
+  if (enabled !== vizEnabled) {
+    if (enabled) {
+      // Route outputNode to the media stream for WaveSurfer visualization
+      outputNode.connect(mediaStreamDest)
+    } else {
+      // Remove routing of output node to media stream (visualization disabled)
+      outputNode.disconnect(mediaStreamDest)
+    }
+    vizEnabled = enabled
+    console.log(`${enabled ? "Connected" : "Disconnected"} visualizer media stream`)
+  }
+})
+
+let currentGeneratedId = 0
 const assetAlternateTracker = new Map()
 
 class GeneratedStopsetAssetBase {
@@ -623,20 +679,7 @@ config.subscribe(($config) => {
   Wait.currentStopsetOverdueTime = $config.STOPSET_OVERDUE_TIME || 0
 })
 
-const setCompression = (value) => {
-  if (value !== compressorEnabled) {
-    if (value) {
-      inputNode.disconnect(audioContext.destination)
-      inputNode.connect(compressor)
-    } else {
-      inputNode.disconnect(compressor)
-      inputNode.connect(audioContext.destination)
-    }
-    compressorEnabled = value
-    console.log("Changed broadcast compression:", value)
-  }
-}
-
+// Speaker stuff
 export const setSpeaker = (choice) => {
   const speakers = new Map(get(playStatus).speakers)
   let choicePretty = speakers.get(choice)
@@ -679,13 +722,8 @@ navigator.mediaDevices.ondevicechange = async () => {
   setSpeaker(get(speaker))
 }
 
-config.subscribe(($config) => {
-  setCompression($config.BROADCAST_COMPRESSION || false)
-})
-
 // Async code called at startup
 ;(async () => {
-  setCompression(get(config).BROADCAST_COMPRESSION || false)
   await updateSpeakers()
   setSpeaker(get(speaker))
 })()

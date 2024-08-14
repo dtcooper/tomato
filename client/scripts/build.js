@@ -40,6 +40,9 @@ const runBuild = async () => {
   const { node: nodeVersion } = electronReleases.find((release) => release.version === electronVersion) || {}
 
   const TOMATO_VERSION = `"${process.env.TOMATO_VERSION || (isDev ? "dev" : "unknown")}"`
+  const TOMATO_EXTRA_BUILD_INFO = process.env.TOMATO_EXTRA_BUILD_INFO
+    ? `"${process.env.TOMATO_EXTRA_BUILD_INFO}"`
+    : "null"
   console.log(
     `Building for ${isDev ? "development" : "production"} (version: ${TOMATO_VERSION.slice(1, -1)}), ` +
       `electron ${electronVersion}, node ${nodeVersion || "unknown"}${watch ? ", watching" : ""}...`
@@ -53,6 +56,7 @@ const runBuild = async () => {
     sourcemap: true,
     define: {
       TOMATO_VERSION,
+      TOMATO_EXTRA_BUILD_INFO,
       IS_MAC: IS_MAC.toString(),
       IS_WIN32: IS_WIN32.toString(),
       IS_LINUX: IS_LINUX.toString(),

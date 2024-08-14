@@ -9,6 +9,8 @@ import sproutIcon from "@iconify/icons-mdi/sprout"
 import { persisted } from "svelte-local-storage-store"
 import { get, readonly, writable } from "svelte/store"
 
+import { darkTheme } from "../utils"
+
 const config = persisted("config", {})
 const readonlyConfig = readonly(config)
 
@@ -19,11 +21,28 @@ const defaultUserConfig = {
   enableMIDIButtonBox: true,
   tooltips: true,
   startFullscreen: false,
+  showViz: false,
   clock: "12h",
   theme: null
 }
 export const userConfig = persisted("user-config", defaultUserConfig)
 export const resetUserConfig = () => userConfig.set(defaultUserConfig)
+
+const darkMediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+const getDark = () => {
+  const { theme } = get(userConfig)
+  if (theme) {
+    return theme === darkTheme
+  } else {
+    return darkMediaQuery.matches
+  }
+}
+const isDark = writable(getDark())
+darkMediaQuery.addEventListener("change", () => isDark.set(getDark()))
+userConfig.subscribe(() => isDark.set(getDark()))
+const readonlyIsDark = readonly(isDark)
+export { readonlyIsDark as isDark }
+
 export const isFullscreen = writable(true)
 
 export const uiModeInfo = [

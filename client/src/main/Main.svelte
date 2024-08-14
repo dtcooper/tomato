@@ -24,7 +24,7 @@
   <Header bind:showSyncModal bind:showSettingsModal />
   <Clock {isWide} />
   <div
-    class="mx-auto grid max-h-fit w-full flex-1 grid-cols-[2fr,1fr] grid-rows-[max-content,auto] gap-5 bg-base-100 px-2 pt-2"
+    class="mx-auto grid max-h-fit w-full flex-1 grid-cols-[2fr,1fr] grid-rows-[max-content,auto] gap-x-5 bg-base-100 px-2 pt-2"
     class:max-w-4xl={!isWide}
     class:max-w-7xl={isWide}
   >

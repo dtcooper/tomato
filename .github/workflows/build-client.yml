@@ -69,6 +69,9 @@ jobs:
         shell: bash
         run: |
           echo "CLIENT_FILENAME=tomato-client-${{ env.CLIENT_VERSION }}-${{ matrix.filename_suffix }}" >> "$GITHUB_ENV"
+          if [ "${{ github.ref_type }}" != 'tag' -a "${{ github.ref_name}}" != main ]; then
+            echo "EXTRA_BUILD_INFO=Branch: ${{ github.ref_name}}" >> "$GITHUB_ENV"
+          fi
       -
         name: Setup Node v${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
@@ -94,7 +97,7 @@ jobs:
             npm config set script-shell $(which bash)
           fi
           npm clean-install
-          TOMATO_VERSION=${{ steps.version.outputs.version }} npm run build
+          TOMATO_VERSION=${{ steps.version.outputs.version }} TOMATO_EXTRA_BUILD_INFO="${EXTRA_BUILD_INFO}" npm run build
           npx electron-forge make --arch ${{ matrix.arch }} --platform ${{ matrix.platform }}
           mkdir ../client-build-files
           mv -v out/make/${{ matrix.out_path }} ../client-build-files/${{ env.CLIENT_FILENAME }}

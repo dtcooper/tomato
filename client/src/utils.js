@@ -16,6 +16,10 @@ export const prettyDuration = (item, max) => {
   }
 }
 
+// Need to be the exact same as in tailwind.config.js
+export const lightTheme = "emerald"
+export const darkTheme = "night"
+
 export const humanDuration = (item) => {
   item = Math.round(item)
   const seconds = Math.floor(item) % 60

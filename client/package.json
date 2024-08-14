@@ -23,7 +23,7 @@
     "make:forge": "electron-forge make",
     "package:forge": "electron-forge package",
     "format": "prettier --config .prettierrc --plugin prettier-plugin-organize-imports --plugin prettier-plugin-svelte --plugin prettier-plugin-tailwindcss --write . ../server/constants.json ../server/tomato/static/admin/tomato/configure_live_clients/configure_live_clients.js ../server/tomato/templates/admin/extra/configure_live_clients_iframe.html ../controller/test/index.html",
-    "lint": "eslint src/ scripts/",
+    "lint": "eslint src/ scripts/ *.js",
     "formatlint": "npm-run-all format lint"
   },
   "repository": {
@@ -76,6 +76,7 @@
     "tailwindcss": "^3.4.9",
     "uuid": "^10.0.0",
     "wait-on": "^7.2.0",
+    "wavesurfer.js": "^7.8.3",
     "weak-ref-collections": "^1.2.4",
     "webmidi": "^3.1.11"
   }
