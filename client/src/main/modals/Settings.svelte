@@ -127,23 +127,6 @@
     </div>
     <hr class="divider col-span-2 m-0 h-0 p-0" />
 
-    <div class="flex justify-end text-lg font-bold">System clock:</div>
-    <div class="tabs-boxed tabs w-max">
-      {#each [[null, false], [hours12, "12h"], [hours24, "24h"]] as [icon, clock]}
-        <button
-          class="tab gap-2"
-          class:tab-active={$userConfig.clock === clock}
-          on:click={() => ($userConfig.clock = clock)}
-        >
-          {#if icon}
-            <Icon {icon} class="h-6 w-6" />
-          {/if}
-          <span class:font-bold={!clock}>{clock ? `${clock.substring(0, 2)} hour` : "OFF"}</span>
-        </button>
-      {/each}
-    </div>
-    <hr class="divider col-span-2 m-0 h-0 p-0" />
-
     <div class="flex justify-end text-lg font-bold">Theme:</div>
     <div class="tabs-boxed tabs w-max">
       {#each themes as [name, theme, icon]}
@@ -333,6 +316,12 @@
               {value.map(([hour, minute]) => dayjs(`${hour}:${minute}`, "H:m").format("h:mma")).join(", ")}
             {:else}
               <em class="text-error">none</em>
+            {/if}
+          {:else if key === "CLOCK"}
+            {#if value}
+              {value.replace(/h$/, "-hour display")}
+            {:else}
+              <span class="text-error">off</span>
             {/if}
           {:else}
             {value}{#if value === 0}<span class="text-error">&nbsp;(disabled)</span>{/if}

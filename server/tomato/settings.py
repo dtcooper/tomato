@@ -322,6 +322,10 @@ CONSTANCE_ADDITIONAL_FIELDS = {
             "max_value": 60,
         },
     ),
+    "clock": (
+        "django.forms.ChoiceField",
+        {"choices": (("", "Off"), ("12h", "12 Hour"), ("24h", "24 Hour")), "required": False},
+    ),
 }
 
 CONSTANCE_CONFIG = {
@@ -453,6 +457,14 @@ CONSTANCE_CONFIG = {
         mark_safe("Reject silence assets of this many seconds. <strong>Set to 0 disable</strong>."),
         "silence",
     ),
+    "CLOCK": (
+        "",
+        (
+            "This will enable a clock that displays the current time in the desktop app (12- or 24-hour display). On"
+            " larger screens the date will also display."
+        ),
+        "clock",
+    ),
 }
 
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
@@ -460,6 +472,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
         "User Interface Options",
         (
             "STATION_NAME",
+            "CLOCK",
             "UI_MODES",
             "UI_MODE_RESET_TIMES",
             "ONE_CLIENT_LOGIN_PER_ACCOUNT",

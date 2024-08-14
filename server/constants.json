@@ -114,6 +114,7 @@
   "settings_descriptions": {
     "ALLOW_REPEATS_IN_STOPSET": "The randomization algorithm will try its absolute best to avoid duplicates. However, when that's not possible (for example because of a nearly empty rotator), do you want the same asset to repeat (True), or for the rotator to be ignored in a given stop set (False)?",
     "BROADCAST_COMPRESSION": "Enable broadcast compression when True, smoothing out dynamic range in audio output.\nNOTE: compression is applied at the time you play an audio asset and performed on-the-fly in the desktop app.",
+    "CLOCK": "This will enable a clock that displays the current time in the desktop app (12 or 24-hour). On larger screens the date will also display.",
     "END_DATE_PRIORITY_WEIGHT_MULTIPLIER": "Multiply an asset's weight by this number if it has an end date and the end date is in the next 24 hours (one day). Set to 0 to disable this feature.",
     "NO_REPEAT_ASSETS_TIME": "The time (in seconds) required to elapse for the Desktop app to attempt to not repeat any assets. Set to 0 to disable and allow potential repetition in the randomization algorithm. If there are not enough assets in a rotator to respect this setting, it will be ignored.",
     "ONE_CLIENT_LOGIN_PER_ACCOUNT": "Only allow one desktop client to be connected per account.",

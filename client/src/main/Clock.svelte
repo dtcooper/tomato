@@ -1,7 +1,7 @@
 <script>
   import dayjs from "dayjs"
 
-  import { userConfig } from "../stores/config"
+  import { config } from "../stores/config"
 
   export let isWide = false
 
@@ -19,9 +19,9 @@
 
   $: {
     clearInterval(interval)
-    is24Hour = $userConfig.clock === "24h"
+    is24Hour = $config.CLOCK === "24h"
     update()
-    if ($userConfig.clock) {
+    if ($config.CLOCK) {
       interval = setInterval(() => update(), 250)
     }
   }
@@ -35,7 +35,7 @@
   }
 </script>
 
-{#if $userConfig.clock}
+{#if $config.CLOCK}
   <div class="relative h-0">
     <div
       class="fixed right-0 flex w-max items-end gap-1 rounded-bl-lg bg-base-200 px-2 py-1 font-mono leading-none {classes}"

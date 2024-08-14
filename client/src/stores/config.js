@@ -22,7 +22,6 @@ const defaultUserConfig = {
   tooltips: true,
   startFullscreen: false,
   showViz: false,
-  clock: "12h",
   theme: null
 }
 export const userConfig = persisted("user-config", defaultUserConfig)

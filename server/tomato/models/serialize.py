@@ -44,7 +44,11 @@ async def get_constance_config_for_api():
     except Exception:
         logger.exception("Error parsing UI_MODE_RESET_TIMES. Sending empty list.")
 
-    config.update({"UI_MODES": list(map(int, config["UI_MODES"])), "UI_MODE_RESET_TIMES": reset_times})
+    config.update({
+        "UI_MODES": list(map(int, config["UI_MODES"])),
+        "UI_MODE_RESET_TIMES": reset_times,
+        "CLOCK": config["CLOCK"] or False,
+    })
     config["_numeric"] = [key for key, value in config.items() if isinstance(value, decimal.Decimal)]
     return config
 
