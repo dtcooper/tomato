@@ -1,6 +1,6 @@
 import decimal
-import sys
 from pathlib import Path
+import sys
 from unittest.mock import Mock
 
 
@@ -14,6 +14,7 @@ TYPES_TO_STRING = {
 TYPE_HINTS_TO_STRING = {
     "audio_bitrate": "32kbps through 320kbps",
     "ui_modes": "Simple, standard, and/or advanced mode",
+    "clock": "Off, 12-hour, and 24-hour",
 }
 
 
@@ -50,6 +51,16 @@ def get_constance_config_default(name, default):
         return f"{default}kbps"
     elif name == "UI_MODES":
         return "Simple & standard mode"
+    elif name == "CLOCK":
+        return "Off"
+    elif name in (
+        "UI_MODE_RESET_TIMES",
+        "REJECT_SILENCE_LENGTH",
+        "NO_REPEAT_ASSETS_TIME",
+        "STOPSET_OVERDUE_TIME",
+        "END_DATE_PRIORITY_WEIGHT_MULTIPLIER",
+    ):
+        return "0 (feature disabled)"
     return repr(default)
 
 
