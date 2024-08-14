@@ -244,13 +244,13 @@ Django = ">=3.2"
 
 [[package]]
 name = "django-file-form"
-version = "3.7.0"
+version = "3.8.0"
 description = "Django-file-form helps you to write forms with a pretty ajax upload"
 optional = false
 python-versions = "*"
 files = [
-    {file = "django_file_form-3.7.0-py3-none-any.whl", hash = "sha256:5631b4690aa0d8b3b8bbc5c36439e8331491aa89368cdffc615b036e6c79d69d"},
-    {file = "django_file_form-3.7.0.tar.gz", hash = "sha256:e72dc6ea078b4ff0b3fcde978d5049ca0b86db17f2407abb92c1d303158d1620"},
+    {file = "django_file_form-3.8.0-py3-none-any.whl", hash = "sha256:0a5c85611bf01b625df39eb17618fd11c1099b99035c1235b3b86b23d8106459"},
+    {file = "django_file_form-3.8.0.tar.gz", hash = "sha256:4cc9ade8c578e760fd6009c8adb1d9a6ecea1a9a799095dbffc050094e8a7d22"},
 ]
 
 [[package]]
@@ -1261,4 +1261,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "605e31824e9dde40bdb81f50b91ae3b209db3b092eae903764b666fc4bf6dac3"
+content-hash = "814594365bbd3aad27d7e8017565146dffeaac74fbac85469676d0d60c68e2ff"

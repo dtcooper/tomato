@@ -28,7 +28,7 @@ services:
 
   nginx:
     restart: always
-    image: jonasal/nginx-certbot:5.2-alpine
+    image: jonasal/nginx-certbot:5.3-alpine
     depends_on:
       - app
       - api
