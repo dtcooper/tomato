@@ -7,7 +7,7 @@ server {
     listen 443 ssl default_server reuseport;
     http2 on;
 
-    server_name ${DOMAIN_NAME};
+    server_name {{ DOMAIN_NAME }};
 
     ssl_certificate /etc/letsencrypt/live/tomato/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/tomato/privkey.pem;
@@ -16,7 +16,14 @@ server {
 
     client_max_body_size 25M;
 
-    ${__NGINX_STATIC_FILES_CONF}
+    {% if DEBUG|int %}
+        # Static files disabled by when DEBUG is true
+    {% else %}
+        # Static files enabled when DEBUG is false
+        location /static/ {
+            alias /serve/static/;
+        }
+    {% endif %}
 
     location /assets/ {
         alias /serve/assets/;

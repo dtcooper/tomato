@@ -22,6 +22,7 @@ jobs:
     strategy:
       matrix:
         tag: [dev, latest]
+        container: [server, nginx]
     steps:
       -
         name: Checkout
@@ -29,10 +30,12 @@ jobs:
       -
         name: Get version
         id: version
+        if: matrix.container == 'server'
         uses: ./.github/actions/version
       -
-        name: Build container
+        name: Build container (server)
         uses: ./.github/actions/docker-build-push
+        if: matrix.container == 'server'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           container: server
@@ -40,6 +43,16 @@ jobs:
           build-args: |
             DEBUG=${{ matrix.tag == 'dev' && '1' || '0' }}
             TOMATO_VERSION=${{ steps.version.outputs.version }}
+      -
+        name: Build container (nginx)
+        uses: ./.github/actions/docker-build-push
+        if: matrix.container == 'nginx'
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          container: nginx
+          context: server/nginx
+          tag: latest
+
 
   deploy:
     runs-on: ubuntu-22.04

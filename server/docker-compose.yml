@@ -28,23 +28,20 @@ services:
 
   nginx:
     restart: always
-    image: jonasal/nginx-certbot:5.3-alpine
+    image: "ghcr.io/dtcooper/tomato-nginx:${TOMATO_VERSION:-latest}"
+    build:
+      context: nginx
     depends_on:
       - app
       - api
       - logs
     volumes:
-      - ./nginx.conf:/etc/nginx/templates/app.conf.template:ro
       - ./serve:/serve:ro
       - nginx_secrets:/etc/letsencrypt
     environment:
       CERTBOT_EMAIL: "${CERTBOT_EMAIL:?CERTBOT_EMAIL needs to be set. See .env file.}"
       DOMAIN_NAME: "${DOMAIN_NAME:?DOMAIN_NAME needs to be set. See .env file.}"
-      __NGINX_STATIC_FILES_CONF: |
-        # Static files enabled via docker-compose.yml
-        location /static/ {
-            alias /serve/static/;
-        }
+      DEBUG: "${DEBUG:-0}"
     ports:
       - 80:80
       - 443:443

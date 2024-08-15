@@ -21,10 +21,11 @@ services:
   nginx:
     restart: 'no'
     volumes:
-      - ./local-ca:/etc/local_ca
+      - ./nginx/local-ca:/etc/local_ca
+      - ./nginx/image/docker-entrypoint.d/25-jinja2-on-templates.sh:/docker-entrypoint.d/25-jinja2-on-templates.sh
+      - ./nginx/image/etc/nginx/templates/app.conf.j2:/etc/nginx/templates/app.conf.j2
     environment:
       USE_LOCAL_CA: "${NGINX_DEBUG_MODE_ONLY_USE_LOCAL_CA:-0}"
-      __NGINX_STATIC_FILES_CONF: "# Static files disabled by configuration override in docker-compose.dev.yml"
 
   db:
     restart: 'no'

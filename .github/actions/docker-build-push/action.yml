@@ -8,6 +8,10 @@ inputs:
   tag:
     description: Container tag name
     required: true
+  context:
+    description: Container context
+    required: false
+    default: ''
   token:
     description: GitHub token
     required: true
@@ -55,7 +59,7 @@ runs:
         push: true
         pull: true
         platforms: ${{ inputs.platforms }}
-        context: ./${{ inputs.container }}/
+        context: ./${{ inputs.context == '' && inputs.container || inputs.context }}/
         tags: ${{ env.REPO }}:${{ inputs.tag }}
         build-args: ${{ inputs.build-args }}
         cache-from: ${{ inputs.no-cache == 'false' && format('type=registry,ref={0}', env.CACHE_TAG) || '' }}
