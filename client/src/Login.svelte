@@ -8,16 +8,17 @@
   import { isFullscreen, setFullscreen } from "./stores/config"
   import { conn, login, protocolVersion } from "./stores/connection"
 
-  import { tomatoIcon, IS_DEV, urlParams } from "./utils"
+  import { tomatoIcon, isDev, urlParams, isPackaged } from "./utils"
 
   import Icon from "./components/Icon.svelte"
   import SyncModal from "./main/modals/Sync.svelte"
 
-  let showPassword = IS_DEV
+  let showPassword = isDev
   let demoMode = false
-  let password = ""
-  let username = persisted("login-username", "")
-  let host = persisted("login-host", "")
+  // Sane defaults for non-packaged dev mode development
+  let password = isDev && !isPackaged ? "tomato" : ""
+  let username = persisted("login-username", isDev && !isPackaged ? "tomato" : "")
+  let host = persisted("login-host", isDev && !isPackaged ? "localhost" : "")
   let showSyncModal
 
   let error = { type: urlParams.errorType || "", message: urlParams.errorMessage || "" }

@@ -3,7 +3,7 @@ import { get } from "svelte/store"
 import { v4 as uuid } from "uuid"
 
 import { client_log_entry_types } from "../../../server/constants.json"
-import { IS_DEV, debounceFunc } from "../utils"
+import { debounceFunc, isDev } from "../utils"
 import { conn, messageServer } from "./connection"
 
 let pendingLogs = new Map()
@@ -48,7 +48,7 @@ export const acknowledgeLog = (id) => {
   savePendingLogs()
 }
 
-setInterval(() => sendPendingLogs(), IS_DEV ? 2500 : 30000) // Run every 30 seconds
+setInterval(() => sendPendingLogs(), isDev ? 2500 : 30000) // Run every 30 seconds
 
 const logErrorDebounced = debounceFunc((s) => log("internal_error", s), 5, 5000) // Don't log more than 5 times in 5 seconds
 

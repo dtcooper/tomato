@@ -8,7 +8,7 @@
   import PlayList from "./player/List.svelte"
   import SinglePlayRotators from "./player/SinglePlayRotators.svelte"
 
-  import { IS_DEV } from "../utils"
+  import { isDev } from "../utils"
   import { registerMessageHandler, messageServer, conn } from "../stores/connection"
   import { config, userConfig } from "../stores/config"
   import { singlePlayRotators, stop as stopSinglePlayRotator } from "../stores/single-play-rotators"
@@ -371,7 +371,7 @@
     const nextItem = items[0]
     if (nextItem.type === "wait") {
       nextItem.run()
-    } else if (nextItem.type === "stopset" && (play || (IS_DEV && $userConfig.autoplay))) {
+    } else if (nextItem.type === "stopset" && (play || (isDev && $userConfig.autoplay))) {
       stopSinglePlayRotator()
       nextItem.play(subindex)
     }

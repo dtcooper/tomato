@@ -1,7 +1,9 @@
 import dayjs from "dayjs"
 
 export const urlParams = Object.fromEntries(new URLSearchParams(window.location.search).entries())
-export const IS_DEV = urlParams.dev === "1"
+export const isDev = urlParams.dev === "1"
+export const isPackaged = urlParams.packaged === "1"
+export const tomatoDataDir = urlParams.tomatoDataDir
 export const progressBarAnimationFramerate = 30
 
 export const prettyDuration = (item, max) => {
@@ -60,7 +62,7 @@ export const tomatoIcon = {
 }
 
 // Tweak setInterval for tracking / debugging
-if (IS_DEV) {
+if (isDev) {
   const originalSetInterval = setInterval
   const originalClearInterval = clearInterval
   const intervals = (window._activeIntervals = new Set())

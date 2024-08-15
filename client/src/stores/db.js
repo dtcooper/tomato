@@ -9,14 +9,14 @@ import { WeakRefSet } from "weak-ref-collections"
 import { get, readonly, writable } from "svelte/store"
 
 import { colors } from "../../../server/constants.json"
-import { IS_DEV, prettyDatetimeShort, urlParams } from "../utils"
+import { isDev, prettyDatetimeShort, tomatoDataDir } from "../utils"
 import { alert } from "./alerts"
 import { log } from "./client-logs"
 import { config } from "./config"
 import { conn } from "./connection"
 import { GeneratedStopset } from "./player"
 
-const assetsDir = path.join(urlParams.userDataDir, "assets")
+const assetsDir = path.join(tomatoDataDir, "assets")
 
 const emptySyncProgress = { syncing: false, total: -1, index: -1, percent: 0, item: "" }
 const syncProgress = writable(emptySyncProgress)
@@ -149,10 +149,10 @@ class Asset extends AssetStopsetHydratableObject {
         }
         if (!exists) {
           console.log(`Downloading: ${url} (asset: ${this.name}${i > 0 ? `, alt #${i}` : ""})`)
-          // Accept any certificate during local development (ie, self-signed ones)
           await download(url, dirname, {
             filename: tmpBasename,
-            rejectUnauthorized: !IS_DEV,
+            // Accept any certificate during local development (ie, self-signed ones)
+            rejectUnauthorized: !(isDev || ["localhost", "127.0.0.1"].includes(new URL(url).host.toLowerCase())),
             timeout: { request: 60000 }
           })
           const actualMd5sum = await md5File(tmpPath)
@@ -551,7 +551,7 @@ export const syncAssetsDB = runOnceAndQueueLastCall(async (jsonData, isFirstSync
   window.localStorage.setItem("last-db-data", JSON.stringify(jsonData, null, ""))
   window._db = replacementDB // Swap out DB
 
-  if (!IS_DEV && isFirstSync) {
+  if (!isDev && isFirstSync) {
     // Artificial wait for UI
     await new Promise((resolve) => setTimeout(resolve, 1000))
   }
@@ -591,5 +591,5 @@ export const clearAssetState = () => {
 
 export const markPlayed = (asset, rotator = null) => DB.markPlayed(asset, rotator)
 
-setInterval(() => DB.cleanup(), IS_DEV ? 15 * 1000 : 45 * 60 * 1000) // Clean up every 45 minutes
+setInterval(() => DB.cleanup(), isDev ? 15 * 1000 : 45 * 60 * 1000) // Clean up every 45 minutes
 window.dbCleanup = () => DB.cleanup()

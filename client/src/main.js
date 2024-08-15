@@ -1,7 +1,10 @@
 const { app, BrowserWindow, powerSaveBlocker, shell, ipcMain, dialog, Menu } = require("electron")
 const dayjs = require("dayjs")
+const dayjsUtc = require("dayjs/plugin/utc")
 const windowStateKeeper = require("electron-window-state")
 const fs = require("fs")
+const { createGzip } = require("zlib")
+const { pipeline } = require("stream")
 const fsExtra = require("fs-extra")
 const { parseArgs } = require("util")
 const path = require("path")
@@ -11,7 +14,8 @@ const { protocol_version } = require("../../server/constants.json")
 const cmdArgs = parseArgs({
   options: {
     "enable-dev-mode": { type: "boolean", default: false },
-    "show-quit-dialog-when-unpackaged": { type: "boolean", default: false }
+    "show-quit-dialog-when-unpackaged": { type: "boolean", default: false },
+    "disable-logs": { type: "boolean", default: false }
   },
   strict: false
 }).values
@@ -24,15 +28,18 @@ const getUserDataDir = (version = protocol_version) =>
   path.join(appDataDir, `tomato-radio-automation-p${version}${isNotPackagedAndDev ? "-dev" : ""}`)
 
 const userDataDir = getUserDataDir()
-const hardResetFile = path.join(userDataDir, ".tomato-clear-dir")
+const tomatoDataDir = path.join(userDataDir, "tomato")
+const hardResetFile = path.join(tomatoDataDir, ".clear-dir")
 
 if (fs.existsSync(hardResetFile)) {
-  console.warn(`Got hard reset file (${hardResetFile}). Clearing user data dir`)
-  fs.rmSync(userDataDir, { recursive: true, force: true })
+  console.warn(`Got hard reset file (${hardResetFile}). Clearing user data dir: ${userDataDir}`)
+  if (fs.existsSync(userDataDir)) {
+    fs.rmSync(userDataDir, { recursive: true, force: true })
+  }
 }
 
 console.log(`Using user data dir: ${userDataDir}`)
-fs.mkdirSync(userDataDir, { recursive: true, permission: 0o700 })
+fs.mkdirSync(tomatoDataDir, { recursive: true, permission: 0o700 })
 app.setPath("userData", userDataDir)
 
 const singleInstanceLock = app.requestSingleInstanceLock()
@@ -51,21 +58,75 @@ if (squirrelCheck || !singleInstanceLock) {
   // Migrate when there's a protocol version bump
   for (let i = 0; i < protocol_version; i++) {
     const oldUserDataDir = getUserDataDir(i)
-    const oldAssetsDir = path.join(oldUserDataDir, "assets")
-    if (fs.existsSync(oldUserDataDir)) {
-      // Copy over old assets to new folder
-      if (fs.existsSync(oldAssetsDir)) {
-        console.log(`Migrating old data dir ${oldUserDataDir} => ${userDataDir}`)
-        fsExtra.copySync(oldAssetsDir, path.join(userDataDir, "assets"), { overwrite: false })
+    if (i <= 6) {
+      // We didn't use to add the tomato/ prefix to our data up to (and including) protocol 6
+      if (fs.existsSync(oldUserDataDir)) {
+        const oldAssetsDir = path.join(oldUserDataDir, "assets")
+        // Copy over old assets to new folder
+        if (fs.existsSync(oldAssetsDir)) {
+          console.log(`Migrating old assets dir ${oldAssetsDir} => ${tomatoDataDir}`)
+          fsExtra.copySync(oldAssetsDir, path.join(tomatoDataDir, "assets"), { overwrite: false })
+        }
+        fsExtra.removeSync(oldUserDataDir)
       }
-      fsExtra.removeSync(oldUserDataDir)
+    } else {
+      // Starting with protocol 7, all our data directories were prefixed with tomato/
+      const oldTomatoDataDir = path.join(oldUserDataDir, "tomato")
+      if (fs.existsSync(oldTomatoDataDir)) {
+        console.log(`Migrating old tomato dir ${oldTomatoDataDir} => ${tomatoDataDir}`)
+        fsExtra.copySync(oldTomatoDataDir, tomatoDataDir, { overwrite: false })
+      }
+      if (fs.existsSync(oldUserDataDir)) {
+        fsExtra.removeSync(oldUserDataDir)
+      }
     }
   }
 
-  const buildTime = dayjs(BUILD_TIME)
-
   app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors,HardwareMediaKeyHandling,MediaSessionService")
   app.commandLine.appendSwitch("disable-pinch")
+
+  if (!cmdArgs["disable-logs"]) {
+    const logFileDir = path.join(tomatoDataDir, "logs")
+
+    // Archive existing log files
+    if (fs.existsSync(logFileDir)) {
+      fs.readdir(logFileDir, (err, files) => {
+        for (const file of files) {
+          if (file.endsWith(".log")) {
+            const filePath = path.join(logFileDir, file)
+            const filePathGz = `${filePath}.gz`
+            pipeline(
+              fs.createReadStream(filePath),
+              createGzip({ level: 9 }),
+              fs.createWriteStream(filePathGz),
+              (err) => {
+                const fileToRemove = err ? filePathGz : filePath
+                if (err) {
+                  console.error("An error occurred:", err)
+                } else {
+                  console.log(`Archived previous log file: ${file}`)
+                }
+                fs.rm(fileToRemove, { force: true }, (err) => {
+                  if (err) {
+                    console.error(err)
+                  }
+                })
+              }
+            )
+          }
+        }
+      })
+    }
+
+    fs.mkdirSync(logFileDir, { recursive: true, permission: 0o700 })
+    dayjs.extend(dayjsUtc)
+    const logFile = path.join(logFileDir, `${dayjs().format("YYYYMMDDHHmmss")}.log`)
+    console.log(`Enabling electron logging: ${logFile}`)
+    app.commandLine.appendSwitch("enable-logging", "file")
+    app.commandLine.appendSwitch("log-file", logFile)
+  }
+
+  const buildTime = dayjs(BUILD_TIME)
   let applicationVersion = `${TOMATO_VERSION}\n(Built on ${buildTime.format("YYYY/MM/DD HH:mm:ss")})`
   if (TOMATO_EXTRA_BUILD_INFO) {
     applicationVersion = `${applicationVersion}\n${TOMATO_EXTRA_BUILD_INFO}`
@@ -82,7 +143,12 @@ if (squirrelCheck || !singleInstanceLock) {
   const baseUrl = isNotPackagedAndDev
     ? "http://localhost:3000/"
     : `file://${path.normalize(path.join(__dirname, "..", "index.html"))}`
-  const baseParams = new URLSearchParams({ userDataDir, dev: isDev ? "1" : "0" })
+  // Append userDataDir with 'tomato' for client
+  const baseParams = new URLSearchParams({
+    tomatoDataDir,
+    dev: isDev ? "1" : "0",
+    packaged: app.isPackaged ? "1" : "0"
+  })
   const url = `${baseUrl}?${baseParams.toString()}`
 
   const createWindow = () => {
