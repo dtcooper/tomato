@@ -49,7 +49,7 @@
       <div>
         <ul class="w-full list-disc text-left">
           <li>
-            <div class="break-all">
+            <div class="break-words">
               Connection: <span class="select-text font-mono">
                 {$conn.username} <span class="select-text font-bold text-info">@</span>
                 {$conn.prettyHost}

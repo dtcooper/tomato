@@ -211,7 +211,7 @@
 
     <div class="flex justify-end text-lg font-bold">Connection:</div>
     <div class="flex w-full items-baseline gap-1">
-      <div class="break-all">
+      <div class="break-words">
         <span class="select-text font-mono tracking-tight">
           {$conn.username} <span class="select-text font-bold text-info">@</span>
           {$conn.prettyHost}
@@ -280,7 +280,7 @@
     />
     <div class="form-control mt-2">
       <label class="label w-max cursor-pointer gap-3 italic" class:text-error={hardLogout} class:font-bold={hardLogout}>
-        <input class="checkbox-error checkbox" type="checkbox" bind:checked={hardLogout} />
+        <input class="checkbox-error checkbox checkbox-lg" type="checkbox" bind:checked={hardLogout} />
         <span>
           {#if hardLogout}
             <span class="underline">CAUTION</span>:

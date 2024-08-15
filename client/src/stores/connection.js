@@ -93,7 +93,7 @@ export const logout = (error = null, hardLogout = false) => {
 const handleMessages = {
   data: async ({ config, ...data }) => {
     setServerConfig(config)
-    await syncAssetsDB(data)
+    await syncAssetsDB(data, !get(conn).didFirstSync)
     updateConn({ didFirstSync: true })
   },
   "ack-log": ({ success, id }) => {

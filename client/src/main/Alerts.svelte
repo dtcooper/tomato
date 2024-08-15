@@ -21,7 +21,7 @@
           style:--pulse-color="var(--{level.substring(0, 2)})"
         >
           <div class="m-0 flex flex-1 items-center gap-2 p-2 md:p-3">
-            <div class="max-h-full flex-1 overflow-y-auto overflow-x-clip break-all md:text-lg">
+            <div class="max-h-full flex-1 overflow-y-auto overflow-x-clip break-words md:text-lg">
               {#if html}
                 {@html msg}
               {:else}

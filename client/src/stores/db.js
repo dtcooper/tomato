@@ -10,6 +10,7 @@ import { get, readonly, writable } from "svelte/store"
 
 import { colors } from "../../../server/constants.json"
 import { IS_DEV, prettyDatetimeShort, urlParams } from "../utils"
+import { alert } from "./alerts"
 import { log } from "./client-logs"
 import { config } from "./config"
 import { conn } from "./connection"
@@ -116,6 +117,8 @@ const processFileData = (file, url, filesize, md5sum, db, duration = undefined) 
   }
 }
 
+let hasAlertedSSLWarning = false
+
 class Asset extends AssetStopsetHydratableObject {
   constructor({ file, url, filesize, md5sum, ...data }, db) {
     super(data, db)
@@ -167,6 +170,13 @@ class Asset extends AssetStopsetHydratableObject {
           console.error(`Error cleaning up ${tmpPath}\n`, e)
         }
         console.error(`Error downloading asset ${this.name} @ ${url}\n`, e)
+        if (e.toString().toLowerCase().includes("self signed certificate") && !hasAlertedSSLWarning) {
+          alert(
+            `There was a self-signed SSL error while downloading from ${get(conn).prettyHost}. Are you sure the site's SSL certificate was set up properly?`,
+            "error"
+          )
+          hasAlertedSSLWarning = true
+        }
         return false
       }
     }
@@ -490,18 +500,26 @@ const runOnceAndQueueLastCall = (func) => {
       pendingCall = args
     } else {
       running = true
-      await func(...args)
+      try {
+        await func(...args)
+      } catch (e) {
+        console.error(e)
+      }
       running = false
       if (pendingCall) {
         const args = pendingCall
         pendingCall = null
-        await func(...args)
+        try {
+          await func(...args)
+        } catch (e) {
+          console.error(e)
+        }
       }
     }
   }
 }
 
-export const syncAssetsDB = runOnceAndQueueLastCall(async (jsonData) => {
+export const syncAssetsDB = runOnceAndQueueLastCall(async (jsonData, isFirstSync) => {
   const replacementDB = new DB(jsonData)
 
   const downloadedAssetsIds = new Set()
@@ -514,18 +532,30 @@ export const syncAssetsDB = runOnceAndQueueLastCall(async (jsonData) => {
       downloadedAssetsIds.add(asset.id)
     }
   }
-  syncProgress.set({ syncing: true, total, current: total, percent: 100, item: "Finalizaing..." })
+  syncProgress.set({
+    syncing: true,
+    total,
+    current: replacementDB.assets.length,
+    percent: 100,
+    item: "Finalizing..."
+  })
 
   console.log(`Sync'd ${downloadedAssetsIds.size} of ${total} assets successfully`)
   replacementDB.lastSync = dayjs()
 
   // filter down DB *and* jsonData (since that's what we put in localStorage)
-  for (let data of [jsonData, replacementDB]) {
+  for (const data of [jsonData, replacementDB, ...replacementDB.rotators.values()]) {
     data.assets = data.assets.filter((asset) => downloadedAssetsIds.has(asset.id))
   }
 
   window.localStorage.setItem("last-db-data", JSON.stringify(jsonData, null, ""))
   window._db = replacementDB // Swap out DB
+
+  if (!IS_DEV && isFirstSync) {
+    // Artificial wait for UI
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+  }
+
   dbStore.set(replacementDB)
   syncProgress.set(emptySyncProgress)
 })

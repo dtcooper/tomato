@@ -292,7 +292,7 @@ class PlayableAsset extends GeneratedStopsetAssetBase {
   }
 
   _errorHelper(e) {
-    console.error("audio error:", e, this.name)
+    console.error("audio error:", e, `${this.name} / ${this.file.localUrl}`)
     this.error = true
     if (!this.didLogError) {
       this.didLogError = true
