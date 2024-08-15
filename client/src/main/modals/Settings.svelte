@@ -10,7 +10,7 @@
   import whiteBalanceSunny from "@iconify/icons-mdi/white-balance-sunny"
   import themeLightDark from "@iconify/icons-mdi/theme-light-dark"
 
-  import { IS_DEV, lightTheme, darkTheme, isPackaged } from "../../utils"
+  import { IS_DEV, lightTheme, darkTheme } from "../../utils"
   import { db } from "../../stores/db"
   import { settings_descriptions } from "../../../../server/constants.json"
   import { logout, protocolVersion, conn } from "../../stores/connection"
