@@ -60,6 +60,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           container: nginx
           context: server/nginx
+          no-cache: true
           tag: ${{ github.ref_name }}
 
   deploy:
