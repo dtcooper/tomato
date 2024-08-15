@@ -21,8 +21,16 @@ jobs:
     name: Build container
     strategy:
       matrix:
-        tag: [dev, latest]
-        container: [server, nginx]
+        include:
+          -
+            container: server
+            tag: dev
+          -
+            container: server
+            tag: latest
+          -
+            container: nginx
+            tag: latest
     steps:
       -
         name: Checkout
@@ -51,7 +59,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           container: nginx
           context: server/nginx
-          tag: latest
+          tag: ${{ matrix.tag }}
 
 
   deploy:
