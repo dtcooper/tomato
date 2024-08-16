@@ -54,6 +54,7 @@ const runBuild = async () => {
     minify: !isDev,
     platform: "node",
     sourcemap: true,
+    legalComments: "none",
     define: {
       TOMATO_VERSION,
       TOMATO_EXTRA_BUILD_INFO,
