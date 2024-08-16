@@ -2,11 +2,12 @@
   import dayjs from "dayjs"
   import fullscreenExit from "@iconify/icons-mdi/fullscreen-exit"
   import fullscreenIcon from "@iconify/icons-mdi/fullscreen"
+  import lanDisconnect from "@iconify/icons-mdi/lan-disconnect"
 
   import { persisted } from "svelte-local-storage-store"
 
   import { isFullscreen, setFullscreen } from "./stores/config"
-  import { conn, login, protocolVersion } from "./stores/connection"
+  import { conn, login, protocolVersion, hasInternet } from "./stores/connection"
 
   import { tomatoIcon, isDev, urlParams, isPackaged } from "./utils"
 
@@ -87,7 +88,17 @@
       -->
       <div class="form-control">
         <div class="label">
-          <span class="label-text">Server address</span>
+          <span class="label-text flex items-center gap-2">
+            Server address
+            {#if !$hasInternet}
+              <div
+                class="tooltip tooltip-bottom tooltip-warning"
+                data-tip="You appear to be disconnected from the Internet. Your server may be unavailable."
+              >
+                <Icon icon={lanDisconnect} class="h-5 w-5 text-warning" />
+              </div>
+            {/if}
+          </span>
           {#if error.type === "host"}
             <span class="label-text-alt font-bold text-error">{error.message}</span>
           {/if}
