@@ -31,6 +31,9 @@
 
   const submit = async () => {
     clearError()
+    if (!isDev) {
+      showPassword = false
+    }
     if ($conn.connecting) {
       return
     }
