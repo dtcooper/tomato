@@ -1,7 +1,7 @@
 import { ipcRenderer } from "electron"
 import ReconnectingWebSocket from "reconnecting-websocket"
 import { persisted } from "svelte-local-storage-store"
-import { derived, get, writable } from "svelte/store"
+import { derived, get, readonly, writable } from "svelte/store"
 import { protocol_version } from "../../../server/constants.json"
 import { alert } from "./alerts"
 import { acknowledgeLog, log, sendPendingLogs } from "./client-logs"
@@ -22,6 +22,11 @@ const connEphemeral = writable({
 const reloading = writable(false) // Whether the whole app is in the reloading process
 let loggingOut = false
 export const protocolVersion = protocol_version
+
+const online = writable(navigator.onLine)
+window.addEventListener("offline", () => online.set(false))
+window.addEventListener("online", () => online.set(true))
+export const hasInternet = readonly(online)
 
 export const conn = derived(
   [connPersisted, connEphemeral, reloading],

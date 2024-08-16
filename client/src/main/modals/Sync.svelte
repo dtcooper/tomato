@@ -3,7 +3,7 @@
   import Modal from "../../components/Modal.svelte"
 
   import { db, syncProgress as progress } from "../../stores/db"
-  import { conn, logout } from "../../stores/connection"
+  import { conn, logout, hasInternet } from "../../stores/connection"
   import { prettyDatetime } from "../../utils"
 
   import autorenew from "@iconify/icons-mdi/autorenew"
@@ -50,18 +50,24 @@
         <ul class="w-full list-disc text-left">
           <li>
             <div class="break-words">
-              Connection: <span class="select-text font-mono">
+              Server: <span class="select-text font-mono">
                 {$conn.username} <span class="select-text font-bold text-info">@</span>
                 {$conn.prettyHost}
               </span>
             </div>
           </li>
-          <li>Last update processed: <span class="font-bold">{prettyDatetime($db.lastSync)}</span></li>
+          <li>
+            Internet connection is currently
+            <span class="font-bold {$hasInternet ? 'text-success' : 'text-error'}">
+              {$hasInternet ? "on" : "off"}line
+            </span>.
+          </li>
+          <li>Last update processed: <span class="font-bold">{prettyDatetime($db.lastSync)}</span>.</li>
           <li>
             Local DB contains
-            {$db.assets.length} asset{$db.assets.length !== 1 ? "s" : ""},
-            {$db.rotators.size} rotator{$db.rotators.size !== 1 ? "s" : ""}, and
-            {$db.stopsets.length} stop set{$db.stopsets.length !== 1 ? "s" : ""}.
+            <strong>{$db.assets.length} asset{$db.assets.length !== 1 ? "s" : ""}</strong>,
+            <strong>{$db.rotators.size} rotator{$db.rotators.size !== 1 ? "s" : ""}</strong>, and
+            <strong>{$db.stopsets.length} stop set{$db.stopsets.length !== 1 ? "s" : ""}</strong>.
           </li>
         </ul>
       </div>
