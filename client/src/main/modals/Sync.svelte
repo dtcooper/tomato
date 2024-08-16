@@ -29,7 +29,7 @@
   <svelte:fragment slot="content">
     {#if $progress.syncing}
       <span>
-        Downloading file <span class="font-mono">{$progress.current}</span>
+        {isFromLogin ? "Downloading" : "Synchronizing"} file <span class="font-mono">{$progress.current}</span>
         of <span class="font-mono">{$progress.total}</span>
       </span>
       <progress class="progress progress-primary w-full" value={$progress.percent} max="100" />
