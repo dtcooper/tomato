@@ -45,7 +45,8 @@
         You are currently disconnected from the server. Tomato is attempting to reconnect.
       </h2>
     {/if}
-    {#if $db.lastSync}
+
+    {#if $conn.didFirstSync}
       <div>
         <ul class="w-full list-disc text-left">
           <li>
@@ -59,10 +60,16 @@
           <li>
             Internet connection is currently
             <span class="font-bold {$hasInternet ? 'text-success' : 'text-error'}">
-              {$hasInternet ? "on" : "off"}line
-            </span>.
+              {$hasInternet ? "on" : "off"}line</span
+            >.
           </li>
-          <li>Last update processed: <span class="font-bold">{prettyDatetime($db.lastSync)}</span>.</li>
+          <li>
+            {#if $db.lastSync}
+              Last update processed: <strong>{prettyDatetime($db.lastSync)}</strong>
+            {:else}
+              <em>Tomato <strong class="text-error underline">has not updated</strong> since start up!</em>
+            {/if}
+          </li>
           <li>
             Local DB contains
             <strong>{$db.assets.length} asset{$db.assets.length !== 1 ? "s" : ""}</strong>,
