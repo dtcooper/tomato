@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Third-party
     "constance",
+    "django_admin_logs",
     "django_file_form",
     "huey.contrib.djhuey",
     "pgtrigger",
@@ -506,6 +507,9 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
     ),
 ))
 CONSTANCE_SERVER_ONLY_SETTINGS = set(CONSTANCE_CONFIG_FIELDSETS["Server & Processing Audio Options"])
+
+DJANGO_ADMIN_LOGS_ENABLED = True
+DJANGO_ADMIN_LOGS_DELETABLE = True
 
 SHELL_PLUS_IMPORTS = [
     "from constance import config",

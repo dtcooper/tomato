@@ -153,6 +153,23 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
+name = "django-admin-logs"
+version = "1.3.0"
+description = "View, delete or disable Django admin log entries."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "django_admin_logs-1.3.0-py3-none-any.whl", hash = "sha256:e9619f185beb09397223bf973f6574db29da50c3066cc25f800f04d58af4c595"},
+    {file = "django_admin_logs-1.3.0.tar.gz", hash = "sha256:57cd55f2dcc04592729b2778c03b86ba94cc64f5c2e286993114ca16464ff7e9"},
+]
+
+[package.dependencies]
+Django = ">=4.2"
+
+[package.extras]
+dev = ["Django", "black", "build", "coverage", "pre-commit", "pytest", "pytest-cov", "pytest-django", "ruff", "tox", "twine"]
+
+[[package]]
 name = "django-admin-notice"
 version = "3.1.0"
 description = "Show a floating notice banner above the Django admon interface"
@@ -1261,4 +1278,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "814594365bbd3aad27d7e8017565146dffeaac74fbac85469676d0d60c68e2ff"
+content-hash = "f51a90ae167f3d9daa8cd10637c1ad8ae1d93701b13befa271293c87773fe4f5"

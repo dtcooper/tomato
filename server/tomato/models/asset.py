@@ -258,6 +258,7 @@ class AssetAlternate(AssetBase):
         db_table = "asset_alternates"
         ordering = ("id",)
         verbose_name = "audio asset alternate"
+        verbose_name_plural = "asset alternates"
 
 
 for model_class in (Asset, AssetAlternate):

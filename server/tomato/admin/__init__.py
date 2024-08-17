@@ -19,6 +19,7 @@ from .asset import AssetAdmin, AssetAlternateAdmin
 from .client_log_entry import ClientLogEntryAdmin
 from .config import ConfigAdmin
 from .rotator import RotatorAdmin
+from .server_log_entry import ServerLogEntry, ServerLogEntryAdmin
 from .stopset import StopsetAdmin
 from .user import UserAdmin
 from .views import extra_views
@@ -112,5 +113,6 @@ admin_site.register(AssetAlternate, AssetAlternateAdmin)
 admin_site.register(ClientLogEntry, ClientLogEntryAdmin)
 admin_site.register([Config], ConfigAdmin)
 admin_site.register(Rotator, RotatorAdmin)
+admin_site.register(ServerLogEntry, ServerLogEntryAdmin)
 admin_site.register(Stopset, StopsetAdmin)
 admin_site.register(User, UserAdmin)
