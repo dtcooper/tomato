@@ -211,13 +211,18 @@ class ButtonBase:
     def __init__(self, pin, *, trigger_pin):
         self._keys = keypad.Keys((pin,), value_when_pressed=False, pull=True)
         self._event = keypad.Event()
-        self._builtin_led = digitalio.DigitalInOut(trigger_pin)
-        self._builtin_led.direction = digitalio.Direction.OUTPUT
+        if trigger_pin:
+            self._builtin_led = digitalio.DigitalInOut(trigger_pin)
+            self._builtin_led.direction = digitalio.Direction.OUTPUT
+        else:
+            self._builtin_led = None
         self.is_pressed = False
 
     def update(self):
         if self._keys.events.get_into(self._event):
-            self.is_pressed = self._builtin_led.value = self._event.pressed
+            self.is_pressed = self._event.pressed
+            if self._builtin_led:
+                self._builtin_led.value = self.is_pressed
             self.on_press(pressed=self.is_pressed)
 
     def on_press(self, pressed):

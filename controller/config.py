@@ -11,7 +11,7 @@ DEFAULT_SETTINGS_TOML = """\
 ### Pins ###
 button = "GP17"  # Pin number for button
 led = "GP16"  # Pin number for LED
-button_trigger_led = "LED"  # Pin number for button trigger LED (turned on when button is down)
+button_trigger_led = "LED"  # Pin number for button trigger LED (turned on when button is down) - false disables
 
 
 ### Debugging ###
@@ -53,7 +53,7 @@ class Config:
     button_pin: microcontroller.Pin
     led: str
     led_pin: microcontroller.Pin
-    button_trigger_led: str
+    button_trigger_led: str | bool
     button_trigger_led_pin: microcontroller.Pin
     debug: bool
     debug_messages_over_midi: bool
@@ -114,8 +114,13 @@ class Config:
                 if value:
                     self._config[override] = True
 
+        pin_attrs = list(self.PIN_ATTRS)
+        if not self.button_trigger_led:
+            pin_attrs.remove("button_trigger_led")
+            self._config["button_trigger_led"] = self._config["button_trigger_led_pin"] = None
+
         try:
-            self._config.update({f"{pin}_pin": getattr(board, getattr(self, pin)) for pin in self.PIN_ATTRS})
+            self._config.update({f"{pin}_pin": getattr(board, getattr(self, pin)) for pin in pin_attrs})
         except Exception:
             print("Error setting pin value!")
             raise
