@@ -176,11 +176,15 @@ class Asset(EnabledBeginEndWeightMixin, AssetBase):
     def __str__(self):
         return f"{self.name}{' (archived)' if self.archived else ''}"
 
-    def save(self, *args, **kwargs):
+    def save(self, dont_overwrite_original_filename=False, *args, **kwargs):
+        # XXX copied from above (AssetBase) to fix bug for event 2024. TODO: refactor and think of a better
+        # way to do this.
+        if not dont_overwrite_original_filename and "file" in self.get_dirty_fields():
+            self.original_filename = Path(self.file.name).with_suffix("").name
         self.name = (
             self.name[:NAME_MAX_LENGTH].strip() or self.original_filename[:NAME_MAX_LENGTH].strip() or "Untitled"
         )
-        super().save(*args, **kwargs)
+        super().save(dont_overwrite_original_filename=dont_overwrite_original_filename, *args, **kwargs)
 
     def is_eligible_to_air(self, now=None, with_reason=False):
         if self.status != self.Status.READY:
