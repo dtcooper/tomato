@@ -22,6 +22,7 @@ server {
     ssl_dhparam /etc/letsencrypt/dhparams/dhparam.pem;
 
     client_max_body_size 25M;
+    client_body_buffer_size 1M;
 
     {% if DEBUG|int %}
         # Static files disabled by when DEBUG is true
