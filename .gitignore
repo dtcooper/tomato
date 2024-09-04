@@ -11,9 +11,6 @@
 /client/dist/
 /client/node_modules/
 /client/out/
-/client/scripts/arch/*.pkg.tar.zst
-/client/scripts/arch/pkg/
-/client/scripts/arch/src/
 
 # server
 __pycache__/
