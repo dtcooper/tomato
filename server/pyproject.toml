@@ -11,18 +11,18 @@ python = "^3.11"
 django = "<5.1"
 django-admin-logs = "^1.3.0"
 django-admin-notice = "^3.1.0"
-django-constance = "^3.1.0"
+django-constance = "^4.1.0"
 django-dirtyfields = "^1.9.3"
 django-environ = "^0.11.2"
 django-file-form = "^3.8.0"
-django-pgtrigger = "^4.11.1"
+django-pgtrigger = "^4.12.0"
 django-user-messages = "^1.0.0"
 gunicorn = "^23.0.0"
 huey = "^2.5.1"
 psycopg = "^3.2.1"
 python-dotenv = "^1.0.1"
 schema = "^0.7.7"
-starlette = "^0.38.2"
+starlette = "^0.38.4"
 uvicorn = {extras = ["standard"], version = "^0.30.6"}
 wait-for-it = "^2.2.2"
 
@@ -32,10 +32,10 @@ django-debug-toolbar = "^4.4.6"
 django-extensions = "^3.2.3"
 flake8 = "^7.1.1"
 ipdb = "^0.13.13"
-ipython = "^8.26.0"
+ipython = "^8.27.0"
 isort = "^5.13.2"
 pywatchman = "^2.0.0"
-watchdog = {extras = ["watchmedo"], version = "^4.0.1"}
+watchdog = {extras = ["watchmedo"], version = "^5.0.2"}
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

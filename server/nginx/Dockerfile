@@ -1,4 +1,4 @@
-FROM jonasal/nginx-certbot:5.3-alpine
+FROM jonasal/nginx-certbot:5.4-alpine
 
 ARG PIP_BREAK_SYSTEM_PACKAGES=1
 ARG JINJANATOR_VERSION=24.3.0
