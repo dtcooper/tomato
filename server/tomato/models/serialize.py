@@ -7,6 +7,7 @@ from django.conf import settings
 from django.db.models import Prefetch
 
 from constance import config as constance_config
+from constance.codecs import loads as constance_loads
 from constance.models import Constance
 
 from .asset import Asset, AssetAlternate
@@ -23,7 +24,7 @@ async def get_config_async(key):
     except Constance.DoesNotExist:
         return settings.CONSTANCE_CONFIG[key][0]  # Default value
     else:
-        return obj.value
+        return constance_loads(obj.value)
 
 
 async def get_constance_config_for_api():

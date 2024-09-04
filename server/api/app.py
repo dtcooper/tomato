@@ -18,6 +18,8 @@ from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 django.setup()
 
+from tomato.utils import django_json_dumps
+
 from .base import SERVER_STATUS
 from .connections import admins, users
 from .schemas import greeting_schema
