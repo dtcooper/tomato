@@ -2,11 +2,11 @@ import digitalio
 import io
 import keypad
 import msgpack
-import pwmio
 import supervisor
 import time
 import usb_midi
 
+from jled import JLed
 import winterbloom_smolmidi as smolmidi
 
 from config import Config
@@ -17,48 +17,49 @@ import constants as c
 
 
 class PulsatingLED:
-    def __init__(self, pin, *, min_duty_cycle=0x1000, max_duty_cycle=0xFFFF, frequency=60, debug=print):
-        self._min_duty = max(min(min_duty_cycle, 0xFFFF), 0x0000)
-        self._max_duty = max(min(max_duty_cycle, 0xFFFF), 0x0000)
-        self._duty_delta = self._max_duty - self._min_duty
-        self._pwm = pwmio.PWMOut(pin, frequency=frequency)
-        self._period = self._pulsate_started = 0.0
-        self._flash_while_pulsating = False
+    def __init__(
+        self,
+        pin,
+        *,
+        min_brightness,
+        max_brightness,
+        flash_period,
+        pulsate_period_slow,
+        pulsate_period_fast,
+        debug=print,
+    ):
+        self._led = JLed(pin)
+        self._led.reset().off()
+        self._min = max(min(min_brightness, 255), 0)
+        self._max = max(min(max_brightness, 255), 0)
+        self._flash_period = flash_period
+        self._pulsate_period_slow = pulsate_period_slow
+        self._pulsate_period_fast = pulsate_period_fast
         self._debug = debug
+        self._num = 0
         self.state = "off"
 
-    def solid(self, on=True):
-        self._period = 0
-        self._flash_while_pulsating = False
-        self._pwm.duty_cycle = 0xFFFF if on else 0x0000
-        self.state = "on" if on else "off"
-        self._debug(f"Turned LED {self.state}")
-
-    def pulsate(self, period, *, flash=False):
-        self._flash_while_pulsating = flash
-        self._period = period
-        self._pulsate_started = time.monotonic()
-        self.state = f"{'flash' if flash else 'pulsate'}/period={period:.2f}s"
-        log_line = f"Set LED to {self.state}"
-        if not flash:
-            log_line = f"{log_line} (duty cycle: 0x{self._min_duty:04x} <> 0x{self._max_duty:04X})"
-        self._debug(log_line)
+    def set(self, num):
+        if c.LED_RANGE_MIN <= num <= c.LED_RANGE_MAX and num != self._num:
+            self._led.reset()
+            if num == c.LED_OFF:
+                self._led.off()
+                self.state = "off"
+            elif num == c.LED_ON:
+                self._led.on()
+                self.state = "on"
+            elif num == c.LED_FLASH:
+                self._led.blink(self._flash_period, self._flash_period).forever()
+                self.state = f"flash/period={self._flash_period / 1000:.3f}s"
+            elif num in (c.LED_PULSATE_SLOW, c.LED_PULSATE_FAST):
+                period = self._pulsate_period_slow if num == c.LED_PULSATE_SLOW else self._pulsate_period_fast
+                self._led.min_brightness(self._min).max_brightness(self._max).breathe(period).forever()
+                self.state = f"pulsate/period={period / 1000:.3f}s [{self._min}<>{self._max}]"
+            self._debug(f"Set LED state to: {self.state}")
+            self._num = num
 
     def update(self):
-        if self._period > 0:
-            current_time = time.monotonic()
-            elapsed = (current_time - self._pulsate_started) % self._period
-            half_period = self._period / 2
-            fading_out = elapsed < half_period
-
-            if self._flash_while_pulsating:
-                duty = 0xFFFF if fading_out else 0x0000
-            else:
-                if fading_out:
-                    duty = 0xFFFF - int(self._min_duty + self._duty_delta * (elapsed / half_period))
-                else:
-                    duty = 0xFFFF - int(self._max_duty - self._duty_delta * ((elapsed - half_period) / half_period))
-            self._pwm.duty_cycle = duty
+        self._led.update()
 
 
 class MIDISystemBase:

@@ -14,14 +14,15 @@ Here's the button box firmware for a Raspberry Pi Pico flashed with CircuitPytho
    [CircuitPython Libraries](https://circuitpython.org/libraries),
 
     1. [`circuitpython_toml`](https://github.com/elpekenin/circuitpython_toml/)
-    2. [`winterbloom_smolmidi`](https://github.com/wntrblm/Winterbloom_SmolMIDI/)
+    2. [`jled-circuitpython`](https://github.com/jandelgado/jled-circuitpython)
+    3. [`winterbloom_smolmidi`](https://github.com/wntrblm/Winterbloom_SmolMIDI/)
        (optionally compile with
        [`mpy-cross`](https://adafruit-circuit-python.s3.amazonaws.com/index.html?prefix=bin/mpy-cross/))
 
-    You can install the first dependency (not `winterbloom_smolmidi`) using the
-    [`circup`](https://github.com/adafruit/circup) tool,
+    You can install the first and second dependencies (not `winterbloom_smolmidi`)
+    using the [`circup`](https://github.com/adafruit/circup) tool,
     ```
-    circup install toml
+    circup install jled toml
     ```
 
 3. Copy all python (`*.py`) files in this folder on to your device.

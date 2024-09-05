@@ -34,14 +34,13 @@ autoreload = true
 flash_on_usb_disconnect = true
 
 # These defaults should be okay
-pwm_min_duty_cycle = 0x0000
-pwm_max_duty_cycle = 0xFFFF
-pwm_frequency = 350
+pulsate_min_brightness = 0  # Between 0 and 255
+pulsate_max_brightness = 255  # Between 0 and 255
 
-# In seconds
-flash_period = 1.0
-pulsate_period_slow = 2.25
-pulsate_period_fast = 0.6
+# In milliseconds
+flash_period = 1000
+pulsate_period_slow = 2250
+pulsate_period_fast = 600
 """
 
 
@@ -60,13 +59,11 @@ class Config:
     serial: bool
     autoreload: bool
     flash_on_usb_disconnect: bool
-    pwm_min_duty_cycle: int
-    pwm_max_duty_cycle: int
-    pwm_frequency: int
-    flash_period: float
-    pulsate_period_slow: float
-
-    pulsate_period_fast: float
+    pulsate_min_brightness: int
+    pulsate_max_brightness: int
+    flash_period: int
+    pulsate_period_slow: int
+    pulsate_period_fast: int
 
     def __init__(self, *, from_boot=False):
         is_first_boot = False
