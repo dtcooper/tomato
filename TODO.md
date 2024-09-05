@@ -92,3 +92,4 @@ Changes for 2024 based on real world usage in 2023 and feedback
 
 - [ ] A `NO_REPEAT_ASSETS_TIME` override
 - [ ] De-dupe multiple uploads better (ie tasks) for the purposes of refreshing
+- [ ] Fades in controller get choppy after a certain amount of time, likely due to `time.monotonic()`
