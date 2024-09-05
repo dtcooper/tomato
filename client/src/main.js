@@ -1,4 +1,4 @@
-const { app, BrowserWindow, powerSaveBlocker, shell, ipcMain, dialog, Menu } = require("electron")
+const { app, BrowserWindow, powerSaveBlocker, shell, ipcMain, dialog, Menu, systemPreferences } = require("electron")
 const dayjs = require("dayjs")
 const dayjsUtc = require("dayjs/plugin/utc")
 const windowStateKeeper = require("electron-window-state")
@@ -160,6 +160,11 @@ if (squirrelCheck || !singleInstanceLock) {
       defaultWidth: Math.min(minWidth, Math.max(screenWidth, defaultWidth)),
       defaultHeight: Math.min(minHeight, Math.max(screenHeight, defaultHeight))
     })
+
+    if (IS_MAC) {
+      // Always show scrollbars on macos
+      systemPreferences.setUserDefault("AppleShowScrollBars", "string", "Always")
+    }
 
     const win = new BrowserWindow({
       x: mainWindowState.x,
