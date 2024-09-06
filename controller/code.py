@@ -140,4 +140,6 @@ except Exception as e:
         time.sleep(1)
 
     midi.send_obj("error", "Reloading...")
+
+finally:
     supervisor.reload()
