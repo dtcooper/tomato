@@ -185,13 +185,13 @@ django = ">=4.2"
 
 [[package]]
 name = "django-constance"
-version = "4.1.0"
+version = "4.1.1"
 description = "Django live settings with pluggable backends, including Redis."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "django_constance-4.1.0-py3-none-any.whl", hash = "sha256:9ad67d688cb2126018b326400b4e6ec95b6da9325a27eb721cebcbcd45b48a31"},
-    {file = "django_constance-4.1.0.tar.gz", hash = "sha256:7ef1b3ff59cae78cba7900822c1eff00fcbaeae5a9250ac5b8219450fbb6ca37"},
+    {file = "django_constance-4.1.1-py3-none-any.whl", hash = "sha256:ff92bade3d059885aa2fe36c3e8ec4f60d8dee5d1a76b763b24e725a562bfa09"},
+    {file = "django_constance-4.1.1.tar.gz", hash = "sha256:068d8e2c8f647264aa4093f721a6ee5df7fde2c96fff2dd6272b5a38f939307e"},
 ]
 
 [package.extras]
@@ -1263,4 +1263,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "3ef8068c6696247913a7474524b3a628c6432d576548b624302a0ccb25525cc5"
+content-hash = "6adcadf466770f9d89cdef842c1d651fd49b48aa7b6dee254258cf24ddec4a7b"
