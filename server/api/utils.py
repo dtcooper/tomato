@@ -3,13 +3,22 @@ from functools import wraps
 import logging
 import random
 
+from asgiref.sync import sync_to_async
+
 from django.conf import settings
 
 from uvicorn.logging import ColourizedFormatter
 
+from constance import config
+
 
 # Various base classes
 logger = logging.getLogger(__name__)
+
+
+@sync_to_async
+def get_config_async(key):
+    return getattr(config, key)
 
 
 class TomatoAuthError(Exception):

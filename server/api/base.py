@@ -13,10 +13,10 @@ from django.utils.crypto import constant_time_compare
 from starlette.websockets import WebSocket
 
 from tomato.constants import PROTOCOL_VERSION
-from tomato.models import User, get_config_async
+from tomato.models import User
 from tomato.utils import django_json_dumps
 
-from .utils import TomatoAuthError
+from .utils import TomatoAuthError, get_config_async
 
 
 logger = logging.getLogger(__name__)

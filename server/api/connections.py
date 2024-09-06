@@ -1,11 +1,11 @@
 import logging
 
 from tomato.constants import CLIENT_LOG_ENTRY_TYPES
-from tomato.models import ClientLogEntry, get_config_async, serialize_for_api
+from tomato.models import ClientLogEntry, serialize_for_api
 
 from .base import Connection, ConnectionsBase
 from .schemas import AdminMessageTypes, OutgoingAdminMessageTypes, OutgoingUserMessageTypes, UserMessageTypes
-from .utils import retry_on_failure
+from .utils import get_config_async, retry_on_failure
 
 
 logger = logging.getLogger(__name__)

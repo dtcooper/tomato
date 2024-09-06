@@ -1,14 +1,12 @@
 import decimal
 import logging
 
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
 
 from django.conf import settings
 from django.db.models import Prefetch
 
-from constance import config as constance_config
-from constance.codecs import loads as constance_loads
-from constance.models import Constance
+from constance import config
 
 from .asset import Asset, AssetAlternate
 from .rotator import Rotator
@@ -18,26 +16,16 @@ from .stopset import Stopset
 logger = logging.getLogger(__name__)
 
 
-async def get_config_async(key):
-    try:
-        obj = await Constance.objects.aget(key=key)
-    except Constance.DoesNotExist:
-        return settings.CONSTANCE_CONFIG[key][0]  # Default value
-    else:
-        return constance_loads(obj.value)
-
-
 async def get_constance_config_for_api():
-    config = {
-        key: await get_config_async(key)
-        for key in dir(constance_config)
-        if key not in settings.CONSTANCE_SERVER_ONLY_SETTINGS
-    }
+    # Get constance config values asynchronously
+    all_config = await sync_to_async(
+        lambda: {k: getattr(config, k) for k in dir(config) if k not in settings.CONSTANCE_SERVER_ONLY_SETTINGS}
+    )()
 
     reset_times = []
     try:
-        if config["UI_MODE_RESET_TIMES"].strip() != "0":
-            for reset_time in config["UI_MODE_RESET_TIMES"].strip().split("\n"):
+        if all_config["UI_MODE_RESET_TIMES"].strip() != "0":
+            for reset_time in all_config["UI_MODE_RESET_TIMES"].strip().split("\n"):
                 reset_time = reset_time.strip()
                 if reset_time:
                     hour, minute = reset_time.split(":")
@@ -45,13 +33,13 @@ async def get_constance_config_for_api():
     except Exception:
         logger.exception("Error parsing UI_MODE_RESET_TIMES. Sending empty list.")
 
-    config.update({
-        "UI_MODES": list(map(int, config["UI_MODES"])),
+    all_config.update({
+        "UI_MODES": list(map(int, all_config["UI_MODES"])),
         "UI_MODE_RESET_TIMES": reset_times,
-        "CLOCK": config["CLOCK"] or False,
+        "CLOCK": all_config["CLOCK"] or False,
     })
-    config["_numeric"] = [key for key, value in config.items() if isinstance(value, decimal.Decimal)]
-    return config
+    all_config["_numeric"] = [key for key, value in all_config.items() if isinstance(value, decimal.Decimal)]
+    return all_config
 
 
 async def serialize_for_api(*, skip_config=False, include_archived=False):
