@@ -222,7 +222,7 @@ const filterItemsByActive = (obj, dt = null) => {
 class Rotator extends HydratableObject {
   constructor({ color, ...data }, db) {
     super(data, db)
-    // Ensure's their sorted for evenly_cycle (backend will sort the, but just for sanity)
+    // Ensure's they're sorted for evenly_cycle (backend will sort them, but just for sanity)
     this.assets = db.assets.filter((a) => a._rotators.includes(this.id)).sort((a, b) => a.id - b.id)
     this.color = colors.find((c) => c.name === color)
   }
