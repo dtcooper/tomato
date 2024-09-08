@@ -91,6 +91,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
 ## 2024 Feedback
 
 - [ ] A `NO_REPEAT_ASSETS_TIME` override
-- [ ] De-dupe multiple uploads better (ie tasks) for the purposes of refreshing
+- [ ] De-dupe multiple uploads better (ie tasks) for the purposes of client reloading
+      via `RELOAD_PLAYLIST_AFTER_DATA_CHANGES` (batches cause many reloads)
 - [x] Fades in controller get choppy after a certain amount of time, likely due to `time.monotonic()`
 - [x] Always show scrollbars on macOS
