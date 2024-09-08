@@ -146,7 +146,9 @@
                         <span class="badge badge-warning border-secondary-content font-medium">Swapped</span>
                       {/if}
                       {#if asset.hasEndDateMultiplier}
-                        <span class="badge badge-success border-secondary-content font-medium italic">Ends today!</span>
+                        <span class="badge badge-success border-secondary-content font-medium italic tracking-tight">
+                          Ends in 24 hours!
+                        </span>
                       {/if}
                     </div>
                     <div class="truncate text-xl">
