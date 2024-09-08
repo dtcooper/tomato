@@ -98,8 +98,3 @@ Use the files contained in the `test/` directory to test. (This is known to work
 
 1. [Google Labs web serial tester](https://googlechromelabs.github.io/serial-terminal/)
 2. [WebMIDI tester](https://studiocode.dev/webmidi-tester/)
-
-
-## TODO
-
-* Localize test.html dependencies
