@@ -1,5 +1,7 @@
 import supervisor
 
+done_imports = False
+
 try:
     import gc
     import microcontroller
@@ -10,6 +12,8 @@ try:
     from config import Config
     import constants as c
     from utils import ButtonBase, MIDISystemBase, PulsatingLED, USBConnectedBase
+
+    done_imports = True
 
     config = Config()
     BOOT_TIME = time.monotonic()
@@ -133,14 +137,18 @@ try:
 except Exception as e:
     import traceback
 
-    for secs in range(5, 0, -1):
-        exc = f"An unexpected error occurred. Reloading in {secs}s...\n{'\n'.join(traceback.format_exception(e))}"
-        debug(exc)
-        midi.send_obj("exception", exc)
-        midi.flush()
-        time.sleep(1)
+    if done_imports:
+        for secs in range(5, 0, -1):
+            exc = f"An unexpected error occurred. Reloading in {secs}s...\n{'\n'.join(traceback.format_exception(e))}"
+            debug(exc)
+            midi.send_obj("exception", exc)
+            midi.flush()
+            time.sleep(1)
 
-    midi.send_obj("error", "Reloading...")
+        midi.send_obj("error", "Reloading...")
+    else:
+        print(f"An early error occurred.\n{'\n'.join(traceback.format_exception(e))}")
+        time.sleep(5)
 
 finally:
     supervisor.reload()

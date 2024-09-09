@@ -14,6 +14,8 @@ import constants as c
 
 
 # Utilities for code.py (not boot.py)
+MIN_BRIGHTNESS = 0
+MAX_BRIGHTNESS = 255
 
 
 class PulsatingLED:
@@ -30,8 +32,8 @@ class PulsatingLED:
     ):
         self._led = JLed(pin)
         self._led.reset().off()
-        self._min = max(min(min_brightness, 255), 0)
-        self._max = max(min(max_brightness, 255), 0)
+        self._min = max(min(min_brightness, MAX_BRIGHTNESS), MIN_BRIGHTNESS)
+        self._max = max(min(max_brightness, MAX_BRIGHTNESS), MIN_BRIGHTNESS)
         self._flash_period = flash_period
         self._pulsate_period_slow = pulsate_period_slow
         self._pulsate_period_fast = pulsate_period_fast
@@ -41,7 +43,7 @@ class PulsatingLED:
 
     def set(self, num):
         if c.LED_RANGE_MIN <= num <= c.LED_RANGE_MAX and num != self._num:
-            self._led.min_brightness(0).max_brightness(255).reset()
+            self._led.min_brightness(MIN_BRIGHTNESS).max_brightness(MAX_BRIGHTNESS).reset()
             if num == c.LED_OFF:
                 self._led.off()
                 self.state = "off"
