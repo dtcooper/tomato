@@ -26,6 +26,10 @@
       const MIDI_BTN_CTRL = 0x10
       const MIDI_LED_CTRL = 0x11
       const BTN_PRESSED = 0x7f
+      const MIDI_THROUGH_PORT_LINUX = "midi through port"
+
+      const portUsable = (port) => !port.name.toLowerCase().includes(MIDI_THROUGH_PORT_LINUX)
+      const filterPorts = (ports) => ports.filter((p) => portUsable(p))
 
       const sysexMsgPack7bitDecode = (msg) => {
         // Decode most significant bit of following 7 bytes first as 0b07654321 0b01111111 0b02222222 ... 0b07777777
@@ -59,36 +63,36 @@
               window.midi = midi = await WebMidi.enable({ sysex: true })
               midi.addListener("connected", (event) => {
                 const port = event.port
-                if (port instanceof Input) {
+                if (port instanceof Input && portUsable(port)) {
                   this.registerInput(port)
                 }
               })
-              midi.inputs.forEach((input) => this.registerInput(input))
+              filterPorts(midi.inputs).forEach((input) => this.registerInput(input))
               this.connected = true
               this.log("Connected!")
               window.tester = this
             },
             led(num, description) {
               this.log(`Setting LED to ${num} (${description})`)
-              midi.outputs.forEach((output) => {
+              filterPorts(midi.outputs).forEach((output) => {
                 output.channels[1].sendControlChange(MIDI_LED_CTRL, num)
               })
             },
             invalidMidiMsg() {
-              midi.outputs.forEach((output) => {
+              filterPorts(midi.outputs).forEach((output) => {
                 output.channels[1].sendNoteOn("A4")
               })
             },
             sysex(data, firstByte = SYSEX_NON_COMMERCIAL, prefix = SYSEX_PREFIX) {
               this.log(`Sending sysex: ${data}`)
               const message = Array.from(prefix + data).map((letter) => letter.charCodeAt(0))
-              midi.outputs.forEach((output) => {
+              filterPorts(midi.outputs).forEach((output) => {
                 output.sendSysex(firstByte, message)
               })
             },
             restart() {
               this.log("Sending restart (reset) byte")
-              midi.outputs.forEach((output) => {
+              filterPorts(midi.outputs).forEach((output) => {
                 output.sendReset()
               })
             },
