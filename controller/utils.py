@@ -41,7 +41,7 @@ class PulsatingLED:
 
     def set(self, num):
         if c.LED_RANGE_MIN <= num <= c.LED_RANGE_MAX and num != self._num:
-            self._led.reset()
+            self._led.min_brightness(0).max_brightness(255).reset()
             if num == c.LED_OFF:
                 self._led.off()
                 self.state = "off"
