@@ -1,7 +1,8 @@
+import supervisor
+
 try:
     import gc
     import microcontroller
-    import supervisor
     import time
 
     import winterbloom_smolmidi as smolmidi
