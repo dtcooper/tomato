@@ -14,14 +14,15 @@
     .progress-container {
       position: fixed;
       z-index: 9999;
-      height: 7px;
+      height: 10px;
       width: 100vw;
       top: 0;
       background-color: #fff;
       border-bottom: 1px #000 solid;
+      cursor: pointer;
     }
     .progress {
-      height: 7px;
+      height: 10px;
       background-color: #000;
     }
     .progress-hidden {
@@ -32,6 +33,13 @@
     document.addEventListener('DOMContentLoaded', () => {
       const progress = document.createElement('div')
       progress.classList.add('progress-container', 'progress-hidden')
+      progress.onclick = (event) => {
+        // Is playing
+        if (audio.currentTime > 0 && !audio.paused && !audio.ended && audio.readyState > 2) {
+          const seek = (event.clientX - progress.offsetLeft) / progress.offsetWidth
+          audio.currentTime = audio.duration * seek
+        }
+      }
       const progressBar = document.createElement('div')
       progressBar.classList.add('progress')
       progress.append(progressBar)
