@@ -11,6 +11,21 @@
       text-decoration: none;
       color: var(--link-fg);
     }
+
+    .progress-time {
+      display: inline-block;
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      z-index: 9999;
+      background-color: #000;
+      color: #fff;
+      padding: 4px 8px;
+      border-top-left-radius: 8px;
+      font-family: var(--font-family-monospace);
+      font-weight: bold;
+    }
+
     .progress-container {
       position: fixed;
       z-index: 9999;
@@ -30,7 +45,21 @@
     }
   </style>
   <script>
+    const prettyDuration = (duration) => {
+      const h = Math.floor(duration / 3600)
+      const m = Math.floor((duration % 3600) / 60)
+      const s = Math.round(duration % 60)
+
+      const part = (h > 0 ? [m, s] : [s]).join(':').replace(/\b(\d)\b/g, "0$1")
+      return `${h > 0 ? h : m}:${part}`
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+      const progressTime = document.createElement('div')
+      progressTime.classList.add('progress-time', 'progress-hidden')
+      progressTime.textContent = '0:00 / 0:00'
+      document.body.prepend(progressTime)
+
       const progress = document.createElement('div')
       progress.classList.add('progress-container', 'progress-hidden')
       progress.onclick = (event) => {
@@ -43,22 +72,38 @@
       const progressBar = document.createElement('div')
       progressBar.classList.add('progress')
       progress.append(progressBar)
-      document.querySelector('body').prepend(progress)
+      document.body.prepend(progress)
 
       const playIcon = '\u25B6\uFE0F'
       const stopIcon = '\u23F9\uFE0F'
 
       let last = null
+      let currentTime = '0:00'
+      let duration = '0:00'
+
       const audio = new Audio()
+
       audio.onerror = audio.onended = audio.onpause = () => {
         progress.classList.add('progress-hidden')
+        progressTime.classList.add('progress-hidden')
+        duration = currentTime = '0:00'
+        progressTime.textContent = '0:00 / 0:00'
         if (last) {
           last.textContent = playIcon
         }
       }
+
       audio.ontimeupdate = () => {
-        progressBar.style.width = `${audio.currentTime / audio.duration * 100}%`
+        currentTime = audio.currentTime
+        progressBar.style.width = `${currentTime / audio.duration * 100}%`
+        progressTime.textContent = `${prettyDuration(currentTime)} / ${prettyDuration(duration)}`
       }
+
+      audio.ondurationchange = () => {
+        duration = audio.duration
+        progressTime.textContent = `${prettyDuration(currentTime)} / ${prettyDuration(duration)}`
+      }
+
       Array.from(document.querySelectorAll('.play-asset-list-display')).forEach(play => {
         play.addEventListener('click', event => {
           event.preventDefault()
@@ -76,6 +121,7 @@
             audio.play()
             progressBar.style.width = '0'
             progress.classList.remove('progress-hidden')
+            progressTime.classList.remove('progress-hidden')
             play.textContent = stopIcon
           }
         })
