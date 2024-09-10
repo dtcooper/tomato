@@ -140,6 +140,8 @@ class AssetBase(DirtyFieldsMixin, TomatoModelBase):
 
 
 class Asset(EnabledBeginEndWeightMixin, AssetBase):
+    objects = AssetEligibleToAirQuerySet.as_manager()
+
     name = models.CharField(
         "name",
         max_length=NAME_MAX_LENGTH,
