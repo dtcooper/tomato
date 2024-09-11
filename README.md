@@ -13,6 +13,7 @@
 </p>
 
 [![Client build status](https://img.shields.io/github/actions/workflow/status/dtcooper/tomato/build-client.yml?branch=main&label=client%20build)](https://github.com/dtcooper/tomato/actions/workflows/build-client.yml) [![Server build &amp deploy status](https://img.shields.io/github/actions/workflow/status/dtcooper/tomato/build-deploy-on-push.yml?branch=main&label=server%20build)](https://github.com/dtcooper/tomato/actions/workflows/build-deploy-on-push.yml)
+
 [![Latest release](https://img.shields.io/github/v/tag/dtcooper/tomato?filter=!preview-build&label=release)](https://github.com/dtcooper/tomato/releases/latest) [![MIT License](https://img.shields.io/github/license/dtcooper/tomato)](https://github.com/dtcooper/tomato/blob/main/LICENSE) [![GitHub stars](https://img.shields.io/github/stars/dtcooper/tomato?style=flat)](https://github.com/dtcooper/tomato/stargazers) [![Latest commit](https://img.shields.io/github/last-commit/dtcooper/tomato)](https://github.com/dtcooper/tomato/commits/)
 
 Client and server for Tomato Radio Automation software. Tomato is easy to use,
