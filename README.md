@@ -12,27 +12,8 @@
   <a href="https://github.com/dtcooper/tomato/blob/main/controller/">Controller</a>
 </p>
 
-<p align="center">
-  <a href="https://github.com/dtcooper/tomato/releases/latest">
-    <img alt="Latest release" src="https://img.shields.io/github/v/tag/dtcooper/tomato?filter=!preview-build&label=release">
-  </a>
-  <a href="https://github.com/dtcooper/tomato/blob/main/LICENSE">
-    <img alt="MIT License" src="https://img.shields.io/github/license/dtcooper/tomato">
-  </a>
-  <a href="https://github.com/dtcooper/tomato/stargazers">
-    <img alt="GitHub stars" src="https://img.shields.io/github/stars/dtcooper/tomato?style=flat">
-  </a>
-
-  <br>
-
-  <a href="https://github.com/dtcooper/tomato/actions/workflows/build-client.yml">
-    <img alt="Client build status" src="https://img.shields.io/github/actions/workflow/status/dtcooper/tomato/build-client.yml?branch=main&label=client%20build">
-  </a>
-  <a href="https://github.com/dtcooper/tomato/actions/workflows/build-deploy-on-push.yml">
-    <img alt="Server build &amp deploy status" src="https://img.shields.io/github/actions/workflow/status/dtcooper/tomato/build-deploy-on-push.yml?branch=main&label=server%20build">
-  </a>
-  <img alt="Latest commit" src="https://img.shields.io/github/last-commit/dtcooper/tomato">
-</p>
+[![Client build status](https://img.shields.io/github/actions/workflow/status/dtcooper/tomato/build-client.yml?branch=main&label=client%20build)](https://github.com/dtcooper/tomato/actions/workflows/build-client.yml) [![Server build &amp deploy status](https://img.shields.io/github/actions/workflow/status/dtcooper/tomato/build-deploy-on-push.yml?branch=main&label=server%20build)](https://github.com/dtcooper/tomato/actions/workflows/build-deploy-on-push.yml)
+[![Latest release](https://img.shields.io/github/v/tag/dtcooper/tomato?filter=!preview-build&label=release)](https://github.com/dtcooper/tomato/releases/latest) [![MIT License](https://img.shields.io/github/license/dtcooper/tomato)](https://github.com/dtcooper/tomato/blob/main/LICENSE) [![GitHub stars](https://img.shields.io/github/stars/dtcooper/tomato?style=flat)](https://github.com/dtcooper/tomato/stargazers) [![Latest commit](https://img.shields.io/github/last-commit/dtcooper/tomato)](https://github.com/dtcooper/tomato/commits/)
 
 Client and server for Tomato Radio Automation software. Tomato is easy to use,
 and hard to screw up playout software written for the specific use case of
