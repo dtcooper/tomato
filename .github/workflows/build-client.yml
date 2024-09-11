@@ -211,6 +211,7 @@ jobs:
           sed -i "s/^pkgver=.*/pkgver=${{ steps.version.outputs.version }}/" PKGBUILD
           sed -i "s/^pkgrel=.*/pkgrel=1/" PKGBUILD
 
+          # Run in an arch docker container
           docker run -i --rm -v "$PWD:/aur" archlinux:base-devel /bin/bash -e <<'EOF'
 
           # Exit on failure
@@ -219,23 +220,19 @@ jobs:
           # Install deps
           pacman -Sy --noconfirm --needed pacman-contrib rsync sudo
 
-          # Quicker build
-          sed -i "s/^PKGEXT=.*$/PKGEXT='.pkg.tar'/" /etc/makepkg.conf
-
           # Add user, copy over package build files
           useradd builduser -m
           echo 'builduser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
           cd ~builduser
           sudo -u builduser rsync -vr --exclude=.git /aur .
 
-          # Build package, and confirm it installs properly, clean up
+          # Update checksums and .SRCINFO
           cd aur
           sudo -u builduser updpkgsums
-          sudo -u builduser makepkg -csi --noconfirm
           sudo -u builduser makepkg --printsrcinfo > .SRCINFO
-          rm -v *.tar.gz *.pkg.tar*
+          rm -fv *.tar.gz
 
-          # Copy back updated build files
+          # Copy back updated files
           rsync -vr ~builduser/aur/ /aur
 
           EOF
