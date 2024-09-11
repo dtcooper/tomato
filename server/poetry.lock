@@ -134,17 +134,17 @@ files = [
 
 [[package]]
 name = "django"
-version = "5.0.9"
+version = "5.1.1"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "Django-5.0.9-py3-none-any.whl", hash = "sha256:f219576ba53be4e83f485130a7283f0efde06a9f2e3a7c3c5180327549f078fa"},
-    {file = "Django-5.0.9.tar.gz", hash = "sha256:6333870d342329b60174da3a60dbd302e533f3b0bb0971516750e974a99b5a39"},
+    {file = "Django-5.1.1-py3-none-any.whl", hash = "sha256:71603f27dac22a6533fb38d83072eea9ddb4017fead6f67f2562a40402d61c3f"},
+    {file = "Django-5.1.1.tar.gz", hash = "sha256:021ffb7fdab3d2d388bc8c7c2434eb9c1f6f4d09e6119010bbb1694dda286bc2"},
 ]
 
 [package.dependencies]
-asgiref = ">=3.7.0,<4"
+asgiref = ">=3.8.1,<4"
 sqlparse = ">=0.3.1"
 tzdata = {version = "*", markers = "sys_platform == \"win32\""}
 
@@ -282,18 +282,22 @@ files = [
 django = ">=4"
 
 [[package]]
-name = "django-user-messages"
-version = "1.0.0"
+name = "django_user_messages"
+version = "1.1.0"
 description = "Offline addon for django.contrib.messages"
 optional = false
 python-versions = ">=3.8"
-files = [
-    {file = "django_user_messages-1.0.0-py3-none-any.whl", hash = "sha256:1eca21f7fa17a660ad1be2987da90eed6d3d308b0d3e945fad009dd950e9ddd0"},
-    {file = "django_user_messages-1.0.0.tar.gz", hash = "sha256:131ca9cfe8fb74ab981dbf194125b18e00b7b4dd897deb383848736d123d383f"},
-]
+files = []
+develop = false
 
 [package.extras]
 tests = ["coverage"]
+
+[package.source]
+type = "git"
+url = "https://github.com/matthiask/django-user-messages.git"
+reference = "HEAD"
+resolved_reference = "a7aaf4eac1579d3fb25191a38716a5c05f3fc736"
 
 [[package]]
 name = "executing"
@@ -1263,4 +1267,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "0a9a2fafd5fe1372670a9eb2d3e9ddb3bb9fc08378bc19536b02fde0809108e6"
+content-hash = "874a10a285f0c3a9c7f866f1c73269dbd9c3b4ca5c460243c3fe745168691eeb"
