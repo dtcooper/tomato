@@ -197,7 +197,7 @@ jobs:
           # Set up ssh key and git
           mkdir -p ~/.ssh
           chmod 0700 ~/.ssh
-          ssh-keyscan -v -t 'rsa,ecdsa,ed25519' aur.archlinux.org >>~/.ssh/known_hosts
+          ssh-keyscan -t 'rsa,ecdsa,ed25519' aur.archlinux.org | tee -a ~/.ssh/known_hosts
           echo "${{ secrets.AUR_SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 0600 ~/.ssh/id_ed25519
           git config set --global user.name "${{ secrets.AUR_NAME }}"
@@ -225,7 +225,7 @@ jobs:
           useradd builduser -m
           echo 'builduser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
           cd ~builduser
-          sudo -u builduser rsync -r --exclude=.git /aur .
+          sudo -u builduser rsync -vr --exclude=.git /aur .
 
           # Build package, and confirm it installs properly, clean up
           cd aur
@@ -235,10 +235,10 @@ jobs:
           rm -v *.tar.gz *.pkg.tar*
 
           # Copy back updated build files
-          rsync -r ~builduser/aur/ /aur
+          rsync -vr ~builduser/aur/ /aur
           EOF
 
           # Push changes to AUR
-          git add .
+          git add -A
           git commit -m "Moved to version ${{ steps.version.outputs.version }}"
           git push
