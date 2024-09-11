@@ -177,3 +177,54 @@ jobs:
           tag: ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
           generateReleaseNotes: true
+      -
+        name: Release to Arch User Repository (AUR)
+        shell: bash
+        if: github.ref_type == 'tag'
+        run: |
+          # Set up ssh key and git
+          mkdir -p ~/.ssh
+          chmod 0700 ~/.ssh
+          echo "${{ secrets.AUR_SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          git config set --global user.name "${{ secrets.AUR_NAME }}"
+          git config set --global user.email "${{ secrets.AUR_EMAIL }}"
+
+          # Clone to AUR repo
+          git clone ssh://aur@aur.archlinux.org/tomato-radio-automation.git aur
+          cd aur
+
+          # Update versions
+          sed -i "s/^pkgver=.*/pkgver=${{ steps.version.outputs.version }}/" PKGBUILD
+          sed -i "s/^pkgrel=.*/pkgrel=1/" PKGBUILD
+
+          docker run -i --rm -v "$PWD:/aur" archlinux:base-devel /bin/bash -e <<'EOF'
+          # Exit on failure
+          set -e
+
+          # Install deps
+          pacman -Sy --noconfirm --needed pacman-contrib rsync sudo
+
+          # Quicker build
+          sed -i "s/^PKGEXT=.*$/PKGEXT='.pkg.tar'/" /etc/makepkg.conf
+
+          # Add user, copy over package build files
+          useradd builduser -m
+          echo 'builduser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+          cd ~builduser
+          sudo -u builduser rsync -r --exclude=.git /aur .
+
+          # Build package, and confirm it installs properly, clean up
+          cd aur
+          sudo -u builduser updpkgsums
+          sudo -u builduser makepkg -csi --noconfirm
+          sudo -u builduser makepkg --printsrcinfo > .SRCINFO
+          rm -v *.tar.gz *.pkg.tar*
+
+          # Copy back updated build files
+          rsync -r ~builduser/aur/ /aur
+          EOF
+
+          # Push changes to AUR
+          git add .
+          git commit -m "Moved to version ${{ steps.version.outputs.version }}"
+          git push
