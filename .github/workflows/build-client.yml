@@ -199,6 +199,7 @@ jobs:
           chmod 0700 ~/.ssh
           ssh-keyscan -v -t 'rsa,ecdsa,ed25519' aur.archlinux.org >>~/.ssh/known_hosts
           echo "${{ secrets.AUR_SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 0600 ~/.ssh/id_ed25519
           git config set --global user.name "${{ secrets.AUR_NAME }}"
           git config set --global user.email "${{ secrets.AUR_EMAIL }}"
 
