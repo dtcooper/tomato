@@ -77,6 +77,22 @@ class TomatoAdminSite(admin.AdminSite):
         urls.extend(super().get_urls())
         return urls
 
+    def get_app_list_extra_context(self, request):
+        app_list_extra = [
+            {"url": f"admin:extra_{view.name}", "title": view.title, "external": False}
+            for view in extra_views
+            if view.check_perms(request) and not view.hide_from_app_list
+        ]
+
+        if request.user.is_superuser:
+            app_list_extra.append({"url": "server_logs", "title": "Server logs", "external": True})
+
+        admin_view_names = {view["url"] for view in app_list_extra if not view["external"]}
+        return {
+            "app_list_extra": sorted(app_list_extra, key=lambda view: view["title"].lower()),
+            "app_list_extra_highlight": request.resolver_match.view_name in admin_view_names,
+        }
+
     def each_context(self, request):
         context = super().each_context(request)
 
@@ -88,20 +104,13 @@ class TomatoAdminSite(admin.AdminSite):
 
         return {
             "app_list_template_original": self.app_list_template_original,
-            "app_list_extra": [
-                {"url": f"admin:extra_{view.name}", "title": view.title}
-                for view in extra_views
-                if view.check_perms(request) and not view.hide_from_app_list
-            ],
-            "app_list_extra_highlight": request.resolver_match.view_name in [
-                f"admin:extra_{view.name}" for view in extra_views
-            ],
             "help_docs_text": help_docs_text,
             "help_docs_url": HELP_DOCS_URL,
             "protocol_version": PROTOCOL_VERSION,
             "tomato_json_data": {"colors": COLORS_DICT, "station_name": constance_config.STATION_NAME},
             "tomato_version": settings.TOMATO_VERSION,
             "station_name": constance_config.STATION_NAME,
+            **self.get_app_list_extra_context(request),
             **context,
         }
 

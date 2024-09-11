@@ -12,10 +12,14 @@
       <tbody>
         {% for view in app_list_extra %}
           <tr class="model-config {% if request.resolver_match.view_name == view.url %} current-model{% endif %}">
-            <th scope="row"><a href="{% url view.url %}">{{ view.title }}</a></th>
+            <th scope="row"><a href="{% url view.url %}"{% if view.external %} target="_blank"{% endif %}>{{ view.title }}</a></th>
             <td></td>
             {% if request.resolver_match.view_name == "admin:app_list_extra" or request.resolver_match.view_name == "admin:index" %}
-              <td><a href="{% url view.url %}" class="changelink">Manage</a></td>
+              <td>
+                <a href="{% url view.url %}" class="changelink"{% if view.external %}target="_blank"{% else %}{% endif %}>
+                  {% if view.external %}Open{% else %}Manage{% endif %}
+                </a>
+              </td>
             {% endif %}
           </tr>
         {% endfor %}
