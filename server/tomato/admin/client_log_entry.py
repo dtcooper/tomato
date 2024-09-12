@@ -4,8 +4,8 @@ from django.contrib import admin
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.urls import path
+from django.utils import timezone
 from django.utils.safestring import mark_safe
-from django.utils.timezone import localtime
 
 from ..models import ClientLogEntry
 from .base import ListPrefetchRelatedMixin, format_datetime
@@ -50,7 +50,7 @@ class ClientLogEntryAdmin(ListPrefetchRelatedMixin, admin.ModelAdmin):
 
     @admin.action(description=f"Export selected {ClientLogEntry._meta.verbose_name_plural} as CSV")
     def csv(self, request, queryset):
-        filename = f"tomato-client-log-entries-{localtime().strftime('%Y%M%S%H%M%S')}.csv"
+        filename = f"tomato-client-log-entries-{timezone.localtime().strftime('%Y%M%S%H%M%S')}.csv"
         response = HttpResponse(
             content_type="text/csv",
             headers={"Content-Disposition": f'attachment; filename="{filename}"'},
@@ -62,7 +62,7 @@ class ClientLogEntryAdmin(ListPrefetchRelatedMixin, admin.ModelAdmin):
         for entry in queryset.order_by("created_at").prefetch_related("created_by"):
             writer.writerow((
                 str(entry.id),
-                localtime(entry.created_at).strftime("%Y/%m/%d %H:%M:%S"),
+                timezone.localtime(entry.created_at).strftime("%Y/%m/%d %H:%M:%S"),
                 entry.category(),
                 entry.type,
                 "unknown/deleted" if entry.created_by is None else entry.created_by.username,

@@ -49,9 +49,11 @@ class AdminAssetDataView(AdminViewMixin, TemplateView):
         zip_file = tempfile.NamedTemporaryFile("wb+")
         zip_filename = export_data_as_zip(zip_file)
         zip_file.seek(0)  # Go back to beginning of file
-        response = HttpResponse(zip_file, content_type="application/octet-stream")
-        response["Content-Disposition"] = f'attachment; filename="{zip_filename}"'
-        return response
+        return HttpResponse(
+            zip_file,
+            content_type="application/octet-stream",
+            headers={"Content-Disposition": f'attachment; filename="{zip_filename}"'},
+        )
 
     def do_import(self, file):
         try:

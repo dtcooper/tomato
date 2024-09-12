@@ -95,4 +95,4 @@ Changes for 2024 based on real world usage in 2023 and feedback
       via `RELOAD_PLAYLIST_AFTER_DATA_CHANGES` (batches cause many reloads)
 - [x] Fades in controller get choppy after a certain amount of time, likely due to `time.monotonic()`
 - [x] Always show scrollbars on macOS
-- [ ] Ability to bulk download assets on asset list view
+- [x] Ability to bulk download assets on asset list view

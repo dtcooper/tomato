@@ -1,4 +1,8 @@
+import logging
+from pathlib import Path
+import tempfile
 import urllib.parse
+import zipfile
 
 from django import forms
 from django.contrib import admin, messages
@@ -9,6 +13,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
+from django.utils import timezone
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 
@@ -18,6 +23,10 @@ from django_file_form.model_admin import FileFormAdminMixin
 from ..models import Asset, AssetAlternate, Rotator
 from ..tasks import bulk_process_assets, process_asset
 from .base import NO_ICON, YES_ICON, AiringFilter, AiringMixin, NoNullRelatedOnlyFieldFilter, TomatoModelAdminBase
+
+
+logger = logging.getLogger(__name__)
+DOWNLOAD_FOLDER_NAME_PREFIX = "tomato-assets"
 
 
 class AssetActionForm(ActionForm):
@@ -104,11 +113,14 @@ class AssetAdminBase(FileFormAdminMixin, TomatoModelAdminBase):
 
     @staticmethod
     def _get_player_html(obj):
-        return format_html(
-            '<audio src="{}" style="height: 45px; width: 450px; max-width: 100%" controlslist="noplaybackrate"'
-            ' preload="auto" controls />',
-            obj.file.url,
-        )
+        if obj.status == obj.Status.READY:
+            return format_html(
+                '<audio src="{}" style="height: 45px; width: 450px; max-width: 100%" controlslist="noplaybackrate"'
+                ' preload="auto" controls />',
+                obj.file.url,
+            )
+        else:
+            return mark_safe("<em>Processing...</em>")
 
     @admin.display(description="Player")
     def file_display(self, obj):
@@ -120,23 +132,26 @@ class AssetAdminBase(FileFormAdminMixin, TomatoModelAdminBase):
 
             html = mark_safe("<table><thead><th>File</th><th>Audio</th</thead><tbody>")
             for n, obj in enumerate(objs):
-                html += format_html(
-                    '<tr><td style="vertical-align: middle;">{}</td><td>', "Primary" if n == 0 else f"Alternate #{n}"
+                html += (
+                    format_html(
+                        '<tr><td style="vertical-align: middle;">{}</td><td>',
+                        "Primary" if n == 0 else f"Alternate #{n}",
+                    )
+                    + self._get_player_html(obj)
+                    + mark_safe("</td></tr>")
                 )
-                if obj.file and obj.status == obj.Status.READY:
-                    html += self._get_player_html(obj)
-                else:
-                    html += mark_safe("<em>Being processed...</em>")
-                html += mark_safe("</td></tr>")
             return html + mark_safe("</tbody></table>")
 
     @admin.display(description="Filename")
     def filename_display(self, obj):
-        return format_html(
-            '<a href="{}" target="_blank">{}</a>',
-            reverse(f"admin:tomato_{self.model._meta.model_name}_download", args=(obj.id,)),
-            obj.filename,
-        )
+        if obj.status == Asset.Status.READY:
+            return format_html(
+                '<a href="{}" target="_blank">{}</a>',
+                reverse(f"admin:tomato_{self.model._meta.model_name}_download", args=(obj.id,)),
+                obj.filename,
+            )
+        else:
+            return mark_safe("<em>Processing...</em>")
 
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = self.readonly_fields
@@ -169,12 +184,12 @@ class AssetAdminBase(FileFormAdminMixin, TomatoModelAdminBase):
             raise PermissionDenied
 
         asset = get_object_or_404(self.model, id=asset_id)
-
-        # Use fancy feature of nginx to provide content disposition headers
-        response = HttpResponse()
-        response["X-Accel-Redirect"] = asset.file.url
-        response["Content-Disposition"] = f"attachment; filename*=utf-8''{urllib.parse.quote(asset.filename)}"
-        return response
+        return HttpResponse(
+            headers={
+                "X-Accel-Redirect": asset.file.url,
+                "Content-Disposition": f"attachment; filename*=utf-8''{urllib.parse.quote(asset.filename)}",
+            }
+        )
 
     def get_urls(self):
         return [
@@ -202,6 +217,7 @@ class AssetAdmin(AiringMixin, AssetAdminBase):
         "disable",
         "add_rotator",
         "remove_rotator",
+        "download_audio",
         "archive",
         "unarchive",
         "delete_selected",
@@ -340,6 +356,46 @@ class AssetAdmin(AiringMixin, AssetAdminBase):
             )
         else:
             self.message_user(request, "You must select a rotator to remove audio assets from.", messages.WARNING)
+
+    @admin.action(description="Download audio files for selected assets")
+    def download_audio(self, request, queryset):
+        assets = queryset.filter(status=Asset.Status.READY)
+        seen_files = set()
+
+        def get_unique_filename(filename):
+            current_try = filename
+            n = 1
+            while current_try in seen_files:
+                current_try = f"{filename} ({n})"
+                n += 1
+            seen_files.add(current_try)
+            return current_try
+
+        if len(assets) >= 1:
+            file = tempfile.NamedTemporaryFile("wb+")
+            export_folder = Path(f"{DOWNLOAD_FOLDER_NAME_PREFIX}-{timezone.localtime().strftime('%Y%m%d-%H%M%S')}")
+            export_zip_filename = export_folder.with_suffix(".zip")
+            zip = zipfile.ZipFile(file, "w")
+
+            for n, asset in enumerate(assets, 1):
+                logger.info(f"Exporting {n}/{len(assets)} assets...")
+                suffix = Path(asset.file.path).suffix
+                filename = get_unique_filename(asset.original_filename)
+                zip.write(asset.file.path, export_folder / f"{filename}{suffix}")
+                for alternate in filter(lambda alt: alt.status == alt.Status.READY, asset.alternates.all()):
+                    alt_filename = get_unique_filename(alternate.original_filename)
+                    zip.write(alternate.file.path, export_folder / f"{alt_filename}{suffix}")
+
+            zip.close()
+            logger.info("Export done!")
+            file.seek(0)  # Go back to beginning of file
+            return HttpResponse(
+                file,
+                content_type="application/octet-stream",
+                headers={"Content-Disposition": f'attachment; filename="{export_zip_filename}"'},
+            )
+        else:
+            self.message_user(request, f"No assets of status '{Asset.Status.READY.label}' to export!", messages.WARNING)
 
     def upload_view(self, request):
         if not self.has_add_permission(request):
