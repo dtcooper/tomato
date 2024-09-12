@@ -222,6 +222,7 @@ class AssetAdmin(AiringMixin, AssetAdminBase):
         "unarchive",
         "delete_selected",
     )
+    date_hierarchy = "created_at"
     fieldsets = (
         NAME_AIRING_FIELDSET,
         ("Audio file", {"fields": ("file", "filename_display", "file_display", "duration", "alternates_display")}),

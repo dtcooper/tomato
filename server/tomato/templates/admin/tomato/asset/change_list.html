@@ -7,6 +7,16 @@
       /* Rotate to be more yellow for alternates */
       filter: hue-rotate(215deg);
     }
+    .uploaded-on-date-filter {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      border-bottom: 1px solid var(--hairline-color);
+    }
+
+    #changelist .toplinks {
+      border: 0;
+    }
   </style>
 {% endblock %}
 
@@ -19,4 +29,17 @@
     </li>
   {% endif %}
   {{ block.super }}
+{% endblock %}
+
+{% block date_hierarchy %}
+  {% if cl.date_hierarchy and cl.queryset.exists %}
+    <div class="uploaded-on-date-filter">
+      <div>Date uploaded filter:</div>
+  {% endif %}
+
+  {{ block.super }}
+
+  {% if cl.date_hierarchy and cl.queryset.exists %}
+    </div>
+  {% endif %}
 {% endblock %}
