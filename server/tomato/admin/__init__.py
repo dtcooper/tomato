@@ -8,7 +8,6 @@ from django.contrib.admin import actions
 from django.templatetags.static import static
 from django.urls import path
 from django.utils.html import format_html
-from django.utils.safestring import mark_safe
 
 from constance import config as constance_config
 from constance.admin import Config
@@ -42,7 +41,7 @@ class TomatoAdminSite(admin.AdminSite):
     app_list_template_original = str(
         (Path(apps.get_app_config("admin").path) / "templates" / "admin" / "app_list.html").absolute()
     )
-    empty_value_display = mark_safe("None")
+    empty_value_display = "None"
     index_title = "Tomato administration"
     site_url = None
 
