@@ -17,4 +17,7 @@ POSTGRES_CHANGES_CHANNEL = "tomato_model_changes"
 EDIT_ONLY_ASSETS_GROUP_NAME = "Edit ONLY audio assets"
 EDIT_ALL_GROUP_NAME = "Edit audio assets, rotators & stop sets"
 
+SUBMIT_TOKEN_MAX_AGE = 20 * 60  # 20 minutes
+SUBMIT_URL_PREFIX = "/submit/"
+
 del _data, _file

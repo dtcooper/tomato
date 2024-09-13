@@ -3,7 +3,16 @@
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
-{%- endset %}
+{% endset -%}
+
+{%- set COMMON_PARAMS %}
+    ssl_certificate /etc/letsencrypt/live/tomato/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/tomato/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/tomato/chain.pem;
+    ssl_dhparam /etc/letsencrypt/dhparams/dhparam.pem;
+
+    client_max_body_size 25M;
+{% endset -%}
 
 map $http_upgrade $connection_upgrade {
     default upgrade;
@@ -16,13 +25,7 @@ server {
 
     server_name {{ DOMAIN_NAME }};
 
-    ssl_certificate /etc/letsencrypt/live/tomato/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/tomato/privkey.pem;
-    ssl_trusted_certificate /etc/letsencrypt/live/tomato/chain.pem;
-    ssl_dhparam /etc/letsencrypt/dhparams/dhparam.pem;
-
-    client_max_body_size 25M;
-    client_body_buffer_size 1M;
+    {{ COMMON_PARAMS }}
 
     {% if DEBUG|int %}
         # Static files disabled by when DEBUG is true
@@ -58,3 +61,37 @@ server {
         proxy_pass http://app:8000;
     }
 }
+
+{% if SUBMIT_ENABLED|int and SUBMIT_ALT_DOMAIN_NAME %}
+    # SUBMIT_ENABLED configuration for SUBMIT_ALT_DOMAIN_NAME ({{ SUBMIT_ALT_DOMAIN_NAME }})
+
+    server {
+        listen 443 ssl;
+        http2 on;
+
+        server_name {{ SUBMIT_ALT_DOMAIN_NAME }};
+
+        ssl_certificate /etc/letsencrypt/live/tomato/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/tomato/privkey.pem;
+        ssl_trusted_certificate /etc/letsencrypt/live/tomato/chain.pem;
+        ssl_dhparam /etc/letsencrypt/dhparams/dhparam.pem;
+
+        client_max_body_size 25M;
+
+        location /static/ {
+            {% if DEBUG|int %}
+                {{ PROXY_PARAMS }}
+                proxy_pass http://app:8000;
+            {% else %}
+                location /static/ {
+                    alias /serve/static/;
+                }
+            {% endif %}
+        }
+
+        location / {
+            {{ PROXY_PARAMS }}
+            proxy_pass http://app:8000/submit/;
+        }
+    }
+{% endif %}

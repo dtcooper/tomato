@@ -149,6 +149,9 @@ document.addEventListener("alpine:init", () => {
           this.items = []
         }
       }
+      ws.onerror = () => {
+        this.log(`An error with the websocket occurred!`)
+      }
     }
   }))
 })

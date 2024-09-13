@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="{% static 'tomato/submit/vendor/simple.css' %}" />
+  <style>
+    article.info, article.success, article.warning, article.error {
+      color: #000000;
+    }
+
+    article.info { background-color: oklch(72.06% .191 231.6); }
+    article.success { background-color: oklch(64.8% .15 160); }
+    article.warning { background-color: oklch(84.71% .199 83.87); }
+    article.error { background-color: oklch(71.76% .221 22.18); }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      {% for url, name in nav_links %}
+        <a href="{{ url }}" class="current">{{ name }}</a>
+      {% endfor %}
+    </nav>
+    <h1>{{ STATION_NAME }}</h1>
+    <p>{{ title }}</p>
+  </header>
+  <main>
+    {% for message in messages %}
+      <article class="{{ message.level_tag }}">
+        {% if message.level_tag == "error" or message.level_tag == "warning" %}
+          <strong>{{ message.level_tag.upper }}:</strong>
+        {% endif %}
+        {{ message }}
+      </article>
+    {% endfor %}
+
+    <pre>logged_in: {{ is_logged_in}}
+    email: {{ email }}</pre>
+
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

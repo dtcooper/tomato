@@ -44,6 +44,7 @@ class TomatoAdminSite(admin.AdminSite):
     empty_value_display = "None"
     index_title = "Tomato administration"
     site_url = None
+    final_catch_all_view = False
 
     @property
     def site_title(self):

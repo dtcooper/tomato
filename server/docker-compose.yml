@@ -42,6 +42,8 @@ services:
       CERTBOT_EMAIL: "${CERTBOT_EMAIL:?CERTBOT_EMAIL needs to be set. See .env file.}"
       DOMAIN_NAME: "${DOMAIN_NAME:?DOMAIN_NAME needs to be set. See .env file.}"
       DEBUG: "${DEBUG:-0}"
+      SUBMIT_ENABLED: "${SUBMIT_ENABLED:-0}"
+      SUBMIT_ALT_DOMAIN_NAME: "${SUBMIT_ALT_DOMAIN_NAME}"
     ports:
       - 80:80
       - 443:443

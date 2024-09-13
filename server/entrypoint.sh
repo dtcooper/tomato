@@ -14,10 +14,12 @@ if [ -z "$SECRET_KEY" ]; then
     NO_SECRET_KEY=1
 fi
 
-wait-for-it --timeout 0 --service db:5432
+if [ -z "$__SKIP_CHECKS" ]; then
+    wait-for-it --timeout 0 --service db:5432
+fi
 
 # If we're not running huey, migration and create tomato:tomato user when DEBUG=1
-if [ -z "$__RUN_HUEY" -a -z "$__RUN_API" ]; then
+if [ -z "$__RUN_HUEY" -a -z "$__RUN_API" -a -z "$__SKIP_CHECKS" ]; then
     if [ "$NO_SECRET_KEY" ]; then
         echo 'Generating SECRET_KEY...'
         NEW_SECRET_KEY="$(python -c 'import string as s, random as r; print("".join(r.choice(s.ascii_letters + s.digits) for _ in range(54)))')"
@@ -34,9 +36,9 @@ if [ -z "$__RUN_HUEY" -a -z "$__RUN_API" ]; then
             DJANGO_SUPERUSER_PASSWORD=tomato ./manage.py createsuperuser --noinput --username tomato
         fi
 
-        if [ ! -d 'tomato/static/admin/tomato/configure_live_clients/node_modules' ]; then
-            echo "Installing node modules for configure_live_clients..."
-            cd tomato/static/admin/tomato/configure_live_clients
+        if [ ! -d 'tomato/static/vendor/node_modules' ]; then
+            echo "Installing vendor node modules..."
+            cd tomato/static/vendor
             npm install
             cd "$(dirname "$0")"
         fi

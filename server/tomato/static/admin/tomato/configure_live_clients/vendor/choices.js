@@ -1,0 +1,1 @@
+../../../../vendor/node_modules/choices.js/public/assets/scripts/choices.min.js
