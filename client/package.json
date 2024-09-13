@@ -58,7 +58,7 @@
     "esbuild-style-plugin": "^1.6.3",
     "esbuild-svelte": "^0.8.1",
     "eslint": "^8.57.0",
-    "eslint-plugin-svelte": "^2.43.0",
+    "eslint-plugin-svelte": "^2.44.0",
     "eventemitter3": "^5.0.1",
     "fs-extra": "^11.2.0",
     "material-ui-colors": "^1.0.0",
