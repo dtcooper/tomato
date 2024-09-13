@@ -14,7 +14,7 @@ django-constance = "^4.1.1"
 django-dirtyfields = "^1.9.3"
 django-environ = "^0.11.2"
 django-file-form = "^3.8.0"
-django-pgtrigger = "^4.12.1"
+django-pgtrigger = "^4.12.2"
 # Until django-user-messages 1.1 is released
 django-user-messages = {git = "https://github.com/matthiask/django-user-messages.git"}
 gunicorn = "^23.0.0"
