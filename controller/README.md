@@ -71,8 +71,7 @@ following LED control actions,
 | <code>0xB0 0x11 **0x01**</code> | **ON** (solid)                             |
 | <code>0xB0 0x11 **0x02**</code> | **Flash** (period = 1.0 seconds)           |
 | <code>0xB0 0x11 **0x03**</code> | **Pulsate SLOW** (period = 2.25 seconds)   |
-| <code>0xB0 0x11 **0x04**</code> | **Pulsate MEDIUM** (period = 1.25 seconds) |
-| <code>0xB0 0x11 **0x05**</code> | **Pulsate FAST** (period = 0.6 seconds)    |
+| <code>0xB0 0x11 **0x04**</code> | **Pulsate FAST** (period = 0.6 seconds)    |
 
 _**NOTE:** The device will acknowledge a correctly processed LED control change by
 returning same message back. For example sending <code>0xB0 0x11 **0x01**</code> to
