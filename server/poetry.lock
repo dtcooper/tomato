@@ -282,22 +282,18 @@ files = [
 django = ">=4"
 
 [[package]]
-name = "django_user_messages"
+name = "django-user-messages"
 version = "1.1.0"
 description = "Offline addon for django.contrib.messages"
 optional = false
 python-versions = ">=3.8"
-files = []
-develop = false
+files = [
+    {file = "django_user_messages-1.1.0-py3-none-any.whl", hash = "sha256:dd502ea27acbe63561215db8f8232cb66ab7fdcad2d5299e4f8f3f7dd0e02370"},
+    {file = "django_user_messages-1.1.0.tar.gz", hash = "sha256:99ef6f94c921e181455278dd5d8bea54638f08abb4b3978a9ea09b2eb4781afd"},
+]
 
 [package.extras]
 tests = ["coverage"]
-
-[package.source]
-type = "git"
-url = "https://github.com/matthiask/django-user-messages.git"
-reference = "HEAD"
-resolved_reference = "a7aaf4eac1579d3fb25191a38716a5c05f3fc736"
 
 [[package]]
 name = "executing"
@@ -425,14 +421,17 @@ redis = ["redis (>=3.0.0)"]
 
 [[package]]
 name = "idna"
-version = "3.8"
+version = "3.9"
 description = "Internationalized Domain Names in Applications (IDNA)"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "idna-3.8-py3-none-any.whl", hash = "sha256:050b4e5baadcd44d760cedbd2b8e639f2ff89bbc7a5730fcc662954303377aac"},
-    {file = "idna-3.8.tar.gz", hash = "sha256:d838c2c0ed6fced7693d5e8ab8e734d5f8fda53a039c0164afb0b82e771e3603"},
+    {file = "idna-3.9-py3-none-any.whl", hash = "sha256:69297d5da0cc9281c77efffb4e730254dd45943f45bbfb461de5991713989b1e"},
+    {file = "idna-3.9.tar.gz", hash = "sha256:e5c5dafde284f26e9e0f28f6ea2d6400abd5ca099864a67f576f3981c6476124"},
 ]
+
+[package.extras]
+all = ["flake8 (>=7.1.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2)"]
 
 [[package]]
 name = "ipdb"
@@ -608,13 +607,13 @@ ptyprocess = ">=0.5"
 
 [[package]]
 name = "platformdirs"
-version = "4.3.2"
+version = "4.3.3"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "platformdirs-4.3.2-py3-none-any.whl", hash = "sha256:eb1c8582560b34ed4ba105009a4badf7f6f85768b30126f351328507b2beb617"},
-    {file = "platformdirs-4.3.2.tar.gz", hash = "sha256:9e5e27a08aa095dd127b9f2e764d74254f482fef22b0970773bfba79d091ab8c"},
+    {file = "platformdirs-4.3.3-py3-none-any.whl", hash = "sha256:50a5450e2e84f44539718293cbb1da0a0885c9d14adf21b77bae4e66fc99d9b5"},
+    {file = "platformdirs-4.3.3.tar.gz", hash = "sha256:d4e0b7d8ec176b341fb03cb11ca12d0276faa8c485f9cd218f613840463fc2c0"},
 ]
 
 [package.extras]
@@ -1267,4 +1266,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "f1046b504c3ae7cbcb70b48309bf600feaf4bb0834448f3da5d706193339f218"
+content-hash = "4355ac428bdfd37aeaf3e517d53e8bcf07e140d364abda7548b58740c668af1d"

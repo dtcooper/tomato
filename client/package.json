@@ -56,7 +56,7 @@
     "electron-window-state": "^5.0.3",
     "esbuild": "^0.23.1",
     "esbuild-style-plugin": "^1.6.3",
-    "esbuild-svelte": "^0.8.1",
+    "esbuild-svelte": "^0.8.2",
     "eslint": "^8.57.0",
     "eslint-plugin-svelte": "^2.44.0",
     "eventemitter3": "^5.0.1",
