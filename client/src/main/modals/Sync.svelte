@@ -67,7 +67,7 @@
             {#if $db.lastSync}
               Last update processed: <strong>{prettyDatetime($db.lastSync)}</strong>
             {:else}
-              <em>Tomato <strong class="text-error underline">has not updated</strong> since start up!</em>
+              <em>Tomato <strong class="text-error underline">has not sync'd with the server</strong> since start up!</em>
             {/if}
           </li>
           <li>
