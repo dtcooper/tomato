@@ -1,5 +1,8 @@
 ARG NODE_VERSION=22
-FROM "node:${NODE_VERSION}-bookworm-slim" AS node-packages
+ARG DEBIAN_VERSION=bookworm
+
+
+FROM "node:${NODE_VERSION}-${DEBIAN_VERSION}-slim" AS node-packages
 
 COPY tomato/static/admin/tomato/configure_live_clients/package*.json /app/
 WORKDIR /app
@@ -7,7 +10,7 @@ WORKDIR /app
 RUN npm install
 
 
-FROM python:3.12-bookworm AS final
+FROM "python:3.12-${DEBIAN_VERSION}" AS final
 
 ENV DJANGO_SETTINGS_MODULE=tomato.settings \
     PYTHONDONTWRITEBYTECODE=1 \
