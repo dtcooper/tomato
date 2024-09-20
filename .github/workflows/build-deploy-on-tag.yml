@@ -36,9 +36,9 @@ jobs:
 
           if [ "$DATE" -ge "$BEFORE_DATE" -a "$DATE" -le "$AFTER_DATE" ]; then
               echo 'Close to Labor Day! Building for linux/amd64 only for performance reasons.'
-              echo 'PLATFORMS=linux/amd64' >> "$GITHUB_ENV"
+              echo 'PLATFORMS=linux/amd64' | tee -a "${GITHUB_ENV}"
           else
-              echo 'PLATFORMS=linux/amd64,linux/arm64' >> "$GITHUB_ENV"
+              echo 'PLATFORMS=linux/amd64,linux/arm64' | tee -a "${GITHUB_ENV}"
           fi
       -
         name: Build container
@@ -60,7 +60,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           container: nginx
           context: server/nginx
-          no-cache: true
+          cache-tag: nginx-latest
           tag: ${{ github.ref_name }}
 
   deploy:

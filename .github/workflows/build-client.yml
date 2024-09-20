@@ -68,9 +68,9 @@ jobs:
         name: Set variables
         shell: bash
         run: |
-          echo "CLIENT_FILENAME=tomato-client-${{ env.CLIENT_VERSION }}-${{ matrix.filename_suffix }}" >> "$GITHUB_ENV"
+          echo "CLIENT_FILENAME=tomato-client-${{ env.CLIENT_VERSION }}-${{ matrix.filename_suffix }}" | tee -a "${GITHUB_ENV}"
           if [ "${{ github.ref_type }}" != 'tag' -a "${{ github.ref_name}}" != main ]; then
-            echo "EXTRA_BUILD_INFO=Branch: ${{ github.ref_name}}" >> "$GITHUB_ENV"
+            echo "EXTRA_BUILD_INFO=Branch: ${{ github.ref_name}}" | tee -a "${GITHUB_ENV}"
           fi
       -
         name: Setup Node v${{ env.NODE_VERSION }}

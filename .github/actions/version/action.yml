@@ -35,6 +35,6 @@ runs:
         PROTOCOL="$(jq -r .protocol_version server/constants.json)"
 
         echo 'Setting Tomato versions'
-        echo "version=${VERSION}" | tee -a "$GITHUB_OUTPUT"
-        echo "protocol=${PROTOCOL}" | tee -a "$GITHUB_OUTPUT"
-        echo "version-short=${VERSION_SHORT}" | tee -a "$GITHUB_OUTPUT"
+        echo "version=${VERSION}" | tee -a "${GITHUB_OUTPUT}"
+        echo "protocol=${PROTOCOL}" | tee -a "${GITHUB_OUTPUT}"
+        echo "version-short=${VERSION_SHORT}" | tee -a "${GITHUB_OUTPUT}"
