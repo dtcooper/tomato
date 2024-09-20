@@ -1,9 +1,4 @@
-ARG CONTAINER="jonasal/nginx-certbot:5.4-alpine"
-
-
-FROM "${CONTAINER}" AS minijinja-builder
-
-RUN apk add --no-cache cargo
+FROM rust:alpine AS minijina-builder
 
 ARG MINIJINJA_VERSION=2.3.1
 RUN cargo install \
@@ -14,7 +9,7 @@ RUN cargo install \
     && strip /build/bin/minijinja-cli
 
 
-FROM "${CONTAINER}" AS final
+FROM jonasal/nginx-certbot:5.4-alpine AS final
 
-COPY --from=minijinja-builder /build/bin/minijinja-cli /usr/local/bin/
+COPY --from=minijina-builder /build/bin/minijinja-cli /usr/local/bin/
 COPY image/ /
