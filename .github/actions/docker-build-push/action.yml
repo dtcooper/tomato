@@ -41,9 +41,7 @@ runs:
       run: |
         USERNAME="$(echo "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
         CACHE_CONTAINER=ghcr.io/${USERNAME}/tomato-build-cache
-        if [ "${{ inputs.no-cache }}" = 'true' ]; then
-          CACHE_TAG=''
-        elif [ "${{ inputs.cache-tag }}" ]; then
+        if [ "${{ inputs.cache-tag }}" ]; then
           CACHE_TAG="${CACHE_CONTAINER}:${{ inputs.cache-tag }}"
         else
           CACHE_TAG="${CACHE_CONTAINER}:${{ inputs.container }}-${{ inputs.tag }}"
