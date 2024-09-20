@@ -1,8 +1,16 @@
-FROM jonasal/nginx-certbot:5.4-alpine
+FROM rust:alpine AS minijina-builder
 
-ARG PIP_BREAK_SYSTEM_PACKAGES=1
-ARG JINJANATOR_VERSION=24.3.0
+ARG MINIJINJA_VERSION=2.3.1
+RUN cargo install \
+            --root /build \
+            --version "${MINIJINJA_VERSION}" \
+            --no-default-features \
+        minijinja-cli \
+    && strip /build/bin/minijinja-cli
 
-RUN pip install --no-cache-dir "jinjanator==${JINJANATOR_VERSION}"
+
+FROM jonasal/nginx-certbot:5.4-alpine AS final
+
+COPY --from=minijina-builder /build/bin/minijinja-cli /usr/local/bin/
 
 ADD image/ /
