@@ -4,13 +4,13 @@
   {{ block.super }}
 
   <style>
-    {% with widths='50 20 20 10' %}
+    {% with widths='50 17 25 8' %}
       {% for width in widths.split %}
-      #changelist table th:nth-child({{ forloop.counter }}),
-      #changelist table td:nth-child({{ forloop.counter }}) {
-        width: {{ width }}% !important;
-        max-width: {{ width }}% !important;
-      }
+        #changelist table th:nth-child({{ forloop.counter }}),
+        #changelist table td:nth-child({{ forloop.counter }}) {
+          width: {{ width }}%;
+          max-width: {{ width }}%;
+        }
       {% endfor %}
     {% endwith %}
   </style>
