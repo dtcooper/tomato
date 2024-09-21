@@ -36,7 +36,9 @@
       <span class="max-w-md truncate font-mono text-sm italic">{$progress.item}</span>
     {:else if $conn.connected}
       {#if $conn.ready}
-        <h2 class="text-xl italic text-success">You are <strong>connected</strong> and up-to-date with the server!</h2>
+        <h2 class="text-xl italic text-success">
+          You are <strong>connected</strong> and up-to-date with the server!
+        </h2>
       {:else}
         <h2 class="text-xl italic">Connecting...</h2>
       {/if}
@@ -67,7 +69,9 @@
             {#if $db.lastSync}
               Last update processed: <strong>{prettyDatetime($db.lastSync)}</strong>
             {:else}
-              <em>Tomato <strong class="text-error underline">has not sync'd with the server</strong> since start up!</em>
+              <em>
+                Tomato <strong class="text-error underline">has not sync'd with the server</strong> since start up!
+              </em>
             {/if}
           </li>
           <li>
