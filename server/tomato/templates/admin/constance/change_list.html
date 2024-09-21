@@ -4,10 +4,15 @@
   {{ block.super }}
 
   <style>
-    /* Prevent weird yellow highlighting due to checkbox selected */
-    #changelist table tbody tr {
-      background-color: #ffffff !important;
-    }
+    {% with widths='50 20 20 10' %}
+      {% for width in widths.split %}
+      #changelist table th:nth-child({{ forloop.counter }}),
+      #changelist table td:nth-child({{ forloop.counter }}) {
+        width: {{ width }}% !important;
+        max-width: {{ width }}% !important;
+      }
+      {% endfor %}
+    {% endwith %}
   </style>
 
   <script>

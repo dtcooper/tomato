@@ -246,6 +246,7 @@ def validate_reset_times(values):
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 CONSTANCE_SUPERUSER_ONLY = False
 CONSTANCE_IGNORE_ADMIN_VERSION_CHECK = True
+_style_full_width = {"style": "width: calc(100% - 5px)"}
 CONSTANCE_ADDITIONAL_FIELDS = {
     "ui_modes": (
         "django.forms.MultipleChoiceField",
@@ -278,16 +279,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
         {
             "max_length": 50,
             "widget": "django.forms.TextInput",
-            "widget_kwargs": {"attrs": {"size": 40}},
-            "required": True,
-        },
-    ),
-    "shorter_text": (
-        "django.forms.CharField",
-        {
-            "max_length": 20,
-            "widget": "django.forms.TextInput",
-            "widget_kwargs": {"attrs": {"size": 16}},
+            "widget_kwargs": {"attrs": _style_full_width},
             "required": True,
         },
     ),
@@ -311,7 +303,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
         "django.forms.CharField",
         {
             "widget": "django.forms.Textarea",
-            "widget_kwargs": {"attrs": {"rows": 8, "cols": 8}},
+            "widget_kwargs": {"attrs": {"rows": 8, **_style_full_width}},
             "validators": (validate_reset_times,),
         },
     ),
@@ -328,6 +320,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
         {"choices": (("", "Off"), ("12h", "12 Hour"), ("24h", "24 Hour")), "required": False},
     ),
 }
+del _style_full_width
 
 CONSTANCE_CONFIG = {
     "STATION_NAME": ("Tomato Radio Automation", "The name of your station.", "short_text"),
