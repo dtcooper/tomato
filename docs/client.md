@@ -108,7 +108,7 @@ or can be download below.
     able to run them. (This just means I didn't pay Apple :material-apple: or
     Microsoft :material-microsoft-windows: an unnecessary fee to avoid these warnings.)
 
-    Read more about [how to do that on macOS :material-apple: here](https://support.apple.com/en-gb/HT202491)
+    Read more about [how to do that on macOS :material-apple: here](https://support.apple.com/en-us/HT202491)
     under the section _"If you want to open an app that hasn't been notarized or
     is from an unidentified developer."_
 
