@@ -1,23 +1,22 @@
-FROM --platform="${BUILDPLATFORM}" messense/rust-musl-cross:x86_64-musl AS minijina-builder-amd64
-FROM --platform="${BUILDPLATFORM}" messense/rust-musl-cross:aarch64-musl AS minijina-builder-arm64
-FROM --platform="${BUILDPLATFORM}" "minijina-builder-${TARGETARCH}" AS minijina-builder
+# Cross-compile minijinja-cli
+FROM --platform="${BUILDPLATFORM}" messense/rust-musl-cross:x86_64-musl AS minijinja-amd64
+FROM --platform="${BUILDPLATFORM}" messense/rust-musl-cross:aarch64-musl AS minijinja-arm64
+FROM "minijinja-${TARGETARCH}" AS minijinja
 
 ARG BUILDARCH
-ARG TARGETARCH
 
 ARG MINIJINJA_VERSION=2.3.1
-RUN echo "Building for arch ${TARGETARCH} on ${BUILDARCH}" \
-    && BUILD_TARGET="$([ "${TARGETARCH}" = amd64 ] && echo x86_64 || echo aarch64)-unknown-linux-musl" \
+RUN echo "Building for ${RUST_MUSL_CROSS_TARGET} on ${BUILDARCH}" \
     && cargo install \
-            --target "${BUILD_TARGET}" \
-            --root /build \
-            --version "${MINIJINJA_VERSION}" \
             --no-default-features \
+            --root /build \
+            --target "${RUST_MUSL_CROSS_TARGET}" \
+            --version "${MINIJINJA_VERSION}" \
         minijinja-cli \
-    && "/usr/local/musl/${BUILD_TARGET}/bin/strip" /build/bin/minijinja-cli
+    && "${TARGET_HOME}/bin/strip" /build/bin/minijinja-cli
 
 
 FROM jonasal/nginx-certbot:5.4-alpine AS final
 
-COPY --from=minijina-builder /build/bin/minijinja-cli /usr/local/bin/
+COPY --from=minijinja /build/bin/minijinja-cli /usr/local/bin/
 COPY image/ /
