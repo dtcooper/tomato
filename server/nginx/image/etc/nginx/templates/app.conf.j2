@@ -14,7 +14,7 @@ server {
     listen 443 ssl default_server reuseport;
     http2 on;
 
-    server_name {{ ENV.DOMAIN_NAME }};
+    server_name {{ DOMAIN_NAME }};
 
     ssl_certificate /etc/letsencrypt/live/tomato/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/tomato/privkey.pem;
@@ -24,7 +24,7 @@ server {
     client_max_body_size 25M;
     client_body_buffer_size 1M;
 
-    {% if ENV.DEBUG|int %}
+    {% if DEBUG|int %}
         # Static files disabled by when DEBUG is true
     {% else %}
         # Static files enabled when DEBUG is false

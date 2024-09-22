@@ -27,8 +27,8 @@ auto_j2() {
     output_path="$output_dir/${relative_path%$suffix}"
     subdir=$(dirname "$relative_path")
     mkdir -p "$output_dir/$subdir"
-    entrypoint_log "$ME: Running minijinja-cli on $template to $output_path"
-    minijinja-cli --env --strict --output "$output_path" "$template"
+    entrypoint_log "$ME: Running jinjanate on $template to $output_path"
+    jinjanate --quiet "$template" > "$output_path"
   done
 }
 
