@@ -63,11 +63,11 @@
               window.midi = midi = await WebMidi.enable({ sysex: true })
               midi.addListener("connected", (event) => {
                 const port = event.port
-                if (port instanceof Input && portUsable(port)) {
+                if (port instanceof Input) {
                   this.registerInput(port)
                 }
               })
-              filterPorts(midi.inputs).forEach((input) => this.registerInput(input))
+              midi.inputs.forEach((input) => this.registerInput(input))
               this.connected = true
               this.log("Connected!")
               window.tester = this
@@ -106,42 +106,46 @@
               }
             },
             registerInput(input) {
-              this.log(`Input: ${input.name}`)
-              input.channels[1].removeListener() // Remove all existing listeners
-              input.removeListener()
-              input.channels[1].addListener("controlchange", (event) => {
-                if (event.controller.number === MIDI_BTN_CTRL) {
-                  const pressed = event.rawValue === BTN_PRESSED
-                  this.log(`Button ${pressed ? "pressed" : "released"}`)
-                  if (pressed && this.turnLedOff) {
-                    this.led(0, "off, button press")
-                  }
-                } else if (event.controller.number === MIDI_LED_CTRL) {
-                  this.log(`Device ack'd LED change: ${event.rawValue}`)
-                } else {
-                  this.log(`Bad controller number: ${event.controller.number}`)
-                }
-              })
-              input.addListener("sysex", (event) => {
-                const message = event.message.rawDataBytes
-                const prefix = new TextDecoder().decode(message.slice(0, SYSEX_PREFIX.length))
-                if (prefix === SYSEX_PREFIX) {
-                  const encoded = message.slice(SYSEX_PREFIX.length)
-                  const [type, obj] = sysexMsgPack7bitDecode(encoded)
-                  if (type === "exception") {
-                    this.log(`Received exception...\n${obj}`)
+              if (portUsable(input)) {
+                this.log(`Input: ${input.name}`)
+                input.channels[1].removeListener() // Remove all existing listeners
+                input.removeListener()
+                input.channels[1].addListener("controlchange", (event) => {
+                  if (event.controller.number === MIDI_BTN_CTRL) {
+                    const pressed = event.rawValue === BTN_PRESSED
+                    this.log(`Button ${pressed ? "pressed" : "released"}`)
+                    if (pressed && this.turnLedOff) {
+                      this.led(0, "off, button press")
+                    }
+                  } else if (event.controller.number === MIDI_LED_CTRL) {
+                    this.log(`Device ack'd LED change: ${event.rawValue}`)
                   } else {
-                    this.log(
-                      `Received ${type} sysex${obj === null ? "" : ": " + JSON.stringify(obj, undefined, Object.keys(obj).length === 1 ? undefined : 2)}`
-                    )
+                    this.log(`Bad controller number: ${event.controller.number}`)
                   }
-                } else {
-                  this.log(`Received INVALID sysex: ${message}`)
-                }
-              })
-              input.addListener("reset", (event) => {
-                this.log("Received reset byte: restarted or reconnected")
-              })
+                })
+                input.addListener("sysex", (event) => {
+                  const message = event.message.rawDataBytes
+                  const prefix = new TextDecoder().decode(message.slice(0, SYSEX_PREFIX.length))
+                  if (prefix === SYSEX_PREFIX) {
+                    const encoded = message.slice(SYSEX_PREFIX.length)
+                    const [type, obj] = sysexMsgPack7bitDecode(encoded)
+                    if (type === "exception") {
+                      this.log(`Received exception...\n${obj}`)
+                    } else {
+                      this.log(
+                        `Received ${type} sysex${obj === null ? "" : ": " + JSON.stringify(obj, undefined, Object.keys(obj).length === 1 ? undefined : 2)}`
+                      )
+                    }
+                  } else {
+                    this.log(`Received INVALID sysex: ${message}`)
+                  }
+                })
+                input.addListener("reset", (event) => {
+                  this.log("Received reset byte: restarted or reconnected")
+                })
+              } else {
+                this.log(`Ignoring input: ${input.name}`)
+              }
             }
           }
         })
