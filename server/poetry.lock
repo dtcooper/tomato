@@ -407,12 +407,12 @@ test = ["Cython (>=0.29.24,<0.30.0)"]
 
 [[package]]
 name = "huey"
-version = "2.5.1"
+version = "2.5.2"
 description = "huey, a little task queue"
 optional = false
 python-versions = "*"
 files = [
-    {file = "huey-2.5.1.tar.gz", hash = "sha256:8a323783ab434a095a4e72b8c48c5b8f957f9031fa860474a390a0927e957112"},
+    {file = "huey-2.5.2.tar.gz", hash = "sha256:df33db474c05414ed40ee2110e9df692369871734da22d74ffb035a4bd74047f"},
 ]
 
 [package.extras]
@@ -879,13 +879,13 @@ tests = ["cython", "littleutils", "pygments", "pytest", "typeguard"]
 
 [[package]]
 name = "starlette"
-version = "0.39.0"
+version = "0.39.1"
 description = "The little ASGI library that shines."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "starlette-0.39.0-py3-none-any.whl", hash = "sha256:57164a38948018134537d31367fb46ef9be6050a8e955fb4990235960ed03f92"},
-    {file = "starlette-0.39.0.tar.gz", hash = "sha256:b35acedae74e95967dd9c0a47b45f5803dcd8973d0d95c18c1abb184845ba42c"},
+    {file = "starlette-0.39.1-py3-none-any.whl", hash = "sha256:0d31c90dacae588734e91b98cb4469fd37848ef23d2dd34355c5542bc827c02a"},
+    {file = "starlette-0.39.1.tar.gz", hash = "sha256:33c5a94f64d3ab2c799b2715b45f254a3752f229d334f1562a3aaf78c23eab95"},
 ]
 
 [package.dependencies]
@@ -1266,4 +1266,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "2c6c513cdae5328fef6063021655f3a08cc3a72096876660adc27b32e076778f"
+content-hash = "a42f6edc5fcf4c7ca23484e517f748db39de1012c5f00f35b23a352975e266e3"
