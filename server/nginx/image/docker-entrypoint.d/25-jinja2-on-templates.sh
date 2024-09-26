@@ -28,7 +28,7 @@ auto_j2() {
     subdir=$(dirname "$relative_path")
     mkdir -p "$output_dir/$subdir"
     entrypoint_log "$ME: Running jinjanate on $template to $output_path"
-    jinjanate --quiet "$template" > "$output_path"
+    jinjanate --quiet --undefined --output-file "$output_path" "$template"
   done
 }
 
