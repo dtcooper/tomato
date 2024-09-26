@@ -15,6 +15,23 @@
     article.success { background-color: oklch(64.8% .15 160); }
     article.warning { background-color: oklch(84.71% .199 83.87); }
     article.error { background-color: oklch(71.76% .221 22.18); }
+
+    table, input[type=email], input[type=text] {
+      width: 100%;
+    }
+
+    .helptext {
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+
+    .errorlist {
+      color: oklch(71.76% .221 22.18);
+    }
+
+    table tbody th {
+      text-align: right;
+    }
   </style>
 </head>
 <body>
@@ -36,9 +53,6 @@
         {{ message }}
       </article>
     {% endfor %}
-
-    <pre>logged_in: {{ is_logged_in}}
-    email: {{ email }}</pre>
 
     {% block content %}{% endblock %}
   </main>

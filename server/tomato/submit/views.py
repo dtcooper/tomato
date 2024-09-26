@@ -1,15 +1,16 @@
 import logging
-import time
 import secrets
 import string
+import time
 
-from django.core.mail import send_mail
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
+from django.core.mail import send_mail
 from django.http import Http404
 from django.shortcuts import resolve_url as _resolve_url
-from django.views.generic import FormView, RedirectView
 from django.utils.text import camel_case_to_spaces
-from django.contrib import messages
+from django.views.generic import FormView, RedirectView
 
 from constance import config
 
@@ -30,6 +31,8 @@ NAV_LINKS = (
 class UserSubmissionMixin:
     title = "User Submission"
     template_name = None
+    success_url = None
+    redirect_url = None
 
     def setup(self, request, *args, **kwargs):
         self.submit_email = request.session.get("submit_email", None)
@@ -56,8 +59,16 @@ class UserSubmissionMixin:
     def message(self, message, level=messages.INFO):
         messages.add_message(self.request, level, message)
 
+    def get_success_url(self):
+        return self.resolve_url(self.success_url)
+
+    def get_redirect_url(self, *args, **kwargs):
+        return self.resolve_url(self.redirect_url)
+
     def get_context_data(self, **kwargs):
         return {
+            "DEBUG": settings.DEBUG,
+            "token": self.request.session.get("submit_token", (None, 0))[0],
             "title": self.title,
             "STATION_NAME": config.STATION_NAME,
             "email": self.submit_email,  # XXX needed?
@@ -67,12 +78,17 @@ class UserSubmissionMixin:
         }
 
 
-class LoginView(UserSubmissionMixin, FormView):
+class LoginView(UserSubmissionMixin, SuccessMessageMixin, FormView):
     form_class = LoginForm
     title = "Audio Submission"
+    success_message = "An email has been sent to %(email)s with a link. Follow that link to log in."
+    success_url = "login"
+
+    def get_context_data(self, **kwargs):
+        return {"email_sent": bool(self.request.GET.get("email_sent")), **super().get_context_data(**kwargs)}
 
     def get_success_url(self):
-        return self.resolve_url("login")
+        return f"{super().get_success_url()}?email_sent=1"
 
     @staticmethod
     def generate_token():
@@ -81,23 +97,28 @@ class LoginView(UserSubmissionMixin, FormView):
     def form_valid(self, form):
         email = form.cleaned_data["email"]
         token = self.generate_token()
-        self.request.session.update({"submit_email": email, "submit_token": (token, time.time()), "submit_logged_in": False})
+        self.request.session.update(
+            {"submit_email": email, "submit_token": (token, time.time()), "submit_logged_in": False}
+        )
         logger.info(f"Sending token verification email to: {email}")
 
         link = self.request.build_absolute_uri(self.resolve_url("validate_token", token=token))
         send_mail("Test subject", f"Test message\n{link}", None, recipient_list=[email])
-        self.message(f"An email has been sent to {email} with a link. Follow the link to log in.")
         return super().form_valid(form)
 
 
 class LogoutView(UserSubmissionMixin, RedirectView):
+    redirect_url = "login"
+
     def get_redirect_url(self, *args, **kwargs):
         self.request.session.pop("submit_logged_in", None)
         self.message("You have been logged out.")
-        return self.resolve_url("login")
+        return super().get_redirect_url(*args, **kwargs)
 
 
 class ValidateView(UserSubmissionMixin, RedirectView):
+    redirect_url = "login"
+
     def get_redirect_url(self, token, *args, **kwargs):
         session_token, created_at = self.request.session.get("submit_token", (None, 0))
         if session_token is not None and secrets.compare_digest(token, session_token):
@@ -107,6 +128,6 @@ class ValidateView(UserSubmissionMixin, RedirectView):
                 self.message("Your email address was successfully validated!", messages.SUCCESS)
                 self.request.session["submit_logged_in"] = True
                 del self.request.session["submit_token"]
-                return self.resolve_url("login")
+                return super().get_redirect_url(*args, **kwargs)
         else:
             raise Http404("Invalid token!")

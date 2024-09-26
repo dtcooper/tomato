@@ -5,8 +5,8 @@ ARG DEBIAN_VERSION=bookworm
 
 FROM "node:${NODE_VERSION}-${DEBIAN_VERSION}-slim" AS node-packages
 
-COPY tomato/ /app/
-WORKDIR /app/static/vendor
+COPY /tomato/static/vendor /vendor/
+WORKDIR /vendor
 
 RUN npm install
 
@@ -64,7 +64,7 @@ RUN poetry install $([ -z "$DEBUG" -o "$DEBUG" = '0' ] && echo '--without=dev') 
 COPY *.py *.sh constants.json /app/
 COPY tomato/ /app/tomato/
 COPY api/ /app/api/
-COPY --from=node-builder /app/static/vendor/node_modules/ /app/tomato/static/vendor/node_modules/
+COPY --from=node-packages /vendor/node_modules/ /app/tomato/static/vendor/node_modules/
 WORKDIR /app
 
 ENTRYPOINT ["/app/entrypoint.sh"]

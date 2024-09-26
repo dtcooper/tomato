@@ -1,11 +1,28 @@
 {% extends "tomato/submit/base.html" %}
 
 {% block content %}
-  <form method="post">
-    {% csrf_token %}
+  <em>{% if is_logged_in %}Logged in! ({{ email }}){% else %}Not logged in.{% endif %}</em><br>
 
-    {{ form.email }}
+  {% if email_sent %}
+    TODO reload form link
 
-    <button type="submit">Submit</button>
-  </form>
+    {% if DEBUG and token %}
+      {# XXX should be a templatetag for submit.localhost #}
+      <a href="{% url 'user_submission_validate_token' token=token %}">{% url 'user_submission_validate_token' token=token %}</a>
+    {% endif %}
+  {% else %}
+    <form method="post">
+      {% csrf_token %}
+
+      <p>
+        First, provide your email address in the form below.
+      </p>
+
+      <table>
+        {{ form.as_table }}
+      </table>
+
+      <button type="submit">Click to verify your email address</button>
+    </form>
+  {% endif %}
 {% endblock %}
