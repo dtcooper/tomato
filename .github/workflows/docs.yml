@@ -40,6 +40,6 @@ jobs:
           curl -sSL https://install.python-poetry.org | python -
           cd docs
           poetry install
-          git config user.name 'Docs Deploy'
-          git config user.email 'docs-deploy@users.noreply.github.com'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           poetry run mkdocs gh-deploy
