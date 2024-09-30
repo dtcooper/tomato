@@ -14,7 +14,7 @@ urlpatterns = [
 ]
 
 if settings.EMAIL_ENABLED:
-    kwargs = {"extra_context": {"site_header": admin_site.site_header}}
+    kwargs = {"extra_context": {"site_header": lambda: admin_site.site_header}}  # lambda since it'll call constance
     urlpatterns.extend([
         path("password_reset/", auth.PasswordResetView.as_view(**kwargs), name="admin_password_reset"),
         path("password_reset/done/", auth.PasswordResetDoneView.as_view(**kwargs), name="password_reset_done"),
