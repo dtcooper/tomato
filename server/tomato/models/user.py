@@ -29,12 +29,9 @@ class User(DirtyFieldsMixin, AbstractUser):
             " enabled, but for test accounts you may not want to pollute the client logs."
         ),
     )
-    is_staff = True
-    first_name = None
-    last_name = None
-    date_joined = None
-    REQUIRED_FIELDS = ()
-    REMOVED_FIELDS = ("is_staff", "first_name", "last_name", "email", "date_joined")
+    is_staff = True  # All accounts, necessarily staff
+    first_name = last_name = date_joined = None
+    REMOVED_FIELDS = ("is_staff", "first_name", "last_name", "date_joined")
 
     class Meta:
         db_table = "users"
