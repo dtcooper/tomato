@@ -48,7 +48,7 @@ services:
 
   db:
     restart: always
-    image: pgautoupgrade/pgautoupgrade:16-alpine
+    image: pgautoupgrade/pgautoupgrade:17-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
