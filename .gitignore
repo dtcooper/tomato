@@ -18,7 +18,7 @@ __pycache__/
 /server/docker-compose.override.yml
 /server/nginx/local-ca/
 /server/serve/
-/server/tomato/static/admin/tomato/configure_live_clients/node_modules/
+/server/tomato/static/vendor/node_modules/
 
 # controller
 /controller/lib/

@@ -4,7 +4,7 @@
   {{ block.super }}
 
   <style>
-    {% with widths='50 17 25 8' %}
+    {% with widths='25 17 50 8' %}
       {% for width in widths.split %}
         #changelist table th:nth-child({{ forloop.counter }}),
         #changelist table td:nth-child({{ forloop.counter }}) {

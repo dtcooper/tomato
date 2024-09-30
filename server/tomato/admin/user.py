@@ -10,17 +10,17 @@ from .base import ListPrefetchRelatedMixin, NoNullRelatedOnlyFieldFilter
 
 class UserAdmin(ListPrefetchRelatedMixin, DjangoUserAdmin):
     add_fieldsets = (
-        (None, {"fields": ("username", "password1", "password2")}),
+        (None, {"fields": ("username", "email", "password1", "password2")}),
         ("Permissions", {"fields": ("is_superuser", "enable_client_logs", "groups")}),
     )
     add_form_template = None  # Removed the top of page warning
     fieldsets = (
-        (None, {"fields": ("username", "password")}),
+        (None, {"fields": ("username", "email", "password")}),
         ("Permissions", {"fields": ("is_active", "is_superuser", "enable_client_logs", "groups")}),
         ("Additional information", {"fields": ("last_login", "created_at", "created_by")}),
     )
     filter_horizontal = ("groups",)
-    list_display = ("username", "is_active", "groups_display", "enable_client_logs")
+    list_display = ("username", "is_active", "email", "groups_display", "enable_client_logs")
     list_filter = (
         "is_superuser",
         "is_active",

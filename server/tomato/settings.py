@@ -4,7 +4,7 @@ from decimal import Decimal
 from pathlib import Path
 import re
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils.safestring import mark_safe
 
 import environ
@@ -25,21 +25,34 @@ TIME_ZONE = env("TIMEZONE", default="US/Pacific")
 
 DEBUG_LOGS_PORT = env.int("DEBUG_LOGS_PORT", default=8002)
 
-EMAIL_EXCEPTIONS_ENABLED = env.bool("EMAIL_EXCEPTIONS_ENABLED", default=True)
+EMAIL_ENABLED = env.bool("EMAIL_ENABLED", default=False)
+EMAIL_EXCEPTIONS_ENABLED = env.bool("EMAIL_EXCEPTIONS_ENABLED", default=False)
+PASSWORD_RESET_TIMEOUT = 60 * 60 * 6  # 6 hours
+
+EMAIL_DEBUG_ONLY_PRINT_TO_CONSOLE_ONLY = DEBUG and env.bool("EMAIL_DEBUG_ONLY_PRINT_TO_CONSOLE_ONLY", default=False)
+
+if EMAIL_ENABLED:
+    if EMAIL_DEBUG_ONLY_PRINT_TO_CONSOLE_ONLY:
+        EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    else:
+        EMAIL_HOST = env("EMAIL_HOST")
+        EMAIL_HOST_USER = env("EMAIL_USERNAME")
+        EMAIL_HOST_PASSWORD = env("EMAIL_PASSWORD")
+        EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+        EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=EMAIL_PORT in (465, 587))
+        DEFAULT_FROM_EMAIL = SERVER_EMAIL = env("EMAIL_FROM_ADDRESS")
+
+elif EMAIL_EXCEPTIONS_ENABLED:
+    raise ImproperlyConfigured("EMAIL_ENABLED=False but EMAIL_EXCEPTIONS_ENABLED=True.")
+
 if EMAIL_EXCEPTIONS_ENABLED:
-    EMAIL_ADMIN_ADDRESS = env("EMAIL_ADMIN_ADDRESS")
-    EMAIL_HOST = env("EMAIL_HOST")
-    EMAIL_HOST_USER = env("EMAIL_USERNAME")
-    EMAIL_HOST_PASSWORD = env("EMAIL_PASSWORD")
-    EMAIL_PORT = env.int("EMAIL_PORT", default=587)
-    EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=(EMAIL_PORT == 587))
-    DEFAULT_FROM_EMAIL = SERVER_EMAIL = env("EMAIL_FROM_ADDRESS")
+    EMAIL_ADMIN_ADDRESS = env("EMAIL_ADMIN_ADDRESS_TO_SEND_EXCEPTIONS")
 
 ADMIN_NOTICE_TEXT = env("ADMIN_NOTICE_TEXT", default=None)
 ADMIN_NOTICE_TEXT_COLOR = env("ADMIN_NOTICE_TEXT_COLOR", default="#ffffff")
 ADMIN_NOTICE_BACKGROUND = env("ADMIN_NOTICE_BACKGROUND", default="#ff0000")
 
-# For development purposes only only
+# For development purposes only
 HUEY_IMMEDIATE_MODE = DEBUG and env("HUEY_IMMEDIATE_MODE", default=False)
 
 # Compute version
@@ -109,7 +122,7 @@ ROOT_URLCONF = "tomato.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
+        "DIRS": [BASE_DIR / "templates"],  # For admin overrides
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -167,7 +180,7 @@ STATIC_URL = "/static/"
 STATIC_ROOT = "/serve/static"
 MEDIA_URL = "/assets/"
 MEDIA_ROOT = "/serve/assets"
-FILE_FORM_MUST_LOGIN = True
+LOGIN_URL = "/login/"
 FILE_FORM_UPLOAD_DIR = "_temp_uploads"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -213,7 +226,7 @@ if EMAIL_EXCEPTIONS_ENABLED:
     ADMINS = [(f"{DOMAIN_NAME} Admin", EMAIL_ADMIN_ADDRESS)]
     LOGGING["handlers"]["mail_admins"] = {
         "level": "ERROR",
-        "filters": ["require_debug_false"],
+        "filters": None if EMAIL_DEBUG_ONLY_PRINT_TO_CONSOLE_ONLY else ["require_debug_false"],
         "class": "django.utils.log.AdminEmailHandler",
         "include_html": True,
     }
@@ -227,6 +240,10 @@ if REQUIRE_STRONG_PASSWORDS:
         {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
         {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
     ]
+
+
+DJANGO_ADMIN_LOGS_ENABLED = True
+DJANGO_ADMIN_LOGS_DELETABLE = True
 
 
 def validate_reset_times(values):
@@ -261,7 +278,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
         {
             "decimal_places": 2,
             "min_value": 0,
-            "widget": "django.forms.TextInput",
+            "widget": "django.forms.NumberInput",
             "widget_kwargs": {"attrs": {"size": 8}},
         },
     ),
@@ -463,7 +480,7 @@ CONSTANCE_CONFIG = {
 
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
     (
-        "User Interface Options",
+        "User interface options",
         (
             "STATION_NAME",
             "CLOCK",
@@ -473,7 +490,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
         ),
     ),
     (
-        "Server & Processing Audio Options",
+        "Server audio processing",
         (
             "AUDIO_BITRATE",
             "EXTRACT_METADATA_FROM_FILE",
@@ -484,7 +501,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
         ),
     ),
     (
-        "Play out options",
+        "Playout options",
         (
             "BROADCAST_COMPRESSION",
             "WARN_ON_EMPTY_ROTATORS",
@@ -499,10 +516,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
         ),
     ),
 ))
-CONSTANCE_SERVER_ONLY_SETTINGS = set(CONSTANCE_CONFIG_FIELDSETS["Server & Processing Audio Options"])
-
-DJANGO_ADMIN_LOGS_ENABLED = True
-DJANGO_ADMIN_LOGS_DELETABLE = True
+CONSTANCE_SERVER_ONLY_SETTINGS = set(CONSTANCE_CONFIG_FIELDSETS["Server audio processing"])
 
 SHELL_PLUS_IMPORTS = [
     "from constance import config",

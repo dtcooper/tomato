@@ -32,7 +32,6 @@ class User(DirtyFieldsMixin, AbstractUser):
     is_staff = True
     first_name = None
     last_name = None
-    email = EMAIL_FIELD = None
     date_joined = None
     REQUIRED_FIELDS = ()
     REMOVED_FIELDS = ("is_staff", "first_name", "last_name", "email", "date_joined")

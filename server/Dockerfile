@@ -1,11 +1,12 @@
+# Install and build node-related files for front-end
 ARG NODE_VERSION=22
 ARG DEBIAN_VERSION=bookworm
 
 
 FROM "node:${NODE_VERSION}-${DEBIAN_VERSION}-slim" AS node-packages
 
-COPY tomato/static/admin/tomato/configure_live_clients/package*.json /app/
-WORKDIR /app
+COPY /tomato/static/vendor /vendor/
+WORKDIR /vendor
 
 RUN npm install
 
@@ -40,7 +41,7 @@ RUN if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
     && rm -rf /var/lib/apt/lists/* \
     && if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
         echo "alias ls='ls --color=auto'" >> /root/.bashrc \
-        && echo "alias rs='[ -z \"\$__RUN_API\" -a -z \"\$__RUN_HUEY\" ] && ./manage.py runserver || /app/entrypoint.sh'" >> /root/.bashrc \
+        && echo "alias rs='__SKIP_CHECKS=1 /app/entrypoint.sh'" >> /root/.bashrc \
         && echo "alias sp='./manage.py shell_plus'" >> /root/.bashrc \
         && echo '. /etc/bash_completion' >> /root/.bashrc \
     ; fi
@@ -63,7 +64,7 @@ RUN poetry install $([ -z "$DEBUG" -o "$DEBUG" = '0' ] && echo '--without=dev') 
 COPY *.py *.sh constants.json /app/
 COPY tomato/ /app/tomato/
 COPY api/ /app/api/
-COPY --from=node-packages /app/node_modules/ /app/tomato/static/admin/tomato/configure_live_clients/node_modules/
+COPY --from=node-packages /vendor/node_modules/ /app/tomato/static/vendor/node_modules/
 WORKDIR /app
 
 ENTRYPOINT ["/app/entrypoint.sh"]
