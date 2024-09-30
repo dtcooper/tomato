@@ -7,15 +7,15 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.mail import send_mail
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import resolve_url as _resolve_url
 from django.utils.text import camel_case_to_spaces
-from django.views.generic import FormView, RedirectView
+from django.views.generic import FormView, RedirectView, CreateView
 
 from constance import config
 
 from ..constants import SUBMIT_TOKEN_MAX_AGE, SUBMIT_URL_PREFIX
-from .forms import LoginForm
+from .forms import LoginForm, SubmittedAssetForm
 
 
 logger = logging.getLogger(__name__)
@@ -26,6 +26,16 @@ NAV_LINKS = (
     ("login", "Login"),
     ("logout", "Logout"),
 )
+
+def resolve_url(request, view_name, *args, **kwargs):
+    url = _resolve_url(f"user_submission_{view_name}", *args, **kwargs)
+    if (
+        settings.SUBMIT_ALT_DOMAIN_NAME is not None
+        and request.get_host().lower() == settings.SUBMIT_ALT_DOMAIN_NAME.lower()
+        and url.startswith(SUBMIT_URL_PREFIX)
+    ):
+        url = f"/{url.removeprefix(SUBMIT_URL_PREFIX)}"
+    return url
 
 
 class UserSubmissionMixin:
@@ -47,14 +57,7 @@ class UserSubmissionMixin:
             return [f"tomato/submit/{basename}.html"]
 
     def resolve_url(self, view_name, *args, **kwargs):
-        url = _resolve_url(f"user_submission_{view_name}", *args, **kwargs)
-        if (
-            settings.SUBMIT_ALT_DOMAIN_NAME is not None
-            and self.request.get_host().lower() == settings.SUBMIT_ALT_DOMAIN_NAME.lower()
-            and url.startswith(SUBMIT_URL_PREFIX)
-        ):
-            url = url.removeprefix(SUBMIT_URL_PREFIX)
-        return url
+        return resolve_url(self.request, view_name, *args, **kwargs)
 
     def message(self, message, level=messages.INFO):
         messages.add_message(self.request, level, message)
@@ -73,7 +76,7 @@ class UserSubmissionMixin:
             "STATION_NAME": config.STATION_NAME,
             "email": self.submit_email,  # XXX needed?
             "is_logged_in": self.submit_logged_in,
-            "nav_links": [(self.resolve_url(view), name) for view, name in NAV_LINKS],
+            "nav_links": NAV_LINKS,
             **super().get_context_data(**kwargs),
         }
 
@@ -105,6 +108,17 @@ class LoginView(UserSubmissionMixin, SuccessMessageMixin, FormView):
         link = self.request.build_absolute_uri(self.resolve_url("validate_token", token=token))
         send_mail("Test subject", f"Test message\n{link}", None, recipient_list=[email])
         return super().form_valid(form)
+
+
+class CreateView(UserSubmissionMixin, CreateView):
+    form_class = SubmittedAssetForm
+    redirect_url = "create"
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.email = self.request.session["submit_email"]
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class LogoutView(UserSubmissionMixin, RedirectView):

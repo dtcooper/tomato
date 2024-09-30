@@ -1,0 +1,24 @@
+{% extends "tomato/submit/base.html" %}
+
+{% load static %}
+{% load submit %}
+
+{% block extrahead %}
+  <script src="{% static "file_form/file_form.min.js" %}"></script>
+  <link rel="stylesheet" href="{% static "file_form/file_form.css" %}">
+{% endblock %}
+
+{% block content %}
+  <form id="create-form" method="post" action="{% submit_url "create" %}">
+    {% csrf_token %}
+
+    <table>
+    {{ form.as_table }}
+    </table>
+
+    <button type="submit">Submit</button>
+  </form>
+  <script>
+    initUploadFields(document.getElementById("create-form"));
+  </script>
+{% endblock %}

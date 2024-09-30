@@ -4,7 +4,7 @@ from decimal import Decimal
 from pathlib import Path
 import re
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils.safestring import mark_safe
 
 import environ
@@ -25,17 +25,15 @@ TIME_ZONE = env("TIMEZONE", default="US/Pacific")
 
 DEBUG_LOGS_PORT = env.int("DEBUG_LOGS_PORT", default=8002)
 
+EMAIL_ENABLED = env.bool("EMAIL_ENABLED", default=False)
 EXCEPTIONS_EMAIL_ENABLED = env.bool("EXCEPTIONS_EMAIL_ENABLED", default=False)
-
-SUBMIT_ENABLED = env.bool("SUBMIT_ENABLED", default=False)
 SUBMIT_ALT_DOMAIN_NAME = env("SUBMIT_ALT_DOMAIN_NAME", default=None)
-SUBMIT_VERIFY_EMAIL_ENABLED = SUBMIT_ENABLED and env.bool("SUBMIT_VERIFY_EMAIL_ENABLED", default=False)
-
-PASSWORD_RESET_EMAIL_ENABLED = env.bool("PASSWORD_RESET_EMAIL_ENABLED", default=False)
 PASSWORD_RESET_TIMEOUT = 60 * 60 * 12  # 12 hours
 
-if SUBMIT_VERIFY_EMAIL_ENABLED or EXCEPTIONS_EMAIL_ENABLED or PASSWORD_RESET_EMAIL_ENABLED:
-    if DEBUG and env.bool("EMAIL_DEBUG_ONLY_PRINT_TO_CONSOLE_ONLY", default=False):
+EMAIL_DEBUG_ONLY_PRINT_TO_CONSOLE_ONLY = DEBUG and env.bool("EMAIL_DEBUG_ONLY_PRINT_TO_CONSOLE_ONLY", default=False)
+
+if EMAIL_ENABLED:
+    if EMAIL_DEBUG_ONLY_PRINT_TO_CONSOLE_ONLY:
         EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
     else:
         EMAIL_HOST = env("EMAIL_HOST")
@@ -44,6 +42,9 @@ if SUBMIT_VERIFY_EMAIL_ENABLED or EXCEPTIONS_EMAIL_ENABLED or PASSWORD_RESET_EMA
         EMAIL_PORT = env.int("EMAIL_PORT", default=587)
         EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=EMAIL_PORT in (465, 587))
         DEFAULT_FROM_EMAIL = SERVER_EMAIL = env("EMAIL_FROM_ADDRESS")
+
+elif EXCEPTIONS_EMAIL_ENABLED:
+    raise ImproperlyConfigured("EMAIL_ENABLED=False but EXCEPTIONS_EMAIL_ENABLED=True.")
 
 if EXCEPTIONS_EMAIL_ENABLED:
     EMAIL_ADMIN_ADDRESS = env("EMAIL_ADMIN_ADDRESS_TO_SEND_EXCEPTIONS")
@@ -183,7 +184,6 @@ STATIC_ROOT = "/serve/static"
 MEDIA_URL = "/assets/"
 MEDIA_ROOT = "/serve/assets"
 LOGIN_URL = "/login/"
-FILE_FORM_MUST_LOGIN = True
 FILE_FORM_UPLOAD_DIR = "_temp_uploads"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
@@ -229,7 +229,7 @@ if EXCEPTIONS_EMAIL_ENABLED:
     ADMINS = [(f"{DOMAIN_NAME} Admin", EMAIL_ADMIN_ADDRESS)]
     LOGGING["handlers"]["mail_admins"] = {
         "level": "ERROR",
-        "filters": ["require_debug_false"],
+        "filters": None if EMAIL_DEBUG_ONLY_PRINT_TO_CONSOLE_ONLY else ["require_debug_false"],
         "class": "django.utils.log.AdminEmailHandler",
         "include_html": True,
     }
@@ -281,7 +281,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
         {
             "decimal_places": 2,
             "min_value": 0,
-            "widget": "django.forms.TextInput",
+            "widget": "django.forms.NumberInput",
             "widget_kwargs": {"attrs": {"size": 8}},
         },
     ),

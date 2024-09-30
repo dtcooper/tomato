@@ -13,6 +13,7 @@ from django.db import models
 from django.db.models import Count, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 from django.utils.safestring import mark_safe
+from django.utils import timezone
 
 from constance import config
 from dirtyfields import DirtyFieldsMixin
@@ -104,16 +105,6 @@ class AssetBase(DirtyFieldsMixin, TomatoModelBase):
                             " feature off with setting <code>PREVENT_DUPLICATES</code>."
                         ),
                         "file": "A duplicate of this file already exists.",
-                    })
-            if config.REJECT_SILENCE_LENGTH > 0:
-                has_silence, silence_duration = silence_detect(self.file.real_path)
-                if has_silence:
-                    raise ValidationError({
-                        "__all__": mark_safe(
-                            f"This audio asset contains a silence of {silence_duration}s. Rejecting. You feature off"
-                            " with setting <code>REJECT_SILENCE_LENGTH</code>."
-                        ),
-                        "file": f"This asset contains a silence of {silence_duration} seconds.",
                     })
 
     def pre_save_normalize_hook(self):

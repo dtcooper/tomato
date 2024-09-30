@@ -62,8 +62,8 @@ server {
     }
 }
 
-{% if SUBMIT_ENABLED|int and SUBMIT_ALT_DOMAIN_NAME %}
-    # SUBMIT_ENABLED configuration for SUBMIT_ALT_DOMAIN_NAME ({{ SUBMIT_ALT_DOMAIN_NAME }})
+{% if SUBMIT_ALT_DOMAIN_NAME %}
+    # Configuration for SUBMIT_ALT_DOMAIN_NAME ({{ SUBMIT_ALT_DOMAIN_NAME }})
 
     server {
         listen 443 ssl;

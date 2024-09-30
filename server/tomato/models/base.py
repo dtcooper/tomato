@@ -10,11 +10,12 @@ from django.db.models.fields.files import FieldFile
 from django.utils import timezone
 from django.utils.html import format_html
 
+from constance import config
 from constance.models import Constance
 from django_file_form.uploaded_file import UploadedTusFile
 
 from ..constants import HELP_DOCS_URL, POSTGRES_CHANGES_CHANNEL
-from ..ffmpeg import ffprobe
+from ..ffmpeg import ffprobe, silence_detect
 
 
 NAME_MAX_LENGTH = 120
@@ -65,6 +66,11 @@ class AudioFileField(models.FileField):
 
         if not ffprobe(value.real_path):
             raise ValidationError("No audio detected in this file. Try again with another file.")
+
+        if config.REJECT_SILENCE_LENGTH > 0:
+            has_silence, silence_duration = silence_detect(value.real_path)
+            if has_silence:
+                raise ValidationError(f"This asset contains a silence of {silence_duration} seconds. Audio must contain less than {config.REJECT_SILENCE_LENGTH} seconds of silence.")
 
 
 class EligibleToAirQuerySet(models.QuerySet):

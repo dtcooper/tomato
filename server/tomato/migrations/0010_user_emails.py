@@ -46,8 +46,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="user",
             name="email",
-            field=models.EmailField(
-                blank=True, max_length=254, verbose_name="email address"
-            ),
+            field=models.EmailField(blank=True, max_length=254, verbose_name="email address"),
         ),
     ]

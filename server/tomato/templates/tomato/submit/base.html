@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   {% load static %}
+  {% load submit %}
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{{ title }}</title>
@@ -33,12 +34,13 @@
       text-align: right;
     }
   </style>
+  {% block extrahead %}{% endblock %}
 </head>
 <body>
   <header>
     <nav>
       {% for url, name in nav_links %}
-        <a href="{{ url }}" class="current">{{ name }}</a>
+        <a href="{% submit_url url %}" class="current">{{ name }}</a>
       {% endfor %}
     </nav>
     <h1>{{ STATION_NAME }}</h1>

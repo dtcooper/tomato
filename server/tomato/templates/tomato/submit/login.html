@@ -1,5 +1,7 @@
 {% extends "tomato/submit/base.html" %}
 
+{% load submit %}
+
 {% block content %}
   <em>{% if is_logged_in %}Logged in! ({{ email }}){% else %}Not logged in.{% endif %}</em><br>
 
@@ -8,10 +10,10 @@
 
     {% if DEBUG and token %}
       {# XXX should be a templatetag for submit.localhost #}
-      <a href="{% url 'user_submission_validate_token' token=token %}">{% url 'user_submission_validate_token' token=token %}</a>
+      <a href="{% submit_url 'validate_token' token=token %}">{% submit_url 'validate_token' token=token %}</a>
     {% endif %}
   {% else %}
-    <form method="post">
+    <form method="post" action="{% submit_url "login" %}">
       {% csrf_token %}
 
       <p>
