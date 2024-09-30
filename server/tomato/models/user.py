@@ -31,6 +31,7 @@ class User(DirtyFieldsMixin, AbstractUser):
     )
     is_staff = True  # All accounts, necessarily staff
     first_name = last_name = date_joined = None
+    REQUIRED_FIELDS = ()
     REMOVED_FIELDS = ("is_staff", "first_name", "last_name", "date_joined")
 
     class Meta:
