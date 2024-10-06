@@ -47,7 +47,7 @@
     "axios": "^1.7.7",
     "browser-sync": "^3.0.3",
     "color": "^4.2.3",
-    "daisyui": "^4.12.11",
+    "daisyui": "^4.12.12",
     "dayjs": "^1.11.13",
     "download": "^8.0.0",
     "electron": "^32.1.2",
