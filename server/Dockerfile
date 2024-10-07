@@ -1,8 +1,9 @@
-# Install and build node-related files for front-end
-ARG NODE_VERSION=22
 ARG DEBIAN_VERSION=bookworm
+ARG NODE_VERSION=22
+ARG PYTHON_VERSION=3.12
 
 
+# Install and build node-related files for front-end
 FROM "node:${NODE_VERSION}-${DEBIAN_VERSION}-slim" AS node-packages
 
 COPY /tomato/static/vendor /vendor/
@@ -11,7 +12,7 @@ WORKDIR /vendor
 RUN npm install
 
 
-FROM "python:3.12-${DEBIAN_VERSION}" AS final
+FROM "python:${PYTHON_VERSION}-${DEBIAN_VERSION}" AS final
 
 ENV DJANGO_SETTINGS_MODULE=tomato.settings \
     PYTHONDONTWRITEBYTECODE=1 \
