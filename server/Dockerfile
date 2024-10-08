@@ -1,6 +1,6 @@
 ARG DEBIAN_VERSION=bookworm
 ARG NODE_VERSION=22
-ARG PYTHON_VERSION=3.12
+ARG PYTHON_VERSION=3.13
 
 
 # Install and build node-related files for front-end
@@ -34,6 +34,7 @@ RUN if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
             less \
             nano \
             netcat-openbsd \
+            nodejs \
             npm \
             postgresql-client \
             sqlite3 \
