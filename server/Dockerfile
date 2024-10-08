@@ -1,6 +1,5 @@
 ARG DEBIAN_VERSION=bookworm
 ARG NODE_VERSION=22
-ARG PYTHON_VERSION=3.12
 
 
 # Install and build node-related files for front-end
@@ -12,12 +11,118 @@ WORKDIR /vendor
 RUN npm install
 
 
-FROM "python:${PYTHON_VERSION}-${DEBIAN_VERSION}" AS final
+# Taken from Python 3.13 dockerfile, add experimental JIT
+FROM buildpack-deps:bookworm AS jit
+
+# ensure local python is preferred over distribution python
+ENV PATH /usr/local/bin:$PATH
+
+# runtime dependencies
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
+		libbluetooth-dev \
+		lsb-release \
+		software-properties-common \
+		tk-dev \
+		uuid-dev \
+	; \
+	rm -rf /var/lib/apt/lists/*
+
+ENV GPG_KEY 7169605F62C751356D054A26A821E680E5FA6305
+ENV PYTHON_VERSION 3.13.0
+
+RUN set -eux; \
+	\
+	wget https://apt.llvm.org/llvm.sh; \
+	chmod +x llvm.sh; \
+	./llvm.sh 18; \
+	rm llvm.sh; \
+	wget -O python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz"; \
+	wget -O python.tar.xz.asc "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz.asc"; \
+	GNUPGHOME="$(mktemp -d)"; export GNUPGHOME; \
+	gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys "$GPG_KEY"; \
+	gpg --batch --verify python.tar.xz.asc python.tar.xz; \
+	gpgconf --kill all; \
+	rm -rf "$GNUPGHOME" python.tar.xz.asc; \
+	mkdir -p /usr/src/python; \
+	tar --extract --directory /usr/src/python --strip-components=1 --file python.tar.xz; \
+	rm python.tar.xz; \
+	\
+	cd /usr/src/python; \
+	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+	./configure \
+		--build="$gnuArch" \
+		--enable-experimental-jit=yes-off \
+		--enable-loadable-sqlite-extensions \
+		--enable-optimizations \
+		--enable-option-checking=fatal \
+		--enable-shared \
+		--with-lto \
+		--with-system-expat \
+		--with-ensurepip \
+	; \
+	nproc="$(nproc)"; \
+	EXTRA_CFLAGS="$(dpkg-buildflags --get CFLAGS)"; \
+	LDFLAGS="$(dpkg-buildflags --get LDFLAGS)"; \
+	make -j "$nproc" \
+		"EXTRA_CFLAGS=${EXTRA_CFLAGS:-}" \
+		"LDFLAGS=${LDFLAGS:-}" \
+		"PROFILE_TASK=${PROFILE_TASK:-}" \
+	; \
+# https://github.com/docker-library/python/issues/784
+# prevent accidental usage of a system installed libpython of the same version
+	rm python; \
+	make -j "$nproc" \
+		"EXTRA_CFLAGS=${EXTRA_CFLAGS:-}" \
+		"LDFLAGS=${LDFLAGS:--Wl},-rpath='\$\$ORIGIN/../lib'" \
+		"PROFILE_TASK=${PROFILE_TASK:-}" \
+		python \
+	; \
+	make install; \
+	\
+# enable GDB to load debugging data: https://github.com/docker-library/python/pull/701
+	bin="$(readlink -ve /usr/local/bin/python3)"; \
+	dir="$(dirname "$bin")"; \
+	mkdir -p "/usr/share/gdb/auto-load/$dir"; \
+	cp -vL Tools/gdb/libpython.py "/usr/share/gdb/auto-load/$bin-gdb.py"; \
+	\
+	cd /; \
+	rm -rf /usr/src/python; \
+	\
+	find /usr/local -depth \
+		\( \
+			\( -type d -a \( -name test -o -name tests -o -name idle_test \) \) \
+			-o \( -type f -a \( -name '*.pyc' -o -name '*.pyo' -o -name 'libpython*.a' \) \) \
+		\) -exec rm -rf '{}' + \
+	; \
+	\
+	ldconfig; \
+	\
+	export PYTHONDONTWRITEBYTECODE=1; \
+	python3 --version; \
+	pip3 --version
+
+# make some useful symlinks that are expected to exist ("/usr/local/bin/python" and friends)
+RUN set -eux; \
+	for src in idle3 pip3 pydoc3 python3 python3-config; do \
+		dst="$(echo "$src" | tr -d 3)"; \
+		[ -s "/usr/local/bin/$src" ]; \
+		[ ! -e "/usr/local/bin/$dst" ]; \
+		ln -svT "$src" "/usr/local/bin/$dst"; \
+	done
+
+CMD ["python3"]
+
+
+# FROM "python:${PYTHON_VERSION}-${DEBIAN_VERSION}" AS final
+FROM jit AS final
 
 ENV DJANGO_SETTINGS_MODULE=tomato.settings \
+    POETRY_VIRTUALENVS_CREATE=false \
+    PYTHON_JIT=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    POETRY_VIRTUALENVS_CREATE=false
+    PYTHONUNBUFFERED=1
 
 ARG DEBUG=0
 RUN if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
@@ -34,6 +139,7 @@ RUN if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
             less \
             nano \
             netcat-openbsd \
+            nodejs \
             npm \
             postgresql-client \
             sqlite3 \
