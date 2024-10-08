@@ -20,7 +20,7 @@ inputs:
     required: false
     default: 'false'
   cache-tag:
-    description: Tag to use for cache when building (default '<container>-<tag>')
+    description: "Tag to use for cache when building (default '<container>-<tag>'). Disabled when 'push: false'"
     required: false
     default: ''
   build-args:
@@ -30,6 +30,10 @@ inputs:
     description: Container build platforms
     required: false
     default: 'linux/amd64,linux/arm64'
+  push:
+    description: Push container upstream
+    required: false
+    default: 'true'
 
 runs:
   using: composite
@@ -66,11 +70,11 @@ runs:
       name: Build and push
       uses: docker/build-push-action@v6
       with:
-        push: true
+        push: ${{ inputs.push  == 'true' && 'true' || 'false'}}
         pull: true
         platforms: ${{ inputs.platforms }}
         context: ./${{ inputs.context == '' && inputs.container || inputs.context }}/
         tags: ${{ env.REPO }}:${{ inputs.tag }}
         build-args: ${{ inputs.build-args }}
-        cache-from: ${{ inputs.no-cache == 'false' && format('type=registry,ref={0}', env.CACHE_TAG) || '' }}
-        cache-to: ${{ inputs.no-cache == 'false' && format('type=registry,ref={0},mode=max', env.CACHE_TAG) || '' }}
+        cache-from: ${{ inputs.no-cache == 'false' && inputs.push  == 'true' && format('type=registry,ref={0}', env.CACHE_TAG) || '' }}
+        cache-to: ${{ inputs.no-cache == 'false' && inputs.push  == 'true' && format('type=registry,ref={0},mode=max', env.CACHE_TAG) || '' }}

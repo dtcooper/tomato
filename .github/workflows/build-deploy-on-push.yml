@@ -3,7 +3,7 @@ name: Build & deploy server container (test)
 on:
   push:
     branches:
-      - main
+      - '*'
     paths:
       - .github/actions/docker-build-push/action.yml
       - .github/actions/version/action.yml
@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: docker-build
+  group: docker-build-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -48,6 +48,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           container: server
           tag: ${{ matrix.tag }}
+          push: ${{ github.ref_name == 'main' && 'true' || 'false' }}
           build-args: |
             DEBUG=${{ matrix.tag == 'dev' && '1' || '0' }}
             TOMATO_VERSION=${{ steps.version.outputs.version }}
@@ -59,12 +60,14 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           container: nginx
           context: server/nginx
+          push: ${{ github.ref_name == 'main' && 'true' || 'false' }}
           tag: ${{ matrix.tag }}
 
 
   deploy:
     runs-on: ubuntu-22.04
     name: Deploy
+    if: github.ref_name == 'main'
     needs: [build]
     steps:
       -
