@@ -47,6 +47,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           container: server
+          platforms: linux/amd64  # TODO: Delete me when merging
           tag: ${{ matrix.tag }}
           push: ${{ github.ref_name == 'main' && 'true' || 'false' }}
           build-args: |
@@ -60,6 +61,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           container: nginx
           context: server/nginx
+          platforms: linux/amd64  # TODO: Delete me when merging
           push: ${{ github.ref_name == 'main' && 'true' || 'false' }}
           tag: ${{ matrix.tag }}
 
