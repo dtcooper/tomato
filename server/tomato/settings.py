@@ -181,6 +181,7 @@ STATIC_ROOT = "/serve/static"
 MEDIA_URL = "/assets/"
 MEDIA_ROOT = "/serve/assets"
 LOGIN_URL = "/login/"
+FILE_FORM_MUST_LOGIN = True
 FILE_FORM_UPLOAD_DIR = "_temp_uploads"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
