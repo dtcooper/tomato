@@ -98,8 +98,12 @@ export const logout = (error = null, hardLogout = false) => {
 const handleMessages = {
   data: async ({ config, ...data }) => {
     setServerConfig(config)
-    await syncAssetsDB(data, !get(conn).didFirstSync)
-    updateConn({ didFirstSync: true })
+    const isFirstSync = !get(conn).didFirstSync
+    await syncAssetsDB(data, isFirstSync)
+    if (isFirstSync) {
+      console.log("First sync completed!")
+      updateConn({ didFirstSync: true })
+    }
   },
   "ack-log": ({ success, id }) => {
     if (success) {
@@ -217,7 +221,7 @@ export const login = (username, password, host) => {
           updateConn({ authenticated: true, connecting: false, connected: true, username, password, host })
           clearTimeout(connTimeout)
           log("login")
-          console.log("Succesfully authenticated!")
+          console.log("Successfully authenticated!")
           resolve()
         } else {
           console.log("Got false auth response. Logging out.")
