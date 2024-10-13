@@ -1002,13 +1002,13 @@ test = ["Cython (>=0.29.36,<0.30.0)", "aiohttp (==3.9.0b0)", "aiohttp (>=3.8.1)"
 
 [[package]]
 name = "wait-for-it"
-version = "2.2.2"
+version = "2.3.0"
 description = "Wait for service(s) to be available before executing a command."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.9"
 files = [
-    {file = "wait-for-it-2.2.2.tar.gz", hash = "sha256:807d759b4143dbf07f65782734ce7837d6cd4c2f36c154484731f855170920e6"},
-    {file = "wait_for_it-2.2.2-py3-none-any.whl", hash = "sha256:ed6ce9bfad11dbfc29ecbef9daac2b9f45d583e5fcd559e1a6106002df0247c1"},
+    {file = "wait_for_it-2.3.0-py3-none-any.whl", hash = "sha256:22ddbf08d6fe1b5f59b3807d539a932df7cab3de2823cb8b63591f81fa666c38"},
+    {file = "wait_for_it-2.3.0.tar.gz", hash = "sha256:bc6eaeb0912cf4d59c824067f36c73739bb7a6182912ec8984f2fb3447ef68c0"},
 ]
 
 [package.dependencies]
@@ -1266,4 +1266,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "ce0a16506331332f36cb7ed2aae1770bfab0613d28015322eb7386f436e13854"
+content-hash = "a5d4d48836218850d81ca555a5b634296d31bf9bc8a008ba1fc42f63459dcab9"
