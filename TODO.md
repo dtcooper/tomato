@@ -103,3 +103,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [x] Ability to bulk download assets on asset list view
 - [ ] Tagging system for all DB models (perhaps using [django-taggit](https://github.com/jazzband/django-taggit))
 - [ ] Rename 'audio assets' to 'assets'
+
+## 2025 Things
+
+- [ ] Simplify permission system, removing groups and just having superusers + regular users + flags on user model?
