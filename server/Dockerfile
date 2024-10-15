@@ -47,11 +47,10 @@ RUN if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
         && echo '. /etc/bash_completion' >> /root/.bashrc \
     ; fi
 
-ARG POETRY_VERSION=1.8.3
+ARG POETRY_VERSION=1.8.4
 RUN curl -sSL https://install.python-poetry.org | python -
 ENV PATH="/root/.local/bin:${PATH}"
-# Add tomato to Python path permanently
-RUN echo '/app' > "$(python -c 'import site; print(site.getsitepackages()[0])')/tomato.pth"
+RUN echo '/app' > "$(python -c 'import site; print(site.getsitepackages()[0])')/app.pth"
 
 COPY pyproject.toml poetry.lock /app/
 WORKDIR /app

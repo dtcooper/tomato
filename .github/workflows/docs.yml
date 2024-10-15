@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-22.04
     name: Publish
     env:
-      POETRY_VERSION: 1.8.3
+      POETRY_VERSION: 1.8.4
       PYTHONDONTWRITEBYTECODE: 1
       PYTHONUNBUFFERED: 1
     steps:
