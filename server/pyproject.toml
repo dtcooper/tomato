@@ -8,7 +8,7 @@ readme = "../README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 django = "^5.1.2"
 django-admin-logs = "^1.3.0"
 django-admin-notice = "^3.1.0"
@@ -24,6 +24,7 @@ psycopg = "^3.2.3"
 python-dotenv = "^1.0.1"
 schema = "^0.7.7"
 starlette = "^0.41.0"
+typing-extensions = "^4.12.2"  # For Python 3.13 + pgtrigger
 uvicorn = {extras = ["standard"], version = "^0.32.0"}
 wait-for-it = "^2.3.0"
 
