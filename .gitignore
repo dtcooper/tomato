@@ -17,7 +17,7 @@ scratch/
 __pycache__/
 /server/.env
 /server/docker-compose.override.yml
-/server/nginx/local-ca/
+/server/local-ca/
 /server/serve/
 /server/tomato/static/vendor/node_modules/
 

@@ -9,9 +9,6 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     name: Build container
-    strategy:
-      matrix:
-        container: [server, nginx]
     steps:
       -
         name: Checkout
@@ -19,12 +16,10 @@ jobs:
       -
         name: Get version
         id: version
-        if: matrix.container == 'server'
         uses: ./.github/actions/version
       -
         name: Set variables
         shell: bash
-        if: matrix.container == 'server'
         run: |
           DATE=$(date +%Y%m%d)
           YEAR=$(date +%Y)
@@ -43,7 +38,6 @@ jobs:
       -
         name: Build container
         uses: ./.github/actions/docker-build-push
-        if: matrix.container == 'server'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           container: server
@@ -52,16 +46,6 @@ jobs:
           platforms: ${{ env.PLATFORMS }}
           build-args: |
             TOMATO_VERSION=${{ steps.version.outputs.version }}
-      -
-        name: Build container (nginx)
-        uses: ./.github/actions/docker-build-push
-        if: matrix.container == 'nginx'
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          container: nginx
-          context: server/nginx
-          cache-tag: nginx-latest
-          tag: ${{ github.ref_name }}
 
   deploy:
     runs-on: ubuntu-22.04

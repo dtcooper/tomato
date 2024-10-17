@@ -28,14 +28,13 @@ services:
 
   nginx:
     restart: always
-    image: "ghcr.io/dtcooper/tomato-nginx:${TOMATO_VERSION:-latest}"
-    build:
-      context: nginx
+    image: ghcr.io/dtcooper/nginx-certbot-jinja:5.4.0-nginx1.27.2
     depends_on:
       - app
       - api
       - logs
     volumes:
+      - ./nginx.conf.j2:/etc/nginx/templates/app.conf.j2
       - ./serve:/serve:ro
       - nginx_secrets:/etc/letsencrypt
     environment:

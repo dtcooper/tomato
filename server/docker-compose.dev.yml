@@ -21,9 +21,7 @@ services:
   nginx:
     restart: 'no'
     volumes:
-      - ./nginx/local-ca:/etc/local_ca
-      - ./nginx/image/docker-entrypoint.d/25-jinja2-on-templates.sh:/docker-entrypoint.d/25-jinja2-on-templates.sh
-      - ./nginx/image/etc/nginx/templates/app.conf.j2:/etc/nginx/templates/app.conf.j2
+      - ./local-ca:/etc/local_ca
     environment:
       USE_LOCAL_CA: "${NGINX_DEBUG_MODE_ONLY_USE_LOCAL_CA:-0}"
       LOCAL_CA_ROOT_CERT_VALIDITY: 90  # 90 days instead of 30

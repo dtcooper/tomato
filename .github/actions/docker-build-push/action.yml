@@ -19,10 +19,6 @@ inputs:
     description: Do not use cache when building
     required: false
     default: 'false'
-  cache-tag:
-    description: "Tag to use for cache when building (default '<container>-<tag>'). Disabled when 'push: false'"
-    required: false
-    default: ''
   build-args:
     description: List of build-time variables
     required: false
@@ -45,11 +41,7 @@ runs:
       run: |
         USERNAME="$(echo "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
         CACHE_CONTAINER=ghcr.io/${USERNAME}/tomato-build-cache
-        if [ "${{ inputs.cache-tag }}" ]; then
-          CACHE_TAG="${CACHE_CONTAINER}:${{ inputs.cache-tag }}"
-        else
-          CACHE_TAG="${CACHE_CONTAINER}:${{ inputs.container }}-${{ inputs.tag }}"
-        fi
+        CACHE_TAG="${CACHE_CONTAINER}:${{ inputs.container }}-${{ inputs.tag }}"
         echo "CACHE_TAG=${CACHE_TAG}" | tee -a "${GITHUB_ENV}"
         echo "REPO=ghcr.io/${USERNAME}/tomato-${{ inputs.container }}" | tee -a "${GITHUB_ENV}"
         echo "USERNAME=${USERNAME}" | tee -a "${GITHUB_ENV}"
@@ -73,7 +65,7 @@ runs:
         push: ${{ inputs.push  == 'true' && 'true' || 'false'}}
         pull: true
         platforms: ${{ inputs.platforms }}
-        context: ./${{ inputs.context == '' && inputs.container || inputs.context }}/
+        context: ./${{ inputs.container }}/
         tags: ${{ env.REPO }}:${{ inputs.tag }}
         build-args: ${{ inputs.build-args }}
         cache-from: ${{ inputs.no-cache == 'false' && inputs.push  == 'true' && format('type=registry,ref={0}', env.CACHE_TAG) || '' }}
