@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "@alpinejs/persist": "^3.14.2",
+    "@alpinejs/persist": "^3.14.3",
     "@msgpack/msgpack": "^3.0.0-beta2",
-    "alpinejs": "^3.14.2",
+    "alpinejs": "^3.14.3",
     "simpledotcss": "^2.3.2",
     "webmidi": "^3.1.11"
   }

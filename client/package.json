@@ -50,7 +50,7 @@
     "daisyui": "^4.12.13",
     "dayjs": "^1.11.13",
     "download": "^8.0.0",
-    "electron": "^33.0.0",
+    "electron": "^33.0.1",
     "electron-forge-maker-appimage": "github:duzda/electron-forge-maker-appimage",
     "electron-squirrel-startup": "^1.0.1",
     "electron-window-state": "^5.0.3",
@@ -58,7 +58,7 @@
     "esbuild-style-plugin": "^1.6.3",
     "esbuild-svelte": "^0.8.2",
     "eslint": "^8.57.1",
-    "eslint-plugin-svelte": "^2.45.0",
+    "eslint-plugin-svelte": "^2.45.1",
     "eventemitter3": "^5.0.1",
     "fs-extra": "^11.2.0",
     "material-ui-colors": "^1.0.0",
@@ -76,7 +76,7 @@
     "tailwindcss": "^3.4.14",
     "uuid": "^10.0.0",
     "wait-on": "^8.0.1",
-    "wavesurfer.js": "^7.8.6",
+    "wavesurfer.js": "^7.8.7",
     "weak-ref-collections": "^1.2.4",
     "webmidi": "^3.1.11"
   }
