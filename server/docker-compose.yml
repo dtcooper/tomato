@@ -34,7 +34,7 @@ services:
       - api
       - logs
     volumes:
-      - ./nginx.conf.j2:/etc/nginx/templates/app.conf.j2
+      - ./nginx.conf.jinja:/etc/nginx/templates/app.conf.jinja
       - ./serve:/serve:ro
       - nginx_secrets:/etc/letsencrypt
     environment:
