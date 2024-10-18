@@ -8,10 +8,6 @@ inputs:
   tag:
     description: Container tag name
     required: true
-  context:
-    description: Container context
-    required: false
-    default: ''
   token:
     description: GitHub token
     required: true
