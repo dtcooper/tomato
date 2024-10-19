@@ -28,20 +28,20 @@ The use case of Tomato is extremely simple by design.
 
 ```mermaid
 flowchart RL
-    subgraph CLIENT_SERVER [Client-Server Relationship]
+    subgraph CLIENT_SERVER["Server"]
         direction BT
-            client("Desktop App\n<em><small>(Client)</small></em>")
-            server("Backend Server\n<em><small>(Web UI)</small></em>")
-            server -- admins upload audio --> client
+            admin("Admins manage data")
+            server("Backend Server<br><em><small>(Web UI)</small></em>")
+            admin -- "Admin uploads audio, etc" --> server
     end
-    subgraph STOPSET [Desktop App]
+    subgraph STOPSET["Desktop (Native App)"]
         direction TB
-            stopset("App Plays Stop Set\n<em><small>(Commercial Break)</small></em>")
-            wait("App Waits\n<em><small>(Countdown Timer)</small></em>")
+            stopset("App Plays Stop Set<br><em><small>(Commercial Break)</small></em>")
+            wait("App Waits<br><em><small>(Countdown Timer)</small></em>")
             stopset --> wait
-            wait -- user manually\ntriggers stop set --> stopset
+            wait -- User manually<br>triggers stop set --> stopset
     end
-    CLIENT_SERVER -- app syncs\nwith server <---> STOPSET
+    CLIENT_SERVER -- app syncs<br>with server <---> STOPSET
 ```
 
 

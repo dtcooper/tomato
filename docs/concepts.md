@@ -50,22 +50,22 @@ station ID jingles at the start and end of a stop set, as in the example below.
 
     ```mermaid
     flowchart TD
-        sids(Station IDs\n<em>Rotator</em>)
-        psas(Public Service Announcements\n<em>Rotator</em>)
-        ads(Advertisements\n<em>Rotator</em>)
-        sid1(S_ID_1.mp3\n<em>Asset</em>)
-        sid2(S_ID_2.mp3\n<em>Asset</em>)
-        sid3(S_ID_3.mp3\n<em>Asset</em>)
+        sids(Station IDs<br><em>Rotator</em>)
+        psas(Public Service Announcements<br><em>Rotator</em>)
+        ads(Advertisements<br><em>Rotator</em>)
+        sid1(S_ID_1.mp3<br><em>Asset</em>)
+        sid2(S_ID_2.mp3<br><em>Asset</em>)
+        sid3(S_ID_3.mp3<br><em>Asset</em>)
         sid1 --> sids
         sid2 --> sids
         sid3 --> sids
-        psa1(PSA_1.mp3\n<em>Asset</em>)
-        psa2(PSA_2.mp3\n<em>Asset</em>)
+        psa1(PSA_1.mp3<br><em>Asset</em>)
+        psa2(PSA_2.mp3<br><em>Asset</em>)
         psa1 --> psas
         psa2 --> psas
-        ad1(AD_1.mp3\n<em>Asset</em>)
-        ad2(AD_2.mp3\n<em>Asset</em>)
-        ad3(AD_3.mp3\n<em>Asset</em>)
+        ad1(AD_1.mp3<br><em>Asset</em>)
+        ad2(AD_2.mp3<br><em>Asset</em>)
+        ad3(AD_3.mp3<br><em>Asset</em>)
         ad1 --> ads
         ad2 --> ads
         ad3 --> ads
@@ -79,11 +79,11 @@ station ID jingles at the start and end of a stop set, as in the example below.
         stopset(Evening Stop Set)
         subgraph "Rotators in stop set"
             direction TB
-            rotator1(1. Station IDs\n<em>Rotator</em>)
-            rotator2(2. Advertisements\n<em>Rotator</em>)
-            rotator3(3. Advertisements\n<em>Rotator</em>\n<strong><small>Repetition Allowed!</small></strong>)
-            rotator4(4. Public Service Announcements\n<em>Rotator</em>)
-            rotator5(5. Station IDs\n<em>Rotator</em>)
+            rotator1("#8291;1. Station IDs<br><em>Rotator</em>")
+            rotator2("#8291;2. Advertisements<br><em>Rotator</em>")
+            rotator3("#8291;3. Advertisements<br><em>Rotator</em><br><strong><small>Repetition Allowed!</small></strong>")
+            rotator4("#8291;4. Public Service Announcements<br><em>Rotator</em>")
+            rotator5("#8291;5. Station IDs<br><em>Rotator</em>")
         end
         rotator1 --- stopset
         rotator2 --- stopset
@@ -99,31 +99,31 @@ station ID jingles at the start and end of a stop set, as in the example below.
     flowchart LR
         subgraph "Rotators in stop set"
             direction TB
-            rotator1(1. Station IDs\n<em>Rotator</em>)
-            rotator2(2. Advertisements\n<em>Rotator</em>)
-            rotator3(3. Advertisements\n<em>Rotator</em>)
-            rotator4(4. Public Service Announcements\n<em>Rotator</em>)
-            rotator5(5. Station IDs\n<em>Rotator</em>)
+            rotator1("#8291;1. Station IDs<br><em>Rotator</em>")
+            rotator2("#8291;2. Advertisements<br><em>Rotator</em>")
+            rotator3("#8291;3. Advertisements<br><em>Rotator</em>")
+            rotator4("#8291;4. Public Service Announcements<br><em>Rotator</em>")
+            rotator5("#8291;5. Station IDs<br><em>Rotator</em>")
         end
         stopset(Evening Stop Set)
         subgraph "Assets played (generated)"
             direction TB
-            asset1(S_ID_2.mp3\n<em>Asset</em>)
-            asset2(AD_3.mp3\n<em>Asset</em>)
-            asset3(AD_1.mp3\n<em>Asset</em>)
-            asset4(PSA_2.mp3\n<em>Asset</em>)
-            asset5(S_ID_1.mp3\n<em>Asset</em>)
+            asset1(S_ID_2.mp3<br><em>Asset</em>)
+            asset2(AD_3.mp3<br><em>Asset</em>)
+            asset3(AD_1.mp3<br><em>Asset</em>)
+            asset4(PSA_2.mp3<br><em>Asset</em>)
+            asset5(S_ID_1.mp3<br><em>Asset</em>)
         end
         rotator1 --- stopset
         rotator2 --- stopset
         rotator3 --- stopset
         rotator4 --- stopset
         rotator5 --- stopset
-        asset1 -- randomly\nselected\nfrom rotator --- rotator1
-        asset2 -- randomly\nselected\nfrom rotator --- rotator2
-        asset3 -- randomly\nselected\nfrom rotator --- rotator3
-        asset4 -- randomly\nselected\nfrom rotator --- rotator4
-        asset5 -- randomly\nselected\nfrom rotator --- rotator5
+        asset1 -- randomly<br>selected<br>from rotator --- rotator1
+        asset2 -- randomly<br>selected<br>from rotator --- rotator2
+        asset3 -- randomly<br>selected<br>from rotator --- rotator3
+        asset4 -- randomly<br>selected<br>from rotator --- rotator4
+        asset5 -- randomly<br>selected<br>from rotator --- rotator5
     ```
 
     !!!note "Stop sets and ***generated*** stop sets"
@@ -141,8 +141,8 @@ flowchart RL
     stopset{Stop Sets}
     rotator{Rotators}
     asset{Audio Assets}
-    rotator -- "many-to-many\nrelationship (ordered list)" --> stopset
-    asset -- "many-to-many\nrelationship (set)" --> rotator
+    rotator -- "many-to-many<br>relationship (ordered list)" --> stopset
+    asset -- "many-to-many<br>relationship (set)" --> rotator
 ```
 
 ## Wait Interval
