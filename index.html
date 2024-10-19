@@ -666,20 +666,20 @@ that are not yet available. <em>Beware!</em></p>
 <h2 id="use-case">Use Case<a class="headerlink" href="#use-case" title="Permanent link">←</a></h2>
 <p>The use case of Tomato is extremely simple by design.</p>
 <pre class="mermaid"><code>flowchart RL
-    subgraph CLIENT_SERVER [Client-Server Relationship]
+    subgraph CLIENT_SERVER["Server"]
         direction BT
-            client("Desktop App\n&lt;em&gt;&lt;small&gt;(Client)&lt;/small&gt;&lt;/em&gt;")
-            server("Backend Server\n&lt;em&gt;&lt;small&gt;(Web UI)&lt;/small&gt;&lt;/em&gt;")
-            server -- admins upload audio --&gt; client
+            admin("Admins manage data")
+            server("Backend Server&lt;br&gt;&lt;em&gt;&lt;small&gt;(Web UI)&lt;/small&gt;&lt;/em&gt;")
+            admin -- "Admin uploads audio, etc" --&gt; server
     end
-    subgraph STOPSET [Desktop App]
+    subgraph STOPSET["Desktop (Native App)"]
         direction TB
-            stopset("App Plays Stop Set\n&lt;em&gt;&lt;small&gt;(Commercial Break)&lt;/small&gt;&lt;/em&gt;")
-            wait("App Waits\n&lt;em&gt;&lt;small&gt;(Countdown Timer)&lt;/small&gt;&lt;/em&gt;")
+            stopset("App Plays Stop Set&lt;br&gt;&lt;em&gt;&lt;small&gt;(Commercial Break)&lt;/small&gt;&lt;/em&gt;")
+            wait("App Waits&lt;br&gt;&lt;em&gt;&lt;small&gt;(Countdown Timer)&lt;/small&gt;&lt;/em&gt;")
             stopset --&gt; wait
-            wait -- user manually\ntriggers stop set --&gt; stopset
+            wait -- User manually&lt;br&gt;triggers stop set --&gt; stopset
     end
-    CLIENT_SERVER -- app syncs\nwith server &lt;---&gt; STOPSET</code></pre>
+    CLIENT_SERVER -- app syncs&lt;br&gt;with server &lt;---&gt; STOPSET</code></pre>
 <h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">←</a></h2>
 <ul>
 <li>Client and server relationship.</li>

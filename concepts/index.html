@@ -706,22 +706,22 @@ station ID jingles at the start and end of a stop set, as in the example below.<
 <p>Let's say we have the following rotators created, and we've put assets in
 each of them them,</p>
 <pre class="mermaid"><code>flowchart TD
-    sids(Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
-    psas(Public Service Announcements\n&lt;em&gt;Rotator&lt;/em&gt;)
-    ads(Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;)
-    sid1(S_ID_1.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
-    sid2(S_ID_2.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
-    sid3(S_ID_3.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+    sids(Station IDs&lt;br&gt;&lt;em&gt;Rotator&lt;/em&gt;)
+    psas(Public Service Announcements&lt;br&gt;&lt;em&gt;Rotator&lt;/em&gt;)
+    ads(Advertisements&lt;br&gt;&lt;em&gt;Rotator&lt;/em&gt;)
+    sid1(S_ID_1.mp3&lt;br&gt;&lt;em&gt;Asset&lt;/em&gt;)
+    sid2(S_ID_2.mp3&lt;br&gt;&lt;em&gt;Asset&lt;/em&gt;)
+    sid3(S_ID_3.mp3&lt;br&gt;&lt;em&gt;Asset&lt;/em&gt;)
     sid1 --&gt; sids
     sid2 --&gt; sids
     sid3 --&gt; sids
-    psa1(PSA_1.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
-    psa2(PSA_2.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+    psa1(PSA_1.mp3&lt;br&gt;&lt;em&gt;Asset&lt;/em&gt;)
+    psa2(PSA_2.mp3&lt;br&gt;&lt;em&gt;Asset&lt;/em&gt;)
     psa1 --&gt; psas
     psa2 --&gt; psas
-    ad1(AD_1.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
-    ad2(AD_2.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
-    ad3(AD_3.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+    ad1(AD_1.mp3&lt;br&gt;&lt;em&gt;Asset&lt;/em&gt;)
+    ad2(AD_2.mp3&lt;br&gt;&lt;em&gt;Asset&lt;/em&gt;)
+    ad3(AD_3.mp3&lt;br&gt;&lt;em&gt;Asset&lt;/em&gt;)
     ad1 --&gt; ads
     ad2 --&gt; ads
     ad3 --&gt; ads</code></pre>
@@ -731,11 +731,11 @@ of five rotators, shown here,</p>
     stopset(Evening Stop Set)
     subgraph "Rotators in stop set"
         direction TB
-        rotator1(1. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
-        rotator2(2. Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;)
-        rotator3(3. Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;\n&lt;strong&gt;&lt;small&gt;Repetition Allowed!&lt;/small&gt;&lt;/strong&gt;)
-        rotator4(4. Public Service Announcements\n&lt;em&gt;Rotator&lt;/em&gt;)
-        rotator5(5. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
+        rotator1("#8291;1. Station IDs&lt;br&gt;&lt;em&gt;Rotator&lt;/em&gt;")
+        rotator2("#8291;2. Advertisements&lt;br&gt;&lt;em&gt;Rotator&lt;/em&gt;")
+        rotator3("#8291;3. Advertisements&lt;br&gt;&lt;em&gt;Rotator&lt;/em&gt;&lt;br&gt;&lt;strong&gt;&lt;small&gt;Repetition Allowed!&lt;/small&gt;&lt;/strong&gt;")
+        rotator4("#8291;4. Public Service Announcements&lt;br&gt;&lt;em&gt;Rotator&lt;/em&gt;")
+        rotator5("#8291;5. Station IDs&lt;br&gt;&lt;em&gt;Rotator&lt;/em&gt;")
     end
     rotator1 --- stopset
     rotator2 --- stopset
@@ -747,31 +747,31 @@ a commercial break, here's what's played.</p>
 <pre class="mermaid"><code>flowchart LR
     subgraph "Rotators in stop set"
         direction TB
-        rotator1(1. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
-        rotator2(2. Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;)
-        rotator3(3. Advertisements\n&lt;em&gt;Rotator&lt;/em&gt;)
-        rotator4(4. Public Service Announcements\n&lt;em&gt;Rotator&lt;/em&gt;)
-        rotator5(5. Station IDs\n&lt;em&gt;Rotator&lt;/em&gt;)
+        rotator1("#8291;1. Station IDs&lt;br&gt;&lt;em&gt;Rotator&lt;/em&gt;")
+        rotator2("#8291;2. Advertisements&lt;br&gt;&lt;em&gt;Rotator&lt;/em&gt;")
+        rotator3("#8291;3. Advertisements&lt;br&gt;&lt;em&gt;Rotator&lt;/em&gt;")
+        rotator4("#8291;4. Public Service Announcements&lt;br&gt;&lt;em&gt;Rotator&lt;/em&gt;")
+        rotator5("#8291;5. Station IDs&lt;br&gt;&lt;em&gt;Rotator&lt;/em&gt;")
     end
     stopset(Evening Stop Set)
     subgraph "Assets played (generated)"
         direction TB
-        asset1(S_ID_2.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
-        asset2(AD_3.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
-        asset3(AD_1.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
-        asset4(PSA_2.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
-        asset5(S_ID_1.mp3\n&lt;em&gt;Asset&lt;/em&gt;)
+        asset1(S_ID_2.mp3&lt;br&gt;&lt;em&gt;Asset&lt;/em&gt;)
+        asset2(AD_3.mp3&lt;br&gt;&lt;em&gt;Asset&lt;/em&gt;)
+        asset3(AD_1.mp3&lt;br&gt;&lt;em&gt;Asset&lt;/em&gt;)
+        asset4(PSA_2.mp3&lt;br&gt;&lt;em&gt;Asset&lt;/em&gt;)
+        asset5(S_ID_1.mp3&lt;br&gt;&lt;em&gt;Asset&lt;/em&gt;)
     end
     rotator1 --- stopset
     rotator2 --- stopset
     rotator3 --- stopset
     rotator4 --- stopset
     rotator5 --- stopset
-    asset1 -- randomly\nselected\nfrom rotator --- rotator1
-    asset2 -- randomly\nselected\nfrom rotator --- rotator2
-    asset3 -- randomly\nselected\nfrom rotator --- rotator3
-    asset4 -- randomly\nselected\nfrom rotator --- rotator4
-    asset5 -- randomly\nselected\nfrom rotator --- rotator5</code></pre>
+    asset1 -- randomly&lt;br&gt;selected&lt;br&gt;from rotator --- rotator1
+    asset2 -- randomly&lt;br&gt;selected&lt;br&gt;from rotator --- rotator2
+    asset3 -- randomly&lt;br&gt;selected&lt;br&gt;from rotator --- rotator3
+    asset4 -- randomly&lt;br&gt;selected&lt;br&gt;from rotator --- rotator4
+    asset5 -- randomly&lt;br&gt;selected&lt;br&gt;from rotator --- rotator5</code></pre>
 <div class="admonition note">
 <p class="admonition-title">Stop sets and <strong><em>generated</em></strong> stop sets</p>
 <p>Note, the above is a so-called "generated" stop set. It's an actual stop set
@@ -785,8 +785,8 @@ because Tomato picks (or generates) individual assets to play.</p>
     stopset{Stop Sets}
     rotator{Rotators}
     asset{Audio Assets}
-    rotator -- "many-to-many\nrelationship (ordered list)" --&gt; stopset
-    asset -- "many-to-many\nrelationship (set)" --&gt; rotator</code></pre>
+    rotator -- "many-to-many&lt;br&gt;relationship (ordered list)" --&gt; stopset
+    asset -- "many-to-many&lt;br&gt;relationship (set)" --&gt; rotator</code></pre>
 <h2 id="wait-interval">Wait Interval<a class="headerlink" href="#wait-interval" title="Permanent link">←</a></h2>
 <p>Tomato's <strong>wait interval</strong> is how long the desktop app should wait before
 notifying the user that a stop set is due to be played.</p>
