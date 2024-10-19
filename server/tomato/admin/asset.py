@@ -109,7 +109,7 @@ class AssetAdminBase(FileFormAdminMixin, TomatoModelAdminBase):
                 )
             return html + mark_safe("</div>")
         else:
-            return ""
+            return mark_safe('<span class="play-asset-list-display">&#x1F6AB;</span>')
 
     @staticmethod
     def _get_player_html(obj):
