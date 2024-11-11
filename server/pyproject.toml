@@ -9,14 +9,14 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
-django = "^5.1.2"
+django = "^5.1.3"
 django-admin-logs = "^1.3.0"
-django-admin-notice = "^3.1.0"
-django-constance = "^4.1.2"
+django-admin-notice = "^3.2.0"
+django-constance = "^4.1.3"
 django-dirtyfields = "^1.9.3"
 django-environ = "^0.11.2"
 django-file-form = "^3.8.0"
-django-pgtrigger = "^4.12.2"
+django-pgtrigger = "^4.13.0"
 django-user-messages = "^1.1.0"
 gunicorn = "^23.0.0"
 huey = "^2.5.2"
@@ -37,7 +37,7 @@ ipdb = "^0.13.13"
 ipython = "^8.29.0"
 isort = "^5.13.2"
 pywatchman = "^2.0.0"
-watchdog = {extras = ["watchmedo"], version = "^5.0.3"}
+watchdog = {extras = ["watchmedo"], version = "^6.0.0"}
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
