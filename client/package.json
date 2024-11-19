@@ -67,7 +67,7 @@
     "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-svelte": "^3.2.8",
-    "prettier-plugin-tailwindcss": "^0.6.8",
+    "prettier-plugin-tailwindcss": "^0.6.9",
     "reconnecting-websocket": "^4.4.0",
     "run-script-os": "^1.1.6",
     "svelte": "^4.2.19",
