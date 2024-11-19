@@ -23,7 +23,7 @@ huey = "^2.5.2"
 psycopg = "^3.2.3"
 python-dotenv = "^1.0.1"
 schema = "^0.7.7"
-starlette = "^0.41.2"
+starlette = "^0.41.3"
 typing-extensions = "^4.12.2"  # For Python 3.13 + pgtrigger
 uvicorn = {extras = ["standard"], version = "^0.32.0"}
 wait-for-it = "^2.3.0"
