@@ -1,6 +1,7 @@
-# Button Box Firmware
+# MIDI Controller - Button Box Firmware
 
-Here's the button box firmware for a Raspberry Pi Pico flashed with CircuitPython.
+Here's the MIDI controller button box firmware for a Raspberry Pi Pico flashed
+with CircuitPython.
 
 <div align="center">
   <img src="https://raw.github.com/dtcooper/tomato/main/.github/tomato-controller.jpg" width="300">

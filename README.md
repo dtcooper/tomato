@@ -9,7 +9,7 @@
   <a href="https://dtcooper.github.io/tomato/">Documentation</a> |
   <a href="https://dtcooper.github.io/tomato/client/">Desktop App</a> |
   <a href="https://dtcooper.github.io/tomato/server/">Server</a> |
-  <a href="https://github.com/dtcooper/tomato/blob/main/controller/">Controller</a>
+  <a href="https://github.com/dtcooper/tomato/blob/main/controller/">Button Box</a>
 </p>
 
 [![Client build status](https://img.shields.io/github/actions/workflow/status/dtcooper/tomato/build-client.yml?branch=main&label=client%20build)](https://github.com/dtcooper/tomato/actions/workflows/build-client.yml) [![Server build &amp deploy status](https://img.shields.io/github/actions/workflow/status/dtcooper/tomato/build-deploy-on-push.yml?branch=main&label=server%20build)](https://github.com/dtcooper/tomato/actions/workflows/build-deploy-on-push.yml) [![Docs build status](https://img.shields.io/github/actions/workflow/status/dtcooper/tomato/docs.yml?branch=main&label=docs%20build)](https://github.com/dtcooper/tomato/actions/workflows/docs.yml)
@@ -81,7 +81,7 @@ Head over to <http://localhost:8888/> in your web browser.
   * Tools, Databases, and Containers: [PostgreSQL](https://www.postgresql.org/),
     [docker-nginx-certbot](https://github.com/JonasAlfredsson/docker-nginx-certbot),
     and [Dozzle](https://dozzle.dev/).
-* Button Box (Controller) &mdash;
+* MIDI Controller Button Box &mdash;
   [Raspberry Pi Pico](https://www.raspberrypi.com/documentation/microcontrollers/raspberry-pi-pico.html)
   (or similar) and [CircuitPython](https://circuitpython.org/)
   * See [`controller/README.md`](controller/README.md) for firmware/setup instructions
