@@ -25,7 +25,6 @@ services:
     environment:
       USE_LOCAL_CA: "${NGINX_DEBUG_MODE_ONLY_USE_LOCAL_CA:-0}"
       LOCAL_CA_ROOT_CERT_VALIDITY: 90  # 90 days instead of 30
-      DHPARAM_SIZE: 1024  # Faster in dev
 
   db:
     restart: 'no'
