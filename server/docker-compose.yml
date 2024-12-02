@@ -28,7 +28,7 @@ services:
 
   nginx:
     restart: always
-    image: ghcr.io/dtcooper/nginx-certbot-jinja:5.4.0-nginx1.27.2
+    image: ghcr.io/dtcooper/nginx-certbot-jinja:5.4.0-nginx1.27.3
     depends_on:
       - app
       - api
