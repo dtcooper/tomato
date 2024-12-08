@@ -47,7 +47,7 @@ RUN if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
         && echo '. /etc/bash_completion' >> /root/.bashrc \
     ; fi
 
-ARG POETRY_VERSION=1.8.4
+ARG POETRY_VERSION=1.8.5
 RUN curl -sSL https://install.python-poetry.org | python -
 ENV PATH="/root/.local/bin:${PATH}"
 RUN echo '/app' > "$(python -c 'import site; print(site.getsitepackages()[0])')/app.pth"
