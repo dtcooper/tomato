@@ -4,6 +4,6 @@
     "choices.js": "^11.0.2",
     "dayjs": "^1.11.13",
     "reconnecting-websocket": "^4.4.0",
-    "simpledotcss": "^2.3.2"
+    "simpledotcss": "^2.3.3"
   }
 }
