@@ -47,7 +47,7 @@
     "axios": "^1.7.9",
     "browser-sync": "^3.0.3",
     "color": "^4.2.3",
-    "daisyui": "^4.12.21",
+    "daisyui": "^4.12.22",
     "dayjs": "^1.11.13",
     "download": "^8.0.0",
     "electron": "^33.2.1",
@@ -76,7 +76,7 @@
     "tailwindcss": "^3.4.16",
     "uuid": "^11.0.3",
     "wait-on": "^8.0.1",
-    "wavesurfer.js": "^7.8.10",
+    "wavesurfer.js": "^7.8.11",
     "weak-ref-collections": "^1.2.4",
     "webmidi": "^3.1.12"
   }
