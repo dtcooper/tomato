@@ -267,13 +267,13 @@ files = [
 
 [[package]]
 name = "django-pgtrigger"
-version = "4.13.2"
+version = "4.13.3"
 description = "Postgres trigger support integrated with Django models."
 optional = false
 python-versions = "<4,>=3.9.0"
 files = [
-    {file = "django_pgtrigger-4.13.2-py3-none-any.whl", hash = "sha256:0f6abd76db30c05c16108f474011650448bd6129cf68e376ec7d40d72fea1c9a"},
-    {file = "django_pgtrigger-4.13.2.tar.gz", hash = "sha256:f4d906df3a6dde1abc42b88b351bd942c180fe28dfb664ff4e766ebe2bd8fd81"},
+    {file = "django_pgtrigger-4.13.3-py3-none-any.whl", hash = "sha256:d6e4d17021bbd5e425a308f07414b237b9b34423275d86ad756b90c307df3ca4"},
+    {file = "django_pgtrigger-4.13.3.tar.gz", hash = "sha256:c525f9e81f120d166c4bd5fe8c3770640356f0644edf0fc2b7f6426008e52f77"},
 ]
 
 [package.dependencies]
@@ -872,20 +872,20 @@ tests = ["cython", "littleutils", "pygments", "pytest", "typeguard"]
 
 [[package]]
 name = "starlette"
-version = "0.41.3"
+version = "0.42.0"
 description = "The little ASGI library that shines."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "starlette-0.41.3-py3-none-any.whl", hash = "sha256:44cedb2b7c77a9de33a8b74b2b90e9f50d11fcf25d8270ea525ad71a25374ff7"},
-    {file = "starlette-0.41.3.tar.gz", hash = "sha256:0e4ab3d16522a255be6b28260b938eae2482f98ce5cc934cb08dce8dc3ba5835"},
+    {file = "starlette-0.42.0-py3-none-any.whl", hash = "sha256:02f877201a3d6d301714b5c72f15cac305ea5cc9e213c4b46a5af7eecad0d625"},
+    {file = "starlette-0.42.0.tar.gz", hash = "sha256:91f1fbd612f3e3d821a8a5f46bf381afe2a9722a7b8bbde1c07fb83384c2882a"},
 ]
 
 [package.dependencies]
 anyio = ">=3.4.0,<5"
 
 [package.extras]
-full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.7)", "pyyaml"]
+full = ["httpx (>=0.27.0,<0.29.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.18)", "pyyaml"]
 
 [[package]]
 name = "traitlets"
@@ -926,13 +926,13 @@ files = [
 
 [[package]]
 name = "uvicorn"
-version = "0.32.1"
+version = "0.34.0"
 description = "The lightning-fast ASGI server."
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "uvicorn-0.32.1-py3-none-any.whl", hash = "sha256:82ad92fd58da0d12af7482ecdb5f2470a04c9c9a53ced65b9bbb4a205377602e"},
-    {file = "uvicorn-0.32.1.tar.gz", hash = "sha256:ee9519c246a72b1c084cea8d3b44ed6026e78a4a309cbedae9c37e4cb9fbb175"},
+    {file = "uvicorn-0.34.0-py3-none-any.whl", hash = "sha256:023dc038422502fa28a09c7a30bf2b6991512da7dcdb8fd35fe57cfc154126f4"},
+    {file = "uvicorn-0.34.0.tar.gz", hash = "sha256:404051050cd7e905de2c9a7e61790943440b3416f49cb409f965d9dcd0fa73e9"},
 ]
 
 [package.dependencies]
@@ -1237,4 +1237,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "3f30d9a757a36e09fccda50a16eb7d76bd1bce79907ee5af1c85f2db24499690"
+content-hash = "d527b8ef16521694bfdcb908c38285bfdb4feaacc1967f9b48eaaa07a532fe69"
