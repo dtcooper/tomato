@@ -104,7 +104,7 @@ if (squirrelCheck || !singleInstanceLock) {
                 if (err) {
                   console.error("An error occurred:", err)
                 } else {
-                  console.log(`Archived previous log file: ${file}`)
+                  console.log(`Archived previous log file: ${file} => ${file}.gz`)
                 }
                 fs.rm(fileToRemove, { force: true }, (err) => {
                   if (err) {
