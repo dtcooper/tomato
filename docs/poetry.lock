@@ -424,14 +424,14 @@ test = ["mkdocs-d2-plugin", "mkdocs-include-markdown-plugin", "mkdocs-macros-tes
 
 [[package]]
 name = "mkdocs-material"
-version = "9.6.1"
+version = "9.6.2"
 description = "Documentation that simply works"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "mkdocs_material-9.6.1-py3-none-any.whl", hash = "sha256:c1742d410be29811a9b7e863cb25a578b9e255fe6f04c69f8c6838863a58e141"},
-    {file = "mkdocs_material-9.6.1.tar.gz", hash = "sha256:da37dba220d9fbfc5f1fc567fafc4028e3c3d7d828f2779ed09ab726ceca77dc"},
+    {file = "mkdocs_material-9.6.2-py3-none-any.whl", hash = "sha256:71d90dbd63b393ad11a4d90151dfe3dcbfcd802c0f29ce80bebd9bbac6abc753"},
+    {file = "mkdocs_material-9.6.2.tar.gz", hash = "sha256:a3de1c5d4c745f10afa78b1a02f917b9dce0808fb206adc0f5bb48b58c1ca21f"},
 ]
 
 [package.dependencies]
@@ -919,4 +919,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9"
-content-hash = "46285b5e1a253491ba1422f62ae683d8592cc5e1a5f7a903c275f40d70c28edf"
+content-hash = "c5c1ab9957eb374ce118debcf5acdb1f02bbcc99ac04029faf932e99ca45e860"
