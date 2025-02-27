@@ -107,3 +107,4 @@ Changes for 2024 based on real world usage in 2023 and feedback
 ## 2025 Things
 
 - [ ] Simplify permission system, removing groups and just having superusers + regular users + flags on user model?
+- [ ] Fix `black` tool.
