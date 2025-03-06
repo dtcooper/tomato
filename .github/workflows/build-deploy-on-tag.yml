@@ -46,6 +46,12 @@ jobs:
           platforms: ${{ env.PLATFORMS }}
           build-args: |
             TOMATO_VERSION=${{ steps.version.outputs.version }}
+      -
+        name: Re-build dev containers
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: build-deploy-on-push.yml
+          ref: ${{ github.sha }}
 
   deploy:
     runs-on: ubuntu-22.04

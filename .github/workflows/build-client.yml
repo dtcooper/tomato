@@ -177,6 +177,13 @@ jobs:
           tag: ${{ github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
           generateReleaseNotes: true
+      -
+        name: Re-build preview client
+        if: github.ref_type == 'tag'
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: build-client.yml
+          ref: ${{ github.sha }}
 
   aur:
     runs-on: ubuntu-22.04
