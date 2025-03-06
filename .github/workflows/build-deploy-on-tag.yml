@@ -51,7 +51,7 @@ jobs:
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: build-deploy-on-push.yml
-          ref: ${{ github.sha }}
+          ref: main
 
   deploy:
     runs-on: ubuntu-22.04

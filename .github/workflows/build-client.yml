@@ -183,7 +183,7 @@ jobs:
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: build-client.yml
-          ref: ${{ github.sha }}
+          ref: main
 
   aur:
     runs-on: ubuntu-22.04
