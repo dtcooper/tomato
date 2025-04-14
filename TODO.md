@@ -108,3 +108,4 @@ Changes for 2024 based on real world usage in 2023 and feedback
 
 - [ ] Simplify permission system, removing groups and just having superusers + regular users + flags on user model?
 - [ ] Fix `black` tool.
+- [ ] Ability to completely remove asset deletion (soft delete only) via constance config
