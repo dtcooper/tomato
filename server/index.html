@@ -705,6 +705,11 @@ heavily leveraging its automatic admin interface.</p>
 <h3 id="server-audio-processing">Server audio processing<a class="headerlink" href="#server-audio-processing" title="Permanent link">←</a></h3>
 <div class="admonition info">
 <dl>
+<dt><code>ENABLE_ASSET_DELETION</code> --- <strong>Type: Boolean (true or false)</strong></dt>
+<dd>
+<p>If disabled, no one can delete assets (can only archive soft delete)</p>
+<p>Default: <code>True</code></p>
+</dd>
 <dt><code>AUDIO_BITRATE</code> --- <strong>Type: 32kbps through 320kbps</strong></dt>
 <dd>
 <p>The audio bitrate to convert an asset to, if <strong>and only if</strong> processing is required.<br><strong>NOTE:</strong> processing is required when a file that is uploaded is <strong>not</strong> a valid MP3 file or <strong>TRIM_SILENCE</strong> is on.</p>
