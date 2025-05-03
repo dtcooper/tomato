@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 
+from constance import config
 from django_file_form.forms import FileFormMixin, MultipleUploadedFileField
 from django_file_form.model_admin import FileFormAdminMixin
 
@@ -263,6 +264,21 @@ class AssetAdmin(AiringMixin, AssetAdminBase):
     )
     readonly_fields = ("airing", "alternates_display", "rotators_display") + AssetAdminBase.readonly_fields
 
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        asset = get_object_or_404(Asset, id=object_id)
+        return super().change_view(
+            request,
+            object_id,
+            form_url,
+            extra_context={
+                "show_archive_link": self.has_change_permission(request, asset),
+                "is_archived": asset.archived,
+            },
+        )
+
+    def has_delete_permission(self, request, obj=None):
+        return config.ENABLE_ASSET_DELETION and super().has_delete_permission(request, obj)
+
     @admin.display(description="name", ordering="name")
     def list_name(self, obj):
         return format_html('<span style="color: red">[archived]</span> {}', obj.name) if obj.archived else obj.name
@@ -452,9 +468,24 @@ class AssetAdmin(AiringMixin, AssetAdminBase):
             },
         )
 
+    def archive_view(self, request, object_id):
+        asset = get_object_or_404(Asset, id=object_id)
+        if not self.has_change_permission(request, asset):
+            raise PermissionDenied
+
+        asset.archived = not asset.archived
+        asset.save()
+        self.message_user(
+            request, f"Asset {asset.name} successfully {'archived' if asset.archived else 'restored'}", messages.SUCCESS
+        )
+        return redirect("admin:tomato_asset_change", object_id=object_id)
+
     def get_urls(self):
         return [
             path("upload/", self.admin_site.admin_view(self.upload_view), name="tomato_asset_upload"),
+            path(
+                "archive/<int:object_id>/", self.admin_site.admin_view(self.archive_view), name="tomato_asset_archive"
+            ),
         ] + super().get_urls()
 
 

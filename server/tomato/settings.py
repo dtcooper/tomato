@@ -477,6 +477,7 @@ CONSTANCE_CONFIG = {
         ),
         "clock",
     ),
+    "ENABLE_ASSET_DELETION": (True, "If disabled, no one can delete assets (can only archive soft delete)"),
 }
 
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
@@ -493,6 +494,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
     (
         "Server audio processing",
         (
+            "ENABLE_ASSET_DELETION",
             "AUDIO_BITRATE",
             "EXTRACT_METADATA_FROM_FILE",
             "PREVENT_DUPLICATE_ASSETS",

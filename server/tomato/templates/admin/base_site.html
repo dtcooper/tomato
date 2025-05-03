@@ -62,6 +62,10 @@
     .vTimeField, .vDateField {
       min-width: 10em;
     }
+
+    .object-tools {
+      font-size: unset; /* XXX fix weird margin issue */
+    }
   </style>
   {{ tomato_json_data|json_script:"tomato-json-data" }}
   <script>
@@ -127,16 +131,18 @@
 
 {% block messages %}
   {% if messages %}
-    <ul class="messagelist">{% for message in messages %}
-      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
-        {{ message|capfirst }}
-        {% if message.deliver_once is not None and not message.deliver_once %}
-          <span>
-            [<a href="#" class="dismiss-message" data-message-id="{{ message.id }}"><strong>Dismiss sticky alert</strong></a>]
-          </span>
-        {% endif %}
-      </li>
-    {% endfor %}</ul>
+    <ul class="messagelist">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+          {{ message|capfirst }}
+          {% if message.deliver_once is not None and not message.deliver_once %}
+            <span>
+              [<a href="#" class="dismiss-message" data-message-id="{{ message.id }}"><strong>Dismiss sticky alert</strong></a>]
+            </span>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
   {% endif %}
 {% endblock messages %}
 

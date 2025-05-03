@@ -48,7 +48,7 @@ target-version = ["py312"]
 preview = true
 enable-unstable-feature = [
     "multiline_string_handling", "string_processing", "wrap_long_dict_values_in_parens",
-    "hex_codes_in_unicode_sequences", "hug_parens_with_braces_and_square_brackets"
+    "hug_parens_with_braces_and_square_brackets"
 ]
 
 [tool.isort]
