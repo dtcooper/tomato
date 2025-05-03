@@ -3,7 +3,7 @@
     "@alpinejs/persist": "^3.14.9",
     "@msgpack/msgpack": "^3.1.1",
     "alpinejs": "^3.14.9",
-    "simpledotcss": "^2.3.5",
+    "simpledotcss": "^2.3.6",
     "webmidi": "^3.1.12"
   }
 }
