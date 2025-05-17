@@ -85,7 +85,8 @@ if (squirrelCheck || !singleInstanceLock) {
   app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors,HardwareMediaKeyHandling,MediaSessionService")
   app.commandLine.appendSwitch("disable-pinch")
 
-  if (IS_LINUX) { // Needed to fix https://github.com/electron/electron/issues/46538
+  if (IS_LINUX) {
+    // Needed to fix https://github.com/electron/electron/issues/46538
     app.commandLine.appendSwitch("gtk-version", "3")
   }
 
