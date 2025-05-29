@@ -23,7 +23,7 @@ huey = "^2.5.3"
 psycopg = "^3.2.9"
 python-dotenv = "^1.1.0"
 schema = "^0.7.7"
-starlette = "^0.46.2"
+starlette = "^0.47.0"
 uvicorn = {extras = ["standard"], version = "^0.34.2"}
 wait-for-it = "^2.3.0"
 
