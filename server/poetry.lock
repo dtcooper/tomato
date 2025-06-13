@@ -100,14 +100,14 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "click"
-version = "8.2.0"
+version = "8.2.1"
 description = "Composable command line interface toolkit"
 optional = false
 python-versions = ">=3.10"
 groups = ["main", "dev"]
 files = [
-    {file = "click-8.2.0-py3-none-any.whl", hash = "sha256:6b303f0b2aa85f1cb4e5303078fadcbcd4e476f114fab9b5007005711839325c"},
-    {file = "click-8.2.0.tar.gz", hash = "sha256:f5452aeddd9988eefa20f90f05ab66f17fce1ee2a36907fd30b05bbb5953814d"},
+    {file = "click-8.2.1-py3-none-any.whl", hash = "sha256:61a3265b914e850b85317d0b3109c7f8cd35a670f963866005d6ef1d5175a12b"},
+    {file = "click-8.2.1.tar.gz", hash = "sha256:27c491cc05d968d271d5a1db13e3b5a184636d9d930f148c50b038f0d0646202"},
 ]
 
 [package.dependencies]
@@ -140,14 +140,14 @@ files = [
 
 [[package]]
 name = "django"
-version = "5.2.1"
+version = "5.2.3"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 optional = false
 python-versions = ">=3.10"
 groups = ["main", "dev"]
 files = [
-    {file = "django-5.2.1-py3-none-any.whl", hash = "sha256:a9b680e84f9a0e71da83e399f1e922e1ab37b2173ced046b541c72e1589a5961"},
-    {file = "django-5.2.1.tar.gz", hash = "sha256:57fe1f1b59462caed092c80b3dd324fd92161b620d59a9ba9181c34746c97284"},
+    {file = "django-5.2.3-py3-none-any.whl", hash = "sha256:c517a6334e0fd940066aa9467b29401b93c37cec2e61365d663b80922542069d"},
+    {file = "django-5.2.3.tar.gz", hash = "sha256:335213277666ab2c5cac44a792a6d2f3d58eb79a80c14b6b160cd4afc3b75684"},
 ]
 
 [package.dependencies]
@@ -284,14 +284,14 @@ files = [
 
 [[package]]
 name = "django-pgtrigger"
-version = "4.15.2"
+version = "4.15.3"
 description = "Postgres trigger support integrated with Django models."
 optional = false
 python-versions = "<4,>=3.9.0"
 groups = ["main"]
 files = [
-    {file = "django_pgtrigger-4.15.2-py3-none-any.whl", hash = "sha256:77ac6bd44fe5df0307e2630e3294cc68dcb25c9ec1a6bb523667546d28c80bea"},
-    {file = "django_pgtrigger-4.15.2.tar.gz", hash = "sha256:a7286db986baa3aa759526c440b8b9baf894b56a4ee237333a44c06f56ab6b9f"},
+    {file = "django_pgtrigger-4.15.3-py3-none-any.whl", hash = "sha256:f710514e6eba28b5db4e5a27ed83abc18eae26cf9a82e0201b0c8d5d29b46c46"},
+    {file = "django_pgtrigger-4.15.3.tar.gz", hash = "sha256:235e07487d7953e85d9a9ecd8079d04072650ccad119148da96267cb2be80e09"},
 ]
 
 [package.dependencies]
@@ -482,14 +482,14 @@ ipython = {version = ">=7.31.1", markers = "python_version >= \"3.11\""}
 
 [[package]]
 name = "ipython"
-version = "9.2.0"
+version = "9.3.0"
 description = "IPython: Productive Interactive Computing"
 optional = false
 python-versions = ">=3.11"
 groups = ["dev"]
 files = [
-    {file = "ipython-9.2.0-py3-none-any.whl", hash = "sha256:fef5e33c4a1ae0759e0bba5917c9db4eb8c53fee917b6a526bd973e1ca5159f6"},
-    {file = "ipython-9.2.0.tar.gz", hash = "sha256:62a9373dbc12f28f9feaf4700d052195bf89806279fc8ca11f3f54017d04751b"},
+    {file = "ipython-9.3.0-py3-none-any.whl", hash = "sha256:1a0b6dd9221a1f5dddf725b57ac0cb6fddc7b5f470576231ae9162b9b3455a04"},
+    {file = "ipython-9.3.0.tar.gz", hash = "sha256:79eb896f9f23f50ad16c3bc205f686f6e030ad246cc309c6279a242b14afe9d8"},
 ]
 
 [package.dependencies]
@@ -971,15 +971,15 @@ test = ["argcomplete (>=3.0.3)", "mypy (>=1.7.0)", "pre-commit", "pytest (>=7.0,
 
 [[package]]
 name = "typing-extensions"
-version = "4.13.2"
-description = "Backported and Experimental Type Hints for Python 3.8+"
+version = "4.14.0"
+description = "Backported and Experimental Type Hints for Python 3.9+"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 groups = ["main"]
 markers = "python_version == \"3.12\""
 files = [
-    {file = "typing_extensions-4.13.2-py3-none-any.whl", hash = "sha256:a439e7c04b49fec3e5d3e2beaa21755cadbbdc391694e28ccdd36ca4a1408f8c"},
-    {file = "typing_extensions-4.13.2.tar.gz", hash = "sha256:e6c81219bd689f51865d9e372991c540bda33a0379d5573cddb9a3a23f7caaef"},
+    {file = "typing_extensions-4.14.0-py3-none-any.whl", hash = "sha256:a1514509136dd0b477638fc68d6a91497af5076466ad0fa6c338e44e359944af"},
+    {file = "typing_extensions-4.14.0.tar.gz", hash = "sha256:8676b788e32f02ab42d9e7c61324048ae4c6d844a399eebace3d4979d75ceef4"},
 ]
 
 [[package]]
@@ -997,14 +997,14 @@ files = [
 
 [[package]]
 name = "uvicorn"
-version = "0.34.2"
+version = "0.34.3"
 description = "The lightning-fast ASGI server."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "uvicorn-0.34.2-py3-none-any.whl", hash = "sha256:deb49af569084536d269fe0a6d67e3754f104cf03aba7c11c40f01aadf33c403"},
-    {file = "uvicorn-0.34.2.tar.gz", hash = "sha256:0e929828f6186353a80b58ea719861d2629d766293b6d19baf086ba31d4f3328"},
+    {file = "uvicorn-0.34.3-py3-none-any.whl", hash = "sha256:16246631db62bdfbf069b0645177d6e8a77ba950cfedbfd093acef9444e4d885"},
+    {file = "uvicorn-0.34.3.tar.gz", hash = "sha256:35919a9a979d7a59334b6b10e05d77c1d0d574c50e0fc98b8b1a0f165708b55a"},
 ]
 
 [package.dependencies]
@@ -1014,12 +1014,12 @@ h11 = ">=0.8"
 httptools = {version = ">=0.6.3", optional = true, markers = "extra == \"standard\""}
 python-dotenv = {version = ">=0.13", optional = true, markers = "extra == \"standard\""}
 pyyaml = {version = ">=5.1", optional = true, markers = "extra == \"standard\""}
-uvloop = {version = ">=0.14.0,<0.15.0 || >0.15.0,<0.15.1 || >0.15.1", optional = true, markers = "sys_platform != \"win32\" and sys_platform != \"cygwin\" and platform_python_implementation != \"PyPy\" and extra == \"standard\""}
+uvloop = {version = ">=0.15.1", optional = true, markers = "sys_platform != \"win32\" and sys_platform != \"cygwin\" and platform_python_implementation != \"PyPy\" and extra == \"standard\""}
 watchfiles = {version = ">=0.13", optional = true, markers = "extra == \"standard\""}
 websockets = {version = ">=10.4", optional = true, markers = "extra == \"standard\""}
 
 [package.extras]
-standard = ["colorama (>=0.4) ; sys_platform == \"win32\"", "httptools (>=0.6.3)", "python-dotenv (>=0.13)", "pyyaml (>=5.1)", "uvloop (>=0.14.0,!=0.15.0,!=0.15.1) ; sys_platform != \"win32\" and sys_platform != \"cygwin\" and platform_python_implementation != \"PyPy\"", "watchfiles (>=0.13)", "websockets (>=10.4)"]
+standard = ["colorama (>=0.4) ; sys_platform == \"win32\"", "httptools (>=0.6.3)", "python-dotenv (>=0.13)", "pyyaml (>=5.1)", "uvloop (>=0.15.1) ; sys_platform != \"win32\" and sys_platform != \"cygwin\" and platform_python_implementation != \"PyPy\"", "watchfiles (>=0.13)", "websockets (>=10.4)"]
 
 [[package]]
 name = "uvloop"
@@ -1316,4 +1316,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "4a510c40518412469db284ae8eca635a2ea0ac0b78acec9f9c40f2cf0123a3f1"
+content-hash = "3a197df0a0e94d9d3c075bfdcd6b857a3006652a69f5f024c59d7f888fa747d8"
