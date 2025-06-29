@@ -32,7 +32,7 @@ if [ -z "$__RUN_HUEY" -a -z "$__RUN_API" -a -z "$__SKIP_CHECKS" ]; then
     ./manage.py createcachetable -v0
     ./manage.py migrate
     if [ "$DEBUG" -a "$DEBUG" != '0' ]; then
-        if [ "$(./manage.py shell -c 'from tomato.models import User; print("" if User.objects.exists() else "1")')" = 1 ]; then
+        if [ "$(./manage.py shell -v 0 -c 'from tomato.models import User; print("" if User.objects.exists() else "1")')" = 1 ]; then
             DJANGO_SUPERUSER_PASSWORD=tomato ./manage.py createsuperuser --noinput --username tomato
         fi
 

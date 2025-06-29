@@ -21,21 +21,21 @@ django-user-messages = "^1.1.0"
 gunicorn = "^23.0.0"
 huey = "^2.5.3"
 psycopg = "^3.2.9"
-python-dotenv = "^1.1.0"
+python-dotenv = "^1.1.1"
 schema = "^0.7.7"
-starlette = "^0.47.0"
-uvicorn = {extras = ["standard"], version = "^0.34.3"}
+starlette = "^0.47.1"
+uvicorn = {extras = ["standard"], version = "^0.35.0"}
 wait-for-it = "^2.3.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"
 django-debug-toolbar = "^5.2.0"
 django-extensions = "^4.1"
-flake8 = "^7.2.0"
+flake8 = "^7.3.0"
 ipdb = "^0.13.13"
 ipython = "^9.3.0"
 isort = "^6.0.1"
-pywatchman = "^2.0.0"
+pywatchman = "^3.0.0"
 watchdog = {extras = ["watchmedo"], version = "^6.0.0"}
 
 [build-system]
