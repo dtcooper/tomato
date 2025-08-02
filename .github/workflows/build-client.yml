@@ -15,7 +15,7 @@ on:
 
 env:
   CLIENT_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || 'preview' }}
-  NODE_VERSION: 20
+  NODE_VERSION: 22
 
 concurrency:
   group: client-build-${{ github.ref_type }}-${{ github.ref_name }}
