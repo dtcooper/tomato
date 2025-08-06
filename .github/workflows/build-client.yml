@@ -128,7 +128,7 @@ jobs:
         uses: ./.github/actions/version
       -
         name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           pattern: client-build-files-*
           path: client-build-files
