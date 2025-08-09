@@ -34,7 +34,7 @@
   {#if $singlePlayRotators.enabled}
     <div class="divider m-0 mb-2 font-mono text-sm italic">Playlist</div>
   {/if}
-  <div class="flex flex-1 flex-col gap-2 overflow-y-auto" id="playlist">
+  <div class="flex flex-1 flex-col gap-2 overflow-y-auto" id="playlist" tabindex="-1">
     {#each items as item, index (item.generatedId)}
       {@const isFirstItem = index === 0}
       {@const firstStopsetIndex = items.findIndex((item) => item.type === "stopset")}
