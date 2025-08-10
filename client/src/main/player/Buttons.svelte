@@ -71,10 +71,10 @@
       } else {
         console.log("Calling play() based on MIDI key press")
         midiButtonBlocked = true
+        setTimeout(() => (midiButtonBlocked = false), 250)
         play()
         // Fix weird race condition bug where play() gets called twice in rapid succession when button box
         // is re-initialized
-        setTimeout(() => (midiButtonBlocked = false), 250)
       }
     }
   })
