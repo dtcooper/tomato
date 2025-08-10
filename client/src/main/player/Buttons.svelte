@@ -57,13 +57,25 @@
   setTimeout(() => midiSetLED(ledState), 500) // Allow 500ms for midi system to initialize
 
   // Remove previously installed press listeners (if component was destroyed and re-created)
-  midiButtonPresses.removeListener("pressed")
+  midiButtonPresses.removeAllListeners("pressed")
+
+  let midiButtonBlocked = false
+
   midiButtonPresses.addListener("pressed", () => {
     if (playDisabled) {
       console.log("Got MIDI press, but currently not eligible to play!")
     } else {
-      console.log("Calling play() based on MIDI key press")
-      play()
+      if (midiButtonBlocked) {
+        // XXX fix this!
+        console.warn("WARNING: Got MIDI press but button was blocked! Unsolved race condition bug encountered!")
+      } else {
+        console.log("Calling play() based on MIDI key press")
+        midiButtonBlocked = true
+        play()
+        // Fix weird race condition bug where play() gets called twice in rapid succession when button box
+        // is re-initialized
+        setTimeout(() => (midiButtonBlocked = false), 250)
+      }
     }
   })
 
