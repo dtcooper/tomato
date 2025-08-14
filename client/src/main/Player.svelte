@@ -152,16 +152,21 @@
   let subscriptionConnectionId = null
   let subscriptionInterval
 
-  // Call after 5 seconds from final invocation, fixes bug of playlist constantly reloading during bulk actions on backend
-  const reloadPlaylistDebounced = debounceAndCallAfterTimeWindow(() => reloadPlaylist(), 6250)
+  // Call after 6.25s from final invocation, fixes bug of playlist constantly reloading during bulk actions on backend
+  const reloadPlaylistDebounced = debounceAndCallAfterTimeWindow(() => {
+    console.log("Invoking debounced playlist reload")
+    reloadPlaylist()
+  }, 6250)
 
   registerMessageHandler("reload-playlist", ({ notify, connection_id, force = false }) => {
     if (notify) {
       alert("An administrator forced a playlist refresh!", "info", 4000)
     }
     if (force) {
+      console.log("Received reload playlist from backend (forced)")
       reloadPlaylist()
     } else {
+      console.log("Received reload playlist from backend (not forced, debounced)")
       reloadPlaylistDebounced()
     }
     if (connection_id) {
