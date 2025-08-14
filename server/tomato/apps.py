@@ -46,7 +46,7 @@ class TomatoConfig(AppConfig):
 
         for name, content_types in (
             (EDIT_ALL_GROUP_NAME, (asset, asset_alternate, rotator, stopset, stopset_rotator)),
-            (EDIT_ONLY_ASSETS_GROUP_NAME, (asset,)),
+            (EDIT_ONLY_ASSETS_GROUP_NAME, (asset, asset_alternate)),
             (f"View and export {ClientLogEntry._meta.verbose_name_plural}", (client_log_entry,)),
         ):
             group, _ = Group.objects.get_or_create(name=name)
