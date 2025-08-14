@@ -8,7 +8,7 @@
   import PlayList from "./player/List.svelte"
   import SinglePlayRotators from "./player/SinglePlayRotators.svelte"
 
-  import { isDev } from "../utils"
+  import { isDev, debounceAndCallAfterTimeWindow } from "../utils"
   import { registerMessageHandler, messageServer, conn } from "../stores/connection"
   import { config, userConfig } from "../stores/config"
   import { singlePlayRotators, stop as stopSinglePlayRotator } from "../stores/single-play-rotators"
@@ -152,12 +152,18 @@
   let subscriptionConnectionId = null
   let subscriptionInterval
 
-  registerMessageHandler("reload-playlist", ({ notify, connection_id }) => {
-    console.warn("Received playlist reload from server")
+  // Call after 5 seconds from final invocation, fixes bug of playlist constantly reloading during bulk actions on backend
+  const reloadPlaylistDebounced = debounceAndCallAfterTimeWindow(() => reloadPlaylist(), 6250)
+
+  registerMessageHandler("reload-playlist", ({ notify, connection_id, force = false }) => {
     if (notify) {
       alert("An administrator forced a playlist refresh!", "info", 4000)
     }
-    reloadPlaylist()
+    if (force) {
+      reloadPlaylist()
+    } else {
+      reloadPlaylistDebounced()
+    }
     if (connection_id) {
       messageServer("ack-action", { connection_id, msg: "Successfully reloaded playlist!" })
     }

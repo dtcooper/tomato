@@ -38,12 +38,12 @@ class AdminConnections(ConnectionsBase):
             await users.message(
                 connection_id,
                 OutgoingUserMessageTypes.RELOAD_PLAYLIST,
-                {"notify": True, "connection_id": connection.id},
+                {"notify": True, "connection_id": connection.id, "force": True},
             )
         else:
             logger.info("Reloading all playlists via admin request")
             await users.broadcast(
-                OutgoingUserMessageTypes.RELOAD_PLAYLIST, {"notify": True, "connection_id": connection.id}
+                OutgoingUserMessageTypes.RELOAD_PLAYLIST, {"notify": True, "connection_id": connection.id, "force": True}
             )
 
     async def process_notify(self, connection: Connection, data):
@@ -98,7 +98,7 @@ class UserConnections(ConnectionsBase):
         if force or has_changed:
             await self.broadcast(self.OutgoingTypes.DATA, serialized_data)
             if has_changed and await get_config_async("RELOAD_PLAYLIST_AFTER_DATA_CHANGES"):
-                await self.broadcast(self.OutgoingTypes.RELOAD_PLAYLIST, {"notify": False})
+                await self.broadcast(self.OutgoingTypes.RELOAD_PLAYLIST, {"notify": False, "force": False})
             self.last_serialized_data = serialized_data
         else:
             logger.debug("No change to DB data. Not broadcasting.")

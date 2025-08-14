@@ -50,7 +50,7 @@ export const acknowledgeLog = (id) => {
 
 setInterval(() => sendPendingLogs(), isDev ? 2500 : 30000) // Run every 30 seconds
 
-const logErrorDebounced = debounceFunc((s) => log("internal_error", s), 5, 5000) // Don't log more than 5 times in 5 seconds
+const logErrorDebounced = debounceFunc((s) => log("internal_error", s), 5, 5000, "log") // Don't log more than 5 times in 5 seconds
 
 // Rudimentary handling of uncaught exceptions / promise rejections (debounced)
 window.addEventListener("error", (event) => logErrorDebounced(`Error: ${event.error}`))

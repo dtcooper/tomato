@@ -40,7 +40,7 @@ export const prettyDatetimeShort = (datetime) => datetime.format("YYYY/M/D @ h:m
 
 export const upperCaseFirst = (s) => `${s.charAt(0).toUpperCase()}${s.substr(1)}`
 
-export const debounceFunc = (fn, limit, timeWindow) => {
+export const debounceFunc = (fn, limit, timeWindow, fnName) => {
   let callTimes = []
 
   return (...args) => {
@@ -52,8 +52,16 @@ export const debounceFunc = (fn, limit, timeWindow) => {
       callTimes.push(now)
       return fn(...args)
     } else {
-      console.log(`Call limit of ${limit} per ${timeWindow / 1000}s exceeded.`)
+      console.warn(`Call limit of ${limit} per ${timeWindow / 1000}s exceeded. Debouncing func ${fnName}()!`)
     }
+  }
+}
+
+export const debounceAndCallAfterTimeWindow = (fn, callAfterTimeWindow) => {
+  let timer
+  return (...args) => {
+    clearTimeout(timer)
+    timer = setTimeout(() => fn(...args), callAfterTimeWindow)
   }
 }
 

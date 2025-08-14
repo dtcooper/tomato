@@ -18,6 +18,7 @@
     LED_PULSATE_SLOW,
     LED_PULSATE_FAST
   } from "../../stores/midi"
+  import { debounceFunc } from "../../utils"
 
   import Icon from "../../components/Icon.svelte"
 
@@ -59,23 +60,23 @@
   // Remove previously installed press listeners (if component was destroyed and re-created)
   midiButtonPresses.removeAllListeners("pressed")
 
-  let midiButtonBlocked = false
+  // Fix weird race condition bug where play() gets called twice in rapid succession when button box
+  // is re-initialized
+  const playDebounced = debounceFunc(
+    () => {
+      console.log("Calling play() based on MIDI key press")
+      play()
+    },
+    1,
+    250,
+    "play"
+  )
 
   midiButtonPresses.addListener("pressed", () => {
     if (playDisabled) {
       console.log("Got MIDI press, but currently not eligible to play!")
     } else {
-      if (midiButtonBlocked) {
-        // XXX fix this!
-        console.warn("WARNING: Got MIDI press but button was blocked! Unsolved race condition bug encountered!")
-      } else {
-        console.log("Calling play() based on MIDI key press")
-        midiButtonBlocked = true
-        setTimeout(() => (midiButtonBlocked = false), 250)
-        play()
-        // Fix weird race condition bug where play() gets called twice in rapid succession when button box
-        // is re-initialized
-      }
+      playDebounced()
     }
   })
 
