@@ -28,7 +28,7 @@ services:
 
   nginx:
     restart: always
-    image: ghcr.io/dtcooper/nginx-certbot-jinja:6.0.0-nginx1.29.0
+    image: ghcr.io/dtcooper/nginx-certbot-jinja:6.0.1-nginx1.29.1
     depends_on:
       - app
       - api
@@ -55,7 +55,7 @@ services:
 
   logs:
     restart: always
-    image: amir20/dozzle:v8.13.8
+    image: amir20/dozzle:v8.13.9
     volumes:
       - "${DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock"
     environment:
