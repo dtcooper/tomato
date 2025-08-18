@@ -89,7 +89,7 @@ class ArchivedFilter(admin.SimpleListFilter):
 
 
 class AssetAdminBase(FileFormAdminMixin, TomatoModelAdminBase):
-    ADDITIONAL_INFO_FIELDSET = ("Additional information", {"fields": ("created_at", "created_by")})
+    ADDITIONAL_INFO_FIELDSET = ("Additional information", {"fields": ("created_at", "created_by", "comment")})
 
     readonly_fields = ("duration", "file_display", "filename_display") + TomatoModelAdminBase.readonly_fields
 
@@ -243,6 +243,7 @@ class AssetAdmin(AiringMixin, AssetAdminBase):
         "duration",
         "rotators_display",
         "created_at",
+        "comment_display",
     )
     list_display_links = ("list_name",)
     list_filter = (
@@ -311,6 +312,14 @@ class AssetAdmin(AiringMixin, AssetAdminBase):
         if not html:
             return mark_safe('<span style="color: red"><strong>WARNING:</strong> not in any rotators</span>')
         return html
+
+    @admin.display(description="Comment")
+    def comment_display(self, obj):
+        comment = (" ".join(obj.comment.split())).strip()
+        if comment:
+            return comment if len(comment) <= 30 else format_html("{}&hellip;", comment[:30])
+        else:
+            return mark_safe("<em>None</em>")
 
     @admin.display(description="Alternate file(s)")
     def alternates_display(self, obj, readonly=False):

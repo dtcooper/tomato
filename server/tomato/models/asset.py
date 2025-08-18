@@ -12,7 +12,8 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.db.models import Count, OuterRef, Subquery
 from django.db.models.functions import Coalesce
-from django.utils.safestring import mark_safe
+from django.urls import reverse
+from django.utils.html import format_html, format_html_join
 
 from constance import config
 from dirtyfields import DirtyFieldsMixin
@@ -64,6 +65,7 @@ class AssetBase(DirtyFieldsMixin, TomatoModelBase):
         choices=Status.choices, default=Status.PENDING, help_text="All assets will be processed after uploading."
     )
     duration = models.DurationField(default=datetime.timedelta(0))
+    comment = models.TextField(help_text="Any private comments about a particular asset", blank=True)
 
     SERIALIZE_FIELDS_TO_IGNORE = {
         "pre_process_md5sum",
@@ -96,13 +98,24 @@ class AssetBase(DirtyFieldsMixin, TomatoModelBase):
                 }
                 if self.id is not None:
                     querysets[self._meta.model] = querysets[self._meta.model].exclude(id=self.id)
-                if any(qs.exists() for qs in querysets.values()):
+
+                duplicates = []
+                for queryset in querysets.values():
+                    for duplicate in queryset:
+                        meta = duplicate._meta
+                        duplicates.append((
+                            reverse(f"admin:{meta.app_label}_{meta.model_name}_change", args=(duplicate.id,)),
+                            duplicate.name,
+                        ))
+                if duplicates:
+                    duplicates_html = format_html_join(", ", '<a href="{}">{}</a>', duplicates)
                     raise ValidationError({
-                        "__all__": mark_safe(
+                        "__all__": format_html(
                             "An audio asset already exists with this audio file. Rejecting duplicate. You can turn this"
-                            " feature off with setting <code>PREVENT_DUPLICATES</code>."
+                            " feature off with setting <code>PREVENT_DUPLICATES</code>. Existing: {}",
+                            duplicates_html,
                         ),
-                        "file": "A duplicate of this file already exists.",
+                        "file": format_html("A duplicate of this file already exists. Existing: {}", duplicates_html),
                     })
 
     def pre_save_normalize_hook(self):

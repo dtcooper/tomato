@@ -43,7 +43,8 @@ class AdminConnections(ConnectionsBase):
         else:
             logger.info("Reloading all playlists via admin request")
             await users.broadcast(
-                OutgoingUserMessageTypes.RELOAD_PLAYLIST, {"notify": True, "connection_id": connection.id, "force": True}
+                OutgoingUserMessageTypes.RELOAD_PLAYLIST,
+                {"notify": True, "connection_id": connection.id, "force": True},
             )
 
     async def process_notify(self, connection: Connection, data):
