@@ -25,7 +25,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       -
         name: Get version
         id: version
@@ -51,7 +51,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       -
         name: Deploy containers
         uses: appleboy/ssh-action@v1.2.2

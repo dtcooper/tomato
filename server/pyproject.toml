@@ -9,7 +9,7 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
-django = "^5.2.5"
+django = "^5.2.6"
 django-admin-logs = "^1.4.0"
 django-admin-notice = "^3.3.0"
 django-constance = "^4.3.2"
@@ -20,10 +20,10 @@ django-pgtrigger = "^4.15.4"
 django-user-messages = "^1.1.0"
 gunicorn = "^23.0.0"
 huey = "^2.5.3"
-psycopg = "^3.2.9"
+psycopg = "^3.2.10"
 python-dotenv = "^1.1.1"
 schema = "^0.7.7"
-starlette = "^0.47.2"
+starlette = "^0.47.3"
 uvicorn = {extras = ["standard"], version = "^0.35.0"}
 wait-for-it = "^2.3.0"
 
@@ -33,7 +33,7 @@ django-debug-toolbar = "^6.0.0"
 django-extensions = "^4.1"
 flake8 = "^7.3.0"
 ipdb = "^0.13.13"
-ipython = "^9.4.0"
+ipython = "^9.5.0"
 isort = "^6.0.1"
 pywatchman = "^3.0.0"
 watchdog = {extras = ["watchmedo"], version = "^6.0.0"}
