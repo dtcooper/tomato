@@ -108,7 +108,13 @@ Changes for 2024 based on real world usage in 2023 and feedback
 ## 2025 Things
 
 - [ ] Simplify permission system, removing groups and just having superusers + regular users + flags on user model?
-- [X] Fix `black` tool. (needs to be run as `black` then `isort` for double linebreak after imports)
-- [X] Ability to completely remove asset deletion (soft delete only) via constance config
+- [x] Fix `black` tool. (needs to be run as `black` then `isort` for double linebreak after imports)
+- [x] Ability to completely remove asset deletion (soft delete only) via constance config
 - [ ] Normalize using LUFs (ChatGPT) algorithm?
-- [X] Proper permissions on asset alternates
+- [x] Proper permissions on asset alternates
+
+## 2026 Stuff
+
+- [ ] Bulk uploads of 50+ files breaks. Look into this.
+- [ ] Allow already uploaded/archived assets to be converted into asset alternatives
+- [ ] Form asset submission
