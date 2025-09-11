@@ -80,7 +80,7 @@ jobs:
       -
         # macOS: appears to fix https://github.com/electron/forge/issues/2807
         name: Fix macOS build
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         if: matrix.platform == 'darwin'
         with:
           python-version: '3.11'
