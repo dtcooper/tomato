@@ -44,7 +44,7 @@
     "@iconify/icons-mdi": "^1.2.48",
     "@msgpack/msgpack": "^3.1.2",
     "autoprefixer": "^10.4.21",
-    "axios": "^1.11.0",
+    "axios": "^1.12.2",
     "browser-sync": "^3.0.4",
     "color": "^4.2.3",
     "daisyui": "^4.12.24",
@@ -75,7 +75,7 @@
     "svelte-local-storage-store": "^0.6.4",
     "tailwindcss": "^3.4.17",
     "uuid": "^11.1.0",
-    "wait-on": "^8.0.4",
+    "wait-on": "^8.0.5",
     "wavesurfer.js": "^7.10.1",
     "weak-ref-collections": "^1.2.4",
     "webmidi": "^3.1.12"
