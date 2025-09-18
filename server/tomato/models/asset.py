@@ -25,7 +25,6 @@ from .base import (
     AudioFileField,
     EligibleToAirQuerySet,
     EnabledBeginEndWeightMixin,
-    NotifyTrigger,
     TomatoModelBase,
 )
 from .rotator import Rotator
@@ -220,7 +219,6 @@ class Asset(EnabledBeginEndWeightMixin, AssetBase):
 class AssetRotatorsProxy(Asset.rotators.through):
     class Meta:
         proxy = True
-        triggers = [NotifyTrigger()]
 
 
 Asset.rotators.through.__str__ = lambda self: f"{self.asset.name} in {self.rotator.name}"

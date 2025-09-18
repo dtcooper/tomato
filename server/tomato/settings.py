@@ -88,7 +88,6 @@ INSTALLED_APPS = [
     "django_admin_logs",
     "django_file_form",
     "huey.contrib.djhuey",
-    "pgtrigger",
     "user_messages",
 ]
 if DEBUG:

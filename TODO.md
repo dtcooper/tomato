@@ -93,7 +93,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [ ] A `NO_REPEAT_ASSETS_TIME` override
 - [x] De-dupe multiple uploads better (ie tasks) for the purposes of client reloading
       via `RELOAD_PLAYLIST_AFTER_DATA_CHANGES` (batches cause many reloads)
-  - [ ] Strip out `django-pgtrigger` (overly complicated), and just override `ModelAdmin`'s `delete_model()`,
+  - [x] Strip out `django-pgtrigger` (overly complicated), and just override `ModelAdmin`'s `delete_model()`,
         `save_model()`, and `delete_queryset()` methods with hook. For quick actions where a model's `update()` method
         is called we'll need to hook `get_actions()`, redefining these action functions to call the hook. The hook
         can proably set a value on the request, that a middleware writes to. Bulk upload will need be marked dirty as

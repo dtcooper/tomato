@@ -281,21 +281,6 @@ files = [
 ]
 
 [[package]]
-name = "django-pgtrigger"
-version = "4.15.4"
-description = "Postgres trigger support integrated with Django models."
-optional = false
-python-versions = "<4,>=3.9.0"
-groups = ["main"]
-files = [
-    {file = "django_pgtrigger-4.15.4-py3-none-any.whl", hash = "sha256:6e1732c85bccbf22b183ca13b410d6908f3eaaeaf6103a3c62c236b0ae6a9072"},
-    {file = "django_pgtrigger-4.15.4.tar.gz", hash = "sha256:3dfef7dd8faca0af3602818075f28da1d540193af63a77bb848f56f532a968e4"},
-]
-
-[package.dependencies]
-django = ">=4"
-
-[[package]]
 name = "django-user-messages"
 version = "1.1.0"
 description = "Offline addon for django.contrib.messages"
@@ -1352,4 +1337,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "5a91a486ce22416639ce079f8fa75fc7f5442eae3e744485260d899eb23c72bb"
+content-hash = "945df49b535ee25f25129a01d81a79f6ed50e697437831e2c0b7d22d60eddc9f"

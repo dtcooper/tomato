@@ -1,8 +1,6 @@
 from pathlib import Path
 import zoneinfo
 
-import pgtrigger
-
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
@@ -26,25 +24,6 @@ UTC = zoneinfo.ZoneInfo("UTC")
 def greater_than_zero(value):
     if value <= 0:
         raise ValidationError("Value must be greater than 0")
-
-
-class NotifyTrigger(pgtrigger.Trigger):
-    name = "tomato_db_notify"
-    when = pgtrigger.After
-    operation = pgtrigger.Insert | pgtrigger.Delete | pgtrigger.Update
-    level = pgtrigger.Statement
-    extra_json = ""
-
-    def get_func(self, model):
-        return f"""
-            perform pg_notify('{POSTGRES_CHANGES_CHANNEL}',
-                json_build_object(
-                    'table', '{model._meta.db_table}',
-                    'op', LOWER(TG_OP){"," if self.extra_json else ""}{self.extra_json}
-                )::text
-            );
-            RETURN NEW;
-        """
 
 
 class AudioFieldFile(FieldFile):
@@ -170,7 +149,6 @@ class TomatoModelBase(models.Model):
     class Meta:
         abstract = True
         ordering = ("name",)
-        triggers = [NotifyTrigger()]
 
     def __str__(self):
         return self.name
@@ -181,9 +159,3 @@ class TomatoModelBase(models.Model):
             for field in self._meta.get_fields()
             if field.name not in self.SERIALIZE_FIELDS_TO_IGNORE and not field.is_relation
         }
-
-
-class ConstanceProxy(Constance):
-    class Meta:
-        proxy = True
-        triggers = [NotifyTrigger()]
