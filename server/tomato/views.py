@@ -24,7 +24,7 @@ def server_logs(request):
 @require_POST
 def dismiss_message(request):
     if not request.user.is_authenticated:
-        raise HttpResponseForbidden()
+        return HttpResponseForbidden()
 
     message = get_object_or_404(Message, user=request.user, id=request.POST.get("id"))
     message.delivered_at = timezone.now()

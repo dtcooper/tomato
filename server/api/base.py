@@ -108,7 +108,7 @@ class ConnectionsBase(MessagesBase):
             if "sessionid" not in websocket.cookies:
                 raise TomatoAuthError("No sessionid cookie, can't complete session auth!")
             store = SessionStore(session_key=websocket.cookies["sessionid"])
-            lookup = {"id": await sync_to_async(store.get)(SESSION_KEY)}
+            lookup = {"id": await store.aget(SESSION_KEY)}
         else:
             lookup = {"username": greeting["username"]}
 
@@ -117,11 +117,9 @@ class ConnectionsBase(MessagesBase):
         except User.DoesNotExist:
             pass
         else:
-            if user.is_active and (
-                not self.is_admin or await sync_to_async(user.has_perm)("tomato.configure_live_clients")
-            ):
+            if user.is_active and (not self.is_admin or await user.ahas_perm("tomato.configure_live_clients")):
                 if is_session:
-                    session_hash = store.get(HASH_SESSION_KEY)
+                    session_hash = await store.aget(HASH_SESSION_KEY)
                     if session_hash and await sync_to_async(constant_time_compare)(
                         session_hash, await sync_to_async(user.get_session_auth_hash)()
                     ):

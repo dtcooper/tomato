@@ -24,7 +24,7 @@ if settings.EMAIL_ENABLED:
     del kwargs
 
 if settings.DEBUG:
-    urlpatterns.append(path("json/", debug_json, name="debug_json")),
+    urlpatterns.append(path("json/", debug_json, name="debug_json"))
     urlpatterns.append(path("__debug__/", include("debug_toolbar.urls")))
     urlpatterns.extend(static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT))
 
