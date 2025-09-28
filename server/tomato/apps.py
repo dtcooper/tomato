@@ -3,9 +3,16 @@ from pathlib import Path
 from django.apps import AppConfig, apps
 from django.conf import settings
 from django.conf.locale.en import formats as en_formats
+from django.db import models
 from django.db.models import signals
 
 from .constants import EDIT_ALL_GROUP_NAME, EDIT_ONLY_ASSETS_GROUP_NAME
+from .utils import notify_api
+
+
+def m2m_changed(action: str, sender: models.Model, **kwargs):
+    if action.startswith("post_") and sender._meta.db_table in ("asset_rotators", "stopset_rotators"):
+        notify_api()
 
 
 class TomatoConfig(AppConfig):
@@ -18,6 +25,7 @@ class TomatoConfig(AppConfig):
         temp_upload_path = Path(settings.MEDIA_ROOT) / settings.FILE_FORM_UPLOAD_DIR
         temp_upload_path.mkdir(parents=True, exist_ok=True)
         signals.post_migrate.connect(self.create_groups, sender=self)
+        signals.m2m_changed.connect(m2m_changed)
 
     def patch_formats(self):
         en_formats.SHORT_DATETIME_FORMAT = "n/j/y g:i A"

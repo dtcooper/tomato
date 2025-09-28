@@ -1,6 +1,6 @@
 from django.db import models
 
-from .base import EnabledBeginEndWeightMixin, TomatoModelBase
+from .base import DBNotifyBase, EnabledBeginEndWeightMixin, TomatoModelBase
 
 
 class Stopset(EnabledBeginEndWeightMixin, TomatoModelBase):
@@ -15,7 +15,7 @@ class Stopset(EnabledBeginEndWeightMixin, TomatoModelBase):
         }
 
 
-class StopsetRotator(models.Model):
+class StopsetRotator(DBNotifyBase, models.Model):
     stopset = models.ForeignKey(Stopset, on_delete=models.CASCADE)
     rotator = models.ForeignKey("tomato.Rotator", on_delete=models.CASCADE, verbose_name="Rotator")
 

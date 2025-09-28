@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 import zoneinfo
 
@@ -9,16 +10,20 @@ from django.utils import timezone
 from django.utils.html import format_html
 
 from constance import config
-from constance.models import Constance
+from dirtyfields import DirtyFieldsMixin
 from django_file_form.uploaded_file import UploadedTusFile
 
-from ..constants import HELP_DOCS_URL, POSTGRES_CHANGES_CHANNEL
+from ..constants import HELP_DOCS_URL
 from ..ffmpeg import ffprobe, silence_detect
+from ..utils import notify_api
 
 
 NAME_MAX_LENGTH = 120
 FILE_MAX_LENGTH = 120
 UTC = zoneinfo.ZoneInfo("UTC")
+
+
+logger = logging.getLogger(__name__)
 
 
 def greater_than_zero(value):
@@ -55,7 +60,37 @@ class AudioFileField(models.FileField):
                 )
 
 
-class EligibleToAirQuerySet(models.QuerySet):
+class DBNotifyBase(DirtyFieldsMixin):
+    def save(self, *args, **kwargs):
+        if self.is_dirty(check_relationship=True):
+            logger.debug(f"Model {self._meta.verbose_name} was saved, notifying API")
+            notify_api()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        notify_api()
+        logger.debug(f"Model {self._meta.verbose_name} was deleted, notifying API")
+        return super().delete(*args, **kwargs)
+
+
+class TomatoModelBaseQueryset(models.QuerySet):
+    def update(self, **kwargs):
+        logger.debug(f"Called update() on queryset for {self.model._meta.verbose_name}, notifying API")
+        notify_api()
+        return super().update(**kwargs)
+
+    update.alters_data = True
+
+    def delete(self):
+        logger.debug(f"Called delete() on queryset for {self.model._meta.verbose_name}, notifying API")
+        notify_api()
+        return super().delete()
+
+    delete.alters_data = True
+    delete.queryset_only = True
+
+
+class EligibleToAirQuerySet(TomatoModelBaseQueryset):
     def _get_currently_airing_Q(self, now=None):
         if now is None:
             now = timezone.now()
@@ -139,7 +174,9 @@ class EnabledBeginEndWeightMixin(models.Model):
         abstract = True
 
 
-class TomatoModelBase(models.Model):
+class TomatoModelBase(DBNotifyBase, models.Model):
+    objects = TomatoModelBaseQueryset.as_manager()
+
     created_at = models.DateTimeField("created at", default=timezone.localtime, db_index=True)
     created_by = models.ForeignKey("tomato.User", verbose_name="created by", on_delete=models.SET_NULL, null=True)
     name = models.CharField("name", max_length=NAME_MAX_LENGTH, unique=True)

@@ -114,6 +114,7 @@ MIDDLEWARE.extend([
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "tomato.middleware.DBNotifyMiddleware",
 ])
 
 ROOT_URLCONF = "tomato.urls"
@@ -185,6 +186,8 @@ FILE_FORM_UPLOAD_DIR = "_temp_uploads"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+TOMATO_DEBUG_LOGGING = env.bool("TOMATO_DEBUG_LOG", default=False)
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -200,6 +203,7 @@ LOGGING = {
     },
     "handlers": {
         "console": {"class": "logging.StreamHandler", "formatter": "console", "level": "INFO"},
+        "console_debug": {"class": "logging.StreamHandler", "formatter": "console", "level": "DEBUG"},
     },
     "loggers": {
         "django": {
@@ -217,8 +221,8 @@ LOGGING = {
             "propagate": False,
         },
         "tomato": {
-            "handlers": ["console"],
-            "level": "INFO",
+            "handlers": ["console_debug" if TOMATO_DEBUG_LOGGING else "console"],
+            "level": "DEBUG" if TOMATO_DEBUG_LOGGING else "INFO",
         },
     },
 }
@@ -527,4 +531,5 @@ SHELL_PLUS_IMPORTS = [
     "from tomato.ffmpeg import ffmpeg_convert, ffprobe, silence_detect",
     "from tomato.models import export_data_as_zip, import_data_from_zip, serialize_for_api",
     "from tomato.tasks import bulk_process_assets, process_asset, cleanup",
+    "from tomato.utils import notify_api, notify_api_multiple",
 ]

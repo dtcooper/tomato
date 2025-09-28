@@ -15,14 +15,18 @@ from user_messages.models import Message as UserMessage
 
 from .ffmpeg import ffmpeg_convert, ffprobe
 from .models import SavedAssetFile
-from .utils import once_at_startup
+from .utils import (
+    block_pending_notify_api_messages,
+    once_at_startup,
+    unblock_and_flush_blocked_pending_notify_api_messages,
+)
 
 
 logger = logging.getLogger(__name__)
 
 
 @djhuey.db_task(context=True, retries=3, retry_delay=5)
-def process_asset(asset, empty_name=False, user=None, no_success_message=False, skip_trim=False, task=None):
+def process_asset(asset, empty_name=False, user=None, from_bulk=False, skip_trim=False, task=None):
     def error(message):
         if user is not None:
             user_messages_api.error(
@@ -35,6 +39,9 @@ def process_asset(asset, empty_name=False, user=None, no_success_message=False, 
         asset.delete()
 
     try:
+        if not from_bulk:
+            block_pending_notify_api_messages()
+
         asset.refresh_from_db()
         logger.info(f"Processing {asset.name}")
         asset.status = asset.Status.PROCESSING
@@ -76,7 +83,7 @@ def process_asset(asset, empty_name=False, user=None, no_success_message=False, 
             file=asset.file, defaults={"original_filename": asset.original_filename}
         )
 
-        if not no_success_message and user is not None:
+        if not from_bulk and user is not None:
             user_messages_api.success(user, f'Audio asset "{asset.name}" successfully processed!')
 
     except Exception:
@@ -84,19 +91,27 @@ def process_asset(asset, empty_name=False, user=None, no_success_message=False, 
         if task is None or task.retries == 0:
             error("could not be processed")
         raise
+    finally:
+        if not from_bulk:
+            unblock_and_flush_blocked_pending_notify_api_messages()
 
 
 @djhuey.db_task()
 def bulk_process_assets(assets, user=None, skip_trim=False):
-    for n, asset in enumerate(assets):
-        logger.info(f"Bulk processing {n}/{len(assets)} assets...")
-        try:
-            process_asset.call_local(asset, empty_name=True, user=user, no_success_message=True, skip_trim=skip_trim)
-        except Exception:
-            pass
+    try:
+        block_pending_notify_api_messages()
 
-    if user is not None:
-        user_messages_api.success(user, f"Finished processing {len(assets)} audio assets.")
+        for n, asset in enumerate(assets):
+            logger.info(f"Bulk processing {n}/{len(assets)} assets...")
+            try:
+                process_asset.call_local(asset, empty_name=True, user=user, from_bulk=True, skip_trim=skip_trim)
+            except Exception:
+                pass
+
+        if user is not None:
+            user_messages_api.success(user, f"Finished processing {len(assets)} audio assets.")
+    finally:
+        unblock_and_flush_blocked_pending_notify_api_messages()
 
 
 @djhuey.db_periodic_task(once_at_startup(crontab(hour="*/6", minute="5")))

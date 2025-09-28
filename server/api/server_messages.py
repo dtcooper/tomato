@@ -7,7 +7,7 @@ import psycopg
 
 from django.conf import settings
 
-from tomato.constants import POSTGRES_CHANGES_CHANNEL
+from tomato.constants import POSTGRES_MESSAGES_CHANNEL
 from tomato.models import User
 
 from .base import MessagesBase
@@ -97,8 +97,8 @@ class ServerMessages(MessagesBase):
     @task
     async def consume_db_notifications(self):
         conn = await psycopg.AsyncConnection.connect(host="db", user="postgres", password="postgres", autocommit=True)
-        await conn.execute(f"LISTEN {POSTGRES_CHANGES_CHANNEL}")
-        logger.info(f"Listening to postgres channel {POSTGRES_CHANGES_CHANNEL!r}")
+        await conn.execute(f"LISTEN {POSTGRES_MESSAGES_CHANNEL}")
+        logger.info(f"Listening to postgres channel {POSTGRES_MESSAGES_CHANNEL!r}")
 
         notifications = conn.notifies()
         async for notification in notifications:

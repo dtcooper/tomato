@@ -16,7 +16,6 @@ from django.urls import reverse
 from django.utils.html import format_html, format_html_join
 
 from constance import config
-from dirtyfields import DirtyFieldsMixin
 
 from ..utils import listdir_recursive
 from .base import (
@@ -48,7 +47,7 @@ def asset_upload_to(instance, filename):
     return generate_random_asset_filename(filename)
 
 
-class AssetBase(DirtyFieldsMixin, TomatoModelBase):
+class AssetBase(TomatoModelBase):
     class Status(models.IntegerChoices):
         PENDING = 0, "Pending processing"
         PROCESSING = 1, "Processing"
@@ -176,7 +175,7 @@ class Asset(EnabledBeginEndWeightMixin, AssetBase):
         verbose_name = "audio asset"
         ordering = ("-created_at",)
         permissions = [
-            ("configure_live_clients", "Can configure live desktop clients"),
+            ("configure_live_clients", "Can configure live desktop clients"),  # TODO: disconnect when this goes away
             ("export_import", "Can manage (import/export/delete all) asset data"),
         ]
 

@@ -42,7 +42,7 @@ cp .env.sample .env
     Now, create a symbolic link for the development [Compose] overrides,
 
     ```bash
-    ln -s docker-compose.dev.yml docker-compose.override.yml
+    ln -s compose.dev.yml compose.override.yml
     ```
 
     Build the containers (or pull them by instead executing `#!bash docker compose pull`),
@@ -119,9 +119,9 @@ cp .env.sample .env
             setups, or if you don't have port `80` and `443` available on your
             server and still want to server Tomato on the default web ports.
 
-        Create and edit a file named `docker-compose.override.yml`,
+        Create and edit a file named `compose.override.yml`,
 
-        ```yaml title="server/docker-compose.override.yml" hl_lines="4-6 9-10 13-14"
+        ```yaml title="server/compose.override.yml" hl_lines="4-6 9-10 13-14"
         services:
           logs:
             ports:

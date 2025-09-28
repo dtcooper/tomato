@@ -43,11 +43,13 @@ RUN if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
     && if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
         echo "alias ls='ls --color=auto'" >> /root/.bashrc \
         && echo "alias rs='__SKIP_CHECKS=1 /app/entrypoint.sh'" >> /root/.bashrc \
+        && echo "alias rs_debug='___SKIP_CHECKS=1 TOMATO_DEBUG_LOG=1 /app/entrypoint.sh'" >> /root/.bashrc \
         && echo "alias sp='./manage.py shell_plus'" >> /root/.bashrc \
+        && echo "alias lint='black . ; isort . ; flake8 .'" >> /root/.bashrc \
         && echo '. /etc/bash_completion' >> /root/.bashrc \
     ; fi
 
-ARG POETRY_VERSION=2.2.0
+ARG POETRY_VERSION=2.2.1
 RUN curl -sSL https://install.python-poetry.org | python -
 ENV PATH="/root/.local/bin:${PATH}"
 RUN echo '/app' > "$(python -c 'import site; print(site.getsitepackages()[0])')/app.pth"
