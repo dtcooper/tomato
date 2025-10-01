@@ -667,7 +667,7 @@ Action on the following,</p>
   mode.</li>
 </ul>
 <p>Now, create a symbolic link for the development <a href="https://docs.docker.com/compose/">Compose</a> overrides,</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>ln<span class="w"> </span>-s<span class="w"> </span>docker-compose.dev.yml<span class="w"> </span>docker-compose.override.yml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>ln<span class="w"> </span>-s<span class="w"> </span>compose.dev.yml<span class="w"> </span>compose.override.yml
 </code></pre></div>
 <p>Build the containers (or pull them by instead executing <code class="highlight">docker<span class="w"> </span>compose<span class="w"> </span>pull</code>),</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>build
@@ -743,8 +743,8 @@ and not recommended. However, here is a guide for non-standard
 setups, or if you don't have port <code>80</code> and <code>443</code> available on your
 server and still want to server Tomato on the default web ports.</p>
 </div>
-<p>Create and edit a file named <code>docker-compose.override.yml</code>,</p>
-<div class="highlight"><span class="filename">server/docker-compose.override.yml</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">services</span><span class="p">:</span>
+<p>Create and edit a file named <code>compose.override.yml</code>,</p>
+<div class="highlight"><span class="filename">server/compose.override.yml</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">services</span><span class="p">:</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">logs</span><span class="p">:</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
 <a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="hll"><span class="w">      </span><span class="c1"># Replace 6666 with any port you like (logs server)</span>
