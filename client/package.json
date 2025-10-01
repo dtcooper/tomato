@@ -50,7 +50,7 @@
     "daisyui": "^4.12.24",
     "dayjs": "^1.11.18",
     "download": "^8.0.0",
-    "electron": "^38.1.2",
+    "electron": "^38.2.0",
     "electron-forge-maker-appimage": "github:duzda/electron-forge-maker-appimage",
     "electron-squirrel-startup": "^1.0.1",
     "electron-window-state": "^5.0.3",
@@ -76,8 +76,8 @@
     "tailwindcss": "^3.4.17",
     "uuid": "^11.1.0",
     "wait-on": "^8.0.5",
-    "wavesurfer.js": "^7.10.1",
+    "wavesurfer.js": "^7.10.3",
     "weak-ref-collections": "^1.2.4",
-    "webmidi": "^3.1.12"
+    "webmidi": "^3.1.13"
   }
 }

@@ -46,31 +46,34 @@ def pg_notify(channel, payload):
     cursor.execute("SELECT pg_notify(%s, %s)", (channel, json.dumps(payload)))
 
 
+def dedupe(list_to_dedupe):
+    seen = set()
+    deduped = []
+    for item in list_to_dedupe:
+        hashable_message = concise_json_dumps(item)
+        if hashable_message not in seen:
+            seen.add(hashable_message)
+            deduped.append(item)
+    return deduped
+
+
 notify_api_local = threading.local()
 
 
-def notify_api(message_type="db-change", extra_data: dict | None = None, *, force=False):
-    notify_api_multiple([(message_type, extra_data)], force=force)
+def notify_api(message_type="db-change", extra_data=None, *, force=False):
+    notify_api_multiple([message_type if extra_data is None else (message_type, extra_data)], force=force)
 
 
-def notify_api_multiple(messages: list[tuple[str, dict | None]], *, force=False):
+def notify_api_multiple(messages: list, *, force=False):
     has_request = getattr(notify_api_local, "request", None) is not None
     is_blocking = getattr(notify_api_local, "blocked_pending_notify_api_messages_list", None) is not None
     if force or (not has_request and not is_blocking):
-        seen = set()
-        deduped_messages = []
-        for message in messages:
-            hashable_message = concise_json_dumps(message)
-            if hashable_message not in seen:
-                seen.add(hashable_message)
-                deduped_messages.append(message)
-
         logger.debug(
             f"Sending {len(messages)} notifications to API (de-duped) via Postgres NOTIFY on channel"
             f" {POSTGRES_MESSAGES_CHANNEL}"
         )
         cursor = connection.cursor()
-        cursor.execute("SELECT pg_notify(%s, %s)", (POSTGRES_MESSAGES_CHANNEL, concise_json_dumps(deduped_messages)))
+        cursor.execute("SELECT pg_notify(%s, %s)", (POSTGRES_MESSAGES_CHANNEL, concise_json_dumps(dedupe(messages))))
     elif has_request:
         notify_api_local.request._notify_api_messages.extend(messages)
     else:

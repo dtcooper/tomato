@@ -5,6 +5,7 @@ from schema import Optional, Or, Schema, Use
 
 class ServerMessageTypes(enum.StrEnum):
     DB_CHANGE = "db-change"
+    DB_CHANGE_FORCE = "db-change-force"  # Force broadcast, for testing
     LOGOUT = "logout"
 
 

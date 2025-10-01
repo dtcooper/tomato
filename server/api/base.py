@@ -136,7 +136,7 @@ class ConnectionsBase(MessagesBase):
                     await connection.disconnect()
                 except Exception:
                     logger.exception(f"Error disconnecting websocket {user_id=}")
-        logger.debug(f"Disconnected {user_id=}, {self.is_admin=}")
+            logger.debug(f"Disconnected {user_id=}, {self.is_admin=}")
 
     async def refresh_user(self, user: User):
         if user.id in self.user_ids_to_connections:

@@ -113,7 +113,7 @@ const handleMessages = {
   },
   logout: () => {
     console.log("Got logout from server. Logging out.")
-    logout({ type: "host", message: "An administrator logged you out." })
+    logout({ type: "host", message: "An account change caused you to be logged out." })
   },
   notify: ({ msg, level, timeout, connection_id }) => {
     alert(msg, level, timeout)

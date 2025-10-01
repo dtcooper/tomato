@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.auth.models import Group
@@ -5,7 +7,11 @@ from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
 
 from ..constants import EDIT_ALL_GROUP_NAME, EDIT_ONLY_ASSETS_GROUP_NAME
+from ..models.user import notify_api_logout
 from .base import ListPrefetchRelatedMixin, NoNullRelatedOnlyFieldFilter
+
+
+logger = logging.getLogger(__name__)
 
 
 class UserAdmin(ListPrefetchRelatedMixin, DjangoUserAdmin):
@@ -57,3 +63,7 @@ class UserAdmin(ListPrefetchRelatedMixin, DjangoUserAdmin):
                 ),
                 level=messages.WARNING,
             )
+
+        if not user.has_perm("tomato.configure_live_clients"):
+            logger.info(f"Forcing configure live clients logout of admin user {user} due to loss permission")
+            notify_api_logout(user.pk, admin_only=True)

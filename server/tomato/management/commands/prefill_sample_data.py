@@ -6,7 +6,7 @@ from urllib.request import urlretrieve
 
 from django.core.management.base import BaseCommand, CommandError
 
-from tomato.models import REQUIRED_EMPTY_FOR_IMPORT_MODEL_CLASSES, User, import_data_from_zip
+from tomato.models import REQUIRED_EMPTY_FOR_IMPORT_MODEL_CLASSES, SavedAssetFile, User, import_data_from_zip
 
 
 SAMPLE_DATA_URL = "https://tomato.nyc3.digitaloceanspaces.com/bmir-sample-data-20240728-185614.zip"
@@ -50,6 +50,8 @@ class Command(BaseCommand):
             ):
                 self.stdout.write(self.style.ERROR("Aborting..."))
                 return
+
+            SavedAssetFile.objects.all().delete()
 
             for model_cls in REQUIRED_EMPTY_FOR_IMPORT_MODEL_CLASSES:
                 model_cls.objects.all().delete()

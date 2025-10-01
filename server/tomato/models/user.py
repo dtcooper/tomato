@@ -6,16 +6,25 @@ from django.utils import timezone
 
 from dirtyfields import DirtyFieldsMixin
 
-from ..utils import notify_api, notify_api_multiple
+from ..utils import notify_api
 
 
 logger = logging.getLogger(__name__)
 
 
+def notify_api_logout(user_id_or_ids: int | list[int], admin_only=False):
+    notify_api(
+        "logout",
+        {"user_ids": [user_id_or_ids] if isinstance(user_id_or_ids, int) else user_id_or_ids, "admin_only": admin_only},
+    )
+
+
 class TomatoUserQueryset(models.QuerySet):
     def delete(self):
-        logger.info("Forcing logout of multiple users since delete() on queryset")
-        notify_api_multiple([("logout", {"id": pk}) for pk in self.values_list("pk", flat=True)])
+        logout_ids = list(self.values_list("pk", flat=True))
+        if logout_ids:
+            logger.info(f"Forcing logout of {len(logout_ids)} user(s) since delete() on queryset")
+            notify_api_logout(logout_ids)
         return super().delete()
 
     delete.alters_data = True
@@ -58,12 +67,12 @@ class User(DirtyFieldsMixin, AbstractUser):
             changes = self.get_dirty_fields()
             if "password" in changes or ("is_active" in changes and not self.is_active):
                 logger.info(f"Forcing logout of user {self} due to password change / set to inactive")
-                notify_api("logout", extra_data={"id": self.pk})
+                notify_api_logout(self.pk)
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         logger.info(f"Forcing logout of user {self} since user was deleted")
-        notify_api("logout", extra_data={"id": self.pk})
+        notify_api_logout(self.pk)
         return super().delete(*args, **kwargs)
 
     def get_full_name(self):

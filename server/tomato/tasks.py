@@ -79,9 +79,12 @@ def process_asset(asset, empty_name=False, user=None, from_bulk=False, skip_trim
 
         asset.status = asset.Status.READY
         asset.save(dont_overwrite_original_filename=True)
-        SavedAssetFile.objects.update_or_create(
-            file=asset.file, defaults={"original_filename": asset.original_filename}
-        )
+        try:
+            SavedAssetFile.objects.update_or_create(
+                file=asset.file, defaults={"original_filename": asset.original_filename}
+            )
+        except SavedAssetFile.MultipleObjectsReturned:
+            logger.exception("Multiple SaveAssetFile objects returned")
 
         if not from_bulk and user is not None:
             user_messages_api.success(user, f'Audio asset "{asset.name}" successfully processed!')
