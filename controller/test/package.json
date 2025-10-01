@@ -4,6 +4,6 @@
     "@msgpack/msgpack": "^3.1.2",
     "alpinejs": "^3.15.0",
     "simpledotcss": "^2.3.7",
-    "webmidi": "^3.1.12"
+    "webmidi": "^3.1.13"
   }
 }
