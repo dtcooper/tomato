@@ -119,4 +119,5 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [ ] Allow already uploaded/archived assets to be converted into asset alternatives
 - [ ] Form asset submission
 - [ ] Client user disconnected for long periods of time, and required client to be restarted to connect.
-      Check websocket.
+      Check websocket. (Seems to do with using the database as a cahce for uploads, could use redis but
+      make sure to stop using sqlite3 for huey as well, then. Probably want to keep DB for config, however.)
