@@ -45,6 +45,7 @@ RUN if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
         && echo "alias rs='__SKIP_CHECKS=1 /app/entrypoint.sh'" >> /root/.bashrc \
         && echo "alias rs_debug='___SKIP_CHECKS=1 TOMATO_DEBUG_LOG=1 /app/entrypoint.sh'" >> /root/.bashrc \
         && echo "alias sp='./manage.py shell_plus'" >> /root/.bashrc \
+        && echo "alias sp_debug='TOMATO_DEBUG_LOG=1 ./manage.py shell_plus'" >> /root/.bashrc \
         && echo "alias lint='black . ; isort . ; flake8 .'" >> /root/.bashrc \
         && echo '. /etc/bash_completion' >> /root/.bashrc \
     ; fi

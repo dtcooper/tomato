@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 
 class ConstanceForm(OriginalConstanceForm):
     def save(self):
+        super().save()
         logger.debug("Constance config was saved in admin UI, notifying API")
         notify_api()
-        super().save()
 
 
 class ConfigAdmin(ConstanceConfigAdmin):

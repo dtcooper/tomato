@@ -175,7 +175,7 @@ class Asset(EnabledBeginEndWeightMixin, AssetBase):
         verbose_name = "audio asset"
         ordering = ("-created_at",)
         permissions = [
-            ("configure_live_clients", "Can configure live desktop clients"),  # TODO: disconnect when this goes away
+            ("configure_live_clients", "Can configure live desktop clients"),
             ("export_import", "Can manage (import/export/delete all) asset data"),
         ]
 
