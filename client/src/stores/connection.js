@@ -113,7 +113,7 @@ const handleMessages = {
   },
   logout: () => {
     console.log("Got logout from server. Logging out.")
-    logout({ type: "host", message: "An account change caused you to be logged out." })
+    logout({ type: "host", message: "The server forcibly logged you out." })
   },
   notify: ({ msg, level, timeout, connection_id }) => {
     alert(msg, level, timeout)
