@@ -118,3 +118,5 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [ ] Bulk uploads of 50+ files breaks. Look into this.
 - [ ] Allow already uploaded/archived assets to be converted into asset alternatives
 - [ ] Form asset submission
+- [ ] Client user disconnected for long periods of time, and required client to be restarted to connect.
+      Check websocket.
