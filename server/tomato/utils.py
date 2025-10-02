@@ -4,10 +4,14 @@ import os
 from pathlib import Path
 import threading
 
+from huey import PriorityRedisHuey
+
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import connection
 
-from .constants import POSTGRES_MESSAGES_CHANNEL
+from django_redis import get_redis_connection
+
+from .constants import REDIS_MESSAGES_PUBSUB_KEY
 
 
 logger = logging.getLogger(__name__)
@@ -69,11 +73,10 @@ def notify_api_multiple(messages: list, *, force=False):
     is_blocking = getattr(notify_api_local, "blocked_pending_notify_api_messages_list", None) is not None
     if force or (not has_request and not is_blocking):
         logger.debug(
-            f"Sending {len(messages)} notifications to API (de-duped) via Postgres NOTIFY on channel"
-            f" {POSTGRES_MESSAGES_CHANNEL}"
+            f"Sending {len(messages)} notifications to API (de-duped) via redis with key {REDIS_MESSAGES_PUBSUB_KEY}"
         )
-        cursor = connection.cursor()
-        cursor.execute("SELECT pg_notify(%s, %s)", (POSTGRES_MESSAGES_CHANNEL, concise_json_dumps(dedupe(messages))))
+        redis = get_redis_connection()
+        redis.publish(REDIS_MESSAGES_PUBSUB_KEY, concise_json_dumps(dedupe(messages)))
     elif has_request:
         notify_api_local.request._notify_api_messages.extend(messages)
     else:
@@ -88,3 +91,10 @@ def unblock_and_flush_blocked_pending_notify_api_messages():
     if getattr(notify_api_local, "blocked_pending_notify_api_messages_list", None):
         notify_api_multiple(notify_api_local.blocked_pending_notify_api_messages_list, force=True)
     notify_api_local.blocked_pending_notify_api_messages_list = None
+
+
+class DjangoPriorityRedisHuey(PriorityRedisHuey):
+    def __init__(self, *args, **kwargs):
+        connection = get_redis_connection()
+        kwargs["connection_pool"] = connection.connection_pool
+        super().__init__(*args, **kwargs)

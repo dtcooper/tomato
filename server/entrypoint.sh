@@ -15,7 +15,7 @@ if [ -z "$SECRET_KEY" ]; then
 fi
 
 if [ -z "$__SKIP_CHECKS" ]; then
-    wait-for-it --timeout 0 --service db:5432
+    wait-for-it --timeout 0 --service db:5432 --service redis:6379
 fi
 
 # If we're not running huey, migration and create tomato:tomato user when DEBUG=1

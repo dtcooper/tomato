@@ -71,7 +71,7 @@ async def startup():
     init_logger()
 
     await users.init_last_serialized_data()
-    server_messages.consume_db_notifications()
+    server_messages.consume_redis_notifications()
 
 
 async def shutdown():

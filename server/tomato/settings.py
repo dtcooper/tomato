@@ -81,7 +81,6 @@ INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.messages",
-    "django.contrib.sessions",
     "django.contrib.staticfiles",
     # Third-party
     "constance",
@@ -155,18 +154,26 @@ DATABASES = {
 
 HUEY = {
     "results": False,
-    "huey_class": "huey.SqliteHuey",
-    "filename": "/huey/huey.db",
+    "huey_class": "tomato.utils.DjangoPriorityRedisHuey",
     "immediate": HUEY_IMMEDIATE_MODE,
     "name": "tomato",
 }
 
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
-        "LOCATION": "cache",
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "CONNECTION_POOL_KWARGS": {"max_connections": 50, "retry_on_timeout": True},
+            "PARSER_CLASS": "redis.connection._HiredisParser",
+            "PICKLE_VERSION": -1,
+        },
+        "KEY_PREFIX": "cache",
     }
 }
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 LANGUAGE_CODE = "en-us"
 USE_I18N = True

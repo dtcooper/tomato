@@ -31,6 +31,11 @@ services:
     ports:
       - "127.0.0.1:${DEBUG_DB_PORT:-5432}:5432"
 
+  redis:
+    restart: 'no'
+    ports:
+      - "127.0.0.1:${DEBUG_REDIS_PORT:-6379}:6379"
+
   logs:
     restart: 'no'
     ports:

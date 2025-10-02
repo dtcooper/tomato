@@ -16,6 +16,7 @@ django-constance = "^4.3.2"
 django-dirtyfields = "^1.9.7"
 django-environ = "^0.12.0"
 django-file-form = "^3.9.0"
+django-redis = {extras = ["hiredis"], version = "^6.0.0"}
 django-user-messages = "^1.1.0"
 gunicorn = "^23.0.0"
 huey = "^2.5.3"
@@ -63,5 +64,5 @@ combine_as_imports = true
 sections = ['FUTURE', 'STDLIB', 'THIRDPARTY', 'DJANGO', 'STARLETTE', 'DJANGOTHIRDPARTY', 'FIRSTPARTY', 'LOCALFOLDER']
 known_starlette = ['starlette', 'uvicorn']
 known_django = ['django']
-known_djangothirdparty = ['constance', 'dirtyfields', 'django_file_form', 'environ', 'huey.contrib', 'safedelete', 'user_messages']
+known_djangothirdparty = ['constance', 'dirtyfields', 'django_file_form', 'environ', 'django_redis', 'huey.contrib', 'safedelete', 'user_messages']
 skip = ['migrations']

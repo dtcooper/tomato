@@ -3,6 +3,7 @@ x-app-template: &app-template
   image: "ghcr.io/dtcooper/tomato-server:${TOMATO_VERSION:-latest}"
   depends_on:
     - db
+    - redis
   build:
     context: .
     args:
@@ -10,7 +11,6 @@ x-app-template: &app-template
   volumes:
     - ./.env:/.env
     - ./serve:/serve
-    - huey_data:/huey
 
 services:
   app:
@@ -53,6 +53,12 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
 
+  redis:
+    restart: always
+    image: redis:8.2-alpine
+    volumes:
+      - redis_data:/data
+
   logs:
     restart: always
     image: amir20/dozzle:v8.14.3
@@ -67,4 +73,4 @@ services:
 volumes:
   nginx_secrets:
   postgres_data:
-  huey_data:
+  redis_data:

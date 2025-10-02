@@ -36,12 +36,13 @@ RUN if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
             netcat-openbsd \
             npm \
             postgresql-client \
-            sqlite3 \
+            redis-tools \
             watchman \
         ) \
     && rm -rf /var/lib/apt/lists/* \
     && if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
         echo "alias ls='ls --color=auto'" >> /root/.bashrc \
+        && echo "alias redis-cli='redis-cli -h redis'" >> /root/.bashrc \
         && echo "alias rs='__SKIP_CHECKS=1 /app/entrypoint.sh'" >> /root/.bashrc \
         && echo "alias rs_debug='___SKIP_CHECKS=1 TOMATO_DEBUG_LOG=1 /app/entrypoint.sh'" >> /root/.bashrc \
         && echo "alias sp='./manage.py shell_plus'" >> /root/.bashrc \
