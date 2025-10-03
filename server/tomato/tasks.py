@@ -87,8 +87,11 @@ def process_asset(asset, empty_name=False, user=None, from_bulk=False, skip_trim
         except ValidationError as e:
             logger.exception(f"full_clean() on {asset} threw a validation error")
             error_msg = "A validation error occurred while processing this asset"
-            if (all_errors := e.message_dict.get("__all__")) is not None and len(all_errors) >= 1:
-                error_msg = strip_tags(all_errors[0])
+            for error_key in ("__all__", "file"):
+                error_list = e.message_dict.get(error_key)
+                if error_list:
+                    error_msg = strip_tags(" ".join(error_list))
+                    break
             error(error_msg)
             return
 
