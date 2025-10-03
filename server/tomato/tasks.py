@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 
 @djhuey.db_task(context=True, retries=3, retry_delay=5)
-def process_asset(asset, empty_name=False, user=None, from_bulk=False, skip_trim=False, task=None):
+def process_asset(asset, empty_name=False, user=None, from_bulk=False, from_command_line_import=False, task=None):
     def error(message):
         if user is not None:
             user_messages_api.error(
@@ -63,7 +63,7 @@ def process_asset(asset, empty_name=False, user=None, from_bulk=False, skip_trim
                 asset.name = ffprobe_data.title
 
         infile = asset.file.real_path
-        if ffprobe_data.format != "mp3" or (config.TRIM_SILENCE and not skip_trim):
+        if ffprobe_data.format != "mp3" or (config.TRIM_SILENCE and not from_command_line_import):
             with tempfile.TemporaryDirectory() as temp_dir:
                 outfile = Path(temp_dir) / "out.mp3"
                 if not ffmpeg_convert(infile, outfile):
@@ -90,7 +90,7 @@ def process_asset(asset, empty_name=False, user=None, from_bulk=False, skip_trim
             for error_key in ("__all__", "file"):
                 error_list = e.message_dict.get(error_key)
                 if error_list:
-                    error_msg = strip_tags(" ".join(error_list))
+                    error_msg = strip_tags(". ".join(error_list))
                     break
             error(error_msg)
             return
@@ -116,14 +116,16 @@ def process_asset(asset, empty_name=False, user=None, from_bulk=False, skip_trim
 
 
 @djhuey.db_task()
-def bulk_process_assets(assets, user=None, skip_trim=False):
+def bulk_process_assets(assets, user=None, from_command_line_import=False):
     try:
         block_pending_notify_api_messages()
 
         for n, asset in enumerate(assets):
             logger.info(f"Bulk processing {n}/{len(assets)} assets...")
             try:
-                process_asset.call_local(asset, empty_name=True, user=user, from_bulk=True, skip_trim=skip_trim)
+                process_asset.call_local(
+                    asset, empty_name=True, user=user, from_bulk=True, from_command_line_import=from_command_line_import
+                )
             except Exception:
                 pass
 

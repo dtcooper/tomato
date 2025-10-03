@@ -146,6 +146,6 @@ def import_data_from_zip(file, created_by=None):
                     assets_to_process.append(alternate)
                     stats["assets"] += 1
 
-        bulk_process_assets(assets_to_process, user=created_by, skip_trim=True)
+        bulk_process_assets(assets_to_process, user=created_by, from_command_line_import=True)
 
         return stats
