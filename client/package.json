@@ -78,6 +78,7 @@
     "wait-on": "^8.0.5",
     "wavesurfer.js": "^7.11.0",
     "weak-ref-collections": "^1.2.4",
-    "webmidi": "^3.1.13"
+    "webmidi": "^3.1.13",
+    "yaml": "^2.8.1"
   }
 }
