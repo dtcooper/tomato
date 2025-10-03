@@ -85,6 +85,7 @@ def process_asset(asset, empty_name=False, user=None, from_bulk=False, skip_trim
         try:
             asset.full_clean(force_check_against_md5sum=asset.pre_process_md5sum)
         except ValidationError as e:
+            logger.exception(f"full_clean() on {asset} threw a validation error")
             error_msg = "A validation error occurred while processing this asset"
             if (all_errors := e.message_dict.get("__all__")) is not None and len(all_errors) >= 1:
                 error_msg = strip_tags(all_errors[0])
