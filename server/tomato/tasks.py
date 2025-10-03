@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 
 @djhuey.db_task(context=True, retries=3, retry_delay=5)
-def process_asset(asset, empty_name=False, user=None, from_bulk=False, from_command_line_import=False, task=None):
+def process_asset(asset, *, empty_name=False, user=None, from_bulk=False, from_command_line_import=False, task=None):
     def error(message):
         if user is not None:
             user_messages_api.error(
@@ -82,18 +82,19 @@ def process_asset(asset, empty_name=False, user=None, from_bulk=False, from_comm
         asset.status = asset.Status.READY
         asset.save(dont_overwrite_original_filename=True)
 
-        try:
-            asset.full_clean(force_check_against_md5sum=asset.pre_process_md5sum)
-        except ValidationError as e:
-            logger.exception(f"full_clean() on {asset} threw a validation error")
-            error_msg = "A validation error occurred while processing this asset"
-            for error_key in ("__all__", "file"):
-                error_list = e.message_dict.get(error_key)
-                if error_list:
-                    error_msg = strip_tags(". ".join(error_list))
-                    break
-            error(error_msg)
-            return
+        if not from_command_line_import:
+            try:
+                asset.full_clean(force_check_against_md5sum=asset.pre_process_md5sum)
+            except ValidationError as e:
+                logger.exception(f"full_clean() on {asset} threw a validation error")
+                error_msg = "A validation error occurred while processing this asset"
+                for error_key in ("__all__", "file"):
+                    error_list = e.message_dict.get(error_key)
+                    if error_list:
+                        error_msg = strip_tags(". ".join(error_list))
+                        break
+                error(error_msg)
+                return
 
         try:
             SavedAssetFile.objects.update_or_create(
@@ -116,7 +117,7 @@ def process_asset(asset, empty_name=False, user=None, from_bulk=False, from_comm
 
 
 @djhuey.db_task()
-def bulk_process_assets(assets, user=None, from_command_line_import=False):
+def bulk_process_assets(assets, *, user=None, from_command_line_import=False):
     try:
         block_pending_notify_api_messages()
 
