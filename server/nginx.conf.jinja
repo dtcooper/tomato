@@ -58,6 +58,9 @@ server {
 
     location / {
         {{ PROXY_PARAMS }}
+        proxy_connect_timeout 180s;
+        proxy_send_timeout 180s;
+        proxy_read_timeout 180s;
         proxy_pass http://app:8000;
     }
 }
