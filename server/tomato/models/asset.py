@@ -85,11 +85,11 @@ class AssetBase(TomatoModelBase):
             "url": self.file.url,
         }
 
-    def full_clean(self, *args, **kwargs):
+    def full_clean(self, force_check_against_md5sum=None, *args, **kwargs):
         super().full_clean(*args, **kwargs)
-        if self.file and "file" in self.get_dirty_fields():
+        if self.file and (force_check_against_md5sum is not None or "file" in self.get_dirty_fields()):
             if config.PREVENT_DUPLICATE_ASSETS:
-                md5sum = self.generate_md5sum()
+                md5sum = force_check_against_md5sum or self.generate_md5sum()
                 querysets = {
                     Asset: Asset.objects.filter(pre_process_md5sum=md5sum),
                     AssetAlternate: AssetAlternate.objects.filter(pre_process_md5sum=md5sum),

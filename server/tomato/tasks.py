@@ -5,7 +5,9 @@ import tempfile
 
 from huey import crontab
 
+from django.core.exceptions import ValidationError
 from django.core.files import File
+from django.utils.html import strip_tags
 
 from constance import config
 from django_file_form.models import TemporaryUploadedFile
@@ -31,7 +33,7 @@ def process_asset(asset, empty_name=False, user=None, from_bulk=False, skip_trim
         if user is not None:
             user_messages_api.error(
                 user,
-                f"{asset.name} {message} and was deleted. Check the file and try again. If this keeps happening,"
+                f"{asset.name} was deleted. {message}. Check the file and try again. If this keeps happening,"
                 " check the server logs.",
                 deliver_once=False,
             )
@@ -79,6 +81,16 @@ def process_asset(asset, empty_name=False, user=None, from_bulk=False, skip_trim
 
         asset.status = asset.Status.READY
         asset.save(dont_overwrite_original_filename=True)
+
+        try:
+            asset.full_clean(force_check_against_md5sum=asset.pre_process_md5sum)
+        except ValidationError as e:
+            error_msg = "A validation error occurred while processing this asset"
+            if (all_errors := e.message_dict.get("__all__")) is not None and len(all_errors) >= 1:
+                error_msg = strip_tags(all_errors[0])
+            error(error_msg)
+            return
+
         try:
             SavedAssetFile.objects.update_or_create(
                 file=asset.file, defaults={"original_filename": asset.original_filename}
