@@ -8,7 +8,7 @@ readme = "../README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.13"
 django = "^5.2.7"
 django-admin-logs = "^1.4.0"
 django-admin-notice = "^3.3.0"
@@ -17,12 +17,15 @@ django-dirtyfields = "^1.9.7"
 django-environ = "^0.12.0"
 django-file-form = "^3.9.0"
 django-redis = {extras = ["hiredis"], version = "^6.0.0"}
+django-simple-captcha = "^0.6.2"
 django-user-messages = "^1.1.0"
+django-widget-tweaks = "^1.5.0"
 gunicorn = "^23.0.0"
 huey = "^2.5.3"
+pillow = "^12.0.0"
 psycopg = "^3.2.10"
 python-dotenv = "^1.1.1"
-schema = "^0.7.7"
+schema = "^0.7.8"
 starlette = "^0.48.0"
 uvicorn = {extras = ["standard"], version = "^0.37.0"}
 wait-for-it = "^2.3.0"
@@ -34,8 +37,7 @@ django-extensions = "^4.1"
 flake8 = "^7.3.0"
 ipdb = "^0.13.13"
 ipython = "^9.6.0"
-isort = "^6.1.0"
-pywatchman = "^3.0.0"
+isort = "^7.0.0"
 watchdog = {extras = ["watchmedo"], version = "^6.0.0"}
 
 [build-system]
@@ -64,5 +66,6 @@ combine_as_imports = true
 sections = ['FUTURE', 'STDLIB', 'THIRDPARTY', 'DJANGO', 'STARLETTE', 'DJANGOTHIRDPARTY', 'FIRSTPARTY', 'LOCALFOLDER']
 known_starlette = ['starlette', 'uvicorn']
 known_django = ['django']
-known_djangothirdparty = ['constance', 'dirtyfields', 'django_file_form', 'environ', 'django_redis', 'huey.contrib', 'safedelete', 'user_messages']
+known_djangothirdparty = ['captcha', 'constance', 'dirtyfields', 'django_file_form', 'environ', 'django_redis',
+                          'huey.contrib', 'safedelete', 'user_messages', 'widget_tweaks']
 skip = ['migrations']

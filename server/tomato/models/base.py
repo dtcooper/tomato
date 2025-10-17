@@ -103,14 +103,7 @@ class EligibleToAirQuerySet(TomatoModelBaseQueryset):
         return self.exclude(self._get_currently_airing_Q(now))
 
 
-class EnabledBeginEndWeightMixin(models.Model):
-    objects = EligibleToAirQuerySet.as_manager()
-
-    enabled = models.BooleanField(
-        "enabled",
-        default=True,
-        help_text="If unselected, entity is completely disabled regardless of begin and end air date.",
-    )
+class BeginEndMixin(models.Model):
     begin = models.DateTimeField(
         "begin air date",
         null=True,
@@ -131,6 +124,19 @@ class EnabledBeginEndWeightMixin(models.Model):
             " eligible before this date. If left blank, its always eligible for random selection starting with begin"
             " air date."
         ),
+    )
+
+    class Meta:
+        abstract = True
+
+
+class EnabledBeginEndWeightMixin(BeginEndMixin, models.Model):
+    objects = EligibleToAirQuerySet.as_manager()
+
+    enabled = models.BooleanField(
+        "enabled",
+        default=True,
+        help_text="If unselected, entity is completely disabled regardless of begin and end air date.",
     )
     weight = models.DecimalField(
         "weight",

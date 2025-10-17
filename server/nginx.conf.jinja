@@ -5,6 +5,14 @@
     proxy_set_header X-Forwarded-Proto $scheme;
 {% endset -%}
 
+{%- set LONGER_READ_PROXY_PARAMS %}
+    send_timeout 180s;
+    proxy_connect_timeout 180s;
+    proxy_send_timeout 180s;
+    proxy_read_timeout 180s;
+    {{ PROXY_PARAMS }}
+{%- endset %}
+
 {%- set COMMON_PARAMS %}
     ssl_certificate /etc/letsencrypt/live/tomato/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/tomato/privkey.pem;
@@ -57,11 +65,41 @@ server {
     }
 
     location / {
-        {{ PROXY_PARAMS }}
-        send_timeout 180s;
-        proxy_connect_timeout 180s;
-        proxy_send_timeout 180s;
-        proxy_read_timeout 180s;
+        {{ LONGER_READ_PROXY_PARAMS }}
         proxy_pass http://app:8000;
     }
 }
+
+{% if USER_SUBMIT_ALT_DOMAIN_NAME %}
+    # Configuration for USER_SUBMIT_ALT_DOMAIN_NAME ({{ USER_SUBMIT_ALT_DOMAIN_NAME }})
+
+    server {
+        listen 443 ssl;
+        http2 on;
+
+        server_name {{ USER_SUBMIT_ALT_DOMAIN_NAME }};
+
+        {{ COMMON_PARAMS }}
+
+        location /static/ {
+            {% if DEBUG|int %}
+                {{ PROXY_PARAMS  }}
+                proxy_pass http://app:8000;
+            {% else %}
+                location /static/ {
+                    alias /serve/static/;
+                }
+            {% endif %}
+        }
+
+        # For uploaded branding image
+        location /assets/config/ {
+            alias /serve/assets/config/;
+        }
+
+        location / {
+            {{ LONGER_READ_PROXY_PARAMS }}
+            proxy_pass http://app:8000/submissions/;
+        }
+    }
+{% endif %}

@@ -16,6 +16,7 @@ from django.urls import reverse
 from django.utils.html import format_html, format_html_join
 
 from constance import config
+from dirtyfields import DirtyFieldsMixin
 
 from ..utils import listdir_recursive
 from .base import (
@@ -47,7 +48,7 @@ def asset_upload_to(instance, filename):
     return generate_random_asset_filename(filename)
 
 
-class AssetBase(TomatoModelBase):
+class SubmissionAndAssetBase(DirtyFieldsMixin, models.Model):
     class Status(models.IntegerChoices):
         PENDING = 0, "Pending processing"
         PROCESSING = 1, "Processing"
@@ -89,10 +90,13 @@ class AssetBase(TomatoModelBase):
         super().full_clean(*args, **kwargs)
         if self.file and (force_check_against_md5sum is not None or "file" in self.get_dirty_fields()):
             if config.PREVENT_DUPLICATE_ASSETS:
+                from ..submit.models import Submission
+
                 md5sum = force_check_against_md5sum or self.generate_md5sum()
                 querysets = {
                     Asset: Asset.objects.filter(pre_process_md5sum=md5sum),
                     AssetAlternate: AssetAlternate.objects.filter(pre_process_md5sum=md5sum),
+                    Submission: Submission.objects.filter(pre_process_md5sum=md5sum),
                 }
                 if self.id is not None:
                     querysets[self._meta.model] = querysets[self._meta.model].exclude(id=self.id)
@@ -109,8 +113,8 @@ class AssetBase(TomatoModelBase):
                     duplicates_html = format_html_join(", ", '<a href="{}">{}</a>', duplicates)
                     raise ValidationError({
                         "__all__": format_html(
-                            "An audio asset already exists with this audio file. Rejecting duplicate. You can turn this"
-                            " feature off with setting <code>PREVENT_DUPLICATES</code>. Existing: {}",
+                            "An audio asset already exists with this audio file. Rejecting duplicate. This feature can "
+                            "be turned off by an administrator. Existing: {}",
                             duplicates_html,
                         ),
                         "file": format_html("A duplicate of this file already exists. Existing: {}", duplicates_html),
@@ -137,6 +141,11 @@ class AssetBase(TomatoModelBase):
     @property
     def filename(self):
         return f"{self.original_filename}{Path(self.file.name).suffix}"
+
+
+class AssetBase(SubmissionAndAssetBase, TomatoModelBase):
+    class Meta:
+        abstract = True
 
 
 class Asset(EnabledBeginEndWeightMixin, AssetBase):

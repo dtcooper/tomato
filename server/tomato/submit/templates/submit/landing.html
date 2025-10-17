@@ -1,0 +1,33 @@
+{% extends 'submit/base.html' %}
+
+{% load submit %}
+
+{% block content %}
+
+    {% if IS_LOGGED_IN %}
+      {% confblock "SUBMISSION_INFO" %}
+        <p>You can submit new audio files audio by <a href="${CREATE_URL}">clicking here</a>.</p>
+      {% endconfblock %}
+      {% if SUBMISSION %}
+
+      {% else %}
+        {% confblock "NO_SUBMISSIONS" %}
+          <article>You currently have no submissions with ${STATION_NAME}.</article>
+        {% endconfblock %}
+      {% endif %}
+    {% else %}
+      {% confblock "PLEASE_SIGN_IN" %}
+        <p>
+          Welcome to the audio submission portal for ${STATION_NAME} &mdash; where you can upload your audio for review
+          and inclusion in our radio station's playout.
+        <p>
+
+        ${CONTENT_BLOCK_PASSWORD_FREE_DESCRIPTION}
+
+        <p>
+          <strong>Please by sign in by <a href="${LOGIN_URL}">clicking here</a>.</strong>
+        </p>
+      {% endconfblock %}
+    {% endif %}
+
+{% endblock%}

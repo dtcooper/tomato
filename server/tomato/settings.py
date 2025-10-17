@@ -1,6 +1,8 @@
 from collections import OrderedDict
 import datetime
 from decimal import Decimal
+from email.utils import parseaddr
+import json
 from pathlib import Path
 import re
 
@@ -15,10 +17,12 @@ env.read_env("/.env")
 
 BASE_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = BASE_DIR.parent
+CONSTANTS_FILE_PATH = PROJECT_DIR / "constants.json"
 
 DEBUG = env.bool("DEBUG", default=False)
 
 DOMAIN_NAME = env("DOMAIN_NAME", default=None)
+USER_SUBMIT_ALT_DOMAIN_NAME = env("USER_SUBMIT_ALT_DOMAIN_NAME", default=None)
 REQUIRE_STRONG_PASSWORDS = env("REQUIRE_STRONG_PASSWORDS", default=not DEBUG)
 SECRET_KEY = env("SECRET_KEY")
 TIME_ZONE = env("TIMEZONE", default="US/Pacific")
@@ -32,6 +36,7 @@ PASSWORD_RESET_TIMEOUT = 60 * 60 * 6  # 6 hours
 EMAIL_DEBUG_ONLY_PRINT_TO_CONSOLE_ONLY = DEBUG and env.bool("EMAIL_DEBUG_ONLY_PRINT_TO_CONSOLE_ONLY", default=False)
 
 if EMAIL_ENABLED:
+    DEFAULT_FROM_EMAIL = SERVER_EMAIL = env("EMAIL_FROM_ADDRESS")
     if EMAIL_DEBUG_ONLY_PRINT_TO_CONSOLE_ONLY:
         EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
     else:
@@ -40,7 +45,6 @@ if EMAIL_ENABLED:
         EMAIL_HOST_PASSWORD = env("EMAIL_PASSWORD")
         EMAIL_PORT = env.int("EMAIL_PORT", default=587)
         EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=EMAIL_PORT in (465, 587))
-        DEFAULT_FROM_EMAIL = SERVER_EMAIL = env("EMAIL_FROM_ADDRESS")
 
 elif EMAIL_EXCEPTIONS_ENABLED:
     raise ImproperlyConfigured("EMAIL_ENABLED=False but EMAIL_EXCEPTIONS_ENABLED=True.")
@@ -67,6 +71,8 @@ if DEBUG:
     ALLOWED_HOSTS.add("localhost")
 if DOMAIN_NAME:
     ALLOWED_HOSTS.add(DOMAIN_NAME)
+if USER_SUBMIT_ALT_DOMAIN_NAME:
+    ALLOWED_HOSTS.add(USER_SUBMIT_ALT_DOMAIN_NAME)
 ALLOWED_HOSTS = list(ALLOWED_HOSTS)
 
 if DEBUG:
@@ -83,11 +89,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Third-party
+    "captcha",
     "constance",
     "django_admin_logs",
     "django_file_form",
     "huey.contrib.djhuey",
     "user_messages",
+    "widget_tweaks",
 ]
 if DEBUG:
     INSTALLED_APPS.extend([
@@ -97,6 +105,7 @@ if DEBUG:
 INSTALLED_APPS.extend([
     # Local
     "tomato",
+    "tomato.submit",
 ])
 
 AUTH_USER_MODEL = "tomato.User"
@@ -113,7 +122,7 @@ MIDDLEWARE.extend([
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "tomato.middleware.DBNotifyMiddleware",
+    "tomato.middleware.RequestMiddleware",
 ])
 
 ROOT_URLCONF = "tomato.urls"
@@ -187,6 +196,7 @@ STATIC_URL = "/static/"
 STATIC_ROOT = "/serve/static"
 MEDIA_URL = "/assets/"
 MEDIA_ROOT = "/serve/assets"
+CONSTANCE_FILE_ROOT = "config"
 LOGIN_URL = "/login/"
 FILE_FORM_MUST_LOGIN = True
 FILE_FORM_UPLOAD_DIR = "_temp_uploads"
@@ -252,6 +262,11 @@ if REQUIRE_STRONG_PASSWORDS:
         {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
     ]
 
+CAPTCHA_FONT_SIZE = 42
+CAPTCHA_LETTER_ROTATION = (-8, 8)
+CAPTCHA_BACKGROUND_COLOR = "#000000"
+CAPTCHA_FOREGROUND_COLOR = "#ffffff"
+CAPTCHA_CHALLENGE_FUNCT = "tomato.submit.forms.captcha_challenge"
 
 DJANGO_ADMIN_LOGS_ENABLED = True
 DJANGO_ADMIN_LOGS_DELETABLE = True
@@ -272,6 +287,7 @@ def validate_reset_times(values):
 
 
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
+CONSTANCE_DATABASE_CACHE_BACKEND = "default"
 CONSTANCE_SUPERUSER_ONLY = False
 CONSTANCE_IGNORE_ADMIN_VERSION_CHECK = True
 _style_full_width = {"style": "width: calc(100% - 5px)"}
@@ -321,11 +337,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
     ),
     "seconds": (
         "django.forms.IntegerField",
-        {
-            "widget": "django.forms.TextInput",
-            "min_value": 0,
-            "max_value": 24 * 60 * 60,
-        },
+        {"widget": "django.forms.TextInput", "min_value": 0, "max_value": 24 * 60 * 60},
     ),
     "reset_times": (
         "django.forms.CharField",
@@ -337,20 +349,49 @@ CONSTANCE_ADDITIONAL_FIELDS = {
     ),
     "silence": (
         "django.forms.IntegerField",
-        {
-            "widget": "django.forms.TextInput",
-            "min_value": 0,
-            "max_value": 60,
-        },
+        {"widget": "django.forms.TextInput", "min_value": 0, "max_value": 60},
     ),
     "clock": (
         "django.forms.ChoiceField",
         {"choices": (("", "Off"), ("12h", "12 Hour"), ("24h", "24 Hour")), "required": False},
     ),
+    "empty_datetime": (
+        "django.forms.SplitDateTimeField",
+        {"widget": "django.contrib.admin.widgets.AdminSplitDateTime", "required": False},
+    ),
+    "rotator": ("tomato.submit.forms.RotatorPickerField",),
+    "image": (
+        "django.forms.FileField",
+        {"widget": "tomato.submit.forms.AlwaysClearableConstanceFileInput", "required": False},
+    ),
+    "content_block": (
+        "django.forms.CharField",
+        {
+            "widget": "django.forms.Textarea",
+            "widget_kwargs": {"attrs": {"rows": 8, **_style_full_width}},
+            "required": False,
+        },
+    ),
 }
 del _style_full_width
 
-CONSTANCE_CONFIG = {
+
+def update_config_with_content_block_defaults(config):
+    with open(PROJECT_DIR / "tomato" / "submit" / "content_block_defaults.json", "r") as f:
+        defaults = json.load(f)
+
+    key_prefix = "USER_SUBMIT_CONTENT_BLOCK_"
+    content_block_config_items = [(k, v) for k, v in config.items() if k.startswith(key_prefix)]
+    for key, default in content_block_config_items:
+        if key.startswith(key_prefix):
+            if default is None:
+                default = f'Content block for "{key.removeprefix(key_prefix).replace("_", " ").lower().title()}"'
+            config[key] = (defaults.get(key, ""), default, "content_block")
+
+    return config
+
+
+CONSTANCE_CONFIG = update_config_with_content_block_defaults({
     "STATION_NAME": ("Tomato Radio Automation", "The name of your station.", "short_text"),
     "BROADCAST_COMPRESSION": (
         False,
@@ -488,7 +529,88 @@ CONSTANCE_CONFIG = {
         "clock",
     ),
     "ENABLE_ASSET_DELETION": (True, "If disabled, no one can delete assets (can only archive soft delete)"),
-}
+    # User submission config below
+    "ENABLE_USER_SUBMIT": (False, "If enabled, user submissions will be available to use in this installation."),
+    "USER_SUBMIT_ACTIVE": (
+        True,
+        mark_safe(
+            "Whether user submissions are currently active to users. Disable to disallow user submissions to the end"
+            " user. If enabled submissions will <strong>stay enabled in the admin site</strong> and but be"
+            " <strong>read-only to the end user</strong>."
+        ),
+    ),
+    "USER_SUBMIT_ALLOW_ALTERNATES": (
+        True,
+        "Whether to allow asset alternates to be uploaded by the user for a submission.",
+    ),
+    "USER_SUBMIT_DEFAULT_ROTATOR": (
+        "",
+        "The default rotator to put user submissions in when they are approved.",
+        "rotator",
+    ),
+    "USER_SUBMIT_START": (
+        "",
+        mark_safe(
+            "The <strong>first valid start date</strong> if <code>USER_SUBMIT_START</code> is optional/mandatory."
+        ),
+        "empty_datetime",
+    ),
+    "USER_SUBMIT_START_REQUIRED": (
+        True,
+        mark_safe(
+            "If <code>USER_SUBMIT_START</code> is set, a <strong>start date is required</strong> to be set by a user"
+            " when this is enabled."
+        ),
+    ),
+    "USER_SUBMIT_END": (
+        "",
+        mark_safe("The <strong>last valid end date</strong> if <code>USER_SUBMIT_END</code> is optional/mandatory."),
+        "empty_datetime",
+    ),
+    "USER_SUBMIT_END_REQUIRED": (
+        True,
+        mark_safe(
+            "If <code>USER_SUBMIT_END</code> is set, an <strong>end date is required</strong> to be set by a user when"
+            " this is enabled."
+        ),
+    ),
+    "USER_SUBMIT_BRANDING_IMAGE": (
+        False,
+        "An optional branding image (should be square) for user submissions",
+        "image",
+    ),
+    "USER_SUBMIT_CONTENT_BLOCK_PASSWORD_FREE_DESCRIPTION": "A description of the password login method.",
+    "USER_SUBMIT_CONTENT_BLOCK_SUBMISSION_INFO": "Call to action on the landing page to submit audio",
+    "USER_SUBMIT_CONTENT_BLOCK_PLEASE_SIGN_IN": None,
+    "USER_SUBMIT_CONTENT_BLOCK_FOOTER_COPYRIGHT": "Copyright footer on each page. Leave blank to remove it entirely.",
+    "USER_SUBMIT_CONTENT_BLOCK_LOGIN_EMAIL": mark_safe(
+        "Email sent to users to log in. <strong>Make it contains a reference to variable ${LINK}</strong> or users"
+        " won't be able to log in!"
+    ),
+    "USER_SUBMIT_CONTENT_BLOCK_NO_SUBMISSIONS": None,
+})
+
+
+if EMAIL_ENABLED:
+    CONSTANCE_CONFIG.update({
+        "USER_SUBMIT_ADMIN_EMAIL": (
+            parseaddr(SERVER_EMAIL)[1],
+            (
+                "The email address of the administrator that users will be prompted to email in case of an error. (For"
+                " example if the asset is a duplicate.)"
+            ),
+            "short_text",
+        ),
+        "USER_SUBMIT_LOGIN_VIA_EMAIL": (
+            True,
+            mark_safe(
+                "Users to log in via email, rather than just a persistent browser session with an unvalidated email."
+                " <strong><u>NOTE</u>: if this is disabled, any user can make a submission with any email address, and"
+                " no verification is performed!"
+            ),
+        ),
+    })
+
 
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
     (
@@ -528,8 +650,38 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
             "END_DATE_PRIORITY_WEIGHT_MULTIPLIER",
         ),
     ),
+    (
+        "User submissions",
+        (
+            "ENABLE_USER_SUBMIT",
+            "USER_SUBMIT_ACTIVE",
+            "USER_SUBMIT_DEFAULT_ROTATOR",
+        )
+        + (
+            (
+                "USER_SUBMIT_ADMIN_EMAIL",
+                "USER_SUBMIT_LOGIN_VIA_EMAIL",
+            )
+            if EMAIL_ENABLED
+            else ()
+        )
+        + (
+            "USER_SUBMIT_ALLOW_ALTERNATES",
+            "USER_SUBMIT_START",
+            "USER_SUBMIT_START_REQUIRED",
+            "USER_SUBMIT_END",
+            "USER_SUBMIT_END_REQUIRED",
+            "USER_SUBMIT_BRANDING_IMAGE",
+        ),
+    ),
+    (
+        "User submissions content blocks",
+        tuple(sorted(k for k in CONSTANCE_CONFIG.keys() if k.startswith("USER_SUBMIT_CONTENT_BLOCK_"))),
+    ),
 ))
-CONSTANCE_SERVER_ONLY_SETTINGS = set(CONSTANCE_CONFIG_FIELDSETS["Server audio processing"])
+CONSTANCE_SERVER_ONLY_SETTINGS = set(CONSTANCE_CONFIG_FIELDSETS["Server audio processing"]) | set(
+    CONSTANCE_CONFIG_FIELDSETS["User submissions"]
+)
 
 SHELL_PLUS_IMPORTS = [
     "from constance import config",

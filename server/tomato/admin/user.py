@@ -47,6 +47,11 @@ class UserAdmin(ListPrefetchRelatedMixin, DjangoUserAdmin):
             groups = [(group.name,) for group in obj.groups.all()]
             return format_html_join(mark_safe("<br>\n"), "&#x25cf; {}", groups) or None
 
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "groups":
+            kwargs["queryset"] = Group.objects.order_by("name")
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
+
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
         user = form.instance

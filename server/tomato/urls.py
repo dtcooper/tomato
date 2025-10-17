@@ -3,13 +3,18 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth
 from django.urls import include, path, re_path
 
-from tomato.admin import admin_site
-from tomato.views import debug_json, dismiss_message, server_logs
+from .admin import admin_site
+from .submit.constants import SUBMIT_URL_PREFIX
+from .views import debug_json, dismiss_message, server_logs
+
+
+SUBMIT_URL_PREFIX_RE = rf"(?:{SUBMIT_URL_PREFIX}/)?"
 
 
 urlpatterns = [
     path("dismiss_message", dismiss_message, name="dismiss_message"),
-    path("upload/", include("django_file_form.urls")),
+    re_path(rf"{SUBMIT_URL_PREFIX_RE}upload/", include("django_file_form.urls")),
+    re_path(rf"{SUBMIT_URL_PREFIX_RE}captcha/", include("captcha.urls")),
     re_path("^server_logs/", server_logs, name="server_logs"),
 ]
 
@@ -24,9 +29,14 @@ if settings.EMAIL_ENABLED:
     del kwargs
 
 if settings.DEBUG:
-    urlpatterns.append(path("json/", debug_json, name="debug_json"))
-    urlpatterns.append(path("__debug__/", include("debug_toolbar.urls")))
+    urlpatterns.extend([
+        path("json/", debug_json, name="debug_json"),
+        re_path(rf"{SUBMIT_URL_PREFIX_RE}__debug__/", include("debug_toolbar.urls")),
+    ])
     urlpatterns.extend(static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT))
 
 # Catch-all in admin, so it should be last
-urlpatterns.append(path("", admin_site.urls))
+urlpatterns.extend([
+    path(rf"{SUBMIT_URL_PREFIX}/", include("tomato.submit.urls")),
+    path("", admin_site.urls),
+])

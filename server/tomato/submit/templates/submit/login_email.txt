@@ -1,0 +1,9 @@
+{% load submit %}
+
+{% confblock "LOGIN_EMAIL" %}
+  Please log in ${STATION_NAME} to upload audio, by clicking the following link: ${LINK}
+
+  Thanks,
+
+  ${STATION_NAME} Administration
+{% endconfblock %}

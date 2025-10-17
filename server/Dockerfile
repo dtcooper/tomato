@@ -1,6 +1,6 @@
-ARG DEBIAN_VERSION=bookworm
+ARG DEBIAN_VERSION=trixie
 ARG NODE_VERSION=22
-ARG PYTHON_VERSION=3.13
+ARG PYTHON_VERSION=3.14
 
 
 # Install and build node-related files for front-end
@@ -28,6 +28,7 @@ RUN if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
     && apt-get install --no-install-recommends -y \
         ffmpeg \
         sox \
+        wamerican-small \
         $([ "$DEBUG" -a "$DEBUG" != '0' ] && echo \
             bash-completion \
             iputils-ping \
@@ -37,7 +38,6 @@ RUN if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
             npm \
             postgresql-client \
             redis-tools \
-            watchman \
         ) \
     && rm -rf /var/lib/apt/lists/* \
     && if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
@@ -48,6 +48,9 @@ RUN if [ "$DEBUG" -a "$DEBUG" != '0' ]; then \
         && echo "alias sp='./manage.py shell_plus'" >> /root/.bashrc \
         && echo "alias sp_debug='TOMATO_DEBUG_LOG=1 ./manage.py shell_plus'" >> /root/.bashrc \
         && echo "alias lint='black . ; isort . ; flake8 .'" >> /root/.bashrc \
+        && mkdir -p /root/.ipython/profile_default/ \
+        && echo 'c = get_config()\nc.TerminalIPythonApp.display_banner = False\nc.TerminalInteractiveShell.confirm_exit = False' \
+            > /root/.ipython/profile_default/ipython_config.py \
         && echo '. /etc/bash_completion' >> /root/.bashrc \
     ; fi
 

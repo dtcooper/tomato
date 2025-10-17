@@ -109,6 +109,10 @@ class TomatoAdminSite(admin.AdminSite):
             "tomato_json_data": {"colors": COLORS_DICT, "station_name": constance_config.STATION_NAME},
             "tomato_version": settings.TOMATO_VERSION,
             "station_name": constance_config.STATION_NAME,
+            "ENABLE_USER_SUBMIT": constance_config.ENABLE_USER_SUBMIT,
+            "USER_SUBMIT_ALT_DOMAIN_NAME": settings.USER_SUBMIT_ALT_DOMAIN_NAME,
+            "MEDIA_URL": settings.MEDIA_URL,
+            "TIME_ZONE": settings.TIME_ZONE,
             **self.get_app_list_extra_context(request),
             **context,
         }

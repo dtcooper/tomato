@@ -1,0 +1,9 @@
+{
+  "USER_SUBMIT_CONTENT_BLOCK_FOOTER_COPYRIGHT": "<a href=\"https://dtcooper.github.io/tomato\" target=\"_blank\">Tomato Radio Automation</a>, version: ${TOMATO_VERSION}\n<br>\n&copy; Copyright 2019-${CURRENT_YEAR} <a href=\"https://jew.pizza\" target=\"_blank\">David Cooper</a> &amp; <a href=\"https://bmir.org\" target=\"_blank\">BMIR</a>.",
+  "USER_SUBMIT_CONTENT_BLOCK_LOGIN_EMAIL": "Please log in ${STATION_NAME} to upload audio, by clicking the following link: ${LINK}\n\nThanks,\n\n${STATION_NAME} Administration",
+  "USER_SUBMIT_CONTENT_BLOCK_NO_SUBMISSIONS": "<article>You currently have no submissions with ${STATION_NAME}.</article>",
+  "USER_SUBMIT_CONTENT_BLOCK_PASSWORD_FREE_DESCRIPTION": "<p>\n  We use simple, <em>password-free</em> logins using just your email address. If you've submitted audio\n  before, use the same email to access your uploads.\n</p>",
+  "USER_SUBMIT_CONTENT_BLOCK_PLEASE_SIGN_IN": "<p>\n  Welcome to the audio submission portal for ${STATION_NAME} &mdash; where you can upload your audio for review\n  and inclusion in our radio station's playout.\n<p>\n\n${CONTENT_BLOCK_PASSWORD_FREE_DESCRIPTION}\n\n<p>\n  <strong>Please by sign in by <a href=\"${LOGIN_URL}\">clicking here</a>.</strong>\n</p>",
+  "USER_SUBMIT_CONTENT_BLOCK_SUBMISSION_INFO": "<p>You can submit new audio files audio by <a href=\"${CREATE_URL}\">clicking here</a>.</p>",
+  "USER_SUBMIT_CONTENT_BLOCK_TEST": "<p>\n  Here is where you can submit audio assets to ${STATION_NAME}."
+}

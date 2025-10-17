@@ -1,0 +1,74 @@
+{% extends 'submit/base.html' %}
+
+{% load submit %}
+{% load widget_tweaks %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('captcha', () => ({
+            open: false,
+            value: '',
+            img: null,
+            hiddenInput: null,
+            init() {
+              this.img = this.$el.querySelector("img.captcha")
+              this.hiddenInput = this.$el.querySelector("#id_captcha_0")
+              const input = this.$el.querySelector("#id_captcha_1")
+
+              const refresh = document.createElement("button")
+              refresh.type = "button"
+              refresh.classList.add("warning")
+              refresh.textContent = "Refresh CAPTCHA"
+
+              this.$el.querySelector("#id_captcha_1").after(refresh)
+              Alpine.bind(refresh, {"@click.prevent": "refresh"})
+              input.setAttribute("maxlength", {{ CAPTCHA_MAX_LENGTH|escapejs }})
+              Alpine.bind(input, {'@input': 'change', 'x-model': 'value'})
+            },
+            async refresh() {
+              this.value = ''
+              this.$el.disabled = true
+              const response = await fetch("/captcha/refresh/", {headers: {"X-Requested-With": "XMLHttpRequest"}})
+              const data = await response.json()
+              this.hiddenInput.value = data.key
+              this.img.src = data.image_url
+              this.$el.disabled = false
+            },
+            change() {
+              this.value = this.value.toUpperCase().replace(/[^A-Z]/g, "")
+            }
+        }))
+    })
+  </script>
+{% endblock %}
+
+{% block content %}
+  {% confblock "PASSWORD_FREE_DESCRIPTION" %}
+    <p>
+      We use simple, <em>password-free</em> logins using just your email address. If you've submitted audio
+      before, use the same email to access your uploads.
+    </p>
+  {% endconfblock %}
+
+  <form method="post">
+    {% csrf_token %}
+
+    <fieldset>
+      <legend>{{ form.email.label }}:</legend>
+      <div class="helptext">{{ form.email.help_text }}</div>
+      {{ form.email.errors }}
+      {% render_field form.email type="email" %}
+    </fieldset>
+
+    <fieldset x-data="captcha">
+      <legend>{{ form.captcha.label }}:</legend>
+      <div class="helptext">{{ form.captcha.help_text }}</div>
+      {{ form.captcha.errors }}
+      {% render_field form.captcha %}
+    </fieldset>
+
+    <button type="submit">Click to Login</button>
+  </form>
+{% endblock %}

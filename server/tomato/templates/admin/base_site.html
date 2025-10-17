@@ -66,6 +66,21 @@
     .object-tools {
       font-size: unset; /* XXX fix weird margin issue */
     }
+
+    p.datetime input {
+      margin-right: 6px !important;
+      margin-top: 4px !important;
+    }
+
+    p.messagelist-dismiss-all {
+      text-align: center;
+    }
+
+    @media (min-width: 1025px) {
+      .user-tools-bottom-info {
+        text-align: right;
+      }
+    }
   </style>
   {{ tomato_json_data|json_script:"tomato-json-data" }}
   <script>
@@ -143,13 +158,21 @@
         </li>
       {% endfor %}
     </ul>
-    {# TODO: Delete all messages if there is more than 1? #}
   {% endif %}
 {% endblock messages %}
 
 {% block userlinks %}
   <a href="{{ help_docs_url }}" target="_blank">Help Docs</a> /
   {{ block.super }}
+  <div class="user-tools-bottom-info">
+    Timezone: <strong style="font-family: var(--font-family-monospace)">{{ TIME_ZONE }}</strong>
+    {% if ENABLE_USER_SUBMIT %}
+      /
+      <a href="{% if USER_SUBMIT_ALT_DOMAIN_NAME and request.is_secure %}https://{{ USER_SUBMIT_ALT_DOMAIN_NAME }}{% else %}{% url 'submit:landing' %}{% endif %}">
+        Submissions Form
+      </a>
+    {% endif %}
+  </div>
 {% endblock %}
 
 {% block content_subtitle %}

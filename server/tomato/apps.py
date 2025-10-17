@@ -42,6 +42,7 @@ class TomatoConfig(AppConfig):
         Rotator = apps.get_model("tomato.Rotator")
         Stopset = apps.get_model("tomato.Stopset")
         StopsetRotator = apps.get_model("tomato.StopsetRotator")
+        Submission = apps.get_model("submit.Submission")
 
         asset = ContentType.objects.get_for_model(Asset)
         asset_alternate = ContentType.objects.get_for_model(AssetAlternate)
@@ -49,6 +50,7 @@ class TomatoConfig(AppConfig):
         stopset = ContentType.objects.get_for_model(Stopset)
         stopset_rotator = ContentType.objects.get_for_model(StopsetRotator)
         client_log_entry = ContentType.objects.get_for_model(ClientLogEntry)
+        submission = ContentType.objects.get_for_model(Submission)
 
         extra_perms = Asset._meta.permissions
 
@@ -56,6 +58,7 @@ class TomatoConfig(AppConfig):
             (EDIT_ALL_GROUP_NAME, (asset, asset_alternate, rotator, stopset, stopset_rotator)),
             (EDIT_ONLY_ASSETS_GROUP_NAME, (asset, asset_alternate)),
             (f"View and export {ClientLogEntry._meta.verbose_name_plural}", (client_log_entry,)),
+            (f"Moderate {Submission._meta.verbose_name_plural} (if enabled)", (submission,)),
         ):
             group, _ = Group.objects.get_or_create(name=name)
             group.permissions.add(

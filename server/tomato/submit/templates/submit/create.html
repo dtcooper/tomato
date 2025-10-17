@@ -1,0 +1,23 @@
+{% extends 'submit/base.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block extrahead %}
+<script src="{% static "file_form/file_form.min.js" %}"></script>
+<link rel="stylesheet" href="{% static "file_form/file_form.css" %}">
+{% endblock %}
+
+{% block content %}
+  <form id="create-form" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% render_field form.name %}
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    initUploadFields(document.getElementById("create-form"));
+  </script>
+{% endblock %}

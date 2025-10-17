@@ -61,7 +61,11 @@ def dedupe(list_to_dedupe):
     return deduped
 
 
-notify_api_local = threading.local()
+tomato_thread_local = threading.local()
+
+
+def get_active_request():
+    return getattr(tomato_thread_local, "request", None)
 
 
 def notify_api(message_type="db-change", extra_data=None, *, force=False):
@@ -69,28 +73,28 @@ def notify_api(message_type="db-change", extra_data=None, *, force=False):
 
 
 def notify_api_multiple(messages: list, *, force=False):
-    has_request = getattr(notify_api_local, "request", None) is not None
-    is_blocking = getattr(notify_api_local, "blocked_pending_notify_api_messages_list", None) is not None
-    if force or (not has_request and not is_blocking):
+    request = get_active_request()
+    is_blocking = getattr(tomato_thread_local, "blocked_pending_notify_api_messages_list", None) is not None
+    if force or (request is not None and not is_blocking):
         logger.debug(
             f"Sending {len(messages)} notifications to API (de-duped) via redis with key {REDIS_MESSAGES_PUBSUB_KEY}"
         )
         redis = get_redis_connection()
         redis.publish(REDIS_MESSAGES_PUBSUB_KEY, concise_json_dumps(dedupe(messages)))
-    elif has_request:
-        notify_api_local.request._notify_api_messages.extend(messages)
+    elif request is not None:
+        request._notify_api_messages.extend(messages)
     else:
-        notify_api_local.blocked_pending_notify_api_messages_list.extend(messages)
+        tomato_thread_local.blocked_pending_notify_api_messages_list.extend(messages)
 
 
 def block_pending_notify_api_messages():
-    notify_api_local.blocked_pending_notify_api_messages_list = []
+    tomato_thread_local.blocked_pending_notify_api_messages_list = []
 
 
 def unblock_and_flush_blocked_pending_notify_api_messages():
-    if getattr(notify_api_local, "blocked_pending_notify_api_messages_list", None):
-        notify_api_multiple(notify_api_local.blocked_pending_notify_api_messages_list, force=True)
-    notify_api_local.blocked_pending_notify_api_messages_list = None
+    if getattr(tomato_thread_local, "blocked_pending_notify_api_messages_list", None):
+        notify_api_multiple(tomato_thread_local.blocked_pending_notify_api_messages_list, force=True)
+    tomato_thread_local.blocked_pending_notify_api_messages_list = None
 
 
 class DjangoPriorityRedisHuey(PriorityRedisHuey):

@@ -40,6 +40,7 @@ services:
     environment:
       CERTBOT_EMAIL: "${CERTBOT_EMAIL:?CERTBOT_EMAIL needs to be set. See .env file.}"
       DOMAIN_NAME: "${DOMAIN_NAME:?DOMAIN_NAME needs to be set. See .env file.}"
+      USER_SUBMIT_ALT_DOMAIN_NAME: "${USER_SUBMIT_ALT_DOMAIN_NAME:-}"
       DEBUG: "${DEBUG:-0}"
     ports:
       - 80:80
@@ -47,9 +48,9 @@ services:
 
   db:
     restart: always
-    image: pgautoupgrade/pgautoupgrade:17-alpine
+    image: pgautoupgrade/pgautoupgrade:18-alpine
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - postgres_data:/var/lib/postgresql
     environment:
       POSTGRES_PASSWORD: postgres
 

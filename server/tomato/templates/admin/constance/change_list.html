@@ -1,5 +1,7 @@
 {% extends 'admin/constance/change_list.html' %}
 
+{% load static %}
+
 {% block extrahead %}
   {{ block.super }}
 
@@ -16,20 +18,39 @@
   </style>
 
   <script>
-    const multipleChoiceFieldChanges = {
-      'UI_MODES': 'Simple &amp; standard views'
-    }
+    const multipleChoiceFieldChanges = [
+      // config name, new default, remove 'reset' link (bool)
+      ['UI_MODES', 'Simple &amp; standard views', true],
+      ['USER_SUBMIT_DEFAULT_ROTATOR', 'No default', false],
+      ['USER_SUBMIT_START', 'Optional', true],
+      ['USER_SUBMIT_END', 'Optional', true],
+      ['USER_SUBMIT_BRANDING_IMAGE', 'No image', false]
+    ]
 
     document.addEventListener('DOMContentLoaded', () => {
-      Array.from(document.querySelectorAll('.reset-link')).forEach(resetLink => {
-        for (const [setting, defaultText] of Object.entries(multipleChoiceFieldChanges)) {
-          if (resetLink.parentElement && resetLink.parentElement.querySelector(`#id_${setting}`)) {
-            const row = resetLink.parentElement.parentElement
-            row.children[1].innerHTML = `<p>${defaultText}</p>`
-            resetLink.remove()
+      for (const contentBlockElement of document.querySelectorAll('[id^="user_submit_content_block"]')) {
+        multipleChoiceFieldChanges.push([contentBlockElement.id.toUpperCase(), "HTML template", false])
+      }
+
+      for (const [setting, defaultText, removeResetLink] of multipleChoiceFieldChanges) {
+        console.log(setting, defaultText, removeResetLink)
+        const configElem = document.getElementById(setting.toLowerCase())
+        if (configElem) {
+          const rowElem = configElem.parentElement.parentElement
+          rowElem.children[1].innerHTML = `<p>${defaultText}</p>`
+          if (removeResetLink) {
+            rowElem.querySelector('.reset-link').remove()
+          }
+
+          // Remove file: False display if there's no file selected
+          if (setting === "USER_SUBMIT_BRANDING_IMAGE") {
+            const falseFileElem = rowElem.querySelector('a[href="{{ MEDIA_URL }}False"]')
+            if (falseFileElem) {
+              falseFileElem.outerHTML = '<em>No image</em>'
+            }
           }
         }
-      })
+      }
     })
   </script>
 {% endblock %}
