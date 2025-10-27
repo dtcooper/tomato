@@ -106,12 +106,12 @@ jobs:
           fi
       -
         name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: client-build-files-${{ matrix.platform }}-${{ matrix.arch }}
           path: client-build-files
           compression-level: 0
-          retention-days: 2
+          retention-days: 30
 
   tag:
     runs-on: ubuntu-22.04
@@ -128,7 +128,7 @@ jobs:
         uses: ./.github/actions/version
       -
         name: Download build artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: client-build-files-*
           path: client-build-files

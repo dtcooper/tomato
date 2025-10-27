@@ -467,14 +467,14 @@ pyyaml = ">=5.1"
 
 [[package]]
 name = "mkdocs-macros-plugin"
-version = "1.4.0"
+version = "1.4.1"
 description = "Unleash the power of MkDocs with macros and variables"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "mkdocs_macros_plugin-1.4.0-py3-none-any.whl", hash = "sha256:630de99fe14d39c26c7915725b39bb7730058c622f547226432eb371cabff33c"},
-    {file = "mkdocs_macros_plugin-1.4.0.tar.gz", hash = "sha256:687e710988736731d1a059633fc34cf66d21e57a07801bdd1991419199e0677c"},
+    {file = "mkdocs_macros_plugin-1.4.1-py3-none-any.whl", hash = "sha256:5a9e483f6056fe7ad0923802affe699233ca468672e20a9640dba237165b3240"},
+    {file = "mkdocs_macros_plugin-1.4.1.tar.gz", hash = "sha256:55a9c93871e3744cdeb0736316783d60830a6d5d97b1132364e6b491607f2332"},
 ]
 
 [package.dependencies]
@@ -485,7 +485,8 @@ packaging = "*"
 pathspec = "*"
 python-dateutil = "*"
 pyyaml = "*"
-super-collections = ">=0.5.7"
+requests = "*"
+super-collections = ">=0.6.2"
 termcolor = "*"
 
 [package.extras]
@@ -905,4 +906,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9"
-content-hash = "69beae98a3fd13ba2715f49b61cfc8523dc8f7d6653d3a6f7bc7c5210b699493"
+content-hash = "20ffada49ae2b18c5d5c533d5c61a6d3316c567f1cb904ec0534d7546cd008c1"
