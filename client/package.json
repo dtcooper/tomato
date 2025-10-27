@@ -44,7 +44,7 @@
     "@iconify/icons-mdi": "^1.2.48",
     "@msgpack/msgpack": "^3.1.2",
     "autoprefixer": "^10.4.21",
-    "axios": "^1.12.2",
+    "axios": "^1.13.0",
     "browser-sync": "^3.0.4",
     "color": "^4.2.3",
     "daisyui": "^4.12.24",
