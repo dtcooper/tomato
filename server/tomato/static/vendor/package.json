@@ -2,7 +2,7 @@
   "dependencies": {
     "alpinejs": "^3.15.1",
     "choices.js": "^11.1.0",
-    "dayjs": "^1.11.18",
+    "dayjs": "^1.11.19",
     "reconnecting-websocket": "^4.4.0",
     "simpledotcss": "^2.3.7"
   }
