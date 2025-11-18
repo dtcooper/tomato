@@ -102,14 +102,14 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "click"
-version = "8.3.0"
+version = "8.3.1"
 description = "Composable command line interface toolkit"
 optional = false
 python-versions = ">=3.10"
 groups = ["main", "dev"]
 files = [
-    {file = "click-8.3.0-py3-none-any.whl", hash = "sha256:9b9f285302c6e3064f4330c05f05b81945b2a39544279343e6e7c5f27a9baddc"},
-    {file = "click-8.3.0.tar.gz", hash = "sha256:e7b8232224eba16f4ebe410c25ced9f7875cb5f3263ffc93cc3e8da705e229c4"},
+    {file = "click-8.3.1-py3-none-any.whl", hash = "sha256:981153a64e25f12d547d3426c367a4857371575ee7ad18df2a6183ab0545b2a6"},
+    {file = "click-8.3.1.tar.gz", hash = "sha256:12ff4785d337a1bb490bb7e9c2b1ee5da3112e94a8622f26a6c77f5d2fc6842a"},
 ]
 
 [package.dependencies]
@@ -227,18 +227,18 @@ sqlparse = ">=0.2"
 
 [[package]]
 name = "django-dirtyfields"
-version = "1.9.7"
+version = "1.9.8"
 description = "Tracking dirty fields on a Django model instance."
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "django_dirtyfields-1.9.7-py3-none-any.whl", hash = "sha256:084957fb8db092c05814ce92dc34276d52a0056e09a55b090bdab29f98eacc53"},
-    {file = "django_dirtyfields-1.9.7.tar.gz", hash = "sha256:23cde794612499e8b5e0f840a1c389a6fd666fcc9c01e82299fcd8ba90af151b"},
+    {file = "django_dirtyfields-1.9.8-py3-none-any.whl", hash = "sha256:28e2de32df1385d7ccd33c23a6de90e3579e9b9644bc9bdfe6214e6c8b51a127"},
+    {file = "django_dirtyfields-1.9.8.tar.gz", hash = "sha256:f18fd998bc891390f92c98a0a1a7a8140b8e8cc8defa5f6539ad416550c46559"},
 ]
 
 [package.dependencies]
-Django = ">=2.2"
+Django = ">=3.2"
 
 [[package]]
 name = "django-environ"
@@ -1671,4 +1671,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13"
-content-hash = "404b0063cc6df16fc85506a86796b1499b2fb3e5b87af97e7fb29f16a1b16812"
+content-hash = "268e97f87540222a5136b8a5dfea0bb1a8ccf871fabd427cab58c9fa30e1b7f3"
