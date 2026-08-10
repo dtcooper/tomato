@@ -122,3 +122,5 @@ Changes for 2024 based on real world usage in 2023 and feedback
 - [ ] Form asset submission
 - [ ] Client user disconnected for long periods of time, and required client to be restarted to connect.
       Check websocket.
+  - [ ] Use actively maintained [partysocket](https://www.npmjs.com/package/partysocket) instead of
+        reconnecting-websocket!
