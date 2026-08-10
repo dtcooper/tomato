@@ -94,6 +94,7 @@ INSTALLED_APPS = [
     "django_admin_logs",
     "django_file_form",
     "huey.contrib.djhuey",
+    "tinycontent",
     "user_messages",
     "widget_tweaks",
 ]

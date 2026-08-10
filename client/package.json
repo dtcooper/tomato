@@ -51,7 +51,7 @@
     "dayjs": "^1.11.19",
     "download": "^8.0.0",
     "electron": "^39.2.7",
-    "electron-forge-maker-appimage": "github:duzda/electron-forge-maker-appimage",
+    "electron-forge-maker-appimage": "^26.8.1",
     "electron-squirrel-startup": "^1.0.1",
     "electron-window-state": "^5.0.3",
     "esbuild": "^0.27.2",

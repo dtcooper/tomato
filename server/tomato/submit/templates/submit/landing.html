@@ -1,6 +1,7 @@
 {% extends 'submit/base.html' %}
 
 {% load submit %}
+{% load tinycontent_tags %}
 
 {% block content %}
 
@@ -29,5 +30,11 @@
         </p>
       {% endconfblock %}
     {% endif %}
+
+    <p>
+      {% tinycontent 'content_name' %}
+        <a href="{{ LOGIN_URL }}">Login!</a>
+      {% endtinycontent %}
+    </p>
 
 {% endblock%}

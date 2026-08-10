@@ -11,6 +11,8 @@ from django.utils.html import format_html
 
 from constance import config as constance_config
 from constance.admin import Config
+from tinycontent.models import TinyContent, TinyContentFileUpload
+from tinycontent.admin import TinyContentAdmin, TinyContentFileUploadAdmin
 
 from ..constants import COLORS_DICT, HELP_DOCS_URL, PROTOCOL_VERSION
 from ..models import Asset, AssetAlternate, ClientLogEntry, Rotator, Stopset, User
@@ -128,3 +130,5 @@ admin_site.register(Rotator, RotatorAdmin)
 admin_site.register(ServerLogEntry, ServerLogEntryAdmin)
 admin_site.register(Stopset, StopsetAdmin)
 admin_site.register(User, UserAdmin)
+admin_site.register(TinyContent, TinyContentAdmin)
+admin_site.register(TinyContentFileUpload, TinyContentFileUploadAdmin)

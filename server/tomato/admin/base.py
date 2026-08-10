@@ -123,7 +123,7 @@ class NumAssetsMixin:
 class TomatoModelAdminBase(ListPrefetchRelatedMixin, SaveCreatedByMixin, admin.ModelAdmin):
     add_fieldsets = None
     list_max_show_all = 5000
-    list_per_page = 500
+    list_per_page = 100
     no_change_fieldsets = None
     readonly_fields = ("created_by", "created_at")
     save_on_top = True

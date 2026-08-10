@@ -29,6 +29,7 @@ schema = "^0.7.8"
 starlette = "^0.51.0"
 uvicorn = {extras = ["standard"], version = "^0.40.0"}
 wait-for-it = "^2.3.0"
+django-tinycontent = {git = "https://github.com/watchdogpolska/django-tinycontent"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.12.0"
