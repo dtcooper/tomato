@@ -1,6 +1,7 @@
 dayjs.extend(dayjs_plugin_duration)
 
 const DATA = JSON.parse(document.getElementById("tomato-configure-live-clients-data").textContent)
+const HEARTBEAT_INTERVAL = DATA.HEARTBEAT_INTERVAL * 1000 * 2 // double it
 const db = DATA.serialized_data
 
 const prettyDuration = (item, max) => {
@@ -17,6 +18,7 @@ const prettyDuration = (item, max) => {
 
 document.addEventListener("alpine:init", () => {
   let ws = null
+  let lastHeartbeat = 0
 
   Alpine.data("tomato", () => ({
     connected: false,
@@ -91,6 +93,16 @@ document.addEventListener("alpine:init", () => {
           ? "ws://localhost:8001/api"
           : `${document.location.protocol.replace("http", "ws")}//${document.location.host}/api`
       )
+
+      window.ws = ws
+
+      setInterval(() => {
+        if (window.performance.now() - lastHeartbeat > HEARTBEAT_INTERVAL) {
+          this.log("Heartbeat timeout! Reconnecting...")
+          ws.reconnect()
+        }
+      }, HEARTBEAT_INTERVAL)
+
       ws.onopen = () => {
         ws.send(
           JSON.stringify({
@@ -130,6 +142,8 @@ document.addEventListener("alpine:init", () => {
             } else {
               console.warn(`Got unsubscribe from ${data.connection_id}, but we weren't subscribed`)
             }
+          } else if (type === "ping") {
+            lastHeartbeat = window.performance.now()
           } else {
             console.log(`Unrecognized ${type} msg`, data)
           }

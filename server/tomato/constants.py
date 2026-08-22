@@ -7,6 +7,7 @@ with open(settings.PROJECT_DIR / "constants.json", "rb") as _file:
     _data = json.load(_file)
 
 PROTOCOL_VERSION = _data["protocol_version"]
+HEARTBEAT_INTERVAL = _data["heartbeat_interval"]
 HELP_DOCS_URL = "http://dtcooper.github.io/tomato/"
 CLIENT_LOG_ENTRY_TYPES = set(_data["client_log_entry_types"])
 COLORS = _data["colors"]

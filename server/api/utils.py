@@ -53,9 +53,9 @@ RUNNING_TASKS = []
 
 def task(coro):
     @wraps(coro)
-    def wrapped(self):
+    def wrapped(*args, **kwargs):
         logger.info(f"Running task {coro.__name__}()")
-        RUNNING_TASKS.append(asyncio.create_task(retry_on_failure(coro, self)))
+        RUNNING_TASKS.append(asyncio.create_task(retry_on_failure(coro, *args, **kwargs)))
 
     return wrapped
 

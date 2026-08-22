@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import random
 
 from schema import SchemaError
 
@@ -19,7 +20,7 @@ from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 django.setup()
 
 from .base import SERVER_STATUS
-from .connections import admins, users
+from .connections import admins, users, send_connection_heartbeats
 from .schemas import greeting_schema
 from .server_messages import server_messages
 from .utils import RUNNING_TASKS, TomatoAuthError, init_logger
@@ -49,7 +50,7 @@ async def api(websocket: WebSocket):
     except TomatoAuthError as auth_error:
         logger.warning(f"An authorization error occurred: {auth_error}")
         if auth_error.should_sleep:
-            await asyncio.sleep(0.5, 1.5)
+            await asyncio.sleep(random.uniform(0.5, 1.5))
         error_msg = {"success": False, "error": str(auth_error)}
         if auth_error.field:
             error_msg["field"] = auth_error.field
@@ -72,6 +73,7 @@ async def startup():
 
     await users.init_last_serialized_data()
     server_messages.consume_redis_notifications()
+    send_connection_heartbeats()
 
 
 async def shutdown():

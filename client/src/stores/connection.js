@@ -1,12 +1,14 @@
 import { ipcRenderer } from "electron"
-import ReconnectingWebSocket from "reconnecting-websocket"
+import { WebSocket as ReconnectingWebSocket } from "partysocket"
 import { persisted } from "svelte-local-storage-store"
 import { derived, get, readonly, writable } from "svelte/store"
-import { protocol_version } from "../../../server/constants.json"
+import { heartbeat_interval as HEARTBEAT_INTERVAL_MS, protocol_version } from "../../../server/constants.json"
 import { alert } from "./alerts"
 import { acknowledgeLog, log, sendPendingLogs } from "./client-logs"
 import { resetUserConfig, setServerConfig } from "./config"
 import { clearAssetsDB, clearAssetState, syncAssetsDB } from "./db"
+
+const HEARTBEAT_INTERVAL = HEARTBEAT_INTERVAL_MS * 1000 * 2 // double it
 
 const connPersisted = persisted("conn", {
   username: "",
@@ -64,6 +66,8 @@ const updateConn = ({ connecting, connected, ...restPersisted }) => {
 }
 
 let ws = (window._websocket = null)
+let heartbeatInterval = null
+let lastHeartbeat = 0
 
 export const logout = (error = null, hardLogout = false) => {
   if (loggingOut) return
@@ -118,6 +122,9 @@ const handleMessages = {
   notify: ({ msg, level, timeout, connection_id }) => {
     alert(msg, level, timeout)
     messageServer("ack-action", { connection_id, msg: "Successfully notified user!" })
+  },
+  ping: () => {
+    lastHeartbeat = window.performance.now()
   }
 }
 
@@ -155,6 +162,7 @@ export const login = (username, password, host) => {
         `Rejecting call to login(). Called with websocket in readyState = ${ws.readyState}, expected closed (${ReconnectingWebSocket.CLOSED}`
       )
       reject({ type: "host", message: "A connection was in progress." })
+      return
     }
 
     updateConn({ connecting: true })
@@ -189,6 +197,7 @@ export const login = (username, password, host) => {
     }
 
     ws = window._websocket = new ReconnectingWebSocket(host)
+
     ws.onerror = (e) => {
       console.error("Websocket error", e)
       const { ready, authenticated } = get(conn)
@@ -242,5 +251,13 @@ export const login = (username, password, host) => {
       ws.send(JSON.stringify({ username, password, protocol_version, tomato: "radio-automation" }))
       connTimeout = setTimeout(() => ws.close(), 15000)
     }
+
+    clearInterval(heartbeatInterval)
+    heartbeatInterval = setInterval(() => {
+      if (window.performance.now() - lastHeartbeat > HEARTBEAT_INTERVAL) {
+        console.warn("Heartbeat timeout! Attempting a reconnect...")
+        ws.reconnect()
+      }
+    }, HEARTBEAT_INTERVAL)
   })
 }

@@ -1,11 +1,12 @@
+import asyncio
 import logging
 
-from tomato.constants import CLIENT_LOG_ENTRY_TYPES
+from tomato.constants import CLIENT_LOG_ENTRY_TYPES, HEARTBEAT_INTERVAL
 from tomato.models import ClientLogEntry, serialize_for_api
 
 from .base import Connection, ConnectionsBase
 from .schemas import AdminMessageTypes, OutgoingAdminMessageTypes, OutgoingUserMessageTypes, UserMessageTypes
-from .utils import get_config_async, retry_on_failure
+from .utils import get_config_async, retry_on_failure, task
 
 
 logger = logging.getLogger(__name__)
@@ -140,3 +141,11 @@ class UserConnections(ConnectionsBase):
 
 admins: AdminConnections = AdminConnections()
 users: UserConnections = UserConnections()
+
+
+@task
+async def send_connection_heartbeats():
+    while True:
+        await asyncio.sleep(HEARTBEAT_INTERVAL)
+        await users.broadcast(OutgoingUserMessageTypes.PING)
+        await admins.broadcast(OutgoingAdminMessageTypes.PING)

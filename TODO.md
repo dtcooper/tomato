@@ -120,7 +120,7 @@ Changes for 2024 based on real world usage in 2023 and feedback
       however. May as well switch from `pg_notify` in that case as well.)
 - [ ] Allow already uploaded/archived assets to be converted into asset alternatives
 - [ ] Form asset submission
-- [ ] Client user disconnected for long periods of time, and required client to be restarted to connect.
+- [x] Client user disconnected for long periods of time, and required client to be restarted to connect.
       Check websocket.
-  - [ ] Use actively maintained [partysocket](https://www.npmjs.com/package/partysocket) instead of
+  - [x] Use actively maintained [partysocket](https://www.npmjs.com/package/partysocket) instead of
         reconnecting-websocket!
