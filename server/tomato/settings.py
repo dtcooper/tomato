@@ -488,6 +488,15 @@ CONSTANCE_CONFIG = {
         "clock",
     ),
     "ENABLE_ASSET_DELETION": (True, "If disabled, no one can delete assets (can only archive soft delete)"),
+    "END_TIME_IN_ASSET_FILENAME": (
+        False,
+        mark_safe(
+            "If enabled, a new asset with a filename in the form <code>_ENDS_<strong>YYYYMMDDHHMM</strong>.ext</code>"
+            " will automatically have the end time <strong>YYYY-MM-DD"
+            " HH:MM</strong> in the server's timezone. For example, <code>myfile_ENDS_202601021430.mp3</code> will have"
+            " an end time of <strong>Jan 2, 2026 @ 2:30pm</strong> server time."
+        ),
+    ),
 }
 
 CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
@@ -511,6 +520,7 @@ CONSTANCE_CONFIG_FIELDSETS = OrderedDict((
             "TRIM_SILENCE",
             "REJECT_SILENCE_LENGTH",
             "RELOAD_PLAYLIST_AFTER_DATA_CHANGES",
+            "END_TIME_IN_ASSET_FILENAME",
         ),
     ),
     (

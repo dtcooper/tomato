@@ -71,6 +71,7 @@ let lastHeartbeat = 0
 
 export const logout = (error = null, hardLogout = false) => {
   if (loggingOut) return
+  clearTimeout(heartbeatInterval)
   loggingOut = true
 
   const wasInReadyState = get(conn).ready // hard refresh if app was in "ready" state

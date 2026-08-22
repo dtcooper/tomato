@@ -4,6 +4,7 @@ import itertools
 import logging
 from pathlib import Path
 import random
+import re
 import string
 
 from django.apps import apps
@@ -14,6 +15,7 @@ from django.db.models import Count, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 from django.urls import reverse
 from django.utils.html import format_html, format_html_join
+from django.utils.timezone import make_aware
 
 from constance import config
 
@@ -30,6 +32,8 @@ from .rotator import Rotator
 
 
 logger = logging.getLogger(__name__)
+
+END_TIME_IN_ASSET_FILENAME_RE = re.compile(r"_ends?_(?P<date>\d{12})$", re.IGNORECASE)
 
 
 class AssetEligibleToAirQuerySet(EligibleToAirQuerySet):
@@ -116,13 +120,13 @@ class AssetBase(TomatoModelBase):
                         "file": format_html("A duplicate of this file already exists. Existing: {}", duplicates_html),
                     })
 
-    def pre_save_normalize_hook(self):
+    def pre_save_hook(self):
         pass
 
     def save(self, dont_overwrite_original_filename=False, *args, **kwargs):
         if not dont_overwrite_original_filename and "file" in self.get_dirty_fields():
             self.original_filename = Path(self.file.name).with_suffix("").name
-        self.pre_save_normalize_hook()  # Way to clean up `self.name`
+        self.pre_save_hook()  # Way to clean up `self.name` and other things before saving
         super().save(*args, **kwargs)
 
     def generate_md5sum(self):
@@ -182,10 +186,18 @@ class Asset(EnabledBeginEndWeightMixin, AssetBase):
     def __str__(self):
         return f"{self.name}{' (archived)' if self.archived else ''}"
 
-    def pre_save_normalize_hook(self):
+    def pre_save_hook(self):
         self.name = (
             self.name[:NAME_MAX_LENGTH].strip() or self.original_filename[:NAME_MAX_LENGTH].strip() or "Untitled"
         )
+
+        # Set end time if the filename has a special _ENDS_YYYYMMDDHHMM suffix and the config is enabled
+        if self.pk is None and "file" in self.get_dirty_fields() and config.END_TIME_IN_ASSET_FILENAME:
+            if match := END_TIME_IN_ASSET_FILENAME_RE.search(self.original_filename):
+                try:
+                    self.end = make_aware(datetime.datetime.strptime(match.group("date"), "%Y%m%d%H%M"))
+                except ValueError:
+                    logger.exception(f"Failed to parse end time from filename {self.original_filename}.")
 
     def is_eligible_to_air(self, now=None, with_reason=False):
         if self.status != self.Status.READY:

@@ -20,7 +20,7 @@ from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 django.setup()
 
 from .base import SERVER_STATUS
-from .connections import admins, users, send_connection_heartbeats
+from .connections import admins, send_connection_heartbeats, users
 from .schemas import greeting_schema
 from .server_messages import server_messages
 from .utils import RUNNING_TASKS, TomatoAuthError, init_logger

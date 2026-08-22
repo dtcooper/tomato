@@ -5,7 +5,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.generic import TemplateView
 
-from ...constants import PROTOCOL_VERSION, HEARTBEAT_INTERVAL
+from ...constants import HEARTBEAT_INTERVAL, PROTOCOL_VERSION
 from ...models import serialize_for_api_sync
 from .base import AdminViewMixin
 
