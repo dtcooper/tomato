@@ -362,10 +362,29 @@
 
     scrollToTopOfPlaylist()
 
+    const itemsWasEmpty = items.length === 0
+
     let numStopsetsToAdd =
       Math.max($config.STOPSET_PRELOAD_COUNT, 1) - items.filter((item) => item.type === "stopset").length
     while (numStopsetsToAdd-- > 0) {
       addStopset()
+    }
+
+    // If list was empty, take the length of the FIRST stopset and sub it (more fair on first load)
+    if (
+      itemsWasEmpty &&
+      $config.WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME &&
+      items.length >= 2 &&
+      items[0].type === "wait" &&
+      items[1].type === "stopset"
+    ) {
+      const wait = items[0]
+      const stopset = items[1]
+      wait.duration = Math.max(
+        $config.WAIT_INTERVAL - stopset.durationAfterQueuedSkips,
+        $config.WAIT_INTERVAL_SUBTRACTS_FROM_STOPSET_PLAYTIME_MIN_LENGTH
+      )
+      updateUI()
     }
 
     if (items.length === 0) {
