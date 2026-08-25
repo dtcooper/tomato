@@ -254,6 +254,7 @@ export const login = (username, password, host) => {
     }
 
     clearInterval(heartbeatInterval)
+    console.log("Installed heartbeat interval")
     heartbeatInterval = setInterval(() => {
       if (window.performance.now() - lastHeartbeat > HEARTBEAT_INTERVAL) {
         console.warn("Heartbeat timeout! Attempting a reconnect...")
