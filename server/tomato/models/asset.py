@@ -187,10 +187,6 @@ class Asset(EnabledBeginEndWeightMixin, AssetBase):
         return f"{self.name}{' (archived)' if self.archived else ''}"
 
     def pre_save_hook(self):
-        self.name = (
-            self.name[:NAME_MAX_LENGTH].strip() or self.original_filename[:NAME_MAX_LENGTH].strip() or "Untitled"
-        )
-
         # Set end time if the filename has a special _ENDS_YYYYMMDDHHMM suffix and the config is enabled
         if self.pk is None and "file" in self.get_dirty_fields() and config.END_TIME_IN_ASSET_FILENAME:
             if match := END_TIME_IN_ASSET_FILENAME_RE.search(self.original_filename):
@@ -198,6 +194,12 @@ class Asset(EnabledBeginEndWeightMixin, AssetBase):
                     self.end = make_aware(datetime.datetime.strptime(match.group("date"), "%Y%m%d%H%M"))
                 except ValueError:
                     logger.exception(f"Failed to parse end time from filename {self.original_filename}.")
+                else:
+                    self.original_filename = END_TIME_IN_ASSET_FILENAME_RE.sub("", self.original_filename)
+
+        self.name = (
+            self.name[:NAME_MAX_LENGTH].strip() or self.original_filename[:NAME_MAX_LENGTH].strip() or "Untitled"
+        )
 
     def is_eligible_to_air(self, now=None, with_reason=False):
         if self.status != self.Status.READY:
