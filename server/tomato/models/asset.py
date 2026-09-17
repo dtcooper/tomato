@@ -95,8 +95,8 @@ class AssetBase(TomatoModelBase):
             if config.PREVENT_DUPLICATE_ASSETS:
                 md5sum = force_check_against_md5sum or self.generate_md5sum()
                 querysets = {
-                    Asset: Asset.objects.filter(pre_process_md5sum=md5sum),
-                    AssetAlternate: AssetAlternate.objects.filter(pre_process_md5sum=md5sum),
+                    Asset: Asset.objects.filter(pre_process_md5sum=md5sum, archived=False),
+                    AssetAlternate: AssetAlternate.objects.filter(pre_process_md5sum=md5sum, asset__archived=False),
                 }
                 if self.id is not None:
                     querysets[self._meta.model] = querysets[self._meta.model].exclude(id=self.id)
@@ -113,8 +113,8 @@ class AssetBase(TomatoModelBase):
                     duplicates_html = format_html_join(", ", '<a href="{}">{}</a>', duplicates)
                     raise ValidationError({
                         "__all__": format_html(
-                            "An audio asset already exists with this audio file. Rejecting duplicate. You can turn this"
-                            " feature off with setting <code>PREVENT_DUPLICATES</code>. Existing: {}",
+                            "An unarchived audio asset already exists with this audio file. Rejecting duplicate. You"
+                            " can turn this feature off with setting <code>PREVENT_DUPLICATES</code>. Existing: {}",
                             duplicates_html,
                         ),
                         "file": format_html("A duplicate of this file already exists. Existing: {}", duplicates_html),

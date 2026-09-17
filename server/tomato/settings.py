@@ -447,8 +447,8 @@ CONSTANCE_CONFIG = {
     "PREVENT_DUPLICATE_ASSETS": (
         True,
         mark_safe(
-            "Prevent duplicate audio assets from being uploaded when <code>True</code>. If <code>False</code>, you may"
-            " have multiple audio assets with the same underlying audio file."
+            "Prevent duplicate (unarchived) audio assets from being uploaded when <code>True</code>. If"
+            " <code>False</code>, you may have multiple audio assets with the same underlying audio file."
         ),
     ),
     "AUDIO_BITRATE": (
